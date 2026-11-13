@@ -70,7 +70,11 @@ in the visual language of the paths (level colours, chunky 3D cards with a botto
 | D11 | Practice hub | The practice screen's activity list as colourful raised tiles with icons and short descriptions | Done (round 88): a full-width first tile (review or tricky words), the rest two per row, each tinted in its activity colour with a raised edge |
 | D12 | Speaking screen | The speak exercise: a big mic button with a pulse while listening, the sentence card and the result in the path's style | Done (round 89): raised sentence card; the mic as the main 92px raised button that turns coral with two expanding rings while listening; the speaker smaller beside it; labels under both; what was heard as a tinted chip |
 | D13 | Level sheet | The level picker sheet: each level as a card in its own colour with its ring | Done (round 90): each level a raised card in its colour with a progress ring, CEFR in the level colour; the current level framed and ticked in its colour |
-| D14 | Owl hero card | The owl header above the paths: softer bubble, chips aligned, one clear call to action | |
+| D14 | Owl hero card | The owl header above the paths: softer bubble, chips aligned, one clear call to action | Done (round 91): soft light spots on the card, a gently floating owl (off under Reduce Motion), a roomier bubble with a soft shadow, the call to action in gold (dark text 8:1) so it stands apart from the bubble; shorter rule-search placeholder that fits 320px |
+| D15 | Path nodes | Done lessons with a soft gold shine, the current node with a stronger ring, locked nodes calmer | |
+| D16 | Chest opening | The chest card and the moment it opens: a burst of confetti-coloured sparks and a bigger reward badge | |
+| D17 | Streak calendar | The week chart grows into a month view of practised days on the Progress screen (roadmap item 9) | |
+| D18 | Launch screen | The PWA splash and app icon background match the app's navy and owl | |
 
 ## Home: what it was for (until round 51)
 

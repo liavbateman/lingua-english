@@ -1472,3 +1472,17 @@ button.pc-form[aria-expanded="true"] .pc-more { transform: rotate(180deg); }
 .lvl-opt .lvl-check { background: var(--lv); color: #0b1430; }
 .lvl-opt .lv-ring { width: 54px; height: 54px; }
 .lvl-opt:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--lv-edge); }
+
+/* ---------- Owl hero card (design round D14) ---------- */
+.path-hero::before {   /* two soft spots of light for depth */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(40% 50% at 85% 10%, rgba(255, 255, 255, .16), transparent 70%),
+              radial-gradient(30% 40% at 10% 100%, rgba(120, 200, 255, .18), transparent 70%);
+}
+.path-hero > * { position: relative; }
+.ph-owl { animation: owlfloat 3.2s ease-in-out infinite; }
+@keyframes owlfloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.ph-say { padding: 10px 13px; border-radius: 16px; box-shadow: 0 4px 0 rgba(10, 30, 80, .25); }
+/* the one call to action: gold, so it stands apart from the white bubble (dark text 8:1) */
+.ph-go { background: #ffc53d; color: #4a3200; box-shadow: 0 4px 0 #c9921a; }
+.ph-go:active { box-shadow: 0 0 0 #c9921a; }

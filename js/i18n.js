@@ -2,7 +2,7 @@
 // To change a text, edit it here; {name} marks a value filled in by the app.
 const STR = {
   en: {
-    'gsearch.ph': 'Find a rule: past, would…', 'gsearch.none': 'No rule found for "{q}"', 'gsearch.one': '1 rule', 'gsearch.count': '{n} rules',
+    'gsearch.ph': 'Find a rule…', 'gsearch.none': 'No rule found for "{q}"', 'gsearch.one': '1 rule', 'gsearch.count': '{n} rules',
     'saved.practice': 'Practise my saved rules ({n})', 'saved.again': 'Another round', 'saved.perfect': 'All correct. These rules are getting solid!',
     'saved.keep': 'Good practice. Keep these rules saved and come back to them.',
     'saved.chip': 'My saved rules', 'saved.add': 'Save for review', 'saved.on': 'Saved · tap to remove',
@@ -149,7 +149,7 @@ const STR = {
   },
 
   he: {
-    'gsearch.ph': 'חיפוש כלל: עבר, would…', 'gsearch.none': 'לא נמצא כלל עבור "{q}"', 'gsearch.one': 'כלל אחד', 'gsearch.count': '{n} כללים',
+    'gsearch.ph': 'חיפוש כלל…', 'gsearch.none': 'לא נמצא כלל עבור "{q}"', 'gsearch.one': 'כלל אחד', 'gsearch.count': '{n} כללים',
     'saved.practice': 'לתרגל את השמורים ({n})', 'saved.again': 'עוד סבב', 'saved.perfect': 'הכול נכון. הכללים האלה כבר מתייצבים!',
     'saved.keep': 'תרגול טוב. כדאי להשאיר את הכללים שמורים ולחזור אליהם.',
     'saved.chip': 'הכללים השמורים שלי', 'saved.add': 'לשמור לחזרה', 'saved.on': 'נשמר · נגיעה להסרה',
