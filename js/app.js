@@ -551,6 +551,30 @@
       const complete = list.length > 0 && done === list.length;
       const reached = next ? at >= n + 1 : complete;
       const icon = complete ? '🎓' : next ? (reached ? '🚪' : '🔒') : '🏁';
+      if (complete) {
+        // A finished level: its gate becomes a framed certificate in the level's colour, with the date it was completed
+        Store.markLevelDone(prev.id);
+        const date = new Intl.DateTimeFormat(Store.lang, { day: 'numeric', month: 'long', year: 'numeric' }).format(Store.levelDoneAt(prev.id));
+        return `
+        <div class="pgate cert lv-${prev.id}${reached ? ' open' : ''} complete" data-lvl="${next ? next.id : 'end'}" role="heading" aria-level="2">
+          <div class="cert-frame">
+            <div class="cert-top">
+              <div class="lv-ring cert-ring" style="--p:100" aria-hidden="true"><b>🎓</b></div>
+              <div class="grow">
+                <span class="cert-kicker">${t('cert.kicker')} · <span class="en">${t('lvl.cefr.' + prev.id)}</span></span>
+                <b>${t('gate.done', { level: t('lv.' + prev.id) })}</b>
+                <span class="cert-meta">${t('cert.meta', { n: list.length, date })}</span>
+              </div>
+            </div>
+            <div class="cert-acts">
+              <a class="pgate-final" href="#/grammar/final-${prev.id}/quiz">🔁 ${t('gate.final')}</a>
+              ${navigator.share ? `<button class="cert-share" data-lvl="${prev.id}" data-n="${list.length}">${t('cert.share')}</button>` : ''}
+            </div>
+            ${next ? `<div class="cert-next">${t('gate.title', { level: t('lv.' + next.id) })} <small class="en">${t('lvl.cefr.' + next.id)}</small>
+              ${at === n + 1 ? `<span class="pgate-tag">${t('gate.mine')}</span>` : !reached ? `<button class="pgate-go" data-lvl="${next.id}">${t('gate.jump')}</button>` : ''}</div>` : ''}
+          </div>
+        </div>`;
+      }
       return `
         <div class="pgate${reached ? ' open' : ''}${complete ? ' complete' : ''}" data-lvl="${next ? next.id : 'end'}" role="heading" aria-level="2">
           <span class="pgate-icon" aria-hidden="true">${icon}</span>
@@ -1317,6 +1341,13 @@
       });
     };
     input.onkeydown = e => { if (e.key === 'Enter') input.blur(); };
+    // A certificate goes to the share sheet as a short message
+    view.querySelectorAll('.cert-share').forEach(b => {
+      b.onclick = e => {
+        e.stopPropagation();
+        navigator.share({ title: 'Lingua', text: t('cert.text', { level: t('lv.' + b.dataset.lvl), cefr: t('lvl.cefr.' + b.dataset.lvl), n: b.dataset.n }) }).catch(() => {});
+      };
+    });
     // Jumping ahead to a level: rules left behind stay open, and the road reopens at the new level
     view.querySelectorAll('.pgate-go').forEach(b => {
       b.onclick = e => {

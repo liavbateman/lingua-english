@@ -65,6 +65,9 @@ const Store = (() => {
     // Grammar rules whose practice was passed
     isGrammarDone: id => !!(state.grammar && state.grammar[id]),
     markGrammar(id) { state.grammar = state.grammar || {}; state.grammar[id] = true; save(); },
+    // When each level's grammar was first seen complete (the date on its certificate)
+    levelDoneAt: lvl => (state.lvdone && state.lvdone[lvl]) || 0,
+    markLevelDone(lvl) { state.lvdone = state.lvdone || {}; if (!state.lvdone[lvl]) { state.lvdone[lvl] = Date.now(); save(); } },
     // Rules with mistakes: every wrong answer adds one, every right answer in a rule review takes one off
     ruleMiss(id) { state.gmiss = state.gmiss || {}; state.gmiss[id] = (state.gmiss[id] || 0) + 1; save(); },
     ruleHit(id) {
