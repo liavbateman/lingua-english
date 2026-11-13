@@ -473,6 +473,42 @@ UNITS.push(
       { en: 'Thank you for your honesty; it means a lot.', he: 'תודה על הכנות, זה חשוב לי.' },
       { en: "Let's set up a follow-up meeting next week.", he: 'כדאי לקבוע פגישת המשך בשבוע הבא.' }
     ]
+  },
+
+  // ---------- Added in round 47 ----------
+  {
+    id: 'a-phr-persuading', level: 'advanced', kind: 'phrases', title: 'Persuading & justifying', he: 'לשכנע ולנמק', emoji: '💡',
+    words: [
+      { en: "The way I see it, we don't have much choice.", he: 'כפי שאני רואה את זה, אין לנו הרבה ברירה.' },
+      { en: "That's a fair point, but consider the cost.", he: 'זו נקודה הוגנת, אבל כדאי להתחשב בעלות.' },
+      { en: 'Let me explain why I think this matters.', he: 'אסביר למה לדעתי זה חשוב.' },
+      { en: 'The main reason is that it saves time.', he: 'הסיבה העיקרית היא שזה חוסך זמן.' },
+      { en: 'If we look at the numbers, the answer is clear.', he: 'אם מסתכלים על המספרים, התשובה ברורה.' },
+      { en: "It isn't perfect, but it's our best option.", he: 'זה לא מושלם, אבל זו האפשרות הכי טובה שלנו.' },
+      { en: 'What would it take to convince you?', he: 'מה יידרש כדי לשכנע אותך?' },
+      { en: "Think about it from the customer's point of view.", he: 'כדאי לחשוב על זה מנקודת המבט של הלקוח.' },
+      { en: "There's plenty of evidence to support this.", he: 'יש הרבה ראיות שתומכות בזה.' },
+      { en: 'In the long run, this will pay off.', he: 'בטווח הארוך, זה ישתלם.' },
+      { en: "I'd be happy to hear any counterarguments.", he: 'אשמח לשמוע טיעונים נגדיים.' },
+      { en: 'So, are we agreed on the next step?', he: 'אז מסכימים על הצעד הבא?' }
+    ]
+  },
+  {
+    id: 'a-phr-workchat', level: 'advanced', kind: 'phrases', title: 'Small talk at work', he: 'שיחות קלילות בעבודה', emoji: '☕',
+    words: [
+      { en: 'How was your weekend?', he: 'איך היה סוף השבוע?' },
+      { en: 'Did you do anything fun?', he: 'עשית משהו כיף?' },
+      { en: "It's been a busy week, hasn't it?", he: 'היה שבוע עמוס, נכון?' },
+      { en: 'Are you working on anything interesting at the moment?', he: 'יש עכשיו פרויקט מעניין על השולחן שלך?' },
+      { en: 'I hear the marketing team is growing.', he: 'שמעתי שצוות השיווק גדל.' },
+      { en: 'Do you fancy a coffee?', he: 'בא לך קפה?' },
+      { en: 'Any plans for the holidays?', he: 'יש תוכניות לחגים?' },
+      { en: 'That sounds exciting!', he: 'זה נשמע מרגש!' },
+      { en: 'When did you join the company?', he: 'מתי הצטרפת לחברה?' },
+      { en: "Let's grab lunch together sometime.", he: 'בואו נאכל ארוחת צהריים ביחד מתישהו.' },
+      { en: 'Have a good evening, see you tomorrow!', he: 'ערב טוב, נתראה מחר!' },
+      { en: 'Thanks for your help today; it made a real difference.', he: 'תודה על העזרה היום, זה ממש עזר.' }
+    ]
   }
 );
 
