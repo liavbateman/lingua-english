@@ -302,6 +302,36 @@ UNITS.push(
       { en: 'Do you have anything earlier?', he: 'יש לכם משהו מוקדם יותר?' },
       { en: 'I am afraid I need to change my appointment.', he: 'לצערי אני צריך לשנות את התור שלי.' }
     ]
+  },
+  {
+    id: 'i-phr-restaurant', level: 'intermediate', kind: 'phrases', title: 'At a restaurant', he: 'במסעדה', emoji: '🍝',
+    words: [
+      { en: 'A table for two, please.', he: 'שולחן לשניים, בבקשה.' },
+      { en: 'Could we see the menu, please?', he: 'אפשר לראות את התפריט, בבקשה?' },
+      { en: 'What do you recommend?', he: 'מה אתה ממליץ?' },
+      { en: 'I am allergic to nuts. Is there anything with nuts in this dish?', he: 'יש לי אלרגיה לאגוזים. יש משהו עם אגוזים במנה הזאת?' },
+      { en: "I'll have the chicken salad, please.", he: 'אני אקח את סלט העוף, בבקשה.' },
+      { en: 'Could I have it without onions?', he: 'אפשר לקבל את זה בלי בצל?' },
+      { en: 'Excuse me, this is not what I ordered.', he: 'סליחה, זה לא מה שהזמנתי.' },
+      { en: 'Could we have the bill, please?', he: 'אפשר לקבל את החשבון, בבקשה?' },
+      { en: 'Can we pay separately?', he: 'אפשר לשלם בנפרד?' },
+      { en: 'Everything was delicious, thank you.', he: 'הכול היה טעים מאוד, תודה.' }
+    ]
+  },
+  {
+    id: 'i-phr-shop', level: 'intermediate', kind: 'phrases', title: 'In a shop', he: 'בחנות', emoji: '🏷️',
+    words: [
+      { en: "I'm just looking, thanks.", he: 'אני רק מסתכל, תודה.' },
+      { en: 'Do you have this in a smaller size?', he: 'יש לכם את זה במידה קטנה יותר?' },
+      { en: 'Where are the fitting rooms?', he: 'איפה תאי המדידה?' },
+      { en: 'How much is this jacket?', he: 'כמה עולה המעיל הזה?' },
+      { en: 'Is this on sale?', he: 'זה במבצע?' },
+      { en: 'Can I pay by card?', he: 'אפשר לשלם בכרטיס אשראי?' },
+      { en: 'Could I have a bag, please?', he: 'אפשר לקבל שקית, בבקשה?' },
+      { en: "I'd like to return this. It doesn't fit.", he: 'אני רוצה להחזיר את זה. זה לא מתאים לי במידה.' },
+      { en: 'Here is the receipt.', he: 'הנה הקבלה.' },
+      { en: 'Can I get a refund, or only a credit note?', he: 'אפשר לקבל החזר כספי, או רק זיכוי?' }
+    ]
   }
 );
 
