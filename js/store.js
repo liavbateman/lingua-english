@@ -132,17 +132,18 @@ const Store = (() => {
     // Learned words whose review time has come
     dueWords: () => ALL_WORDS.filter(w => state.words[w.id] && state.words[w.id].due <= Date.now()),
 
-    // The last 7 days, oldest first: [{ date, count, today }]
-    week() {
+    // The last n days, oldest first: [{ date, count, today }] (history is kept for 60 days)
+    days(len) {
       const h = state.history || {};
-      return Array.from({ length: 7 }, (_, n) => {
-        const date = new Date(Date.now() - (6 - n) * DAY);
+      return Array.from({ length: len }, (_, n) => {
+        const date = new Date(Date.now() - (len - 1 - n) * DAY);
         let count = h[dayKey(date)] || 0;
         // answers given today before this chart existed are already in the daily counter
-        if (n === 6 && state.daily.date === dayKey()) count = Math.max(count, state.daily.count || 0);
-        return { date, count, today: n === 6 };
+        if (n === len - 1 && state.daily.date === dayKey()) count = Math.max(count, state.daily.count || 0);
+        return { date, count, today: n === len - 1 };
       });
     },
+    week() { return this.days(7); },
 
     // Tricky words: missed at least twice and not yet learned. Once learned they leave the list.
     trickyWords: () => ALL_WORDS.filter(w => {

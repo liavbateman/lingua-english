@@ -1523,3 +1523,18 @@ button.pc-form[aria-expanded="true"] .pc-more { transform: rotate(180deg); }
 }
 .chest-coin { font-size: 1.5rem; line-height: 1; }
 .chest-xp { font-size: clamp(1.15rem, 5.4vw, 1.6rem); white-space: nowrap; max-width: 100%; }
+
+/* ---------- Streak calendar (design round D17) ---------- */
+.month { margin-top: 10px; border: 0; box-shadow: 0 4px 0 rgba(0, 0, 0, .35); }
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 12px; }
+.cal-wd { text-align: center; font-size: .75rem; font-weight: 800; color: var(--muted); padding-bottom: 2px; }
+.cal-d {
+  display: grid; place-items: center; aspect-ratio: 1; border-radius: 9px; font-size: .78rem; font-weight: 700;
+  color: #9aa1cf; background: rgba(255, 255, 255, .05);
+}
+.cal-d.l1 { background: rgba(47, 208, 147, .3); color: #e8fff5; }
+.cal-d.l2 { background: rgba(47, 208, 147, .58); color: #fff; }
+.cal-d.l3 { background: #2fd093; color: #06301f; }
+.cal-d.now { box-shadow: 0 0 0 2px #ffb199; }
+.cal-key { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 10px; }
+.cal-key .cal-d { width: 14px; height: 14px; border-radius: 4px; aspect-ratio: auto; }

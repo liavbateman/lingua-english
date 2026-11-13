@@ -23,7 +23,7 @@ borrowing proven patterns from leading language apps, and adapts them to a Hebre
 | P9 | Path: lesson preview | The lesson card shows what's inside: first words (all of them, with a check on mastered ones, for a done lesson), first sentences, or a rule's example | Memrise course preview | Done (round 46) |
 | 7 | Owl reactions | The owl mascot reacts in feedback, empty states and celebrations | Duolingo | |
 | 8 | First-run setup | Three short screens: level, daily goal, reminder time | Babbel, Busuu | |
-| 9 | Streak calendar | A month view of practiced days on the Progress screen | Duolingo | |
+| 9 | Streak calendar | A month view of practiced days on the Progress screen | Duolingo | Done (round 94, design item D17) |
 
 ## Grammar tab (round 51)
 
@@ -73,7 +73,7 @@ in the visual language of the paths (level colours, chunky 3D cards with a botto
 | D14 | Owl hero card | The owl header above the paths: softer bubble, chips aligned, one clear call to action | Done (round 91): soft light spots on the card, a gently floating owl (off under Reduce Motion), a roomier bubble with a soft shadow, the call to action in gold (dark text 8:1) so it stands apart from the bubble; shorter rule-search placeholder that fits 320px |
 | D15 | Path nodes | Done lessons with a soft gold shine, the current node with a stronger ring, locked nodes calmer | Done (round 92): a gloss highlight on done, current and open nodes plus a soft gold glow on done ones; the current node has a thicker ring and a coral glow; locked nodes darker and quieter |
 | D16 | Chest opening | The chest card and the moment it opens: a burst of confetti-coloured sparks and a bigger reward badge | Done (round 93): 14 coloured sparks burst from the chest (removed after the animation); the points as a big pill badge with a star, one line even at 320px |
-| D17 | Streak calendar | The week chart grows into a month view of practised days on the Progress screen (roadmap item 9) | |
+| D17 | Streak calendar | The week chart grows into a month view of practised days on the Progress screen (roadmap item 9) | Done (round 94): a 5-week calendar under the week chart, laid out by weekday; days tinted in four steps by answers, today ringed, active days and longest run in the header, a less/more key |
 | D18 | Launch screen | The PWA splash and app icon background match the app's navy and owl | |
 
 ## Home: what it was for (until round 51)

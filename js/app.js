@@ -2046,6 +2046,7 @@
         <div class="card stat st-best"><span class="st-ico" aria-hidden="true">🏆</span><b>${Store.best}</b><span class="small">${t('progress.best')}</span></div>
       </div>
       ${weekCard()}
+      ${monthCard()}
       ${LEVELS.map(levelCard).join('')}
       <div class="card backup">
         <b>💾 ${t('backup.title')}</b>
@@ -2099,6 +2100,35 @@
     $('#reset').onclick = () => {
       if (confirm(t('progress.confirm'))) { Store.reset(); route(); }
     };
+  }
+
+  // The last 5 weeks as a calendar: a day is tinted by how much was practised, today is ringed,
+  // and the header counts active days and the longest run (as streak calendars do)
+  function monthCard() {
+    const days = Store.days(35);
+    const pad = days[0].date.getDay();                      // first column is Sunday
+    const level = c => (c === 0 ? 0 : c < 10 ? 1 : c < 25 ? 2 : 3);
+    let run = 0, best = 0;
+    days.forEach(d => { run = d.count ? run + 1 : 0; best = Math.max(best, run); });
+    const active = days.filter(d => d.count).length;
+    const narrow = new Intl.DateTimeFormat(Store.lang, { weekday: 'narrow' });
+    const long = new Intl.DateTimeFormat(Store.lang, { day: 'numeric', month: 'long' });
+    const sun = new Date(2024, 0, 7);                       // a Sunday, for the weekday letters
+    const said = d => t(d.count === 1 ? 'week.answer.one' : 'week.answers', { n: d.count });
+    return `
+      <div class="card month">
+        <div class="week-head">
+          <b>${t('month.title')}</b>
+          <span class="small">${t('month.sub', { a: active, b: best })}</span>
+        </div>
+        <div class="cal" role="list">
+          ${Array.from({ length: 7 }, (_, k) => `<span class="cal-wd" aria-hidden="true">${narrow.format(new Date(sun.getTime() + k * 864e5))}</span>`).join('')}
+          ${Array.from({ length: pad }, () => '<span class="cal-pad" aria-hidden="true"></span>').join('')}
+          ${days.map(d => `<span class="cal-d l${level(d.count)}${d.today ? ' now' : ''}" role="listitem"
+              aria-label="${long.format(d.date)}: ${said(d)}" title="${long.format(d.date)}: ${said(d)}">${d.date.getDate()}</span>`).join('')}
+        </div>
+        <div class="cal-key small" aria-hidden="true">${t('month.less')} <i class="cal-d l0"></i><i class="cal-d l1"></i><i class="cal-d l2"></i><i class="cal-d l3"></i> ${t('month.more')}</div>
+      </div>`;
   }
 
   // Answers per day for the last week: one hue, thin bars on a baseline, today labelled
