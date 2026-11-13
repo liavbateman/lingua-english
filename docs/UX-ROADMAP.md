@@ -11,6 +11,7 @@ borrowing proven patterns from leading language apps, and adapts them to a Hebre
 | 4 | Combo and lesson-end stats | "3 in a row!" while answering; the end screen shows accuracy, points and time as tiles that count up | Duolingo, Busuu | Done (round 26) |
 | 5 | Flashcards that flip and swipe | 3D flip animation; swipe right for "I know it" and left for "Again" | Drops, Memrise, Anki | Done (round 27) |
 | 6 | One "Continue" on Home | The Home screen leads with one big card for the next best step; secondary items move down | Babbel, Duolingo | Done (round 28); moving the rest down waits on the 4-tab decision |
+| 6b | Lesson path | Words, sentences and grammar each shown as a winding road of round lessons: done (gold, check), current (coral, "Start" bubble, progress ring), started, locked (with a "open anyway" option); jump-back button; level chips above | Duolingo, user's reference app | Done (round 29) |
 | 7 | Owl reactions | The owl mascot reacts in feedback, empty states and celebrations | Duolingo | |
 | 8 | First-run setup | Three short screens: level, daily goal, reminder time | Babbel, Busuu | |
 | 9 | Streak calendar | A month view of practiced days on the Progress screen | Duolingo | |

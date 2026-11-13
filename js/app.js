@@ -30,6 +30,8 @@
     target: svg('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>'),
     search: svg('<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20"/>'),
     cross: svg('<path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke-width="3"/>'),
+    lock: svg('<rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="currentColor" stroke="none"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" stroke-width="2.4"/>'),
+    arrowUp: svg('<path d="M12 19V5M5.5 11.5 12 5l6.5 6.5" stroke-width="2.6"/>'),
     calendar: svg('<rect x="3.500" y="5" width="17" height="15.500" rx="3"/><path d="M3.500 10h17M8 3v4M16 3v4"/>')
   };
 
@@ -402,18 +404,142 @@
       }).join('');
   }
 
+
+  // ---------- Lesson path (as in Duolingo): each part of the course is a winding road of lessons ----------
+  // done = gold with a check, current = big coral node with a "Start" bubble, started = purple,
+  // locked = grey with a lock. A locked lesson can still be opened after a short warning.
+  const PATH_ROW = 132;
+  const PATH_SWAY = [0, .55, .82, .55, 0, -.55, -.82, -.55];
+  let pathItems = [];
+
+  function pathFor(part) {
+    let items;
+    if (part === 'grammar') {
+      items = levelGrammar().map((g, n) => {
+        const done = Store.isGrammarDone(g.id);
+        return { href: `#/grammar/${g.id}`, face: `<b class="pnum">${n + 1}</b>`, label: ruleTitle(g),
+          plain: (isHe() ? g.he : g.title), done, started: done, pct: done ? 100 : 0 };
+      });
+    } else {
+      items = levelUnits().filter(u => (u.kind === 'phrases') === (part === 'phrases')).map(u => {
+        const p = Store.unitProgress(u);
+        return { href: `#/unit/${u.id}`, face: u.emoji, label: unitTitle(u), plain: unitTitle(u),
+          done: p.total > 0 && p.mastered / p.total >= 0.6, started: p.seen > 0, pct: p.pct };
+      });
+    }
+    const cur = items.findIndex(x => !x.done);
+    items.forEach((x, i) => {
+      x.state = x.done ? 'done' : i === cur ? 'current' : (x.started || i < cur) ? 'open' : 'locked';
+    });
+    items.cur = cur;
+    return items;
+  }
+
+  function pathHtml(items) {
+    const doneCount = items.filter(x => x.done).length;
+    return `
+      <div class="path-head"><span>${levelLabel()}</span><small>${t('path.count', { a: doneCount, b: items.length })}</small></div>
+      <div class="path" id="path" style="height:${items.length * PATH_ROW + 90}px">
+        <svg class="path-line" id="pathline" aria-hidden="true"></svg>
+        ${items.map((x, i) => `
+          <div class="pnode-wrap" data-i="${i}">
+            ${x.state === 'current' ? `<span class="pbubble">${t(x.started ? 'path.continue' : 'path.start')}</span>` : ''}
+            <button class="pnode ${x.state}" data-i="${i}" style="--pct:${x.pct}"
+              aria-label="${x.plain.replace(/"/g, '')} · ${t('path.state.' + x.state)}">
+              <span class="pnode-face">${x.face}</span>
+              ${x.state === 'locked' ? `<span class="pbadge lock">${ICON.lock}</span>` : x.state === 'done' ? `<span class="pbadge ok">${ICON.check}</span>` : ''}
+            </button>
+            <span class="plabel">${x.label}</span>
+          </div>`).join('')}
+      </div>
+      <button class="path-jump" id="pathjump" hidden aria-label="${t('path.jump')}">${ICON.arrowUp}</button>`;
+  }
+
+  // Positions depend on the screen width, so they are set after drawing (and again on rotate/resize)
+  function layoutPath() {
+    const path = document.getElementById('path');
+    if (!path) return;
+    const W = path.clientWidth, half = Math.max(0, W / 2 - 64);
+    const pts = [];
+    path.querySelectorAll('.pnode-wrap').forEach((el, i) => {
+      // extra room above the current lesson for its "Start" bubble
+      const gap = pathItems.cur >= 0 && i >= pathItems.cur ? 30 : 0;
+      const x = W / 2 + PATH_SWAY[i % PATH_SWAY.length] * half, y = 56 + i * PATH_ROW + gap;
+      el.style.left = (x - 66) + 'px';
+      el.style.top = y + 'px';
+      pts.push([x, y + 38]);
+    });
+    const curve = list => list.map(([x, y], i) => {
+      if (!i) return `M${x} ${y}`;
+      const [px, py] = list[i - 1], my = (py + y) / 2;
+      return `C${px} ${my} ${x} ${my} ${x} ${y}`;
+    }).join(' ');
+    const reach = pathItems.cur < 0 ? pts.length : pathItems.cur + 1;
+    const svg = document.getElementById('pathline');
+    svg.setAttribute('viewBox', `0 0 ${W} ${path.clientHeight}`);
+    svg.innerHTML = `<path class="pl-base" d="${curve(pts)}"/>` + (reach > 1 ? `<path class="pl-done" d="${curve(pts.slice(0, reach))}"/>` : '');
+  }
+
+  function bindPath(items) {
+    pathItems = items;
+    layoutPath();
+    const path = document.getElementById('path');
+    path.querySelectorAll('.pnode').forEach(b => {
+      b.onclick = () => {
+        const x = items[+b.dataset.i];
+        if (x.state !== 'locked') { location.hash = x.href; return; }
+        const cur = items[items.cur];
+        sheet({
+          title: t('path.locked.title'), text: t('path.locked.text', { title: cur.plain }),
+          primary: t('path.locked.go'), onPrimary: () => { location.hash = cur.href; },
+          secondary: t('path.locked.anyway'), onSecondary: () => { location.hash = x.href; }
+        });
+      };
+    });
+    // Open where the learner is: the current lesson in the middle of the screen
+    const curEl = items.cur >= 0 && path.querySelector(`.pnode-wrap[data-i="${items.cur}"]`);
+    const jump = document.getElementById('pathjump');
+    if (!curEl) return;
+    const toCurrent = smooth => curEl.scrollIntoView({ block: 'center', behavior: smooth ? 'smooth' : 'auto' });
+    if (items.cur > 1) toCurrent(false);
+    jump.onclick = () => toCurrent(true);
+    // The "back to my lesson" button shows only while the current lesson is off screen, pointing to it
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([e]) => {
+        jump.hidden = e.isIntersecting;
+        jump.classList.toggle('down', !e.isIntersecting && e.boundingClientRect.top > 0);
+      }, { root: view }).observe(curEl.querySelector('.pnode'));
+    }
+  }
+  window.addEventListener('resize', () => layoutPath());
+
+  // The level can be changed right here, above the path
+  function levelSeg() {
+    return `<div class="seg level-seg" role="group" aria-label="${t('home.level')}">
+      ${LEVELS.map(l => `<button data-level="${l.id}" class="${l.id === Store.level ? 'on' : ''}" aria-pressed="${l.id === Store.level}">${t('lv.' + l.id)}</button>`).join('')}
+    </div>`;
+  }
+  function bindLevelSeg(redraw) {
+    view.querySelectorAll('.level-seg button').forEach(b => {
+      b.onclick = () => { Store.level = b.dataset.level; redraw(); };
+    });
+  }
+
   function learn() {
+    const items = pathFor('vocab');
     view.innerHTML = `
       <h1>${t('learn.title')}</h1>
-      <p class="sub">${t('learn.sub', { level: levelLabel() })}</p>
       ${learnTabs('vocab')}
+      ${levelSeg()}
       <div class="search">
         ${ICON.search}
         <input id="search" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
           placeholder="${t('search.ph')}" aria-label="${t('search.ph')}">
       </div>
-      <div id="units">${levelUnits().filter(u => u.kind !== 'phrases').map(unitCard).join('')}</div>
+      <div id="units">${pathHtml(items)}</div>
       <div id="results" hidden></div>`;
+    bindPath(items);
+    bindLevelSeg(learn);
     const input = $('#search'), units = $('#units'), results = $('#results');
     // Only the results area is redrawn while typing, so the keyboard stays open
     input.oninput = () => {
@@ -430,27 +556,26 @@
 
   // Useful full sentences, grouped by situation
   function phrases() {
+    const items = pathFor('phrases');
     view.innerHTML = `
       <h1>${t('learn.title')}</h1>
-      <p class="sub">${t('learn.phrases.sub', { level: levelLabel() })}</p>
       ${learnTabs('phrases')}
-      ${levelUnits().filter(u => u.kind === 'phrases').map(unitCard).join('')}`;
+      ${levelSeg()}
+      ${pathHtml(items)}`;
+    bindPath(items);
+    bindLevelSeg(phrases);
   }
 
   // ---------- Grammar ----------
   function grammarList() {
-    const list = levelGrammar();
-    const doneCount = list.filter(g => Store.isGrammarDone(g.id)).length;
+    const items = pathFor('grammar');
     view.innerHTML = `
       <h1>${t('learn.title')}</h1>
-      <p class="sub">${t('grammar.sub', { level: levelLabel(), a: doneCount, b: list.length })}</p>
       ${learnTabs('grammar')}
-      ${list.map((g, n) => `
-        <a class="task" href="#/grammar/${g.id}">
-          <span class="tile dim num">${n + 1}</span>
-          <span class="grow"><b>${ruleTitle(g)}</b><span class="small">${ruleOther(g)}</span></span>
-          <span class="check ${Store.isGrammarDone(g.id) ? 'done' : ''}">${Store.isGrammarDone(g.id) ? ICON.check : ''}</span>
-        </a>`).join('')}`;
+      ${levelSeg()}
+      ${pathHtml(items)}`;
+    bindPath(items);
+    bindLevelSeg(grammarList);
   }
 
   function grammarTopic(id) {
@@ -1277,7 +1402,7 @@
   }
 
   // A bottom sheet: the question, one main answer under the thumb, and a quiet second one
-  function sheet({ title, text, primary, secondary, onSecondary }) {
+  function sheet({ title, text, primary, secondary, onSecondary, onPrimary }) {
     const back = document.createElement('div');
     back.className = 'sheet-back';
     back.innerHTML = `
@@ -1290,7 +1415,7 @@
     const close = () => { back.classList.add('out'); setTimeout(() => back.remove(), 200); document.removeEventListener('keydown', key); };
     const key = e => { if (e.key === 'Escape') close(); };
     back.onclick = e => { if (e.target === back) close(); };
-    back.querySelector('#sheet-primary').onclick = close;
+    back.querySelector('#sheet-primary').onclick = () => { close(); if (onPrimary) onPrimary(); };
     back.querySelector('#sheet-secondary').onclick = () => { close(); onSecondary(); };
     document.addEventListener('keydown', key);
     document.body.appendChild(back);
