@@ -42,6 +42,7 @@ Home's screen (H1, H2 below) is no longer shown; its code stays, in case the dai
 | G5 | Rule search | A search box above the road (Hebrew or English: names, structures, examples); a result goes back to the road on that rule with its card open | Babbel, Busuu grammar reference | Done (round 59) |
 | G6 | Level check at the gate | "Jump here" offers a 6-question check (one question from each of 6 rules of the level before); 5 right moves the learner up, misses go to the review stop; moving without it stays possible | Duolingo jump-ahead test | Done (round 61) |
 | G7 | Mini-map by level | The grammar road's sticky map groups its stages by level, with each level's name and done count above its group; the name jumps to that level's gate; the current level is highlighted | Duolingo course overview | Done (round 63) |
+| G8 | Hear the example | A speaker next to the rule's example in its card (and in a finished rule's cheat sheet), without opening the lesson | Duolingo, Busuu audio examples | Done (round 65) |
 
 ## Home: what it was for (until round 51)
 

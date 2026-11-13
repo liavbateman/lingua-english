@@ -1145,3 +1145,11 @@ button.path-head:active span { background: rgba(142, 125, 255, .22); }
 .minimap.grouped .mm-seg { height: 30px; }
 .minimap.grouped .mm-bar { height: 16px; }
 .minimap.grouped .mm-seg span { display: none; }
+
+/* Rule cards: the example sits next to a speaker */
+.pc-ex { display: flex; align-items: center; gap: 8px; }
+.pc-ex .grow { display: grid; gap: 4px; min-width: 0; }
+.pc-say { width: 40px; height: 40px; flex: none; background: rgba(255, 255, 255, .9); color: #5546e0; }
+.pc-say svg { width: 20px; height: 20px; }
+.pcard.done .pc-say { color: #8a5a00; }
+.pcard.locked .pc-say { background: rgba(255, 255, 255, .14); color: #fff; }

@@ -576,16 +576,19 @@
 
   // What is inside a lesson, shown in its card: the first words (a check on the ones already
   // mastered), the first sentences of a sentence lesson, or a rule's first example
+  const sayBtn = text => `<button class="speak sm pc-say" data-say="${text.replace(/"/g, '&quot;')}" aria-label="${t('aria.listen')}">${ICON.speaker}</button>`;
+  const exampleRow = ex => `<div class="pc-ex">${sayBtn(ex[0])}<div class="grow"><b class="en" dir="ltr">${ex[0]}</b><span>${ex[1]}</span></div></div>`;
   function lessonPreview(x) {
     if (x.rule && x.state === 'done') {
       const g = x.rule;
       return `<div class="pc-cheat">
           <span class="pc-cheat-h">👑 ${t('cheat.title')}</span>
           ${g.forms.map(([tag, text]) => `<div class="pc-form"><span class="pc-tag">${formTag(tag)}</span><span class="en" dir="ltr">${text}</span></div>`).join('')}
+          ${exampleRow(g.ex[0])}
           <p class="pc-tip">⚠️ ${heMix(g.tip)}</p>
         </div>`;
     }
-    if (x.example) return `<div class="pc-ex"><b class="en" dir="ltr">${x.example[0]}</b><span>${x.example[1]}</span></div>`;
+    if (x.example) return exampleRow(x.example);
     if (!x.words) return '';
     if (x.words[0].phrase) {
       return `<div class="pc-lines">${x.words.slice(0, 2).map(w => `<span class="en" dir="ltr">${w.en}</span>`).join('')}
@@ -830,7 +833,7 @@
     const openCard = i => {
       const x = items[i], cur = items[items.cur];
       const wrap = path.querySelector(`.pnode-wrap[data-i="${i}"]`);
-      placeCard(wrap, 96, x.state, x.plain, x.state === 'locked' ? `
+      const card = placeCard(wrap, 96, x.state, x.plain, x.state === 'locked' ? `
           <b>${x.label}</b>
           <p>${t('path.locked.text', { title: cur ? cur.plain : '' })}</p>
           ${cur ? `<a class="btn" href="${cur.href}">${t('path.locked.go')}</a>` : ''}
@@ -841,6 +844,7 @@
           ${lessonPreview(x)}
           <a class="btn" href="${x.state === 'done' ? x.review : x.href}">${t(x.state === 'done' ? 'path.review' : x.started ? 'path.continue' : 'path.start')}</a>
           ${x.state === 'done' ? `<a class="pcard-link" href="${x.href}">${t('path.again')}</a>` : ''}`, i);
+      card.querySelectorAll('.pc-say').forEach(b => { b.onclick = e => { e.stopPropagation(); speak(b.dataset.say.replace(/"/g, "")); }; });
       path.querySelector(`.pnode[data-i="${i}"]`).setAttribute('aria-expanded', 'true');
     };
     // Chests: locked explains what is left, ready opens with a celebration and points, opened says so
