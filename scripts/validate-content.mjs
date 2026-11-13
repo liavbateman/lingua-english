@@ -101,6 +101,29 @@ for (const g of GRAMMAR) {
   }
 }
 
+// ---------- explanations: every grammar question says why its answer is right and why each wrong option is wrong ----------
+const explainFiles = ['js/explain.js', 'js/explain-beginner.js', 'js/explain-intermediate.js', 'js/explain-advanced.js'];
+for (const f of explainFiles) {
+  const p = path.join(root, f);
+  if (!fs.existsSync(p)) { errors.push(`${f}: missing`); continue; }
+  try { vm.runInContext(fs.readFileSync(p, 'utf8'), ctx, { filename: f }); loaded.push(f); }
+  catch (e) { errors.push(`${f}: does not run: ${e.message}`); }
+}
+const EXPLAIN = vm.runInContext('typeof EXPLAIN === "undefined" ? {} : EXPLAIN', ctx);
+for (const g of GRAMMAR) {
+  const e = EXPLAIN[g.id];
+  if (!Array.isArray(e) || e.length !== (g.quiz || []).length) { errors.push(`explain "${g.id}": needs one explanation per quiz question`); continue; }
+  g.quiz.forEach((q, i) => {
+    const x = e[i] || {};
+    if (!hasHe(x.ok)) errors.push(`explain "${g.id}" #${i + 1}: missing a Hebrew "ok" (why the answer is right)`);
+    const keys = Object.keys(x.no || {});
+    for (const w of q[2]) if (!hasHe((x.no || {})[w])) errors.push(`explain "${g.id}" #${i + 1}: no explanation for the wrong option "${w}"`);
+    for (const k of keys) if (!q[2].includes(k)) errors.push(`explain "${g.id}" #${i + 1}: "${k}" is not one of the wrong options`);
+    for (const txt of [x.ok, ...Object.values(x.no || {})]) if (/[—–]/.test(txt || '')) errors.push(`explain "${g.id}" #${i + 1}: uses a dash (— or –)`);
+  });
+}
+for (const id of Object.keys(EXPLAIN)) if (!GRAMMAR.some(g => g.id === id)) errors.push(`explain "${id}": no grammar rule with this id`);
+
 // ---------- report ----------
 console.log('Loaded:', loaded.join(', '));
 for (const lv of levels) {

@@ -1757,3 +1757,21 @@ body[data-lv="advanced"] .lb-track i { background: linear-gradient(90deg, #8e7cf
   mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
 }
 .ph-goal-done { background: rgba(47, 208, 147, .35); }
+
+/* ---------- "Why?" under every answer: why the pick is wrong, why the answer is right ---------- */
+body.in-lesson .view.has-fb { padding-bottom: calc(var(--fb-h, 230px) + 24px + env(safe-area-inset-bottom)); }
+.fb { max-height: 78vh; max-height: 78dvh; overflow-y: auto; overscroll-behavior: contain; }
+.fb-why { display: grid; gap: 8px; margin-top: 12px; padding: 10px 12px; border-radius: 14px; background: rgba(0, 0, 0, .25); }
+.fb-why-h { font-size: .9rem; color: var(--ink); }
+.why-row { display: grid; gap: 3px; padding-inline-start: 10px; border-inline-start: 3px solid var(--good); }
+.why-row.no { border-inline-start-color: var(--bad); }
+.why-tag { font-size: .78rem; font-weight: 800; color: #8ff0c8; }
+.why-row.no .why-tag { color: #ffb3bb; }
+.why-tag .en, .why-row p .en { unicode-bidi: isolate; }
+.why-row p { margin: 0; font-size: .92rem; line-height: 1.5; color: var(--ink); }
+
+.pc-why { display: grid; gap: 6px; position: relative; }
+.pc-why p { margin: 0; padding: 6px 8px; border-radius: 10px; background: rgba(255, 255, 255, .5); font-size: .82rem; line-height: 1.45; }
+.pc-why b .en { unicode-bidi: isolate; }
+.why-line { display: block; margin-top: 3px; }
+.why-line.en { font-weight: 700; text-align: left; }

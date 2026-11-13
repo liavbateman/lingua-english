@@ -947,7 +947,9 @@
       const quickGo = card.querySelector('.pc-quick-go'), quick = card.querySelector('.pc-quick');
       if (quickGo && quick) {
         const ask = () => {
-          const [q, ans, wrong] = x.rule.quiz[Math.floor(Math.random() * x.rule.quiz.length)];
+          const qi = Math.floor(Math.random() * x.rule.quiz.length);
+          const [q, ans, wrong] = x.rule.quiz[qi];
+          const ex = (EXPLAIN[x.rule.id] || [])[qi];
           quick.hidden = false;
           quick.innerHTML = `
             <p class="pc-q en" dir="ltr">${q.replace('___', '_____')}</p>
@@ -962,6 +964,9 @@
               quick.querySelector('.pc-q').textContent = q.replace('___', ans);
               quick.querySelector('.pc-q-msg').innerHTML = `<span>${ok ? '✓ ' + t('quick.right') : '✗ ' + t('quick.wrong', { a: ans })}</span>
                 <button class="pc-quick-more">${t('quick.more')}</button>`;
+              if (ex) quick.querySelector('.pc-q-msg').insertAdjacentHTML('afterend', `<div class="pc-why">
+                ${ok ? '' : `<p><b>✗ <span class="en" dir="ltr">${esc(b.textContent)}</span>:</b> ${heMix(ex.no[b.textContent] || '')}</p>`}
+                <p><b>✓ <span class="en" dir="ltr">${esc(ans)}</span>:</b> ${heMix(ex.ok)}</p></div>`);
               quick.querySelector('.pc-quick-more').onclick = ev => { ev.stopPropagation(); ask(); };
             };
           });
@@ -1492,7 +1497,9 @@
           const full = q.replace('___', answer);
           $('#sentence').innerHTML = q.replace('___', `<mark class="gq-ans">${answer}</mark>`);
           speak(full.replace(/"/g, ''));
-          showFeedback({ ok, answer: ok ? '' : full, mark: answer, say: full.replace(/"/g, ''), combo: streak });
+          const ex = (EXPLAIN[rule.id] || [])[rule.quiz.indexOf(qs[i].q)];
+          const why = ex ? whyHtml({ picked: btn.textContent, pickedWhy: ok ? '' : heMix(ex.no[btn.textContent] || ''), answer, answerWhy: heMix(ex.ok) }) : '';
+          showFeedback({ ok, answer: ok ? '' : full, mark: answer, say: full.replace(/"/g, ''), combo: streak, why });
       });
       $('#next').onclick = () => { i++; i < qs.length ? question() : (review ? reviewSummary() : saved ? savedSummary() : final ? finalSummary() : test ? testSummary() : summary()); };
     }
@@ -1910,8 +1917,45 @@
       if (sp) sp.onclick = () => speak(w.en);
       speak(w.en);   // every new question starts with the sound of the word
 
+      // Why, from the word data: what the picked word really means, and what the answer means (with its example)
+      function wordWhy(ok, picked, typed) {
+        // a word: "X means Y"; a whole sentence: the English and its Hebrew on two lines
+        const means = x => x.phrase
+          ? `<span class="why-line en" dir="ltr">${x.en}</span><span class="why-line" dir="rtl">"${x.he}"</span>`
+          : t('v.means', { en: `<b class="en" dir="ltr">${x.en}</b>`, he: x.he });
+        const answerWhy = means(w) + (w.ex && kind !== 'cloze' ? ` ${t('v.ex', { ex: `<span class="en" dir="ltr">${w.ex}</span>` })}` : '');
+        if (ok && typed === undefined) return whyHtml({ answer: kind === 'choice' && toHebrew ? w.he : w.en, answerWhy });
+        let pickedWhy = '';
+        if (typed !== undefined) {
+          const other = ALL_WORDS.find(x => !x.phrase && normalize(x.en) === normalize(typed) && x.id !== w.id);
+          if (other) pickedWhy = t('v.typedOther', { v: `<b class="en" dir="ltr">${esc(typed)}</b>`, he: other.he });
+          else if (editDistance(normalize(typed), normalize(w.en)) > Math.max(2, w.en.length / 2)) {
+            pickedWhy = t('v.typedWrong', { v: `<b class="en" dir="ltr">${esc(typed)}</b>`, en: `<b class="en" dir="ltr">${w.en}</b>`, he: w.he });
+          } else {
+            const a = normalize(typed), b = w.en.toLowerCase();
+            let k = 0;
+            while (k < a.length && k < b.length && a[k] === b[k]) k++;
+            const marked = esc(w.en.slice(0, k)) + `<mark class="fb-mark">${esc(w.en.slice(k, k + 1) || ' ')}</mark>` + esc(w.en.slice(k + 1));
+            pickedWhy = t(ok ? 'v.typedClose' : 'v.typed', { v: `<b class="en" dir="ltr">${esc(typed)}</b>`, en: `<b class="en" dir="ltr">${marked}</b>` });
+          }
+          return whyHtml({ picked: typed, pickedWhy, answer: w.en, answerWhy, typed: true });
+        }
+        if (picked.phrase) {
+          pickedWhy = t('v.otherPhrase') + means(picked);
+        } else if (kind === 'choice' && toHebrew) {
+          pickedWhy = t('v.notThis', { he: picked.he, en: `<b class="en" dir="ltr">${picked.en}</b>`, w: `<b class="en" dir="ltr">${w.en}</b>` });
+        } else if (kind === 'listen') {
+          pickedWhy = means(picked) + ' ' + t('v.heard', { en: `<b class="en" dir="ltr">${w.en}</b>`, he: w.he });
+        } else if (kind === 'cloze') {
+          pickedWhy = means(picked) + ' ' + t('v.gap', { he: w.he, en: `<b class="en" dir="ltr">${w.en}</b>` });
+        } else {
+          pickedWhy = means(picked) + ' ' + t('v.wordIs', { he: w.he, en: `<b class="en" dir="ltr">${w.en}</b>` });
+        }
+        return whyHtml({ picked: picked[key], pickedWhy, answer: kind === 'choice' && toHebrew ? w.he : w.en, answerWhy });
+      }
+
       // After any answer: score it, maybe send the word back, reveal "Next"
-      function settle(ok, close = false) {
+      function settle(ok, close = false, why = '') {
           streak = ok ? streak + 1 : 0;
           announce(ok ? t('sr.right') : t('sr.wrong', { answer: w[kind === 'choice' && toHebrew ? 'he' : 'en'] }));
           // Only the first try is scored and moves the word between review boxes
@@ -1937,7 +1981,8 @@
             lang: heAnswer ? 'he' : 'en',
             sub: heAnswer ? w.en : w.he,
             say: kind === 'cloze' ? w.ex : w.en,
-            combo: streak
+            combo: streak,
+            why
           });
       }
 
@@ -1949,7 +1994,7 @@
           });
           if (!ok) btn.classList.add('wrong');
           ok ? Feel.right() : Feel.wrong(btn);
-          settle(ok);
+          settle(ok, false, wordWhy(ok, options.find(o => o.id === btn.dataset.id)));
       });
 
       if (kind === 'type') {
@@ -1964,7 +2009,8 @@
           input.classList.add(grade === 'wrong' ? 'wrong' : 'right');
           grade === 'wrong' ? Feel.wrong(input) : Feel.right();
           $('#check').hidden = true;
-          settle(grade !== 'wrong', grade === 'close');   // Enter again goes on to the next word
+          settle(grade !== 'wrong', grade === 'close',
+            grade === 'right' ? wordWhy(true) : wordWhy(grade !== 'wrong', null, input.value.trim()));   // Enter again goes on to the next word
         };
       }
       $('#next').onclick = () => { i++; i < queue.length ? question() : summary(); };
@@ -2282,7 +2328,20 @@
 
   // After an answer: a green or red sheet rises from the bottom with the right answer, its sound,
   // and the Continue button, always in the same place under the thumb (as in Duolingo)
-  function showFeedback({ ok, close, answer, lang = 'en', sub, say, combo = 0, mark }) {
+  // The "Why?" block under an answer: why the option picked is wrong (if it was), then why the answer is right
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  // a short option is repeated in the row's label; a whole sentence is not (the row itself shows it)
+  const short = x => x && String(x).length <= 28 ? ` <span dir="auto">${esc(x)}</span>` : '';
+  function whyHtml({ picked, pickedWhy, answer, answerWhy, typed }) {
+    if (!pickedWhy && !answerWhy) return '';
+    return `<div class="fb-why">
+      <b class="fb-why-h">💡 ${t('why.title')}</b>
+      ${pickedWhy ? `<div class="why-row no"><span class="why-tag">✗ ${t(typed ? 'why.typed' : 'why.picked')}${short(picked)}</span><p>${pickedWhy}</p></div>` : ''}
+      ${answerWhy ? `<div class="why-row ok"><span class="why-tag">✓ ${t('why.answer')}${short(answer)}</span><p>${answerWhy}</p></div>` : ''}
+    </div>`;
+  }
+
+  function showFeedback({ ok, close, answer, lang = 'en', sub, say, combo = 0, mark, why = '' }) {
     // mark: the part of the answer that was the gap; it gets a highlight so the eye lands on it
     const answerHtml = answer && mark && answer.includes(mark) ? answer.replace(mark, `<mark class="fb-mark">${mark}</mark>`) : answer;
     const next = $('#next');
@@ -2298,11 +2357,13 @@
         ${say ? `<button class="speak sm fb-say" aria-label="${t('aria.listen')}">${ICON.speaker}</button>` : ''}
       </div>
       ${answer ? `<div class="fb-answer ${lang}" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${answerHtml}</div>` : ''}
-      ${sub ? `<div class="fb-sub">${sub}</div>` : ''}`;
+      ${sub ? `<div class="fb-sub" dir="auto">${sub}</div>` : ''}
+      ${why}`;
     next.hidden = false;
     fb.appendChild(next);
     view.appendChild(fb);
     view.classList.add('has-fb');
+    view.style.setProperty('--fb-h', fb.offsetHeight + 'px');   // the page scrolls far enough to show everything above the sheet
     const s = fb.querySelector('.fb-say');
     if (s) s.onclick = () => speak(say);
     next.focus({ preventScroll: true });
