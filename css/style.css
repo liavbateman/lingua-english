@@ -1855,3 +1855,13 @@ body.in-lesson .view.has-fb { padding-bottom: calc(var(--fb-h, 230px) + 24px + e
 .ex-say b { flex: 1; min-width: 0; text-align: left; font-size: 1rem; line-height: 1.4; }
 .ex-bubble .he { padding-inline: 12px 4px; font-size: .88rem; color: #c9cdf0; }
 .ex-key { padding: 0 3px; border-radius: 5px; background: color-mix(in srgb, var(--lv) 32%, transparent); color: #fff; box-shadow: inset 0 -2px 0 var(--lv); }
+
+/* ---------- Empty and offline states (design round D34) ---------- */
+.empty-title { display: block; margin-bottom: 4px; font-size: 1.15rem; color: var(--ink); }
+.offline {
+  flex: none; display: flex; align-items: center; gap: 8px; margin: 0 16px 8px; padding: 8px 14px; border-radius: 14px;
+  background: #3a2a14; color: #ffd9a0; border: 1px solid rgba(255, 179, 74, .4);
+  font-size: .82rem; font-weight: 700; line-height: 1.35; animation: fade .25s ease both;
+}
+.offline[hidden] { display: none; }
+body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }

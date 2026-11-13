@@ -90,7 +90,11 @@ in the visual language of the paths (level colours, chunky 3D cards with a botto
 | D31 | Explanation sheet polish | The "Why?" block: a collapsible block when long, the rule's name as a link to its page, a small owl beside it | Done (round 108): the owl beside the "Why?" heading; in grammar a collapsible "Rule reminder: <rule>" in the level colour with when-to-use and the first three structure rows, opened in place (a link would have left the round and lost it); the sheet scrolls when the explanation is long |
 | D32 | Level sheet transitions | The level picker sheet slides up with a soft spring, the chosen level's card pops, the rest dim | Done (round 109): a grip bar on top, the sheet rises with a soft spring, the level cards arrive one after another; on a pick the chosen card pops with a glow in its colour and the others dim for a moment before the sheet slides away; all of it off under Reduce Motion (the pick applies at once) |
 | D33 | Rule page examples | The examples on a rule page as speech-bubble cards in the level colour, the key word highlighted | Done (round 110): each example is a speech bubble tinted with the level colour (speaker inside, the Hebrew under it); where one of the rule's quiz answers appears in the sentence it is marked in the level colour (about 55% of the 244 examples; whole words only, longest match first) |
-| D34 | Empty and offline states | A friendly offline banner and consistent owl empty states across search, saved, review | |
+| D34 | Empty and offline states | A friendly offline banner and consistent owl empty states across search, saved, review | Done (round 111): with no connection a calm amber banner sits under the header (in the flow, never covering content) saying learning still works from the phone; the empty practice screen (nothing due, nothing missed) now uses the same owl card as search and saved, with a bold title line |
+| D35 | Topbar | The header: the streak pill in flame colours with a small count-up when it grows, the language button as a flag-free pill | |
+| D36 | Grammar road nodes | The grammar road's nodes in their level colour, with the rule's short tag (e.g. "s/es") under the node | |
+| D37 | Week chart | The week chart's bars with rounded caps, today's bar glowing, a dashed goal line | |
+| D38 | Path banners | Stage banners with a soft pattern, the stage's progress as a thin bar along the bottom edge | |
 
 ## Home: what it was for (until round 51)
 

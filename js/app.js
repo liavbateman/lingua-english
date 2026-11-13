@@ -1858,13 +1858,9 @@
     if (!src || !['choice', 'listen', 'cloze', 'type'].includes(mode)) return notFound();
     if (!src.pool.length) {
       endLesson();
-      view.innerHTML = `
-        <div class="card center result">
-          <div class="big">✅</div>
-          <h1>${t('quiz.empty')}</h1>
-          <p class="sub">${t('quiz.empty.sub')}</p>
-          <a class="btn" href="#/learn">${t('btn.lessons')}</a>
-        </div>`;
+      // nothing to practise here (e.g. no words due): the same owl as every other empty screen
+      view.innerHTML = emptyState(`<b class="empty-title">${t('quiz.empty')}</b>${t('quiz.empty.sub')}`,
+        `<a class="btn" href="#/learn">${t('btn.lessons')}</a>`);
       return;
     }
 
@@ -2648,6 +2644,19 @@
     if (el) el.classList.add('fading');
     setTimeout(closeSurprise, 400);
   });
+
+  // No connection: a calm banner under the header. Everything still works from the copy on the phone.
+  const offline = document.createElement('div');
+  offline.className = 'offline';
+  offline.setAttribute('role', 'status');
+  document.querySelector('.topbar').after(offline);   // in the flow under the header, so it never covers the content
+  const net = () => {
+    offline.hidden = navigator.onLine;
+    offline.innerHTML = navigator.onLine ? '' : `<span aria-hidden="true">📴</span> ${t('offline')}`;
+  };
+  window.addEventListener('online', net);
+  window.addEventListener('offline', net);
+  net();
 
   window.addEventListener('hashchange', route);
   applyLang();
