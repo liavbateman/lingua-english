@@ -1119,11 +1119,12 @@
           ${LEVELS.map(l => {
             const pct = Math.round(partDone(l.id, part) * 100);
             const on = l.id === Store.level;
-            return `<button class="lvl-opt${on ? ' on' : ''}" data-level="${l.id}" aria-pressed="${on}">
-              <span class="lvl-top"><b>${t('lv.' + l.id)}</b><small>${t('lvl.cefr.' + l.id)}</small>${on ? `<span class="lvl-check">${ICON.check}</span>` : ''}</span>
-              <span class="lvl-desc">${t('lvl.desc.' + l.id)}</span>
-              <span class="lvl-bar"><i style="width:${pct}%"></i></span>
-              <span class="lvl-pct">${t('lvl.pct', { n: pct })}</span>
+            return `<button class="lvl-opt lv-${l.id}${on ? ' on' : ''}" data-level="${l.id}" aria-pressed="${on}" aria-label="${t('lv.' + l.id)} · ${t('lvl.pct', { n: pct })}">
+              <span class="lv-ring" style="--p:${pct}" aria-hidden="true"><b class="en">${pct}%</b></span>
+              <span class="grow">
+                <span class="lvl-top"><b>${t('lv.' + l.id)}</b><small>${t('lvl.cefr.' + l.id)}</small>${on ? `<span class="lvl-check">${ICON.check}</span>` : ''}</span>
+                <span class="lvl-desc">${t('lvl.desc.' + l.id)}</span>
+              </span>
             </button>`;
           }).join('')}
         </div>`;

@@ -1459,3 +1459,16 @@ button.pc-form[aria-expanded="true"] .pc-more { transform: rotate(180deg); }
 .heard.wait { background: rgba(255, 255, 255, .06); }
 .heard.ok { background: var(--good-soft); }
 .heard.bad { background: var(--bad-soft); }
+
+/* ---------- Level sheet (design round D13): each level a card in its own colour, with its ring ---------- */
+.lvl-opt.lv-beginner, .lvl-opt.lv-intermediate, .lvl-opt.lv-advanced {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 20px; text-align: start;
+  border: 2px solid transparent; background: linear-gradient(160deg, var(--lv-bg-a), var(--lv-bg-b)); box-shadow: 0 5px 0 var(--lv-edge);
+}
+.lvl-opt .grow { display: grid; gap: 4px; min-width: 0; }
+.lvl-opt .lvl-top small { color: var(--lv); }
+.lvl-opt .lvl-desc { color: #d5d9f2; }
+.lvl-opt.on { border-color: var(--lv); box-shadow: 0 5px 0 var(--lv-edge), 0 0 0 4px color-mix(in srgb, var(--lv) 25%, transparent); }
+.lvl-opt .lvl-check { background: var(--lv); color: #0b1430; }
+.lvl-opt .lv-ring { width: 54px; height: 54px; }
+.lvl-opt:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--lv-edge); }
