@@ -674,3 +674,25 @@ body.in-lesson .view.has-check { padding-bottom: calc(132px + env(safe-area-inse
   background: linear-gradient(to bottom, transparent, var(--bg) 35%);
 }
 @media (prefers-reduced-motion: reduce) { .btn, .opt { transition: none; } }
+
+/* ---------- In-a-row combo and end-of-round tiles ---------- */
+.combo {
+  flex: none; padding: 4px 10px; border-radius: 999px; font-size: .82rem; font-weight: 800; color: #2a1300;
+  background: linear-gradient(140deg, #ffd27a, #ff9a3c); animation: pop .4s cubic-bezier(.2, 1.6, .4, 1) both;
+}
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 8px; margin: 4px 0 18px; }
+.st {
+  display: grid; gap: 2px; padding: 10px 6px 12px; border-radius: 16px; border: 2px solid;
+  text-align: center; animation: pop .45s cubic-bezier(.2, 1.4, .4, 1) both;
+}
+.st:nth-child(2) { animation-delay: .08s; }
+.st:nth-child(3) { animation-delay: .16s; }
+.st span { font-size: .72rem; font-weight: 800; letter-spacing: .04em; }
+.st b { font-size: 1.35rem; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+.st.acc { border-color: var(--good); background: var(--good-soft); }
+.st.acc span { color: var(--good); }
+.st.xp { border-color: #ffb34a; background: rgba(255, 179, 74, .14); }
+.st.xp span { color: #ffb34a; }
+.st.time { border-color: #6fb4ff; background: rgba(111, 180, 255, .14); }
+.st.time span { color: #6fb4ff; }
+@media (prefers-reduced-motion: reduce) { .combo, .st { animation: none; } }

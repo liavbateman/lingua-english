@@ -460,7 +460,8 @@
   function grammarQuiz(id) {
     const g = GRAMMAR.find(x => x.id === id);
     if (!g) return notFound();
-    let i = 0, correct = 0;
+    let i = 0, correct = 0, streak = 0;
+    const started = Date.now();
 
     function question() {
       const [q, answer, wrong] = g.quiz[i];
@@ -485,10 +486,11 @@
           if (!ok) btn.classList.add('wrong');
           ok ? Feel.right() : Feel.wrong(btn);
           if (ok) correct++;
+          streak = ok ? streak + 1 : 0;
           const full = q.replace('___', answer);
           $('#sentence').textContent = full;
           speak(full.replace(/"/g, ''));
-          showFeedback({ ok, answer: ok ? '' : full, say: full.replace(/"/g, '') });
+          showFeedback({ ok, answer: ok ? '' : full, say: full.replace(/"/g, ''), combo: streak });
       });
       $('#next').onclick = () => { i++; i < g.quiz.length ? question() : summary(); };
     }
@@ -506,11 +508,13 @@
           <div class="big">${passed ? '🏆' : '💪'}</div>
           <h1>${t('quiz.score', { a: correct, b: g.quiz.length })}</h1>
           <p class="sub">${t(passed ? 'grammar.done' : 'grammar.retry')}</p>
+          ${roundStats({ correct, total: g.quiz.length, ms: Date.now() - started })}
           ${passed
             ? (next ? `<a class="btn" href="#/grammar/${next.id}">${t('grammar.next', { title: ruleTitle(next) })}</a>` : `<a class="btn" href="#/">${t('btn.home')}</a>`)
             : `<a class="btn" href="#/grammar/${g.id}">${t('grammar.again')}</a>`}
           <a class="btn ghost" href="#/grammar">${t('grammar.all')}</a>
         </div>`;
+      countUp();
     }
 
     question();
@@ -659,7 +663,8 @@
     const tried = new Set();              // words already answered once this round
     const retries = new Map();            // how many times each word was sent back
     const missed = [];                    // words answered wrong on the first try
-    let i = 0, correct = 0;
+    let i = 0, correct = 0, streak = 0;
+    const started = Date.now();
 
     function question() {
       const w = queue[i];
@@ -724,6 +729,7 @@
 
       // After any answer: score it, maybe send the word back, reveal "Next"
       function settle(ok, close = false) {
+          streak = ok ? streak + 1 : 0;
           announce(ok ? t('sr.right') : t('sr.wrong', { answer: w[kind === 'choice' && toHebrew ? 'he' : 'en'] }));
           // Only the first try is scored and moves the word between review boxes
           if (!retry) {
@@ -747,7 +753,8 @@
             answer: kind === 'cloze' ? w.ex : heAnswer ? w.he : w.en,
             lang: heAnswer ? 'he' : 'en',
             sub: heAnswer ? w.en : w.he,
-            say: kind === 'cloze' ? w.ex : w.en
+            say: kind === 'cloze' ? w.ex : w.en,
+            combo: streak
           });
       }
 
@@ -803,7 +810,9 @@
         <a class="btn" href="#/quiz/${mode}/missed">${ICON.repeat} ${t('quiz.again.missed')}</a>` : '';
       done(pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '💪',
         t('quiz.score', { a: correct, b: total }),
-        t(pct >= 80 ? 'quiz.great' : 'quiz.keep'), fix);
+        t(pct >= 80 ? 'quiz.great' : 'quiz.keep'),
+        roundStats({ correct, total, xp: correct * 10, ms: Date.now() - started }) + fix);
+      countUp();
       view.querySelectorAll('.missed [data-say]').forEach(b => { b.onclick = () => speak(missed[b.dataset.say].en); });
       // with mistakes, "Practice these again" is the main button, so Home becomes the quiet one
       if (missed.length) view.querySelector('a.btn[href="#/"]').classList.add('ghost');
@@ -1043,7 +1052,7 @@
 
   // After an answer: a green or red sheet rises from the bottom with the right answer, its sound,
   // and the Continue button, always in the same place under the thumb (as in Duolingo)
-  function showFeedback({ ok, close, answer, lang = 'en', sub, say }) {
+  function showFeedback({ ok, close, answer, lang = 'en', sub, say, combo = 0 }) {
     const next = $('#next');
     const fb = document.createElement('div');
     fb.className = 'fb ' + (ok ? 'ok' : 'bad');
@@ -1053,6 +1062,7 @@
       <div class="fb-head">
         <span class="fb-icon" aria-hidden="true">${ok ? ICON.check : ICON.cross}</span>
         <b>${title}</b>
+        ${combo >= 3 ? `<span class="combo">🔥 ${t('combo', { n: combo })}</span>` : ''}
         ${say ? `<button class="speak sm fb-say" aria-label="${t('aria.listen')}">${ICON.speaker}</button>` : ''}
       </div>
       ${answer ? `<div class="fb-answer ${lang}" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${answer}</div>` : ''}
@@ -1064,6 +1074,32 @@
     const s = fb.querySelector('.fb-say');
     if (s) s.onclick = () => speak(say);
     next.focus({ preventScroll: true });
+  }
+
+  // End of a round: accuracy, points and time as three tiles that count up (as in Duolingo and Busuu)
+  function roundStats({ correct, total, xp, ms }) {
+    const acc = total ? Math.round((correct / total) * 100) : 0;
+    const sec = Math.max(1, Math.round(ms / 1000));
+    const time = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+    return `
+      <div class="stats-row">
+        <div class="st acc"><span>${t('st.acc')}</span><b data-count="${acc}" data-suffix="%">${acc}%</b></div>
+        ${xp !== undefined ? `<div class="st xp"><span>${t('st.xp')}</span><b data-count="${xp}" data-prefix="+">+${xp}</b></div>` : ''}
+        <div class="st time"><span>${t('st.time')}</span><b>${time}</b></div>
+      </div>`;
+  }
+  function countUp() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    view.querySelectorAll('[data-count]').forEach(el => {
+      const to = +el.dataset.count, pre = el.dataset.prefix || '', suf = el.dataset.suffix || '';
+      const t0 = performance.now();
+      const step = now => {
+        const p = Math.min(1, (now - t0) / 700);
+        el.textContent = pre + Math.round(to * (1 - Math.pow(1 - p, 3))) + suf;
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    });
   }
 
   // Multiple choice: tap to select, then Check (a second tap on the same answer also checks).
