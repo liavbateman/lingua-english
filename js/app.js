@@ -1038,13 +1038,63 @@
 
   // ---------- Grammar ----------
   // The Grammar tab: one road through every rule of every level (as the Learn paths)
+  // Rules found by a search in Hebrew or English: names first, then the structures and examples
+  function ruleSearch(items, query) {
+    const k = searchKey(query);
+    if (!k) return [];
+    return items.map((x, i) => {
+      const g = x.rule;
+      const name = searchKey(`${g.title} ${g.he}`);
+      const body = searchKey(`${g.forms.map(f => f[1]).join(' ')} ${g.ex.map(e => e[0]).join(' ')}`);
+      const s = name.split(' ').some(w => w.startsWith(k)) ? 0 : name.includes(k) ? 1 : body.includes(k) ? 2 : -1;
+      return { x, i, s };
+    }).filter(o => o.s >= 0).sort((a, b) => a.s - b.s || a.i - b.i).slice(0, 12);
+  }
+
   function grammarRoad() {
     const items = pathFor('gall');
     view.innerHTML = `
       <h1 class="sr-only">${t('gr.title')}</h1>
       ${pathHero(items)}
-      ${pathHtml(items)}`;
+      <div class="search">
+        ${ICON.search}
+        <input id="gsearch" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+          placeholder="${t('gsearch.ph')}" aria-label="${t('gsearch.ph')}">
+      </div>
+      <div id="gresults" hidden></div>
+      <div id="groad">${pathHtml(items)}</div>`;
     bindPath(items);
+    // Search: the road steps aside for the results; a result goes back to the road, on that rule, with its card open
+    const input = $('#gsearch'), results = $('#gresults'), road = $('#groad');
+    input.oninput = () => {
+      const q = input.value.trim();
+      road.hidden = !!q;
+      results.hidden = !q;
+      if (!q) { layoutPath(); results.innerHTML = ''; return; }
+      const found = ruleSearch(items, q);
+      results.innerHTML = found.length
+        ? `<p class="small search-count" role="status">${t(found.length === 1 ? 'gsearch.one' : 'gsearch.count', { n: found.length })}</p>` +
+          found.map(o => `
+            <button class="gres" data-i="${o.i}">
+              <b class="gres-num ${o.x.state}">${o.x.done ? '👑' : o.i + 1}</b>
+              <span class="grow"><b>${o.x.label}</b><small>${t('lv.' + o.x.lvl)} · ${t('path.state.' + o.x.state)}</small></span>
+              <span class="go-chev" aria-hidden="true">${fwd()}</span>
+            </button>`).join('')
+        : `<p class="sub center search-empty">${t('gsearch.none', { q: q.replace(/[<>&"]/g, '') })}</p>`;
+      results.querySelectorAll('.gres').forEach(b => {
+        b.onclick = () => {
+          input.value = '';
+          results.hidden = true;
+          results.innerHTML = '';
+          road.hidden = false;
+          layoutPath();
+          const node = $(`#path .pnode[data-i="${b.dataset.i}"]`);
+          node.scrollIntoView({ block: 'center' });
+          setTimeout(() => node.click(), 0);
+        };
+      });
+    };
+    input.onkeydown = e => { if (e.key === 'Enter') input.blur(); };
     // Jumping ahead to a level: rules left behind stay open, and the road reopens at the new level
     view.querySelectorAll('.pgate-go').forEach(b => {
       b.onclick = e => {
