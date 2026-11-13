@@ -1267,11 +1267,60 @@
         Store.markWelcomed();
         back.classList.add('out');
         setTimeout(() => back.remove(), 200);
-        route();
+        if (location.hash && location.hash !== '#/') location.hash = '#/'; else route();
+        setTimeout(tour, 450);   // then a short tour of the Today screen
       };
     });
     document.body.appendChild(back);
     back.querySelector('.wl-lvl').focus({ preventScroll: true });
+  }
+
+  // First-time tour of the Today screen: three spots lit one after another, each with a short bubble
+  function tour() {
+    if (Store.toured) return;
+    const steps = [
+      { sel: '.continue', text: t('tour.1') },
+      { sel: '.tasks', text: t('tour.2') },
+      { sel: '.tabbar', text: t('tour.3') }
+    ].filter(s => document.querySelector(s.sel));
+    if (!steps.length) return;
+    const layer = document.createElement('div');
+    layer.className = 'tour';
+    layer.innerHTML = `<div class="tour-spot" aria-hidden="true"></div>
+      <div class="tour-bubble" role="dialog" aria-modal="true" aria-live="polite" aria-labelledby="tour-text">
+        <p id="tour-text"></p>
+        <div class="tour-row">
+          <span class="tour-dots" aria-hidden="true">${steps.map(() => '<i></i>').join('')}</span>
+          <button class="tour-skip">${t('tour.skip')}</button>
+          <button class="btn tour-next"></button>
+        </div>
+      </div>`;
+    document.body.appendChild(layer);
+    const spot = layer.querySelector('.tour-spot'), bubble = layer.querySelector('.tour-bubble');
+    let k = 0;
+    const end = () => { Store.markToured(); layer.remove(); document.removeEventListener('keydown', key); };
+    const key = e => { if (e.key === 'Escape') end(); };
+    const show = () => {
+      const el = document.querySelector(steps[k].sel);
+      if (!el) return end();
+      el.scrollIntoView({ block: 'center' });
+      const r = el.getBoundingClientRect(), pad = 6;
+      Object.assign(spot.style, { top: (r.top - pad) + 'px', left: (r.left - pad) + 'px', width: (r.width + pad * 2) + 'px', height: (r.height + pad * 2) + 'px' });
+      layer.querySelector('#tour-text').textContent = steps[k].text;
+      layer.querySelectorAll('.tour-dots i').forEach((d, n) => d.classList.toggle('on', n === k));
+      const next = layer.querySelector('.tour-next');
+      next.textContent = k === steps.length - 1 ? t('tour.done') : t('tour.next');
+      // the bubble goes below the spot when there is room, otherwise above it
+      const below = r.bottom + 16 + 150 < innerHeight;
+      bubble.style.top = below ? (r.bottom + 16) + 'px' : '';
+      bubble.style.bottom = below ? '' : (innerHeight - r.top + 16) + 'px';
+      bubble.classList.toggle('up', !below);
+      next.focus({ preventScroll: true });
+    };
+    layer.querySelector('.tour-next').onclick = () => { if (++k < steps.length) show(); else end(); };
+    layer.querySelector('.tour-skip').onclick = end;
+    document.addEventListener('keydown', key);
+    show();
   }
 
   function learn() {

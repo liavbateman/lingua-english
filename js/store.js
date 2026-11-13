@@ -67,6 +67,8 @@ const Store = (() => {
       return !!state.welcomed || state.xp > 0 || Object.keys(state.words || {}).length > 0 || Object.keys(state.grammar || {}).length > 0;
     },
     markWelcomed() { state.welcomed = true; save(); },
+    get toured() { return !!state.toured; },
+    markToured() { state.toured = true; save(); },
 
     // Grammar rules whose practice was passed
     isGrammarDone: id => !!(state.grammar && state.grammar[id]),

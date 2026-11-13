@@ -2060,3 +2060,23 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
 /* ---------- Gradual reveal: extras hidden for a new learner, chests of stages not begun stay quiet ---------- */
 .minimap[hidden], .search[hidden], .gsearch-row[hidden], .tn-entry[hidden], .pgate-go[hidden] { display: none !important; }
 .pchest-wrap.is-quiet { visibility: hidden; }
+
+/* ---------- First-time tour: one lit spot at a time and a short bubble ---------- */
+.tour { position: fixed; inset: 0; z-index: 70; }
+.tour-spot {
+  position: fixed; border-radius: 20px; pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(4, 7, 22, .74), 0 0 0 3px rgba(255, 197, 61, .9) inset;
+  transition: top .3s ease, left .3s ease, width .3s ease, height .3s ease;
+}
+.tour-bubble {
+  position: fixed; left: 16px; right: 16px; max-width: 420px; margin: 0 auto; padding: 14px 16px 12px; border-radius: 18px;
+  background: #fff; color: #1a1f45; box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+}
+.tour-bubble p { margin: 0 0 10px; font-weight: 700; line-height: 1.5; }
+.tour-row { display: flex; align-items: center; gap: 8px; }
+.tour-dots { display: flex; gap: 5px; margin-inline-end: auto; }
+.tour-dots i { width: 8px; height: 8px; border-radius: 50%; background: #c9cdf0; }
+.tour-dots i.on { width: 20px; border-radius: 999px; background: #6a5cff; }
+.tour-skip { min-height: 44px; padding: 0 10px; border: 0; background: none; color: #5b628f; font: inherit; font-weight: 700; cursor: pointer; }
+.tour-next { width: auto; margin: 0; min-height: 44px; padding: 0 18px; }
+@media (prefers-reduced-motion: reduce) { .tour-spot { transition: none; } }
