@@ -1,12 +1,13 @@
 // Offline and instant start: answer from the copy on the phone right away, and fetch a fresh
 // copy in the background for the next launch. Changing CACHE replaces every file at once
 // (the app then shows "New version ready").
-const CACHE = 'english-app-v30';
+const CACHE = 'english-app-v31';
 const FILES = [
   './', 'index.html', 'css/style.css',
   'js/data.js', 'js/grammar.js', 'js/content-beginner.js', 'js/content-intermediate.js', 'js/content-advanced.js', 'js/content-index.js',
   'js/store.js', 'js/i18n.js', 'js/app.js',
-  'manifest.webmanifest', 'icons/owl-180.png', 'icons/owl-192.png', 'icons/owl-512.png', 'icons/logo.png', 'icons/favicon.png'
+  'manifest.webmanifest', 'icons/owl-180.png', 'icons/owl-192.png', 'icons/owl-512.png', 'icons/logo.png', 'icons/favicon.png',
+  'media/surprise.jpg'
 ];
 const FONTS = ['https://fonts.googleapis.com', 'https://fonts.gstatic.com'];
 
@@ -28,6 +29,8 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
+  // Audio asks for byte ranges; iPhone plays it only from a real partial response, so it goes to the network
+  if (req.headers.has('range')) return;
   const origin = new URL(req.url).origin;
   const own = origin === location.origin;
   if (!own && !FONTS.includes(origin)) return;   // anything else goes straight to the network

@@ -1038,6 +1038,37 @@
     document.body.appendChild(bar);
   });
 
+  // Surprise: tapping the logo opens a pink screen with a photo and a song; any tap closes it
+  const song = new Audio('media/surprise.mp3');
+  song.preload = 'auto';
+  function closeSurprise() {
+    const el = document.getElementById('surprise');
+    if (el) el.remove();
+    song.pause();
+  }
+  document.querySelector('.brand .logo').addEventListener('click', e => {
+    e.preventDefault();          // the logo opens the surprise; the LINGUA text still goes home
+    e.stopPropagation();
+    closeSurprise();
+    const el = document.createElement('div');
+    el.id = 'surprise';
+    el.className = 'surprise';
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+    el.setAttribute('aria-label', 'Surprise');
+    el.innerHTML = '<img src="media/surprise.jpg" alt="">';
+    el.onclick = closeSurprise;
+    document.body.appendChild(el);
+    song.currentTime = 0;
+    song.play().catch(() => {});
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSurprise(); });
+  song.addEventListener('ended', () => {
+    const el = document.getElementById('surprise');
+    if (el) el.classList.add('fading');
+    setTimeout(closeSurprise, 400);
+  });
+
   window.addEventListener('hashchange', route);
   applyLang();
   route();

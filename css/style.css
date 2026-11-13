@@ -534,3 +534,21 @@ a.card:active, .task:active { transform: scale(.985); }
 }
 .plan-done svg { width: 20px; height: 20px; color: var(--good); flex: none; }
 .plan-done b { color: var(--good); }
+
+/* Surprise screen behind the logo */
+.surprise {
+  position: fixed; inset: 0; z-index: 1000; cursor: pointer;
+  display: grid; place-items: center; padding: 24px;
+  background: radial-gradient(circle at 50% 40%, #ffd1e6, #ff8fc4 70%, #ff6fb1);
+  animation: surprise-in .35s ease-out; transition: opacity .4s;
+}
+.surprise.fading { opacity: 0; }
+.surprise img {
+  width: min(82vw, 420px); aspect-ratio: 1; object-fit: cover;
+  border-radius: 28px; border: 6px solid #fff;
+  box-shadow: 0 18px 50px rgba(190, 40, 110, .45);
+  animation: surprise-pop .5s cubic-bezier(.2, 1.4, .4, 1);
+}
+@keyframes surprise-in { from { opacity: 0; } }
+@keyframes surprise-pop { from { transform: scale(.6) rotate(-6deg); } }
+@media (prefers-reduced-motion: reduce) { .surprise, .surprise img { animation: none; } }
