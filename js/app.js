@@ -713,6 +713,35 @@
   }
   window.addEventListener('resize', () => layoutPath());
 
+  // A header above the path (as in the reference app): the owl says what is next, with the streak,
+  // the level and one button straight into the current lesson
+  function pathHero(items) {
+    const cur = items.cur >= 0 ? items[items.cur] : null;
+    let say, go;
+    if (!cur) {
+      say = t('ph.alldone');
+      go = `<a class="ph-go" href="#/practice">${t('ph.practice')}</a>`;
+    } else {
+      const s = Math.floor(items.cur / PATH_SECTION);
+      const left = items.slice(s * PATH_SECTION, (s + 1) * PATH_SECTION).filter(x => !x.done).length;
+      say = !items.some(x => x.started) ? t('ph.hello')
+        : left === 1 ? t('ph.one', { n: s + 1 }) : t('ph.left', { n: left, s: s + 1 });
+      go = `<a class="ph-go" href="${cur.href}">▶ ${t(cur.started ? 'ph.continue' : 'ph.start', { title: cur.plain })}</a>`;
+    }
+    return `
+      <section class="path-hero">
+        <img class="ph-owl" src="icons/owl-512.png" alt="" width="112" height="112">
+        <div class="ph-side">
+          <div class="ph-chips">
+            <span class="ph-chip">🔥 ${Store.streak}</span>
+            <span class="ph-chip">${levelLabel()}</span>
+          </div>
+          <p class="ph-say">${say}</p>
+          ${go}
+        </div>
+      </section>`;
+  }
+
   // The level can be changed right here, above the path
   function levelSeg() {
     return `<div class="seg level-seg" role="group" aria-label="${t('home.level')}">
@@ -728,7 +757,8 @@
   function learn() {
     const items = pathFor('vocab');
     view.innerHTML = `
-      <h1>${t('learn.title')}</h1>
+      <h1 class="sr-only">${t('learn.title')}</h1>
+      ${pathHero(items)}
       ${learnTabs('vocab')}
       ${levelSeg()}
       <div class="search">
@@ -758,7 +788,8 @@
   function phrases() {
     const items = pathFor('phrases');
     view.innerHTML = `
-      <h1>${t('learn.title')}</h1>
+      <h1 class="sr-only">${t('learn.title')}</h1>
+      ${pathHero(items)}
       ${learnTabs('phrases')}
       ${levelSeg()}
       ${pathHtml(items)}`;
@@ -770,7 +801,8 @@
   function grammarList() {
     const items = pathFor('grammar');
     view.innerHTML = `
-      <h1>${t('learn.title')}</h1>
+      <h1 class="sr-only">${t('learn.title')}</h1>
+      ${pathHero(items)}
       ${learnTabs('grammar')}
       ${levelSeg()}
       ${pathHtml(items)}`;
