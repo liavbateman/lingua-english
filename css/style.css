@@ -1684,3 +1684,18 @@ body[data-lv="advanced"] .lb-track i { background: linear-gradient(90deg, #8e7cf
 .fc-btns .fc-know:not(:disabled):active { box-shadow: 0 0 0 #17795a; }
 .fc-btns .fc-again { background: #3a2a14; color: #ffc46b; border: 2px solid rgba(255, 179, 74, .45); box-shadow: 0 4px 0 #22180a; }
 .fc-btns .fc-again:not(:disabled):active { box-shadow: 0 0 0 #22180a; }
+
+/* ---------- Speaking screen in the level's colour (design round D24) ---------- */
+.speak-card.lv-beginner, .speak-card.lv-intermediate, .speak-card.lv-advanced {
+  background: linear-gradient(160deg, var(--lv-bg-a), var(--lv-bg-b)); box-shadow: 0 5px 0 var(--lv-edge); border-top: 3px solid var(--lv);
+}
+.speak-card[class*="lv-"] .small { color: #d5d9f2; }
+.speak-card[class*="lv-"] .he { color: var(--lv); }
+.speak-card[class*="lv-"] .speak:not(.mic) { background: color-mix(in srgb, var(--lv) 22%, transparent); color: var(--lv); }
+.speak-card[class*="lv-"] .speak.mic:not(.on) { background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--lv) 70%, #fff), var(--lv));
+  color: #0b1430; box-shadow: 0 5px 0 var(--lv-edge), 0 0 0 6px color-mix(in srgb, var(--lv) 18%, transparent); }
+.speak-card[class*="lv-"] .speak.mic:not(.on):active { box-shadow: 0 1px 0 var(--lv-edge), 0 0 0 6px color-mix(in srgb, var(--lv) 18%, transparent); }
+.speak-card .heard { border: 1px solid rgba(255, 255, 255, .08); font-weight: 700; }
+.speak-card .heard.ok { border-color: color-mix(in srgb, var(--good) 50%, transparent); }
+.speak-card .heard.bad { border-color: color-mix(in srgb, var(--bad) 50%, transparent); }
+.speak-card .heard .en { display: inline-block; margin-top: 2px; padding: 1px 8px; border-radius: 8px; background: rgba(0, 0, 0, .25); }

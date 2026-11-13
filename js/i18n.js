@@ -129,7 +129,7 @@ const STR = {
     'quiz.missed': 'Words to go over', 'quiz.again.missed': 'Practice these words again', 'quiz.missedTitle': 'Your mistakes',
     'quiz.empty': 'Nothing to review', 'quiz.empty.sub': 'Learn a new lesson and its words will come back here at the right time.',
 
-    'speak.count': 'Speaking Practice · {a} of {b}', 'speak.do': 'Listen, then say it out loud',
+    'speak.title': 'Speaking Practice', 'speak.count': 'Speaking Practice · {a} of {b}', 'speak.do': 'Listen, then say it out loud',
     'speak.hard': 'Still hard', 'speak.said': 'I said it',
     'speak.do.mic': 'Listen, then tap the microphone and say it', 'speak.mic': 'Say it into the microphone',
     'speak.listening': 'Listening…', 'speak.great': 'Excellent! That was clear ✓',
@@ -283,7 +283,7 @@ const STR = {
     'quiz.missed': 'מילים לחזור עליהן', 'quiz.again.missed': 'לתרגל שוב את המילים האלה', 'quiz.missedTitle': 'הטעויות שלך',
     'quiz.empty': 'אין מילים לחזרה', 'quiz.empty.sub': 'אחרי שיעור חדש, המילים שלו יחזרו לכאן בזמן הנכון.',
 
-    'speak.count': 'תרגול דיבור · {a} מתוך {b}', 'speak.do': 'מקשיבים, ואז אומרים בקול',
+    'speak.title': 'תרגול דיבור', 'speak.count': 'תרגול דיבור · {a} מתוך {b}', 'speak.do': 'מקשיבים, ואז אומרים בקול',
     'speak.hard': 'עדיין קשה', 'speak.said': 'אמרתי',
     'speak.do.mic': 'מקשיבים, מקישים על המיקרופון ואומרים בקול', 'speak.mic': 'אמירה למיקרופון',
     'speak.listening': 'האזנה…', 'speak.great': 'מצוין! זה נשמע ברור ✓',

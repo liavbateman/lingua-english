@@ -2018,10 +2018,17 @@
     function draw() {
       const w = queue[i];
       let heardOk = false;
+      // The speaking round wears the colour of the learner's level, like the paths
+      const lvl = Store.level;
+      document.body.dataset.lv = lvl;
       view.innerHTML = `
-        <p class="sub">${t('speak.count', { a: i + 1, b: queue.length })}</p>
+        <div class="gq-head lv-${lvl}">
+          <span class="gq-title">🎤 ${t('speak.title')}</span>
+          <span class="gq-count">${t('card.count', { a: i + 1, b: queue.length })}</span>
+        </div>
         ${lessonBar(i / queue.length)}
-        <div class="card flash speak-card">
+        <div class="card flash speak-card lv-${lvl}">
+          <span class="gq-lvl">${t('lv.' + lvl)} · <span class="en">${t('lvl.cefr.' + lvl)}</span></span>
           <div class="small">${t(Recognition() ? 'speak.do.mic' : 'speak.do')}</div>
           <div class="word en ${w.phrase ? 'long' : ''}" style="margin-top:8px">${w.en}</div>
           <div class="speak-row">
@@ -2032,9 +2039,9 @@
           <div class="he ${w.phrase ? 'long' : ''}">${w.he}</div>
           ${w.ex ? `<div class="example en">${w.ex}</div>` : ''}
         </div>
-        <div class="pager">
-          <button class="btn ghost" id="hard">${t('speak.hard')}</button>
-          <button class="btn" id="said">${t('speak.said')}</button>
+        <div class="pager fc-btns lv-${lvl}">
+          <button class="btn fc-again" id="hard">${t('speak.hard')}</button>
+          <button class="btn fc-know" id="said">${t('speak.said')}</button>
         </div>`;
       $('#speak').onclick = () => speak(w.en);
       speak(w.en);   // hear it first, then say it
