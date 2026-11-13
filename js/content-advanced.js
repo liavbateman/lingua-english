@@ -567,6 +567,42 @@ UNITS.push(
       { en: 'premiere', he: 'הקרנת בכורה', ex: "The film's premiere was held in Cannes." },
       { en: 'provocative', he: 'מעורר מחשבה, פרובוקטיבי', ex: 'The play raises some provocative questions.' }
     ]
+  },
+
+  // ---------- Added in round 66 ----------
+  {
+    id: 'a-phr-debate', level: 'advanced', kind: 'phrases', title: 'Debating social issues', he: 'דיון בנושאים חברתיים', emoji: '🗣️',
+    words: [
+      { en: "It's a complex issue with no easy answers.", he: 'זה נושא מורכב בלי תשובות פשוטות.' },
+      { en: 'On the one hand, it creates jobs.', he: 'מצד אחד, זה יוצר מקומות עבודה.' },
+      { en: 'On the other hand, it harms the environment.', he: 'מצד שני, זה פוגע בסביבה.' },
+      { en: 'Studies have shown that the opposite is true.', he: 'מחקרים הראו שההפך הוא הנכון.' },
+      { en: "That argument doesn't hold up to scrutiny.", he: 'הטיעון הזה לא עומד בבדיקה מעמיקה.' },
+      { en: "We shouldn't generalise from one example.", he: 'אסור להכליל מדוגמה אחת.' },
+      { en: 'Where do you draw the line?', he: 'איפה עובר הגבול?' },
+      { en: "It's not as black and white as it seems.", he: 'זה לא שחור ולבן כמו שזה נראה.' },
+      { en: 'The real question is who pays for it.', he: 'השאלה האמיתית היא מי משלם על זה.' },
+      { en: 'I take your point, but the data says otherwise.', he: 'נקודה נכונה, אבל הנתונים מראים אחרת.' },
+      { en: "Let's look at it from a different angle.", he: 'בואו נסתכל על זה מזווית אחרת.' },
+      { en: 'At the end of the day, it comes down to values.', he: 'בסופו של דבר, זה מסתכם בערכים.' }
+    ]
+  },
+  {
+    id: 'a-phr-formal', level: 'advanced', kind: 'phrases', title: 'Formal requests & letters', he: 'בקשות ומכתבים רשמיים', emoji: '📨',
+    words: [
+      { en: 'I am writing to enquire about your services.', he: 'אני פונה כדי לברר לגבי השירותים שלכם.' },
+      { en: 'I would be grateful if you could reply by Friday.', he: 'אודה על תשובה עד יום שישי.' },
+      { en: 'Please find attached the requested documents.', he: 'מצורפים המסמכים שביקשתם.' },
+      { en: 'Could you kindly confirm receipt of this email?', he: 'אפשר לאשר את קבלת המייל הזה?' },
+      { en: 'I would like to request a meeting at your earliest convenience.', he: 'אבקש לקבוע פגישה במועד הקרוב הנוח לכם.' },
+      { en: 'We regret to inform you that the position has been filled.', he: 'צר לנו להודיע שהמשרה כבר אוישה.' },
+      { en: 'Further to our conversation, here are the details.', he: 'בהמשך לשיחתנו, הנה הפרטים.' },
+      { en: 'Should you require any further information, do not hesitate to contact me.', he: 'אם יידרש מידע נוסף, אפשר לפנות אליי בכל עת.' },
+      { en: 'Thank you in advance for your cooperation.', he: 'תודה מראש על שיתוף הפעולה.' },
+      { en: 'I would appreciate it if this matter could be dealt with promptly.', he: 'אודה על טיפול מהיר בעניין.' },
+      { en: 'Please accept our sincere apologies for the inconvenience.', he: 'אנא קבלו את התנצלותנו הכנה על אי-הנוחות.' },
+      { en: 'Yours sincerely,', he: 'בכבוד רב,' }
+    ]
   }
 );
 
