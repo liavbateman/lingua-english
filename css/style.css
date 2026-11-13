@@ -1351,3 +1351,26 @@ button.pc-form[aria-expanded="true"] .pc-more { transform: rotate(180deg); }
 .mm-lvl, .mm-lvl small { font-size: .75rem; }
 /* the current lesson's number: white on coral was 2.6:1, this coral gives 3.3:1 (large bold text) */
 .pnode.current { --face: #f0603e; --edge: #b8452a; }
+
+/* ---------- End-of-lesson screen (design round D7) ---------- */
+.result {
+  margin-top: 14px; padding: 24px 18px 20px; border: 0; border-radius: 26px;
+  background: radial-gradient(120% 70% at 50% 0%, rgba(142, 125, 255, .35), transparent 60%), linear-gradient(160deg, #262d68, #1a2052);
+  box-shadow: 0 6px 0 #0d1232;
+}
+.result .big {
+  width: 104px; height: 104px; margin: 0 auto 6px; border-radius: 50%; display: grid; place-items: center;
+  font-size: 3.3rem; line-height: 1;
+  background: radial-gradient(circle, rgba(255, 210, 120, .35), rgba(255, 210, 120, 0) 70%);
+  animation: pop .5s cubic-bezier(.2, 1.6, .4, 1) both;
+}
+.result h1 { font-size: 1.7rem; margin: 4px 0; }
+.result .sub { margin-bottom: 14px; }
+/* stat tiles as raised cards */
+.st { border: 0; box-shadow: 0 4px 0 rgba(0, 0, 0, .3); padding: 12px 6px; }
+.st span i { font-style: normal; }
+.st b { font-size: 1.5rem; }
+.st.acc { background: linear-gradient(160deg, rgba(47, 208, 147, .28), rgba(47, 208, 147, .12)); }
+.st.xp { background: linear-gradient(160deg, rgba(255, 179, 74, .28), rgba(255, 179, 74, .12)); }
+.st.time { background: linear-gradient(160deg, rgba(111, 180, 255, .28), rgba(111, 180, 255, .12)); }
+@media (prefers-reduced-motion: reduce) { .result .big { animation: none; } }

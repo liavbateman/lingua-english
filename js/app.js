@@ -1385,7 +1385,7 @@
       refreshChrome('grammar');
       endLesson(1);
       view.innerHTML = `
-        <div class="card center" style="margin-top:14px">
+        <div class="card center result">
           <div class="big">${good ? '🎓' : '💪'}</div>
           <h1>${t('quiz.score', { a: correct, b: qs.length })}</h1>
           <p class="sub">${t(good ? 'final.pass' : 'final.fail')}</p>
@@ -1400,7 +1400,7 @@
       refreshChrome('grammar');
       endLesson(1);
       view.innerHTML = `
-        <div class="card center" style="margin-top:14px">
+        <div class="card center result">
           <div class="big">${correct === qs.length ? '🏆' : '⭐'}</div>
           <h1>${t('quiz.score', { a: correct, b: qs.length })}</h1>
           <p class="sub">${t(correct === qs.length ? 'saved.perfect' : 'saved.keep')}</p>
@@ -1418,7 +1418,7 @@
       refreshChrome('grammar');
       endLesson(1);
       view.innerHTML = `
-        <div class="card center" style="margin-top:14px">
+        <div class="card center result">
           <div class="big">${passed ? '🚪' : '💪'}</div>
           <h1>${t('quiz.score', { a: correct, b: qs.length })}</h1>
           <p class="sub">${passed ? t('gtest.pass', { level: t('lv.' + test) }) : t('gtest.fail', { n: qs.length - 1 })}</p>
@@ -1434,7 +1434,7 @@
       endLesson(1);
       const left = Store.weakRules().length;
       view.innerHTML = `
-        <div class="card center" style="margin-top:14px">
+        <div class="card center result">
           <div class="big">${left ? '💪' : '🏆'}</div>
           <h1>${t('quiz.score', { a: correct, b: qs.length })}</h1>
           <p class="sub">${left ? t(left === 1 ? 'grev.left.one' : 'grev.left', { n: left }) : t('grev.clear')}</p>
@@ -1449,12 +1449,12 @@
       const passed = correct >= qs.length - 1;
       // The daily task counts only when the rule was actually passed
       if (passed) { Store.markGrammar(g.id); Store.completeTask('grammar'); }
-      refreshChrome('learn');
+      refreshChrome('grammar');
       endLesson(1);
       const next = levelGrammar().find(x => !Store.isGrammarDone(x.id));
       view.innerHTML = `
         ${celebration()}
-        <div class="card center" style="margin-top:14px">
+        <div class="card center result">
           <div class="big">${passed ? '🏆' : '💪'}</div>
           <h1>${t('quiz.score', { a: correct, b: qs.length })}</h1>
           <p class="sub">${t(passed ? 'grammar.done' : 'grammar.retry')}</p>
@@ -1482,7 +1482,7 @@
     function finish() {
       endLesson(1);
       view.innerHTML = `
-        <div class="card center" style="margin-top:14px">
+        <div class="card center result">
           <div class="big">🃏</div>
           <h1>${t('cards.done.title')}</h1>
           <p class="sub">${t('cards.done', { a: known, b: words.length })}</p>
@@ -1654,7 +1654,7 @@
     endLesson(1);
     view.innerHTML = `
       ${celebration()}
-      <div class="card center" style="margin-top:14px">
+      <div class="card center result">
         <div class="big">${emoji}</div>
         <h1>${title}</h1>
         <p class="sub">${text}</p>
@@ -1699,7 +1699,7 @@
     if (!src.pool.length) {
       endLesson();
       view.innerHTML = `
-        <div class="card center" style="margin-top:14px">
+        <div class="card center result">
           <div class="big">✅</div>
           <h1>${t('quiz.empty')}</h1>
           <p class="sub">${t('quiz.empty.sub')}</p>
@@ -2146,9 +2146,9 @@
     const time = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
     return `
       <div class="stats-row">
-        <div class="st acc"><span>${t('st.acc')}</span><b data-count="${acc}" data-suffix="%">${acc}%</b></div>
-        ${xp !== undefined ? `<div class="st xp"><span>${t('st.xp')}</span><b data-count="${xp}" data-prefix="+">+${xp}</b></div>` : ''}
-        <div class="st time"><span>${t('st.time')}</span><b>${time}</b></div>
+        <div class="st acc"><span><i aria-hidden="true">🎯</i> ${t('st.acc')}</span><b data-count="${acc}" data-suffix="%">${acc}%</b></div>
+        ${xp !== undefined ? `<div class="st xp"><span><i aria-hidden="true">⚡</i> ${t('st.xp')}</span><b data-count="${xp}" data-prefix="+">+${xp}</b></div>` : ''}
+        <div class="st time"><span><i aria-hidden="true">⏱️</i> ${t('st.time')}</span><b>${time}</b></div>
       </div>`;
   }
   function countUp() {
