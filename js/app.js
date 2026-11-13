@@ -1306,6 +1306,7 @@
       Store.markWelcomed();
       back.classList.add('out');
       setTimeout(() => back.remove(), 200);
+      Store.kidsMode = true;   // the rest of the app now needs a grown-up answer
       location.hash = '#/kids';
       route();
       Kids.hello();
@@ -2857,6 +2858,16 @@
   window.addEventListener('online', net);
   window.addEventListener('offline', net);
   net();
+
+  // Kids mode: leaving the kids world (other tabs, the language switch) needs a grown-up answer
+  document.addEventListener('click', e => {
+    if (!Store.kidsMode || !document.body.classList.contains('kids')) return;
+    const el = e.target.closest('.tabbar a:not([data-tab="kids"]), #lang');
+    if (!el || el.dataset.passed) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    Kids.gate(() => { el.dataset.passed = '1'; el.click(); delete el.dataset.passed; });
+  }, true);
 
   // The kids world lives in kids.js and borrows these helpers
   Kids.init({ view, shuffle, Feel, confetti, announce, lessonBar, endLesson });

@@ -26,6 +26,12 @@ const Kids = (() => {
       skip: 'דלג', sayHe: 'עכשיו אתם! תגידו',
       chest: 'האוצר של היום', chestLocked: 'שחקו באי אחד כדי לפתוח את האוצר', chestReady: 'האוצר מוכן! לחצו לפתוח',
       chestOpened: 'נפתח היום! חזרו מחר לאוצר חדש', chestGot: 'מצאתם מדבקה!', chestDays: '☀️ {n} ימי אוצר', treasure: 'מדבקות אוצר',
+      parents: 'להורים', gateTitle: 'רק להורים', gateText: 'כדי להמשיך, בחרו את התשובה הנכונה:', gateWrong: 'לא נכון, נסו שוב',
+      cancel: 'ביטול', pcTitle: 'פינת ההורים', pcWords: 'מילים שהילד זיהה', pcIslands: 'איים שהושלמו', pcStars: 'כוכבים',
+      pcTreasure: 'ימי אוצר', pcToday: 'זמן משחק היום', pcMin: '{n} דק׳', pcLimit: 'הגבלת זמן יומית', pcOff: 'בלי',
+      pcMode: 'מצב ילדים', pcModeText: 'שאר האפליקציה (דקדוק, לימוד, התקדמות) ומעבר השפה נעולים מאחורי שאלה להורים',
+      pcPer: 'התקדמות לפי אי', pcBack: 'חזרה לעולם הילדים', pcTip: 'טיפ: 10–15 דקות ביום, כמה פעמים בשבוע, עובדות הכי טוב לילדים צעירים. שבו לידם ושחקו יחד!',
+      restTitle: 'הגיע זמן לנוח!', restText: 'שיחקתם יפה היום. הינשוף הולך לישון, נתראה מחר!', restMore: 'עוד 10 דקות (להורים)',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -45,6 +51,12 @@ const Kids = (() => {
       skip: 'Skip', sayHe: 'Now you! Say',
       chest: "Today's treasure", chestLocked: 'Play one island to open the treasure', chestReady: 'The treasure is ready! Tap to open',
       chestOpened: 'Opened today! Come back tomorrow for a new one', chestGot: 'You found a sticker!', chestDays: '☀️ {n} treasure days', treasure: 'Treasure stickers',
+      parents: 'For parents', gateTitle: 'Grown-ups only', gateText: 'To go on, pick the right answer:', gateWrong: 'Not quite, try again',
+      cancel: 'Cancel', pcTitle: 'Parent corner', pcWords: 'Words recognised', pcIslands: 'Islands finished', pcStars: 'Stars',
+      pcTreasure: 'Treasure days', pcToday: 'Play time today', pcMin: '{n} min', pcLimit: 'Daily time limit', pcOff: 'Off',
+      pcMode: 'Kids mode', pcModeText: 'The rest of the app (grammar, learn, progress) and the language switch need a grown-up answer',
+      pcPer: 'Progress by island', pcBack: 'Back to the kids world', pcTip: 'Tip: 10–15 minutes a day, a few times a week, works best for young children. Sit with them and play together!',
+      restTitle: 'Time to rest!', restText: 'You played so well today. The owl is going to sleep, see you tomorrow!', restMore: '10 more minutes (grown-ups)',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -178,7 +190,9 @@ const Kids = (() => {
             </li>`;
           }).join('')}
         </ol>
+        <button class="k-parents" id="k-parents"><span aria-hidden="true">👪</span> ${kt('parents')}</button>
       </div>`;
+    $('#k-parents').onclick = () => gate(() => { location.hash = '#/kids/parents'; });
     const chest = $('#k-chest');
     if (chest) chest.onclick = () => openChest(chest);
     K.view.querySelectorAll('.k-isle.locked .k-isle-btn').forEach(a => {
@@ -191,6 +205,111 @@ const Kids = (() => {
     });
     const cur = $('.k-isle.cur');
     if (cur) setTimeout(() => cur.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60);
+  }
+
+  // ---------- grown-up check ----------
+  // A multiplication young children can't do yet, with 4 answers to pick from (the usual
+  // parental gate in kids' apps). Passing it opens the gate for 10 minutes.
+  let gateUntil = 0;
+  function gate(onPass) {
+    if (Date.now() < gateUntil) return onPass();
+    const a = 6 + Math.floor(Math.random() * 4), b = 6 + Math.floor(Math.random() * 4), right = a * b;
+    const opts = K.shuffle([right, right + a, right - b, right + 10]);
+    const back = document.createElement('div');
+    back.className = 'k-reveal k-gate';
+    back.setAttribute('role', 'dialog');
+    back.setAttribute('aria-modal', 'true');
+    back.setAttribute('aria-labelledby', 'k-gate-title');
+    back.innerHTML = `
+      <div class="k-reveal-card">
+        <span class="k-gate-lock" aria-hidden="true">🔒</span>
+        <b id="k-gate-title">${kt('gateTitle')}</b>
+        <p>${kt('gateText')}</p>
+        <p class="k-gate-q" dir="ltr">${a} × ${b} = ?</p>
+        <div class="k-gate-opts" dir="ltr">${opts.map(n => `<button class="k-gate-opt" data-n="${n}">${n}</button>`).join('')}</div>
+        <p class="k-gate-msg" role="status"></p>
+        <button class="k-skip" id="k-gate-no">${kt('cancel')}</button>
+      </div>`;
+    const close = () => back.remove();
+    back.querySelectorAll('.k-gate-opt').forEach(btn => {
+      btn.onclick = () => {
+        if (+btn.dataset.n === right) { gateUntil = Date.now() + 10 * 60 * 1000; close(); onPass(); }
+        else { close(); }   // a wrong answer just closes: no hint for a child trying all four
+      };
+    });
+    back.querySelector('#k-gate-no').onclick = close;
+    back.onclick = e => { if (e.target === back) close(); };
+    document.body.appendChild(back);
+    back.querySelector('.k-gate-opt').focus({ preventScroll: true });
+  }
+
+  // ---------- parent corner ----------
+  function parents() {
+    K.endLesson();
+    if (Date.now() >= gateUntil) { location.hash = '#/kids'; return; }   // reached without the check
+    const learned = KIDS_WORDS.filter(w => Store.kidsWordCount(w.id) > 0).length;
+    const tr = Store.kidsTreasure;
+    const mins = Math.round(Store.kidsTimeToday / 60);
+    const limits = [0, 10, 15, 20, 30, 45];
+    K.view.innerHTML = `
+      <div class="k-wrap k-pc">
+        <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('pcBack')}</a>
+        <h1 class="k-title">👪 ${kt('pcTitle')}</h1>
+        <div class="k-pc-stats">
+          <div><b>${learned}/${KIDS_WORDS.length}</b><span>${kt('pcWords')}</span></div>
+          <div><b>${Store.kidsStickerCount}/${KIDS_THEMES.length}</b><span>${kt('pcIslands')}</span></div>
+          <div><b>★ ${Store.kidsTotalStars}</b><span>${kt('pcStars')}</span></div>
+          <div><b>☀️ ${tr.days}</b><span>${kt('pcTreasure')}</span></div>
+          <div><b>${kt('pcMin', { n: mins })}</b><span>${kt('pcToday')}</span></div>
+        </div>
+        <section class="k-pc-box">
+          <h2>${kt('pcLimit')}</h2>
+          <div class="k-pc-seg" role="radiogroup" aria-label="${kt('pcLimit')}">
+            ${limits.map(n => `<button role="radio" aria-checked="${Store.kidsLimit === n}" class="${Store.kidsLimit === n ? 'on' : ''}" data-n="${n}">${n ? kt('pcMin', { n }) : kt('pcOff')}</button>`).join('')}
+          </div>
+        </section>
+        <section class="k-pc-box">
+          <label class="k-pc-switch">
+            <span class="grow"><b>${kt('pcMode')}</b><small>${kt('pcModeText')}</small></span>
+            <input type="checkbox" id="k-mode" ${Store.kidsMode ? 'checked' : ''}>
+          </label>
+        </section>
+        <section class="k-pc-box">
+          <h2>${kt('pcPer')}</h2>
+          ${KIDS_THEMES.map(th => {
+            const n = th.words.filter(w => Store.kidsWordCount(w.id) > 0).length;
+            return `<div class="k-pc-row"><span aria-hidden="true">${th.pic}</span><span class="grow">${themeName(th)}</span>
+              <span class="k-pc-bar"><i style="width:${Math.round(n / th.words.length * 100)}%;background:${th.color}"></i></span>
+              <span class="k-pc-n">${n}/${th.words.length}</span></div>`;
+          }).join('')}
+        </section>
+        <p class="k-pc-tip">💡 ${kt('pcTip')}</p>
+      </div>`;
+    K.view.querySelectorAll('.k-pc-seg button').forEach(b => {
+      b.onclick = () => { Store.kidsLimit = +b.dataset.n; parents(); };
+    });
+    $('#k-mode').onchange = e => { Store.kidsMode = e.target.checked; };
+  }
+
+  // ---------- daily time limit ----------
+  // Play time counts while a kids screen is on and the app is in front
+  setInterval(() => {
+    if (document.body.classList.contains('kids') && document.visibilityState === 'visible') Store.kidsAddTime(15);
+  }, 15000);
+  const overLimit = () => Store.kidsLimit > 0 && Store.kidsTimeToday >= (Store.kidsLimit + Store.kidsExtraToday) * 60;
+  function rest() {
+    K.endLesson();
+    K.view.innerHTML = `
+      <div class="k-wrap k-play k-end">
+        <div class="k-end-card k-rest">
+          <span class="k-rest-owl" aria-hidden="true">🦉<i>💤</i></span>
+          <h1>${kt('restTitle')}</h1>
+          <p>${kt('restText')}</p>
+        </div>
+        <button class="k-btn ghost" id="k-more">${kt('restMore')}</button>
+      </div>`;
+    say([['he', kt('restTitle')], ['en', 'Good night!']]);
+    $('#k-more').onclick = () => gate(() => { Store.kidsAddExtra(10); map(); });
   }
 
   // ---------- daily treasure ----------
@@ -700,12 +819,15 @@ const Kids = (() => {
     show(a, b) {
       stopRec();
       document.body.classList.add('kids');
+      if (a === 'parents') return parents();
+      if (overLimit()) return rest();   // checked between screens, never in the middle of a game
       if (a === 'play') play(b);
       else if (a === 'stickers') stickers();
       else if (a === 'abc') b ? letter(b) : abc();
       else if (a === 'abcgame') abcGame();
       else map();
     },
+    gate,
     leave() { stopRec(); document.body.classList.remove('kids'); document.body.style.removeProperty('--kc'); }
   };
 })();

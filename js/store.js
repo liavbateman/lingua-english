@@ -135,6 +135,23 @@ const Store = (() => {
       save();
     },
     kidsWordCount: id => (state.kids && state.kids.words[id]) || 0,
+    // Kids mode: the rest of the app (and the language switch) sits behind a grown-up check
+    get kidsMode() { return !!state.kidsMode; },
+    set kidsMode(v) { state.kidsMode = !!v; save(); },
+    // Daily play-time limit in minutes (0 = no limit) and today's play time in seconds
+    get kidsLimit() { return (state.kids && state.kids.limit) || 0; },
+    set kidsLimit(v) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.limit = v; save(); },
+    get kidsTimeToday() { const t = state.kids && state.kids.time; return t && t.day === dayKey() ? t.sec : 0; },
+    // Extra minutes a grown-up allowed today on top of the limit
+    get kidsExtraToday() { const t = state.kids && state.kids.time; return t && t.day === dayKey() ? (t.extra || 0) : 0; },
+    kidsAddTime(sec) {
+      state.kids = state.kids || { stars: {}, stickers: {}, words: {} };
+      const t = state.kids.time && state.kids.time.day === dayKey() ? state.kids.time : { day: dayKey(), sec: 0, extra: 0 };
+      t.sec += sec;
+      state.kids.time = t;
+      save();
+    },
+    kidsAddExtra(min) { this.kidsAddTime(0); state.kids.time.extra = (state.kids.time.extra || 0) + min; save(); },
     // Daily treasure: once a day, after finishing something, a chest gives a bonus sticker.
     // No streak to lose: the count of treasure days only ever grows.
     get kidsTreasure() {
