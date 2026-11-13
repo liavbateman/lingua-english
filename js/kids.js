@@ -322,6 +322,8 @@ const Kids = (() => {
 
   return {
     init(helpers) { K = helpers; },
+    // First meeting: the owl greets the child (Hebrew when there is a Hebrew voice, then English)
+    hello() { say([['he', 'היי! אני הינשוף. בואו נלמד אנגלית ביחד!'], ['en', "Hello! Let's play!"]]); },
     show(a, b) {
       document.body.classList.add('kids');
       if (a === 'play') play(b);

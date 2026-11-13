@@ -1275,7 +1275,12 @@
           <li><span aria-hidden="true">📖</span>${t('wl.p2')}</li>
           <li><span aria-hidden="true">🔊</span>${t('wl.p3')}</li>
         </ul>
-        <b class="wl-ask">${t('wl.ask')}</b>
+        <b class="wl-ask">${t('wl.who')}</b>
+        <button class="wl-kid" id="wl-kid">
+          <span class="wl-kid-pic" aria-hidden="true">🧒🎈</span>
+          <span class="grow"><b>${t('wl.kid')}</b><span>${t('wl.kid.sub')}</span></span>
+        </button>
+        <b class="wl-ask small">${t('wl.grown')}</b>
         ${LEVELS.map(l => `
           <button class="lvl-opt wl-lvl lv-${l.id}" data-level="${l.id}">
             <span class="grow">
@@ -1291,11 +1296,22 @@
         Store.markWelcomed();
         back.classList.add('out');
         setTimeout(() => back.remove(), 200);
+        location.hash = '#/grammar';
         route();
       };
     });
+    // A child goes straight to the kids world (Home); the owl says hello out loud
+    back.querySelector('#wl-kid').onclick = () => {
+      Store.level = 'beginner';
+      Store.markWelcomed();
+      back.classList.add('out');
+      setTimeout(() => back.remove(), 200);
+      location.hash = '#/kids';
+      route();
+      Kids.hello();
+    };
     document.body.appendChild(back);
-    back.querySelector('.wl-lvl').focus({ preventScroll: true });
+    back.querySelector('#wl-kid').focus({ preventScroll: true });
   }
 
   function learn() {
