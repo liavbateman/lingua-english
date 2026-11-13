@@ -868,3 +868,22 @@ body:has(.pcard) .path-jump { display: none; }
 }
 .psec-pill.ok { background: rgba(255, 255, 255, .92); color: #17795a; direction: inherit; }
 .psec-pill svg { width: 14px; height: 14px; }
+
+/* Path: a chest at the end of each stage */
+.pchest-wrap { position: absolute; width: 80px; display: grid; place-items: center; }
+.pchest {
+  width: 68px; height: 64px; border-radius: 20px; border: 0; cursor: pointer; display: grid; place-items: center;
+  font-size: 2rem; background: #2b3160; box-shadow: 0 6px 0 #1b2046; transition: transform .07s ease, box-shadow .07s ease;
+}
+.pchest:active { transform: translateY(4px); box-shadow: 0 2px 0 #1b2046; }
+.pchest.locked span { filter: grayscale(1); opacity: .5; }
+.pchest.ready { background: linear-gradient(140deg, #ffd27a, #f2a43c); box-shadow: 0 6px 0 #b9761f, 0 0 0 6px rgba(255, 197, 61, .25);
+  animation: chestwiggle 2.2s ease-in-out infinite; }
+.pchest.opened { background: #1f2a3a; box-shadow: 0 6px 0 #141c28; }
+.pchest.opening { animation: chestpop .6s cubic-bezier(.2, 1.6, .4, 1) both; }
+@keyframes chestwiggle { 0%, 80%, 100% { transform: rotate(0); } 84% { transform: rotate(-8deg); } 88% { transform: rotate(8deg); } 92% { transform: rotate(-5deg); } 96% { transform: rotate(4deg); } }
+@keyframes chestpop { 0% { transform: scale(1); } 40% { transform: scale(1.35) rotate(-6deg); } 100% { transform: scale(1); } }
+.pcard.chest { background: linear-gradient(140deg, #ffd27a, #f2a43c); color: #3d2600; box-shadow: 0 5px 0 #b9761f, 0 18px 40px rgba(0, 0, 0, .45); }
+.pcard.chest .btn { color: #8a5a00; box-shadow: 0 4px 0 #f3dca0; }
+.chest-xp { font-size: 1.6rem; font-weight: 900; direction: ltr; text-align: center; }
+@media (prefers-reduced-motion: reduce) { .pchest.ready, .pchest.opening { animation: none; } }

@@ -14,7 +14,7 @@ borrowing proven patterns from leading language apps, and adapts them to a Hebre
 | 6b | Lesson path | Words, sentences and grammar each shown as a winding road of round lessons: done (gold, check), current (coral, "Start" bubble, progress ring), started, locked (with a "open anyway" option); jump-back button; level chips above | Duolingo, user's reference app | Done (round 29) |
 | P1 | Path: lesson card | Tapping a lesson opens a small card under it (name, progress, one clear button) instead of jumping in; locked lessons explain why | Duolingo | Done (round 30) |
 | P2 | Path: section banners | Every few lessons a colored banner names the stage ("Part 2 · Around town") with its own progress | Duolingo units | Done (round 32): "Stage N" banner every 5 lessons, lesson icons, progress pill, one road per stage |
-| P3 | Path: milestone chests | A treasure node after each section that opens with a small celebration once the section is done | Duolingo chests | |
+| P3 | Path: milestone chests | A treasure node after each section that opens with a small celebration once the section is done | Duolingo chests | Done (round 34): locked / ready (wiggles) / opened, +20 points once |
 | P4 | Path: progress you can see happen | Coming back from a finished lesson, the node turns gold and the road fills up to the next one | Duolingo | |
 | P5 | Path: mascot header | A header with the owl, streak and the next step above the path, like the reference app | User's reference app | |
 | P6 | Path: review stops | A "review" node that appears on the road when words from earlier lessons are due | Duolingo practice nodes | |

@@ -434,11 +434,20 @@
       x.state = x.done ? 'done' : i === cur ? 'current' : (x.started || i < cur) ? 'open' : 'locked';
     });
     items.cur = cur;
+    items.part = part;
     return items;
   }
 
   // The path is split into stages of 5 lessons, each opened by a coloured banner (as Duolingo's units)
   const PATH_SECTION = 5;
+  const PATH_CHEST = 104;
+  const CHEST_XP = 20;
+  const chestKey = (items, s) => `${Store.level}:${items.part}:${s}`;
+  // locked until every lesson of the stage is done, then ready to open, then opened (once)
+  function chestState(items, s) {
+    if (Store.chestOpened(chestKey(items, s))) return 'opened';
+    return items.slice(s * PATH_SECTION, (s + 1) * PATH_SECTION).every(x => x.done) ? 'ready' : 'locked';
+  }
   const PATH_BANNER = 112;
   const SECTION_COLORS = ['coral', 'blue', 'green', 'gold', 'purple'];
 
@@ -466,6 +475,14 @@
       <div class="path" id="path">
         <svg class="path-line" id="pathline" aria-hidden="true"></svg>
         ${Array.from({ length: sections }, (_, s) => sectionBanner(items, s)).join('')}
+        ${Array.from({ length: sections }, (_, s) => {
+          const st = chestState(items, s);
+          return `<div class="pchest-wrap" data-s="${s}">
+            <button class="pchest ${st}" data-s="${s}" aria-label="${t('chest.aria', { n: s + 1 })} · ${t('chest.state.' + st)}">
+              <span aria-hidden="true">${st === 'opened' ? '✨' : '🎁'}</span>
+            </button>
+          </div>`;
+        }).join('')}
         ${items.map((x, i) => `
           <div class="pnode-wrap" data-i="${i}">
             ${x.state === 'current' ? `<span class="pbubble">${t(x.started ? 'path.continue' : 'path.start')}</span>` : ''}
@@ -487,6 +504,8 @@
     const W = path.clientWidth, half = Math.max(0, W / 2 - 64);
     const pts = [];
     const banners = path.querySelectorAll('.psec');
+    const count = path.querySelectorAll('.pnode-wrap').length;
+    const chestPts = [];
     let y = 8;
     path.querySelectorAll('.pnode-wrap').forEach((el, i) => {
       if (i % PATH_SECTION === 0) {                       // a stage banner before every 5 lessons
@@ -499,6 +518,15 @@
       el.style.top = y + 'px';
       pts.push([x, y + 38]);
       y += PATH_ROW;
+      if (i % PATH_SECTION === PATH_SECTION - 1 || i === count - 1) {   // the stage's chest
+        const s = Math.floor(i / PATH_SECTION);
+        const cx = W / 2 + PATH_SWAY[(i % PATH_SECTION + 1) % PATH_SWAY.length] * half;
+        const chest = path.querySelector(`.pchest-wrap[data-s="${s}"]`);
+        chest.style.left = (cx - 40) + 'px';
+        chest.style.top = y + 'px';
+        chestPts[s] = [cx, y + 34];
+        y += PATH_CHEST;
+      }
     });
     path.style.height = y + 'px';
     const curve = list => list.map(([x, y], i) => {
@@ -510,9 +538,10 @@
     const reach = pathItems.cur < 0 ? pts.length : pathItems.cur + 1;
     let d = '', done = '';
     for (let s = 0; s < pts.length; s += PATH_SECTION) {
-      const seg = pts.slice(s, s + PATH_SECTION);
+      const lessons = pts.slice(s, s + PATH_SECTION);
+      const seg = lessons.concat([chestPts[s / PATH_SECTION]]);     // the road ends at the chest
       d += curve(seg) + ' ';
-      const upto = Math.min(seg.length, reach - s);
+      const upto = Math.min(lessons.length, reach - s) + (reach - s > lessons.length ? 1 : 0);
       if (upto > 1) done += curve(seg.slice(0, upto)) + ' ';
     }
     const svg = document.getElementById('pathline');
@@ -530,23 +559,38 @@
     const closeCard = () => {
       const c = path.querySelector('.pcard');
       if (c) c.remove();
+      open = -1;
       path.querySelectorAll('.pnode[aria-expanded]').forEach(n => n.setAttribute('aria-expanded', 'false'));
       open = -1;
     };
-    const openCard = i => {
+    // Places a card under a node or chest, its arrow pointing at it, and brings it into view
+    const placeCard = (wrap, below, cls, label, html, key) => {
       closeCard();
-      const x = items[i], cur = items[items.cur];
-      const wrap = path.querySelector(`.pnode-wrap[data-i="${i}"]`);
       const W = path.clientWidth, cw = Math.min(300, W - 24);
       const nodeX = wrap.offsetLeft + wrap.offsetWidth / 2;
       const left = Math.max(12, Math.min(W - cw - 12, nodeX - cw / 2));
       const card = document.createElement('div');
-      card.className = 'pcard ' + x.state;
+      card.className = 'pcard ' + cls;
       card.id = 'pcard';
-      card.style.cssText = `top:${wrap.offsetTop + 96}px; left:${left}px; width:${cw}px; --arrow:${nodeX - left}px`;
+      card.style.cssText = `top:${wrap.offsetTop + below}px; left:${left}px; width:${cw}px; --arrow:${nodeX - left}px`;
       card.setAttribute('role', 'dialog');
-      card.setAttribute('aria-label', x.plain);
-      card.innerHTML = x.state === 'locked' ? `
+      card.setAttribute('aria-label', label);
+      card.innerHTML = html;
+      path.appendChild(card);
+      open = key;
+      // Focus first, then scroll so the whole card is above the tab bar (focus would cancel a smooth scroll)
+      setTimeout(() => {
+        const f = card.querySelector('.btn, .pcard-link');
+        if (f) f.focus({ preventScroll: true });
+        const over = card.getBoundingClientRect().bottom + 16 - view.getBoundingClientRect().bottom;
+        if (over > 0) view.scrollBy({ top: over, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      }, 30);
+      return card;
+    };
+    const openCard = i => {
+      const x = items[i], cur = items[items.cur];
+      const wrap = path.querySelector(`.pnode-wrap[data-i="${i}"]`);
+      placeCard(wrap, 96, x.state, x.plain, x.state === 'locked' ? `
           <b>${x.label}</b>
           <p>${t('path.locked.text', { title: cur ? cur.plain : '' })}</p>
           ${cur ? `<a class="btn" href="${cur.href}">${t('path.locked.go')}</a>` : ''}
@@ -555,17 +599,43 @@
           <b>${x.label}</b>
           <p>${x.progress}</p>
           <a class="btn" href="${x.state === 'done' ? x.review : x.href}">${t(x.state === 'done' ? 'path.review' : x.started ? 'path.continue' : 'path.start')}</a>
-          ${x.state === 'done' ? `<a class="pcard-link" href="${x.href}">${t('path.again')}</a>` : ''}`;
-      path.appendChild(card);
+          ${x.state === 'done' ? `<a class="pcard-link" href="${x.href}">${t('path.again')}</a>` : ''}`, i);
       path.querySelector(`.pnode[data-i="${i}"]`).setAttribute('aria-expanded', 'true');
-      open = i;
-      // Focus first, then scroll so the whole card is above the tab bar (focus would cancel a smooth scroll)
-      setTimeout(() => {
-        card.querySelector('.btn, .pcard-link').focus({ preventScroll: true });
-        const over = card.getBoundingClientRect().bottom + 16 - view.getBoundingClientRect().bottom;
-        if (over > 0) view.scrollBy({ top: over, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-      }, 30);
     };
+    // Chests: locked explains what is left, ready opens with a celebration and points, opened says so
+    path.querySelectorAll('.pchest').forEach(b => {
+      b.onclick = e => {
+        e.stopPropagation();
+        const s = +b.dataset.s, key = 'c' + s;
+        if (open === key) return closeCard();
+        const wrap = b.parentElement;
+        const st = chestState(items, s);
+        if (st === 'locked') {
+          const left = items.slice(s * PATH_SECTION, (s + 1) * PATH_SECTION).filter(x => !x.done).length;
+          placeCard(wrap, 84, 'locked', t('chest.aria', { n: s + 1 }), `
+            <b>🎁 ${t('chest.locked.title', { n: s + 1 })}</b>
+            <p>${t(left === 1 ? 'chest.left.one' : 'chest.left', { n: left })}</p>`, key);
+          return;
+        }
+        if (st === 'ready' && Store.openChest(chestKey(items, s), CHEST_XP)) {
+          b.classList.remove('ready');
+          b.classList.add('opening', 'opened');
+          b.firstElementChild.textContent = '✨';
+          Feel.right();
+          refreshChrome('learn');
+          placeCard(wrap, 84, 'chest', t('chest.aria', { n: s + 1 }), `
+            <b>🎉 ${t('chest.won.title', { n: s + 1 })}</b>
+            <p class="chest-xp">+${CHEST_XP} ${t('chest.xp')}</p>
+            <button class="btn" id="chest-ok">${t('chest.ok')}</button>`, key);
+          $('#chest-ok').onclick = ev => { ev.stopPropagation(); closeCard(); };
+          announce(t('chest.won.title', { n: s + 1 }));
+          return;
+        }
+        placeCard(wrap, 84, 'done', t('chest.aria', { n: s + 1 }), `
+          <b>✨ ${t('chest.opened.title', { n: s + 1 })}</b>
+          <p>${t('chest.opened.text')}</p>`, key);
+      };
+    });
     path.querySelectorAll('.pnode').forEach(b => {
       b.setAttribute('aria-expanded', 'false');
       b.onclick = e => {
@@ -575,7 +645,13 @@
       };
     });
     path.onclick = e => { if (!e.target.closest('.pcard')) closeCard(); };
-    view.onkeydown = e => { if (e.key === 'Escape' && open >= 0) { const i = open; closeCard(); path.querySelector(`.pnode[data-i="${i}"]`).focus(); } };
+    view.onkeydown = e => {
+      if (e.key !== 'Escape' || open === -1) return;
+      const k = open;
+      closeCard();
+      const back = typeof k === 'string' ? path.querySelector(`.pchest[data-s="${k.slice(1)}"]`) : path.querySelector(`.pnode[data-i="${k}"]`);
+      if (back) back.focus();
+    };
     // Open where the learner is: the current lesson in the middle of the screen
     const curEl = items.cur >= 0 && path.querySelector(`.pnode-wrap[data-i="${items.cur}"]`);
     const jump = document.getElementById('pathjump');

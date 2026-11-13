@@ -66,6 +66,18 @@ const Store = (() => {
     isGrammarDone: id => !!(state.grammar && state.grammar[id]),
     markGrammar(id) { state.grammar = state.grammar || {}; state.grammar[id] = true; save(); },
 
+    // Stage chests on the lesson path: each one opens once and gives a points bonus
+    chestOpened: key => !!(state.chests && state.chests[key]),
+    openChest(key, xp) {
+      state.chests = state.chests || {};
+      if (state.chests[key]) return false;
+      state.chests[key] = true;
+      state.xp += xp;
+      touchDay();
+      save();
+      return true;
+    },
+
     box,
     isSeen: id => box(id) >= 1,
     isMastered: id => box(id) >= MASTERED_BOX,
