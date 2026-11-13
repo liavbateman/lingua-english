@@ -1306,3 +1306,16 @@ button.pc-form[aria-expanded="true"] .pc-more { transform: rotate(180deg); }
 .fb-icon { width: 40px; height: 40px; }
 .fb-icon svg { width: 22px; height: 22px; }
 .fb-answer { display: inline-block; margin-top: 10px; padding: 8px 12px; border-radius: 12px; background: rgba(255, 255, 255, .08); }
+
+/* ---------- Tab bar and header (design round D4) ---------- */
+.tabbar { box-shadow: 0 -6px 24px rgba(0, 0, 0, .35); border-top-color: rgba(255, 255, 255, .06); }
+.tabbar a { gap: 4px; transition: color .15s; }
+.tabbar svg { box-sizing: border-box; width: 60px; height: 32px; padding: 4px 18px; border-radius: 999px; transition: background .2s; }
+.tabbar a.active svg { background: rgba(142, 125, 255, .34); }
+.tabbar a.active span { color: #d8d2ff; }
+.tabbar a:not(.active):active svg { background: rgba(255, 255, 255, .06); }
+.streak { transition: background .2s, border-color .2s; }
+.streak.lit { background: linear-gradient(140deg, rgba(255, 154, 60, .26), rgba(255, 92, 92, .18)); border-color: rgba(255, 154, 60, .45); color: #ffe0c2; }
+.streak:not(.lit) { filter: grayscale(.8); opacity: .8; }
+.lang { transition: background .15s; }
+@media (prefers-reduced-motion: reduce) { .tabbar a, .tabbar svg, .streak { transition: none; } }

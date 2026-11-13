@@ -188,6 +188,7 @@
     const s = Store.streak;
     document.getElementById('stat-streak').textContent = s;
     document.getElementById('stat-streak-label').textContent = t(s === 1 ? 'streak.one' : 'streak.many');
+    document.querySelector('.streak').classList.toggle('lit', s > 0);   // a live streak glows, 0 stays quiet
     document.querySelectorAll('.tabbar a').forEach(a => {
       a.classList.toggle('active', a.dataset.tab === tab);
       if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
