@@ -1505,7 +1505,7 @@
           $('#sentence').innerHTML = q.replace('___', `<mark class="gq-ans">${answer}</mark>`);
           speak(full.replace(/"/g, ''));
           const ex = (EXPLAIN[rule.id] || [])[rule.quiz.indexOf(qs[i].q)];
-          const why = ex ? whyHtml({ picked: btn.textContent, pickedWhy: ok ? '' : heMix(ex.no[btn.textContent] || ''), answer, answerWhy: heMix(ex.ok) }) : '';
+          const why = ex ? whyHtml({ picked: btn.textContent, pickedWhy: ok ? '' : heMix(ex.no[btn.textContent] || ''), answer, answerWhy: heMix(ex.ok), rule }) : '';
           showFeedback({ ok, answer: ok ? '' : full, mark: answer, say: full.replace(/"/g, ''), combo: streak, why });
       });
       $('#next').onclick = () => { i++; i < qs.length ? question() : (review ? reviewSummary() : saved ? savedSummary() : final ? finalSummary() : test ? testSummary() : summary()); };
@@ -2365,12 +2365,19 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   // a short option is repeated in the row's label; a whole sentence is not (the row itself shows it)
   const short = x => x && String(x).length <= 28 ? ` <span dir="auto">${esc(x)}</span>` : '';
-  function whyHtml({ picked, pickedWhy, answer, answerWhy, typed }) {
+  function whyHtml({ picked, pickedWhy, answer, answerWhy, typed, rule }) {
     if (!pickedWhy && !answerWhy) return '';
+    // a grammar answer can open a short reminder of its rule right here, without leaving the round
+    const ruleBox = rule ? `<details class="why-rule lv-${rule.level}">
+        <summary>📖 ${t('why.rule')}: ${ruleTitle(rule)}</summary>
+        <p>${heMix(rule.when)}</p>
+        <div class="why-forms">${rule.forms.slice(0, 3).map(([tag, text]) => `<div><span class="rtag">${formTag(tag)}</span><span class="en" dir="ltr">${text}</span></div>`).join('')}</div>
+      </details>` : '';
     return `<div class="fb-why">
-      <b class="fb-why-h">💡 ${t('why.title')}</b>
+      <b class="fb-why-h"><img src="icons/owl-192.png" alt="" width="22" height="22"> ${t('why.title')}</b>
       ${pickedWhy ? `<div class="why-row no"><span class="why-tag">✗ ${t(typed ? 'why.typed' : 'why.picked')}${short(picked)}</span><p>${pickedWhy}</p></div>` : ''}
       ${answerWhy ? `<div class="why-row ok"><span class="why-tag">✓ ${t('why.answer')}${short(answer)}</span><p>${answerWhy}</p></div>` : ''}
+      ${ruleBox}
     </div>`;
   }
 

@@ -1816,3 +1816,18 @@ body.in-lesson .view.has-fb { padding-bottom: calc(var(--fb-h, 230px) + 24px + e
   background: rgba(255, 214, 107, .14); color: #ffd66b; box-shadow: 0 4px 0 rgba(0, 0, 0, .3); }
 .ty-hint:disabled { opacity: .45; cursor: default; }
 @media (max-width: 340px) { .ty-slots i { width: 19px; height: 27px; font-size: .85rem; } .ty-hint { padding: 0 9px; font-size: .78rem; } }
+
+/* ---------- "Why?" polish: the owl beside the heading, a collapsible rule reminder (design round D31) ---------- */
+.fb-why-h { display: flex; align-items: center; gap: 6px; }
+.fb-why-h img { border-radius: 7px; }
+.why-rule { border-radius: 12px; background: color-mix(in srgb, var(--lv) 14%, transparent); border: 1px solid color-mix(in srgb, var(--lv) 30%, transparent); }
+.why-rule summary { min-height: 44px; display: flex; align-items: center; padding: 0 12px; cursor: pointer; font-weight: 800; font-size: .85rem; color: var(--lv); list-style: none; }
+.why-rule summary::-webkit-details-marker { display: none; }
+.why-rule summary::after { content: "▾"; margin-inline-start: auto; transition: transform var(--dur-ui); }
+.why-rule[open] summary::after { transform: rotate(180deg); }
+.why-rule p { margin: 0 12px 8px; font-size: .86rem; line-height: 1.5; color: var(--ink); }
+.why-forms { display: grid; gap: 4px; margin: 0 12px 12px; }
+.why-forms div { display: flex; align-items: baseline; gap: 8px; font-size: .82rem; }
+.why-forms .en { flex: 1; min-width: 0; text-align: left; font-weight: 700; overflow-wrap: anywhere; }
+.why-forms .rtag { font-size: .7rem; padding: 1px 8px; }
+@media (prefers-reduced-motion: reduce) { .why-rule summary::after { transition: none; } }
