@@ -187,3 +187,31 @@ body.kids .offline { color: var(--k-ink); }
 .k-slot.got { background: #fff; border: 3px solid var(--c); box-shadow: 0 5px 0 var(--k-edge); }
 .k-slot.got .k-sticker { opacity: 1; }
 .k-slot-name { font-size: .9rem; color: var(--k-ink); }
+
+/* pop the balloon: balloons bob gently in place (they never fly away before a child can tap them) */
+.k-sky { display: flex; justify-content: space-around; align-items: flex-end; gap: 6px; min-height: 230px; padding-top: 18px; }
+.k-balloon {
+  position: relative; width: 84px; height: 104px; flex: none; border: 0; padding: 0; cursor: pointer;
+  border-radius: 50% 50% 48% 48% / 56% 56% 44% 44%;
+  background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, .7) 0 8%, transparent 26%), var(--b);
+  box-shadow: inset -8px -10px 0 rgba(0, 0, 0, .12);
+  animation: k-drift 3s ease-in-out var(--d) infinite;
+}
+.k-balloon::before {   /* the knot */
+  content: ''; position: absolute; left: 50%; bottom: -7px; margin-left: -6px;
+  border: 6px solid transparent; border-bottom: 8px solid var(--b); transform: rotate(180deg);
+}
+.k-balloon::after {    /* the string */
+  content: ''; position: absolute; left: 50%; top: 100%; width: 2px; height: 70px; margin-top: 6px;
+  background: rgba(29, 42, 91, .35); transform-origin: top; transform: rotate(4deg);
+}
+.k-balloon-pic { display: grid; place-items: center; height: 100%; font-size: 2.6rem; filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .15)); }
+.k-sky .k-balloon:nth-child(even) { margin-bottom: 40px; }
+@keyframes k-drift { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-16px) rotate(3deg); } }
+.k-balloon.nope { animation: k-nope .45s ease, k-drift 3s ease-in-out var(--d) infinite; }
+@keyframes k-nope { 25% { transform: translateX(-8px) rotate(-8deg); } 75% { transform: translateX(8px) rotate(8deg); } }
+.k-balloon.popped { animation: k-burst .35s ease-out forwards; }
+.k-balloon.popped::after { display: none; }
+@keyframes k-burst { 40% { transform: scale(1.35); opacity: 1; } 100% { transform: scale(1.7); opacity: 0; } }
+.k-balloon:disabled:not(.popped) { opacity: .5; cursor: default; }
+@media (max-width: 350px) { .k-balloon { width: 70px; height: 88px; } .k-balloon-pic { font-size: 2.1rem; } }

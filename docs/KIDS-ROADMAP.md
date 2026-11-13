@@ -23,7 +23,7 @@ Each round takes the next open item, builds it, checks it in the preview at phon
 |---|---|---|---|
 | K1 | Kids world | A new first tab and home: a sky-blue island map (10 picture-word themes, 75 words); each island a session of meet the words → find the picture you hear (3 then 4 pictures, errorless) → memory game (4 pairs); 1–3 stars, a sticker per island, a sticker album; the owl buddy; Hebrew spoken instructions; rounded font | Done (round 1) |
 | K2 | Welcome for kids | First launch asks "Who is learning?" (a child / a grown-up); a child goes straight to the kids world with the owl saying hello | Done (round 2): a big sky-to-pink "A child (4–9)" button above the levels; the owl greets out loud; grown-ups who pick a level land on the grammar road |
-| K3 | Pop the balloons | A game: balloons with pictures float up, pop the one you hear | |
+| K3 | Pop the balloons | A game: balloons with pictures float up, pop the one you hear | Done (round 3): half of each session's find-the-picture steps are balloons that bob in place (3–4, never flying away); a wrong tap wiggles, the right one bursts with a soft pop sound; white balloons on the colours island |
 | K4 | ABC & phonics island | Letters A–Z with a sound, a word and a picture each (A is for apple); trace or tap the letter | |
 | K5 | Say it! | Speak the word into the mic; the owl cheers any close try (speech recognition, lenient) | |
 | K6 | Daily treasure | One small gift a day for playing (a streak for kids: suns in a row, no loss shown) | |

@@ -18,6 +18,7 @@ const Kids = (() => {
       done: 'כל הכבוד!', newSticker: 'מדבקה חדשה!', best: 'שיא חדש!', backToMap: 'חזרה למפה',
       tryAgain: 'כמעט! נסו שוב', great: ['מעולה!', 'יופי!', 'אלוף!', 'נהדר!', 'וואו!'],
       words: '{n} מילים', island: 'אי {n}', nextIsland: 'האי הבא נפתח!',
+      pop: 'פוצצו את הבלון', popTip: 'הקשיבו ופוצצו את הבלון הנכון', sayPop: 'פוצצו את הבלון של',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -29,6 +30,7 @@ const Kids = (() => {
       done: 'Great job!', newSticker: 'New sticker!', best: 'New best!', backToMap: 'Back to the map',
       tryAgain: 'Almost! Try again', great: ['Great!', 'Super!', 'Yes!', 'Awesome!', 'Wow!'],
       words: '{n} words', island: 'Island {n}', nextIsland: 'The next island is open!',
+      pop: 'Pop the balloon', popTip: 'Listen and pop the right balloon', sayPop: 'Pop the',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -67,6 +69,31 @@ const Kids = (() => {
     });
   }
   const sayEn = (text, rate) => say([['en', text]], rate);
+
+  // A soft "pop" for a balloon: a short falling tone and a puff of noise (quiet; silence is fine too)
+  let actx = null;
+  function popSound() {
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === 'suspended') actx.resume();
+      const now = actx.currentTime;
+      const osc = actx.createOscillator(), g = actx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(900, now);
+      osc.frequency.exponentialRampToValueAtTime(120, now + .12);
+      g.gain.setValueAtTime(.18, now);
+      g.gain.exponentialRampToValueAtTime(.0001, now + .15);
+      osc.connect(g).connect(actx.destination);
+      osc.start(now); osc.stop(now + .16);
+      const len = Math.floor(actx.sampleRate * .08), buf = actx.createBuffer(1, len, actx.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+      const n = actx.createBufferSource(), ng = actx.createGain();
+      n.buffer = buf; ng.gain.value = .12;
+      n.connect(ng).connect(actx.destination);
+      n.start(now);
+    } catch (e) { /* no sound is fine */ }
+  }
+  const BALLOONS = ['#ff5d8f', '#3fa7ff', '#ffc93c', '#2fd093', '#b98cff'];
 
   // ---------- the owl buddy ----------
   const owl = (text, mood = '') => `
@@ -129,10 +156,13 @@ const Kids = (() => {
     if (!isOpen(idx)) { location.hash = '#/kids'; return; }
     document.body.style.setProperty('--kc', th.color);
     const words = th.words;
-    // Find the picture: every word once, then the ones the child missed come back at the end
+    // Meet every word, then hear-and-find each one: half as picture cards, half as balloons to pop,
+    // then the memory game. Two different games for the same skill keep it fresh.
+    const order = K.shuffle(words), half = Math.ceil(order.length / 2);
     const steps = [
       ...words.map(w => ({ kind: 'meet', w })),
-      ...K.shuffle(words).map(w => ({ kind: 'tap', w })),
+      ...order.slice(0, half).map(w => ({ kind: 'tap', w })),
+      ...order.slice(half).map(w => ({ kind: 'pop', w })),
       { kind: 'match' }
     ];
     let at = 0, firstTry = 0, tapped = 0;
@@ -145,6 +175,7 @@ const Kids = (() => {
       const s = steps[at];
       if (s.kind === 'meet') meet(s.w, words.indexOf(s.w));
       else if (s.kind === 'tap') tap(s.w);
+      else if (s.kind === 'pop') pop(s.w);
       else match();
     }
 
@@ -214,6 +245,58 @@ const Kids = (() => {
             K.Feel.wrong(b);
             $('.k-bubble').textContent = kt('tryAgain');
             setTimeout(() => sayEn(w.en), 350);   // hear the word again, then try again
+          }
+        };
+      });
+    }
+
+    // Pop the balloon: balloons with pictures bob in the sky; pop the one you hear.
+    // On the colours island the balloons are all white, so a balloon's colour never competes with the answer.
+    let popsShown = 0;
+    function pop(w) {
+      popsShown++;
+      const others = K.shuffle(words.filter(x => x !== w)).slice(0, words.length >= 6 ? 3 : 2);
+      const opts = K.shuffle([w, ...others]);
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🎈</span> ${kt('pop')}</p>
+          <div class="k-prompt">
+            <button class="k-speaker" id="k-say" aria-label="${kt('listen')}: ${w.en}"><span aria-hidden="true">🔊</span></button>
+            <span class="k-target en" lang="en">${w.en}</span>
+          </div>
+          <div class="k-sky">
+            ${opts.map((o, i) => `
+              <button class="k-balloon" data-i="${i}" aria-label="${o.en}" style="--b:${th.id === 'colors' ? '#f4f7ff' : BALLOONS[i % BALLOONS.length]};--d:${(i * 0.45).toFixed(2)}s">
+                <span class="k-balloon-pic" aria-hidden="true">${o.pic}</span>
+              </button>`).join('')}
+          </div>
+          ${owl(kt('popTip'), 'small')}
+        </div>`;
+      $('#k-say').onclick = () => sayEn(w.en);
+      setTimeout(() => say(popsShown === 1 ? [['he', kt('sayPop')], ['en', w.en]] : [['en', w.en]]), 200);
+      K.view.querySelectorAll('.k-balloon').forEach(b => {
+        b.onclick = () => {
+          const o = opts[+b.dataset.i];
+          if (o === w) {
+            K.view.querySelectorAll('.k-balloon').forEach(x => { x.disabled = true; });
+            b.classList.add('popped');
+            popSound();
+            K.Feel.right();
+            if (!missed) { firstTry++; Store.kidsWordRight(w.id); }
+            tapped++;
+            const cheer = pickOne(kt('great'));
+            $('.k-bubble').textContent = cheer;
+            $('.k-owl').classList.add('happy');
+            K.announce(cheer);
+            setTimeout(() => sayEn(w.en), 250);
+            setTimeout(nextStep, 1300);
+          } else {
+            missed = true;
+            b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope');
+            K.Feel.wrong(b);
+            $('.k-bubble').textContent = kt('tryAgain');
+            setTimeout(() => sayEn(w.en), 350);
           }
         };
       });
