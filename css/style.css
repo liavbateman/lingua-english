@@ -185,6 +185,15 @@ a.card:active, .task:active { transform: scale(.985); }
 .hero-stats b small { font-size: .6em; }
 .hero-stats span { font-size: clamp(.62rem, 3vw, .78rem); color: #cfd3ee; white-space: nowrap; }
 .hero-stats { grid-template-columns: 1fr 1.15fr .95fr; }
+/* Short phones (iPhone SE and similar): a slimmer welcome card, so today's plan starts on the first screen */
+@media (max-height: 740px) {
+  .hero { padding: 14px 16px 14px; }
+  .hero .tower { height: 92%; }
+  .hero h2 { margin: 8px 0 0; }
+  .hero p { display: none; }
+  .hero-stats { margin: 12px 0 10px; padding-top: 10px; }
+  .hero-stats b { font-size: 1.4rem; }
+}
 
 /* ---------- home: level ---------- */
 .seg { display: flex; background: var(--card); border-radius: 16px; padding: 0; }
