@@ -34,6 +34,8 @@ const Kids = (() => {
       restTitle: 'הגיע זמן לנוח!', restText: 'שיחקתם יפה היום. הינשוף הולך לישון, נתראה מחר!', restMore: 'עוד 10 דקות (להורים)',
       wardrobe: 'המלתחה של הינשוף', wardSub: 'אספו כוכבים כדי לפתוח עוד בגדים וצבעים', colors: 'צבע', things: 'אביזרים',
       needStars: 'צריך {n} ★', owlLooks: 'איזה ינשוף יפה!',
+      stories: 'סיפורים', storiesSub: 'סיפורים קצרים עם תמונות, לקרוא ולשמוע', storyLocked: 'סיימו את האי {name} כדי לפתוח',
+      readAgain: 'עוד פעם', storyTap: 'לחצו על מילה כדי לשמוע אותה', storyQ: 'שאלה קטנה', theEnd: 'הסוף!',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -61,6 +63,8 @@ const Kids = (() => {
       restTitle: 'Time to rest!', restText: 'You played so well today. The owl is going to sleep, see you tomorrow!', restMore: '10 more minutes (grown-ups)',
       wardrobe: "The owl's wardrobe", wardSub: 'Collect stars to open more clothes and colours', colors: 'Colour', things: 'Things to wear',
       needStars: 'Needs {n} ★', owlLooks: 'What a lovely owl!',
+      stories: 'Stories', storiesSub: 'Short picture stories to read and hear', storyLocked: 'Finish the {name} island to open',
+      readAgain: 'Again', storyTap: 'Tap a word to hear it', storyQ: 'A little question', theEnd: 'The end!',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -183,6 +187,11 @@ const Kids = (() => {
         </div>
         <h1 class="sr-only">${kt('title')}</h1>
         ${chestCard()}
+        <a class="k-abc-card k-story-card" href="#/kids/stories">
+          <span class="k-story-books" aria-hidden="true">📚</span>
+          <span class="grow"><b>${kt('stories')}</b><small>${kt('storiesSub')}</small></span>
+          <span class="k-story-count">${KIDS_STORIES.filter(st => Store.kidsHasSticker('st-' + st.id)).length}/${KIDS_STORIES.length}</span>
+        </a>
         <a class="k-abc-card" href="#/kids/abc">
           <span class="k-abc-letters" aria-hidden="true"><b>A</b><b>B</b><b>C</b></span>
           <span class="grow"><b>${kt('abc')}</b><small>${kt('abcSub')}</small></span>
@@ -218,6 +227,143 @@ const Kids = (() => {
     });
     const cur = $('.k-isle.cur');
     if (cur) setTimeout(() => cur.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60);
+  }
+
+  // ---------- picture stories ----------
+  const storyOpen = st => !st.island || Store.kidsHasSticker(st.island);
+  function stories() {
+    K.endLesson();
+    K.view.innerHTML = `
+      <div class="k-wrap">
+        <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
+        <h1 class="k-title">📚 ${kt('stories')}</h1>
+        <p class="k-sub">${kt('storiesSub')}</p>
+        <div class="k-books">
+          ${KIDS_STORIES.map(st => {
+            const open = storyOpen(st), read = Store.kidsHasSticker('st-' + st.id);
+            const isle = st.island && theme(st.island);
+            return `
+            <a class="k-book ${open ? '' : 'locked'}" ${open ? `href="#/kids/story/${st.id}"` : 'role="link" aria-disabled="true"'}
+               style="--c:${isle ? isle.color : '#ff9f43'}">
+              <span class="k-book-pic" aria-hidden="true">${open ? st.pic : '🔒'}</span>
+              <span class="k-book-title en">${st.title}</span>
+              <span class="k-book-he">${open ? st.he : kt('storyLocked', { name: themeName(isle) })}</span>
+              ${read ? starsHtml(Store.kidsStars('st-' + st.id), 'sm') : ''}
+            </a>`;
+          }).join('')}
+        </div>
+      </div>`;
+    K.view.querySelectorAll('.k-book.locked').forEach(b => { b.onclick = e => { e.preventDefault(); K.Feel.wrong(b); }; });
+  }
+
+  // Read aloud with the word being said lit up (where the browser reports word boundaries)
+  function readAlong(text, words, onEnd) {
+    if (!('speechSynthesis' in window)) { if (onEnd) onEnd(); return; }
+    if (!enVoice) voices();
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    if (enVoice) u.voice = enVoice;
+    u.rate = 0.75;
+    u.pitch = 1.1;
+    const starts = [];
+    text.replace(/[A-Za-z']+/g, (m, i) => { starts.push(i); return m; });
+    const light = n => words.forEach((w, k) => w.classList.toggle('lit', k === n));
+    u.onboundary = e => {
+      if (e.name && e.name !== 'word') return;
+      let n = starts.findIndex((s, k) => e.charIndex >= s && (k === starts.length - 1 || e.charIndex < starts[k + 1]));
+      light(n);
+    };
+    u.onend = () => { light(-1); if (onEnd) onEnd(); };
+    speechSynthesis.speak(u);
+  }
+
+  function story(id) {
+    const st = KIDS_STORIES.find(x => x.id === id);
+    if (!st || !storyOpen(st)) { location.hash = '#/kids/stories'; return; }
+    document.body.classList.add('in-lesson');
+    const total = st.pages.length + 1;
+    let at = 0;
+    function page() {
+      K.lessonBar(at / total);
+      const [scene, en, he] = st.pages[at];
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step en">${st.title} · ${at + 1}/${st.pages.length}</p>
+          <div class="k-card k-page">
+            <div class="k-scene" aria-hidden="true">${scene}</div>
+            <p class="k-sentence en" lang="en">${en.split(' ').map(w => `<button class="k-w">${w}</button>`).join(' ')}</p>
+            <p class="k-he he" lang="he">${he}</p>
+          </div>
+          <p class="k-tip">${kt('storyTap')}</p>
+          <div class="k-story-nav">
+            <button class="k-btn ghost" id="k-again">🔁 ${kt('readAgain')}</button>
+            <button class="k-btn" id="k-next">${kt('next')} <span aria-hidden="true">${isHe() ? '←' : '→'}</span></button>
+          </div>
+        </div>`;
+      const words = [...K.view.querySelectorAll('.k-w')];
+      words.forEach(w => { w.onclick = () => { const t = w.textContent.replace(/[^A-Za-z']/g, ''); sayEn(t); w.classList.add('lit'); setTimeout(() => w.classList.remove('lit'), 600); }; });
+      $('#k-again').onclick = () => readAlong(en, words);
+      $('#k-next').onclick = () => { at++; at < st.pages.length ? page() : question(); };
+      setTimeout(() => readAlong(en, words), 250);
+    }
+    function question() {
+      K.lessonBar(st.pages.length / total);
+      const [q, qhe, opts] = st.ask;
+      const shown = K.shuffle(opts);
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">❓</span> ${kt('storyQ')}</p>
+          <div class="k-prompt">
+            <button class="k-speaker" id="k-say" aria-label="${kt('listen')}: ${q}"><span aria-hidden="true">🔊</span></button>
+            <span class="k-target en" lang="en">${q}</span>
+            <span class="k-qhe" lang="he">${qhe}</span>
+          </div>
+          <div class="k-opts">${shown.map((o, i) => `<button class="k-opt" data-i="${i}"><span aria-hidden="true">${o}</span></button>`).join('')}</div>
+          ${owl(kt('tapTip'), 'small')}
+        </div>`;
+      $('#k-say').onclick = () => sayEn(q);
+      setTimeout(() => sayEn(q), 250);
+      K.view.querySelectorAll('.k-opt').forEach(b => {
+        b.onclick = () => {
+          if (shown[+b.dataset.i] === opts[0]) {
+            K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; });
+            b.classList.add('right');
+            K.Feel.right();
+            $('.k-bubble').textContent = pickOne(kt('great'));
+            $('.k-owl').classList.add('happy');
+            setTimeout(() => end(missed ? 2 : 3), 1200);
+          } else {
+            missed = true;
+            b.disabled = true;
+            b.classList.add('nope');
+            K.Feel.wrong(b);
+            $('.k-bubble').textContent = kt('tryAgain');
+            setTimeout(() => sayEn(q), 350);
+          }
+        };
+      });
+    }
+    function end(stars) {
+      K.endLesson(1);
+      const res = Store.kidsFinish('st-' + st.id, stars, 15);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">
+            <span class="k-sticker" aria-hidden="true">📖</span>
+            <h1>${kt('theEnd')}</h1>
+            ${starsHtml(stars, 'big pop')}
+            ${res.better && !res.firstSticker ? `<b class="k-best">${kt('best')}</b>` : ''}
+          </div>
+          <a class="k-btn" href="#/kids/stories">📚 ${kt('stories')}</a>
+          <button class="k-btn ghost" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+        </div>`;
+      K.confetti('kids');
+      sayEn('The end! Great reading!', 0.9);
+      $('#k-again').onclick = () => story(id);
+    }
+    page();
   }
 
   // ---------- the owl's wardrobe ----------
@@ -876,6 +1022,8 @@ const Kids = (() => {
       else if (a === 'abc') b ? letter(b) : abc();
       else if (a === 'abcgame') abcGame();
       else if (a === 'owl') wardrobe();
+      else if (a === 'stories') stories();
+      else if (a === 'story') story(b);
       else map();
     },
     gate,

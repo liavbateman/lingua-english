@@ -162,3 +162,60 @@ const KIDS_ABC = [
   ['V', 'vee', 'violin', 'כינור', '🎻'], ['W', 'double you', 'whale', 'לווייתן', '🐳'], ['X', 'ex', 'fox', 'שועל', '🦊'],
   ['Y', 'why', 'yo-yo', 'יו-יו', '🪀'], ['Z', 'zee', 'zebra', 'זברה', '🦓']
 ].map(([L, name, word, he, pic]) => ({ L, name, word, he, pic }));
+
+// Picture stories: 4–5 short pages built from island words, read aloud word by word,
+// then one picture question. A story opens once its island is finished (the first is always open).
+// page: [scene pictures, English sentence, Hebrew]; ask: [question, Hebrew, [right picture, other, other]]
+const KIDS_STORIES = [
+  {
+    id: 'catdog', island: null, title: 'The cat and the dog', he: 'החתול והכלב', pic: '🐱',
+    pages: [
+      ['🐱🏡', 'This is a cat.', 'זה חתול.'],
+      ['🐶', 'This is a dog.', 'זה כלב.'],
+      ['🐱⚽🐶', 'The cat and the dog play with a ball.', 'החתול והכלב משחקים בכדור.'],
+      ['🐱😴🐶', 'Now they sleep. Good night!', 'עכשיו הם ישנים. לילה טוב!']
+    ],
+    ask: ['What do they play with?', 'במה הם משחקים?', ['⚽', '🍎', '🚗']]
+  },
+  {
+    id: 'balloon', island: 'colors', title: 'My red balloon', he: 'הבלון האדום שלי', pic: '🎈',
+    pages: [
+      ['🧒🎈', 'I have a red balloon.', 'יש לי בלון אדום.'],
+      ['🎈⬆️', 'Oh no! The balloon flies up.', 'אוי לא! הבלון עף למעלה.'],
+      ['☁️🎈☀️', 'It is in the blue sky.', 'הוא בשמיים הכחולים.'],
+      ['👋🎈', 'Bye bye, red balloon!', 'ביי ביי, בלון אדום!']
+    ],
+    ask: ['What color is the balloon?', 'באיזה צבע הבלון?', ['🔴', '🔵', '🟢']]
+  },
+  {
+    id: 'count', island: 'numbers', title: 'Count with me', he: 'סופרים איתי', pic: '🔢',
+    pages: [
+      ['☀️', 'One sun.', 'שמש אחת.'],
+      ['🐦🐦', 'Two birds.', 'שתי ציפורים.'],
+      ['🌸🌸🌸', 'Three flowers.', 'שלושה פרחים.'],
+      ['🐟🐟🐟🐟', 'Four fish.', 'ארבעה דגים.'],
+      ['⭐⭐⭐⭐⭐', 'Five stars!', 'חמישה כוכבים!']
+    ],
+    ask: ['How many birds?', 'כמה ציפורים?', ['2️⃣', '3️⃣', '5️⃣']]
+  },
+  {
+    id: 'lunch', island: 'food', title: 'Lunch time', he: 'ארוחת צהריים', pic: '🍕',
+    pages: [
+      ['😋', 'I am hungry.', 'אני רעב.'],
+      ['🍎', 'I eat an apple.', 'אני אוכל תפוח.'],
+      ['🥛', 'I drink milk.', 'אני שותה חלב.'],
+      ['🍕😋', 'And pizza! Yummy!', 'וגם פיצה! טעים!']
+    ],
+    ask: ['What do I drink?', 'מה אני שותה?', ['🥛', '🍌', '🍕']]
+  },
+  {
+    id: 'family', island: 'family', title: 'I love my family', he: 'אני אוהב את המשפחה שלי', pic: '💖',
+    pages: [
+      ['👩', 'This is my mom.', 'זאת אמא שלי.'],
+      ['👨', 'This is my dad.', 'זה אבא שלי.'],
+      ['👶', 'This is my baby sister.', 'זאת אחותי התינוקת.'],
+      ['👨‍👩‍👧💖', 'I love my family!', 'אני אוהב את המשפחה שלי!']
+    ],
+    ask: ['Who is the baby?', 'מי התינוקת?', ['👶', '👵', '👨']]
+  }
+];

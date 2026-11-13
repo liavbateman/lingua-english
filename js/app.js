@@ -2764,7 +2764,7 @@
     document.querySelectorAll('.sheet-back').forEach(s => s.remove());
     view.onkeydown = null;
     view.onscroll = null;
-    const inLesson = ['unit', 'quiz', 'speak'].includes(name) || (name === 'grammar' && b === 'quiz') || (name === 'kids' && (a === 'play' || a === 'abcgame'));
+    const inLesson = ['unit', 'quiz', 'speak'].includes(name) || (name === 'grammar' && b === 'quiz') || (name === 'kids' && ['play', 'abcgame', 'story'].includes(a));
     if (name !== 'kids' && name !== 'home' && name) Kids.leave();
     document.body.classList.toggle('in-lesson', inLesson);
     if (inLesson) lessonBar(0);

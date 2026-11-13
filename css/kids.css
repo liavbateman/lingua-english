@@ -385,3 +385,29 @@ a.k-btn { text-decoration: none; text-align: center; }
 .k-ward-item small { font-size: .75rem; color: var(--k-muted); }
 .k-ward-pic { font-size: 2rem; line-height: 1; }
 .k-swatch { width: 36px; height: 36px; border-radius: 50%; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .15); }
+
+/* picture stories */
+.k-story-card { margin-top: 10px; }
+.k-story-books { font-size: 2.4rem; flex: none; }
+.k-story-count { flex: none; padding: 4px 10px; border-radius: 999px; background: #eef3ff; color: var(--k-muted); font-size: .9rem; }
+.k-books { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.k-book {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px 10px 14px; border-radius: 10px 24px 24px 10px;
+  background: #fff; color: var(--k-ink); text-decoration: none; text-align: center; border-inline-start: 10px solid var(--c);
+  box-shadow: 0 5px 0 var(--k-edge); transition: transform var(--dur-press), box-shadow var(--dur-press);
+}
+.k-book:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--k-edge); }
+.k-book.locked { background: rgba(255, 255, 255, .6); border-inline-start-color: #c7d3ea; }
+.k-book-pic { font-size: 3rem; line-height: 1.1; }
+.k-book-title { font-weight: 700; font-size: 1rem; }
+.k-book-he { font-size: .85rem; color: var(--k-muted); }
+.k-page { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 22px 16px; cursor: default; border-top: 10px solid var(--kc, #ff9f43); }
+.k-scene { font-size: 4.6rem; line-height: 1.15; letter-spacing: .05em; text-align: center; animation: k-pop .45s var(--ease-pop) both; }
+.k-sentence { margin: 6px 0 0; text-align: center; font-size: 1.7rem; line-height: 1.5; direction: ltr; }
+.k-w { border: 0; padding: 0 3px; border-radius: 8px; background: none; color: var(--k-ink); font: 700 1em var(--k-font); cursor: pointer; transition: background var(--dur-quick), color var(--dur-quick); }
+.k-w.lit { background: #ffe066; color: #1d2a5b; }
+.k-page .k-he { margin: 0; }
+.k-qhe { color: var(--k-ink); font-size: 1.05rem; background: rgba(255, 255, 255, .8); padding: 2px 10px; border-radius: 10px; }
+.k-scene { direction: ltr; }
+.k-story-nav { display: grid; grid-template-columns: 1fr 1.4fr; gap: 12px; }
+.k-story-nav .k-btn { margin-top: 0; }
