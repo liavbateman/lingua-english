@@ -62,7 +62,11 @@ in the visual language of the paths (level colours, chunky 3D cards with a botto
 | D3 | Quiz and lesson screens | Answer tiles, progress bar and feedback sheet polished to match the path cards | Done (round 80): green progress fill on a clearer track, raised question card, lighter answer tiles, rounder feedback sheet with a larger icon and the answer as a chip |
 | D4 | Tab bar and header | Active tab as a pill, softer bar with blur, consistent icon weights | Done (round 81): active tab gets a purple pill around its icon, the bar a soft shadow; the streak pill glows orange while a streak is alive and greys out at 0 (no blur: the bar does not sit over the content) |
 | D5 | Flashcards | Card faces with the unit's colour and emoji, nicer back side | Done (round 82): faces in the level colour with a 3D edge, the unit's emoji as a corner badge and a faded watermark; back side with a level-coloured top edge, translation and speaker in the level colour |
-| D6 | Type and spacing audit | One scale for headings, labels and small text; consistent card gaps | |
+| D6 | Type and contrast audit | Measured every text on the main screens: size under 12px, contrast under WCAG AA | Done (round 83): stage banners, hero button, active Learn tab and mini-map numbers raised to 4.5:1+ (white text); current-node number to 3.3:1 (large text); nothing under 12px |
+| D7 | End-of-lesson screen | The result screen after a lesson or quiz: a celebration header in the level colour, the stat tiles as raised cards, clear next step | |
+| D8 | Empty and edge states | Search with no results, nothing saved, all done: a friendly owl illustration and one helpful action each | |
+| D9 | Motion tokens | One set of durations and easings for presses, cards, sheets and rings; all respect Reduce Motion | |
+| D10 | Learn screen header | The words/sentences/practice tabs and the owl hero aligned with the grammar road's look | |
 
 ## Home: what it was for (until round 51)
 

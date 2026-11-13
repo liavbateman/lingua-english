@@ -1333,3 +1333,21 @@ button.pc-form[aria-expanded="true"] .pc-more { transform: rotate(180deg); }
 .fc-wrap .flash .hint { position: relative; }
 .fc-wrap .flash .word, .fc-wrap .flash .speak { position: relative; }
 .fc-wrap .speak { background: color-mix(in srgb, var(--lv) 22%, transparent); color: var(--lv); }
+
+/* ---------- Contrast & type audit (design round D6) ----------
+   Measured on the main screens: white text on the light stage banners, the hero button and the active
+   Learn tab was at 1.8-3.2:1. Every colour below gives white text at least 4.5:1 (WCAG AA). */
+.psec.coral { --sec-a: #d0453a; --sec-b: #b8334a; --sec-edge: #8f2638; }
+.psec.blue { --sec-a: #3767d6; --sec-b: #2350b8; --sec-edge: #1a3c8a; }
+.psec.green { --sec-a: #1d7f63; --sec-b: #0d6e57; --sec-edge: #0a5242; }
+.psec.gold { --sec-a: #b35c00; --sec-b: #97590a; --sec-edge: #6e4108; }
+.psec.purple { --sec-a: #6352e6; --sec-b: #4b3cc9; --sec-edge: #36299a; }
+.ph-go { background: #2a73d9; }
+.ph-chip { background: rgba(0, 0, 0, .28); }
+.seg a.on, .seg button.on { background: linear-gradient(135deg, #5a4ae0, #4a3cc4); }
+/* mini-map numbers sit on a dark chip, so they read over any fill */
+.mm-bar span { padding: 0 6px; border-radius: 999px; background: rgba(8, 13, 38, .6); }
+/* nothing smaller than 12px */
+.mm-lvl, .mm-lvl small { font-size: .75rem; }
+/* the current lesson's number: white on coral was 2.6:1, this coral gives 3.3:1 (large bold text) */
+.pnode.current { --face: #f0603e; --edge: #b8452a; }
