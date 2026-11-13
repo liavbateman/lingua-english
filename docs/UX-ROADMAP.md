@@ -15,7 +15,7 @@ borrowing proven patterns from leading language apps, and adapts them to a Hebre
 | P1 | Path: lesson card | Tapping a lesson opens a small card under it (name, progress, one clear button) instead of jumping in; locked lessons explain why | Duolingo | Done (round 30) |
 | P2 | Path: section banners | Every few lessons a colored banner names the stage ("Part 2 · Around town") with its own progress | Duolingo units | Done (round 32): "Stage N" banner every 5 lessons, lesson icons, progress pill, one road per stage |
 | P3 | Path: milestone chests | A treasure node after each section that opens with a small celebration once the section is done | Duolingo chests | Done (round 34): locked / ready (wiggles) / opened, +20 points once |
-| P4 | Path: progress you can see happen | Coming back from a finished lesson, the node turns gold and the road fills up to the next one | Duolingo | |
+| P4 | Path: progress you can see happen | Coming back from a finished lesson, the node turns gold and the road fills up to the next one | Duolingo | Done (round 36): node turns gold, road grows, bubble drops onto the next lesson, once per change |
 | P5 | Path: mascot header | A header with the owl, streak and the next step above the path, like the reference app | User's reference app | |
 | P6 | Path: review stops | A "review" node that appears on the road when words from earlier lessons are due | Duolingo practice nodes | |
 | 7 | Owl reactions | The owl mascot reacts in feedback, empty states and celebrations | Duolingo | |

@@ -534,25 +534,69 @@
       const [px, py] = list[i - 1], my = (py + y) / 2;
       return `C${px} ${my} ${x} ${my} ${x} ${y}`;
     }).join(' ');
-    // one road per stage, so it doesn't run under the banners
+    // one road per stage, so it doesn't run under the banners; gold up to `reach`
+    const roads = reach => {
+      let d = '', done = '';
+      for (let s = 0; s < pts.length; s += PATH_SECTION) {
+        const lessons = pts.slice(s, s + PATH_SECTION);
+        const seg = lessons.concat([chestPts[s / PATH_SECTION]]);     // the road ends at the chest
+        d += curve(seg) + ' ';
+        const upto = Math.min(lessons.length, reach - s) + (reach - s > lessons.length ? 1 : 0);
+        if (upto > 1) done += curve(seg.slice(0, upto)) + ' ';
+      }
+      return { d, done };
+    };
     const reach = pathItems.cur < 0 ? pts.length : pathItems.cur + 1;
-    let d = '', done = '';
-    for (let s = 0; s < pts.length; s += PATH_SECTION) {
-      const lessons = pts.slice(s, s + PATH_SECTION);
-      const seg = lessons.concat([chestPts[s / PATH_SECTION]]);     // the road ends at the chest
-      d += curve(seg) + ' ';
-      const upto = Math.min(lessons.length, reach - s) + (reach - s > lessons.length ? 1 : 0);
-      if (upto > 1) done += curve(seg.slice(0, upto)) + ' ';
-    }
+    const { d, done } = roads(reach);
     const svg = document.getElementById('pathline');
     svg.setAttribute('viewBox', `0 0 ${W} ${y}`);
     svg.innerHTML = `<path class="pl-base" d="${d}"/>` + (done ? `<path class="pl-done" d="${done}"/>` : '');
+
+    // Back from a finished lesson: the gold road grows from where it was to where it is now
+    const from = pathItems.growFrom;
+    pathItems.growFrom = undefined;                       // only once, not on every resize
+    const gold = svg.querySelector('.pl-done');
+    if (from !== undefined && from < reach && gold && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const full = gold.getTotalLength();
+      const tmp = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      tmp.setAttribute('d', roads(from).done || 'M0 0');
+      svg.appendChild(tmp);
+      const start = roads(from).done ? tmp.getTotalLength() : 0;
+      tmp.remove();
+      gold.style.strokeDasharray = `${full} ${full}`;
+      gold.style.strokeDashoffset = String(full - start);
+      gold.getBoundingClientRect();                       // commit the start before animating
+      gold.style.transition = 'stroke-dashoffset 1.1s cubic-bezier(.4, 0, .2, 1) .45s';
+      gold.style.strokeDashoffset = '0';
+    }
+  }
+
+  // What the path looked like last time, per level and part, to show what changed since
+  const pathMemKey = items => `lingua-path:${Store.level}:${items.part}`;
+  function pathMemory(items) {
+    let before = null;
+    try { before = JSON.parse(localStorage.getItem(pathMemKey(items)) || 'null'); } catch (e) { /* private mode */ }
+    try { localStorage.setItem(pathMemKey(items), JSON.stringify(items.map(x => x.done ? 1 : 0))); } catch (e) { /* fine */ }
+    return before;
   }
 
   function bindPath(items) {
     pathItems = items;
+    // Lessons finished since the last visit turn gold in front of the learner, and the road follows
+    const before = pathMemory(items);
+    const fresh = before ? items.map((x, i) => x.done && !before[i] ? i : -1).filter(i => i >= 0) : [];
+    if (fresh.length) {
+      const oldCur = before.findIndex(v => !v);
+      items.growFrom = oldCur < 0 ? items.length : oldCur + 1;
+    }
     layoutPath();
     const path = document.getElementById('path');
+    fresh.forEach(i => path.querySelector(`.pnode[data-i="${i}"]`).classList.add('just-done'));
+    if (fresh.length) {
+      const bub = path.querySelector('.pbubble');
+      if (bub) bub.classList.add('arrive');
+      setTimeout(() => Feel.right(), 700);
+    }
     // Tapping a lesson opens a small card under it (as in Duolingo): its name, how far it is,
     // and one clear button. A second tap, a tap elsewhere or Escape closes it.
     let open = -1;
