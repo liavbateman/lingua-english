@@ -596,7 +596,8 @@
     ['b-would-like', 'b-want-need'], ['b-would-like', 'a-would-rather'], ['can', 'modals'], ['modals', 'a-deduction'],
     ['b-adjective-position', 'i-adjectives-adverbs'], ['gerund-infinitive', 'b-want-need'], ['b-connectors', 'a-concession'],
     ['passive', 'a-causative'], ['reported-speech', 'past-perfect'], ['i-so-neither', 'i-question-tags'], ['plurals', 'quantity'],
-    ['b-spell-s', 'present-simple'], ['b-spell-s', 'plurals'], ['b-spell-ing', 'present-continuous'], ['i-spell-ed', 'past-simple']
+    ['b-spell-s', 'present-simple'], ['b-spell-s', 'plurals'], ['b-spell-ing', 'present-continuous'], ['i-spell-ed', 'past-simple'],
+    ['past-perfect', 'a-past-perfect-continuous'], ['present-perfect-continuous', 'a-past-perfect-continuous'], ['a-future-perfect-continuous', 'a-future-perfect-progressive']
   ];
   const rulePartners = id => RULE_PAIRS.filter(p => p.includes(id)).map(p => p[0] === id ? p[1] : p[0]);
   function relatedRules(x) {
@@ -1196,6 +1197,41 @@
   }
 
   // ---------- Grammar ----------
+  // ---------- Tenses map: when (past / present / future) × how (simple, progressive, perfect, perfect progressive) ----------
+  const TENSES = [
+    ['past', [['simple', 'past-simple', 'I worked'], ['prog', 'past-continuous', 'I was working'],
+      ['perf', 'past-perfect', 'I had worked'], ['pp', 'a-past-perfect-continuous', 'I had been working']]],
+    ['present', [['simple', 'present-simple', 'I work'], ['prog', 'present-continuous', 'I am working'],
+      ['perf', 'present-perfect', 'I have worked'], ['pp', 'present-perfect-continuous', 'I have been working']]],
+    ['future', [['simple', 'future', 'I will work'], ['prog', 'a-future-perfect-continuous', 'I will be working'],
+      ['perf', 'a-future-perfect-continuous', 'I will have worked'], ['pp', 'a-future-perfect-progressive', 'I will have been working']]]
+  ];
+  const TENSE_EN = { past: 'Past', present: 'Present', future: 'Future', simple: 'Simple', prog: 'Progressive', perf: 'Perfect', pp: 'Perfect Progressive' };
+  const isTenseRule = id => TENSES.some(([, cells]) => cells.some(c => c[1] === id));
+
+  function tenses() {
+    view.innerHTML = `
+      <a class="back" href="#/grammar">${bwd()} ${t('grammar.back')}</a>
+      <h1>⏱️ ${t('tn.title')}</h1>
+      <p class="sub">${t('tn.sub')}</p>
+      <div class="tn-key" aria-hidden="true">${['simple', 'prog', 'perf', 'pp'].map(a => `<span class="asp-${a}">${t('tn.' + a)}</span>`).join('')}</div>
+      ${TENSES.map(([time, cells]) => `
+        <section class="tn-time">
+          <h2 class="tn-h">${t('tn.' + time)} <small class="en">${TENSE_EN[time]}</small></h2>
+          <div class="tn-grid">
+            ${cells.map(([asp, id, ex]) => {
+              const g = GRAMMAR.find(x => x.id === id);
+              return `<a class="tn-cell asp-${asp}" href="#/grammar/${id}">
+                <b>${t('tn.' + time)} ${t('tn.' + asp)}</b>
+                <small class="en">${TENSE_EN[time]} ${TENSE_EN[asp]}</small>
+                <span class="tn-ex en" dir="ltr">${ex}</span>
+                <span class="tn-meta">${t('lv.' + g.level)}${Store.isGrammarDone(id) ? ' · 👑' : ''}</span>
+              </a>`;
+            }).join('')}
+          </div>
+        </section>`).join('')}`;
+  }
+
   // The Grammar tab: one road through every rule of every level (as the Learn paths)
   // Rules found by a search in Hebrew or English: names first, then the structures and examples
   function ruleSearch(items, query) {
@@ -1215,6 +1251,8 @@
     view.innerHTML = `
       <h1 class="sr-only">${t('gr.title')}</h1>
       ${pathHero(items)}
+      <a class="tn-entry" href="#/tenses"><span class="tn-entry-ico" aria-hidden="true">⏱️</span>
+        <span class="grow"><b>${t('tn.title')}</b><small>${t('tn.card')}</small></span><span class="go-chev" aria-hidden="true">${fwd()}</span></a>
       <div class="gsearch-row">
         <div class="search">
           ${ICON.search}
@@ -1302,6 +1340,7 @@
           <span class="rule-num">${t('rule.num', { n: road.indexOf(g) + 1, m: road.length })}</span>
         </div>
         <h1>${ruleTitle(g)}${done ? ' <span class="rule-crown" aria-label="' + t('path.state.done') + '">👑</span>' : ''}</h1>
+        ${isTenseRule(g.id) ? `<a class="rule-tn" href="#/tenses">⏱️ ${t('tn.title')}</a>` : ''}
         <p class="sub">${ruleOther(g)}</p>
       </header>
 
@@ -2338,6 +2377,7 @@
       case 'quiz': refreshChrome('learn'); quiz(a, b); break;
       case 'speak': refreshChrome('learn'); speaking(); break;
       case 'progress': refreshChrome('progress'); progress(); break;
+      case 'tenses': refreshChrome('grammar'); tenses(); break;
       default: refreshChrome(''); notFound();
     }
     // After a screen change, put keyboard and screen-reader focus on its heading (not on the first load)

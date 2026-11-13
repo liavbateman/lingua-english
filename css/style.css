@@ -1540,3 +1540,33 @@ button.pc-form[aria-expanded="true"] .pc-more { transform: rotate(180deg); }
 .cal-key .cal-d { width: 14px; height: 14px; border-radius: 4px; aspect-ratio: auto; }
 /* tags take their direction from their first letter: "+ s" reads left to right, "תנועה + y" right to left */
 .rtag, .pc-tag, .ftag { unicode-bidi: plaintext; }
+
+/* ---------- Tenses map ---------- */
+.tn-entry {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding: 12px 14px; border-radius: 18px;
+  color: var(--ink); text-decoration: none; background: linear-gradient(160deg, #2a2f7a, #1d225d);
+  border: 1px solid rgba(142, 125, 255, .35); box-shadow: 0 4px 0 #11163a;
+}
+.tn-entry:active { transform: translateY(3px); box-shadow: 0 1px 0 #11163a; }
+.tn-entry-ico { font-size: 1.6rem; line-height: 1; }
+.tn-entry .grow { display: grid; gap: 2px; }
+.tn-entry small { color: #c9cdf0; font-size: .82rem; }
+.tn-key { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 6px; }
+.tn-key span { padding: 3px 10px; border-radius: 999px; font-size: .78rem; font-weight: 800; background: color-mix(in srgb, var(--c) 30%, transparent); color: #fff; }
+.tn-time { margin-top: 16px; }
+.tn-h { margin: 0 0 8px; font-size: 1.15rem; display: flex; align-items: baseline; gap: 8px; }
+.tn-h small { color: var(--muted); font-size: .8rem; }
+.tn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tn-cell {
+  display: grid; gap: 4px; align-content: start; padding: 12px; border-radius: 18px; color: var(--ink); text-decoration: none;
+  background: #1d2352; background: linear-gradient(160deg, color-mix(in srgb, var(--c) 32%, #1a2052), #171d48);
+  border-top: 3px solid var(--c); box-shadow: 0 4px 0 #0d1232;
+}
+.tn-cell:active { transform: translateY(3px); box-shadow: 0 1px 0 #0d1232; }
+.tn-cell b { font-size: .98rem; line-height: 1.25; }
+.tn-cell small { color: #c9cdf0; font-size: .75rem; }
+.tn-ex { margin-top: 4px; padding: 5px 8px; border-radius: 9px; background: rgba(0, 0, 0, .22); font-weight: 700; font-size: .85rem; text-align: left; }
+.tn-meta { font-size: .75rem; color: #c9cdf0; font-weight: 700; }
+.asp-simple { --c: #3f7df0; } .asp-prog { --c: #2cb98d; } .asp-perf { --c: #f2a43c; } .asp-pp { --c: #8e6cf5; }
+.rule-tn { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; min-height: 36px; padding: 0 12px; border-radius: 999px;
+  background: rgba(255, 255, 255, .1); color: var(--ink); text-decoration: none; font-weight: 700; font-size: .85rem; }

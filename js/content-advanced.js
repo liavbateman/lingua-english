@@ -840,5 +840,33 @@ GRAMMAR.push(
     ex: [['The doctor recommended that she rest for a week.', 'הרופאה המליצה שתנוח שבוע.'], ['It is essential that every student attend the meeting.', 'חיוני שכל הסטודנטים ישתתפו בפגישה.'], ['They insisted that he not be told.', 'הם עמדו על כך שלא יספרו לו.']],
     tip: 'טעות נפוצה: להוסיף s או to מתוך הרגל: "I suggest that he goes" או "that he to go". בסגנון הרשמי אומרים "that he go". באנגלית בריטית מדוברת מקובל גם "that he should go".',
     quiz: [['The manager insisted that everyone ___ on time.', 'arrive', ['arrives', 'arrived', 'to arrive']], ['It is vital that she ___ informed immediately.', 'be', ['is', 'was', 'being']], ['I recommend that he ___ a lawyer.', 'consult', ['consults', 'consulting', 'to consult']]]
+  },
+
+  // ---------- The two tenses that completed the tenses map ----------
+  {
+    id: 'a-past-perfect-continuous', level: 'advanced', title: 'Past Perfect Continuous', he: 'עבר מושלם ממושך',
+    when: 'לפעולה שנמשכה זמן מה עד נקודה בעבר, או עד שקרה משהו אחר בעבר. המבנה הוא had been ואחריו פועל עם ing. הזמן הזה מדגיש את משך הזמן: "כבר שעה ש...".',
+    forms: [
+      ['+', 'had been + verb-ing: I had been working'],
+      ['–', "had not (hadn't) been + verb-ing: I hadn't been working"],
+      ['?', 'Had you been working?'],
+      ['for / since', 'She had been waiting for an hour when the bus came.']
+    ],
+    ex: [['I had been waiting for an hour when she arrived.', 'חיכיתי כבר שעה כשהיא הגיעה.'], ['They were tired because they had been running.', 'הם היו עייפים כי הם רצו.'], ["He hadn't been sleeping well before the exam.", 'הוא לא ישן טוב לפני המבחן.'], ['How long had you been living there?', 'כמה זמן גרת שם?']],
+    tip: 'טעות נפוצה: להשתמש בעבר פשוט כשמדגישים משך זמן עד נקודה בעבר. במקום "I waited for an hour when she arrived" אומרים "I had been waiting for an hour when she arrived".',
+    quiz: [['She was tired because she ___ all day.', 'had been working', ['has been working', 'was work', 'had working']], ['We ___ for two hours when the film started.', 'had been waiting', ['have been waiting', 'had waited been', 'were wait']], ['How long ___ you been learning English before you moved?', 'had', ['have', 'did', 'were']]]
+  },
+  {
+    id: 'a-future-perfect-progressive', level: 'advanced', title: 'Future Perfect Continuous', he: 'עתיד מושלם ממושך',
+    when: 'למשך של פעולה עד נקודה בעתיד: "עד יוני אעבוד כאן כבר שנה". המבנה הוא will have been ואחריו פועל עם ing. זמן נדיר יחסית, שבא בעיקר עם for ועם by.',
+    forms: [
+      ['+', 'will have been + verb-ing: I will have been working'],
+      ['–', "won't have been + verb-ing"],
+      ['?', 'Will you have been working?'],
+      ['by / for', 'By June, I will have been working here for a year.']
+    ],
+    ex: [['By June, I will have been working here for a year.', 'עד יוני אעבוד כאן כבר שנה.'], ['Next month we will have been living in Israel for ten years.', 'בחודש הבא נגור בישראל כבר עשר שנים.'], ['She will be tired because she will have been driving all day.', 'היא תהיה עייפה כי היא תנהג כל היום.']],
+    tip: 'טעות נפוצה: לשכוח את have או את been: "I will been working" או "I will have working". המבנה המלא הוא will have been ואחריו פועל עם ing.',
+    quiz: [['By 6 pm, I ___ for ten hours.', 'will have been working', ['will be have working', 'will have working', 'will been working']], ['Next year she ___ teaching for a decade.', 'will have been', ['will be been', 'will have being', 'has been']], ['___ you have been waiting long by the time he arrives?', 'Will', ['Do', 'Are', 'Have']]]
   }
 );
