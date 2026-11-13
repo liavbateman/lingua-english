@@ -29,6 +29,7 @@
     keyboard: svg('<rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6.5 10h.01M10 10h.01M14 10h.01M17.5 10h.01M8 14.5h8"/>'),
     target: svg('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>'),
     search: svg('<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20"/>'),
+    cross: svg('<path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke-width="3"/>'),
     calendar: svg('<rect x="3.500" y="5" width="17" height="15.500" rx="3"/><path d="M3.500 10h17M8 3v4M16 3v4"/>')
   };
 
@@ -488,7 +489,7 @@
           const full = q.replace('___', answer);
           $('#sentence').textContent = full;
           speak(full.replace(/"/g, ''));
-          $('#next').hidden = false;
+          showFeedback({ ok, answer: ok ? '' : full, say: full.replace(/"/g, '') });
         };
       });
       $('#next').onclick = () => { i++; i < g.quiz.length ? question() : summary(); };
@@ -713,7 +714,6 @@
           <input id="answer" class="en" dir="ltr" lang="en" type="text" enterkeyhint="go"
             autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="${t('quiz.type')}" placeholder="${t('quiz.type.ph')}">
           <button class="btn" id="check" type="submit">${t('quiz.check')}</button>
-          <div class="typed-result" id="result" aria-live="polite"></div>
         </form>` : `
         <div class="options">
           ${options.map(o => `<button class="opt ${toHebrew ? 'he' : 'en'} ${long}" data-id="${o.id}">${o[key]}</button>`).join('')}
@@ -725,7 +725,7 @@
       if (kind === 'listen') speak(w.en);
 
       // After any answer: score it, maybe send the word back, reveal "Next"
-      function settle(ok) {
+      function settle(ok, close = false) {
           announce(ok ? t('sr.right') : t('sr.wrong', { answer: w[kind === 'choice' && toHebrew ? 'he' : 'en'] }));
           // Only the first try is scored and moves the word between review boxes
           if (!retry) {
@@ -742,8 +742,15 @@
           $('#next').textContent = t(i === queue.length - 1 ? 'btn.finish' : 'btn.next');
           if (kind === 'cloze') $('#sentence').textContent = w.ex;
           if (kind !== 'listen' && !toHebrew) speak(kind === 'cloze' ? w.ex : w.en);
-          $('#next').hidden = false;
-          if (kind !== 'type') $('#next').focus();
+          // The answer in the language that was asked for, its pair underneath
+          const heAnswer = kind === 'choice' && toHebrew;
+          showFeedback({
+            ok, close,
+            answer: kind === 'cloze' ? w.ex : heAnswer ? w.he : w.en,
+            lang: heAnswer ? 'he' : 'en',
+            sub: heAnswer ? w.en : w.he,
+            say: kind === 'cloze' ? w.ex : w.en
+          });
       }
 
       view.querySelectorAll('.opt').forEach(btn => {
@@ -771,12 +778,7 @@
           input.classList.add(grade === 'wrong' ? 'wrong' : 'right');
           grade === 'wrong' ? Feel.wrong(input) : Feel.right();
           $('#check').hidden = true;
-          $('#result').innerHTML = grade === 'right'
-            ? `<b class="ok">${t('quiz.type.right')}</b>`
-            : `<b class="${grade === 'close' ? 'ok' : 'bad'}">${t(grade === 'close' ? 'quiz.type.close' : 'quiz.type.wrong')}</b>
-               <span class="en" dir="ltr">${w.en}</span>`;
-          settle(grade !== 'wrong');
-          $('#next').focus();   // Enter again goes on to the next word
+          settle(grade !== 'wrong', grade === 'close');   // Enter again goes on to the next word
         };
       }
       $('#next').onclick = () => { i++; i < queue.length ? question() : summary(); };
@@ -1043,7 +1045,33 @@
   const lbFill = document.getElementById('lb-fill');
   const lbTrack = document.getElementById('lb-track');
 
+  // After an answer: a green or red sheet rises from the bottom with the right answer, its sound,
+  // and the Continue button, always in the same place under the thumb (as in Duolingo)
+  function showFeedback({ ok, close, answer, lang = 'en', sub, say }) {
+    const next = $('#next');
+    const fb = document.createElement('div');
+    fb.className = 'fb ' + (ok ? 'ok' : 'bad');
+    fb.setAttribute('role', 'status');
+    const title = ok ? (close ? t('quiz.type.close') : t('fb.right.' + Math.floor(Math.random() * 4))) : t('fb.answer');
+    fb.innerHTML = `
+      <div class="fb-head">
+        <span class="fb-icon" aria-hidden="true">${ok ? ICON.check : ICON.cross}</span>
+        <b>${title}</b>
+        ${say ? `<button class="speak sm fb-say" aria-label="${t('aria.listen')}">${ICON.speaker}</button>` : ''}
+      </div>
+      ${answer ? `<div class="fb-answer ${lang}" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${answer}</div>` : ''}
+      ${sub ? `<div class="fb-sub">${sub}</div>` : ''}`;
+    next.hidden = false;
+    fb.appendChild(next);
+    view.appendChild(fb);
+    view.classList.add('has-fb');
+    const s = fb.querySelector('.fb-say');
+    if (s) s.onclick = () => speak(say);
+    next.focus({ preventScroll: true });
+  }
+
   function lessonBar(fraction) {
+    view.classList.remove('has-fb');
     lessonDone = Math.max(0, Math.min(1, fraction));
     lbFill.style.width = (lessonDone * 100) + '%';
     lbTrack.setAttribute('aria-valuenow', String(Math.round(lessonDone * 100)));
@@ -1051,6 +1079,7 @@
   }
   function endLesson(fraction) {
     if (fraction !== undefined) lessonBar(fraction);
+    view.classList.remove('has-fb');
     document.body.classList.remove('in-lesson');
   }
 

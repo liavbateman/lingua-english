@@ -6,7 +6,7 @@ borrowing proven patterns from leading language apps, and adapts them to a Hebre
 | # | Round | Pattern | Inspired by | Status |
 |---|---|---|---|---|
 | 1 | Lesson focus mode | Header and tab bar hide during an exercise; close button and one thick progress bar at the top; a bottom sheet asks before leaving mid-round | Duolingo, Babbel | Done (round 23) |
-| 2 | Answer feedback sheet | After answering, a green or red sheet slides up from the bottom with the correct answer, a speaker and a large Continue button in the thumb zone, so the button never jumps around | Duolingo | |
+| 2 | Answer feedback sheet | After answering, a green or red sheet slides up from the bottom with the correct answer, a speaker and a large Continue button in the thumb zone, so the button never jumps around | Duolingo | Done (round 24) |
 | 3 | Tactile buttons | Thick 3D buttons and answer tiles that visibly press down; select an answer, then Check, to avoid mis-taps | Duolingo | |
 | 4 | Combo and lesson-end stats | "3 in a row!" while answering; the end screen shows accuracy, points and time as tiles that count up | Duolingo, Busuu | |
 | 5 | Flashcards that flip and swipe | 3D flip animation; swipe right for "I know it" and left for "Again" | Drops, Memrise, Anki | |

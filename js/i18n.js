@@ -27,6 +27,8 @@ const STR = {
 
     'search.ph': 'Search a word in English or Hebrew', 'search.none': 'No words match “{q}”',
     'search.count': '{n} results', 'search.one': '1 result',
+    'fb.right.0': 'Correct!', 'fb.right.1': 'Excellent!', 'fb.right.2': 'Nice one!', 'fb.right.3': 'Great job!',
+    'fb.answer': 'Correct answer:',
     'lesson.close': 'Close the lesson', 'lesson.quit.title': 'Leave this lesson?',
     'lesson.quit.text': "Your answers so far are saved, but this round won't count as finished.",
     'lesson.quit.stay': 'Keep learning', 'lesson.quit.leave': 'Leave',
@@ -118,6 +120,8 @@ const STR = {
 
     'search.ph': 'חיפוש מילה באנגלית או בעברית', 'search.none': 'לא נמצאו מילים עבור „{q}”',
     'search.count': '{n} תוצאות', 'search.one': 'תוצאה אחת',
+    'fb.right.0': 'נכון!', 'fb.right.1': 'מצוין!', 'fb.right.2': 'יפה מאוד!', 'fb.right.3': 'כל הכבוד!',
+    'fb.answer': 'התשובה הנכונה:',
     'lesson.close': 'יציאה מהשיעור', 'lesson.quit.title': 'לצאת מהשיעור?',
     'lesson.quit.text': 'התשובות עד עכשיו נשמרו, אבל הסבב הזה לא ייחשב כגמור.',
     'lesson.quit.stay': 'ממשיכים ללמוד', 'lesson.quit.leave': 'יציאה',
