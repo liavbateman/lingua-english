@@ -73,7 +73,13 @@
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (hadCopy) window.dispatchEvent(new Event('app-updated'));
       });
-      navigator.serviceWorker.register('sw.js').catch(() => {});
+      const reg = navigator.serviceWorker.register('sw.js');
+      reg.catch(() => {});
+      // An installed app on the phone is usually resumed, not reloaded, so the browser never looks
+      // for a new version by itself. Look every time the app comes back to the screen.
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') reg.then(r => r.update()).catch(() => {});
+      });
     }
   </script>
 </body>
