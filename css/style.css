@@ -1319,3 +1319,17 @@ button.pc-form[aria-expanded="true"] .pc-more { transform: rotate(180deg); }
 .streak:not(.lit) { filter: grayscale(.8); opacity: .8; }
 .lang { transition: background .15s; }
 @media (prefers-reduced-motion: reduce) { .tabbar a, .tabbar svg, .streak { transition: none; } }
+
+/* ---------- Flashcards in their level's colour (design round D5) ---------- */
+.fc-wrap .fc-face {
+  border: 1px solid rgba(255, 255, 255, .08);
+  background: linear-gradient(160deg, var(--lv-bg-a), var(--lv-bg-b)); box-shadow: 0 6px 0 var(--lv-edge);
+}
+.fc-wrap .fc-face.back { background: linear-gradient(160deg, #262d68, #1a2052); border-top: 4px solid var(--lv); }
+.fc-emoji { position: absolute; top: 12px; inset-inline-end: 14px; font-size: 1.9rem; line-height: 1; }
+.fc-mark { position: absolute; bottom: -18px; inset-inline-start: -10px; font-size: 7.5rem; line-height: 1; opacity: .08; pointer-events: none; filter: grayscale(.3); }
+.fc-wrap .flash .he { color: var(--lv); }
+.fc-wrap .fc-en { color: #c9cdf0; }
+.fc-wrap .flash .hint { position: relative; }
+.fc-wrap .flash .word, .fc-wrap .flash .speak { position: relative; }
+.fc-wrap .speak { background: color-mix(in srgb, var(--lv) 22%, transparent); color: var(--lv); }

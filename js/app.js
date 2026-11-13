@@ -1500,16 +1500,18 @@
       view.innerHTML = `
         <p class="sub">${unit.emoji} ${unitTitle(unit)} · ${t('card.count', { a: i + 1, b: words.length })}</p>
         ${lessonBar(i / words.length)}
-        <div class="fc-wrap" id="fcwrap">
+        <div class="fc-wrap lv-${unit.level}" id="fcwrap">
           <span class="fc-tag know" aria-hidden="true">${t('cards.know')} ✓</span>
           <span class="fc-tag again" aria-hidden="true">↺ ${t('cards.again')}</span>
           <div class="fc" id="fc">
             <div class="fc-face front card flash">
+              <span class="fc-emoji" aria-hidden="true">${unit.emoji}</span><span class="fc-mark" aria-hidden="true">${unit.emoji}</span>
               <div class="word en ${long}">${w.en}</div>
               <button class="speak" data-speak aria-label="${t('aria.listen')}">${ICON.speaker}</button>
               <button class="hint" id="flip" aria-expanded="false">${t('card.hint')}</button>
             </div>
             <div class="fc-face back card flash" aria-hidden="true">
+              <span class="fc-emoji" aria-hidden="true">${unit.emoji}</span>
               <div class="fc-en en">${w.en}</div>
               <div class="he ${long}">${w.he}</div>
               ${w.ex ? `<div class="example en">${w.ex}</div>` : ''}

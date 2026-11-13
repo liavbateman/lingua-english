@@ -61,7 +61,7 @@ in the visual language of the paths (level colours, chunky 3D cards with a botto
 | D2 | Grammar rule page | The rule screen in its level's colour: header card, structure as a clean table, examples as speaker rows, mistake card with a clear warning style | Done (round 79): header with level, CEFR, "rule N of 66" and a crown; section cards with icons and a level-coloured edge; tags and speakers in the level colour; amber mistake card |
 | D3 | Quiz and lesson screens | Answer tiles, progress bar and feedback sheet polished to match the path cards | Done (round 80): green progress fill on a clearer track, raised question card, lighter answer tiles, rounder feedback sheet with a larger icon and the answer as a chip |
 | D4 | Tab bar and header | Active tab as a pill, softer bar with blur, consistent icon weights | Done (round 81): active tab gets a purple pill around its icon, the bar a soft shadow; the streak pill glows orange while a streak is alive and greys out at 0 (no blur: the bar does not sit over the content) |
-| D5 | Flashcards | Card faces with the unit's colour and emoji, nicer back side | |
+| D5 | Flashcards | Card faces with the unit's colour and emoji, nicer back side | Done (round 82): faces in the level colour with a 3D edge, the unit's emoji as a corner badge and a faded watermark; back side with a level-coloured top edge, translation and speaker in the level colour |
 | D6 | Type and spacing audit | One scale for headings, labels and small text; consistent card gaps | |
 
 ## Home: what it was for (until round 51)
