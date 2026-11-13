@@ -625,7 +625,7 @@ body.in-lesson .view { padding-bottom: calc(24px + env(safe-area-inset-bottom));
 @media (prefers-reduced-motion: reduce) { .lb-track i { transition: none; } }
 
 /* ---------- Answer feedback sheet ---------- */
-.view.has-fb { padding-bottom: calc(230px + env(safe-area-inset-bottom)); }
+body.in-lesson .view.has-fb { padding-bottom: calc(230px + env(safe-area-inset-bottom)); }
 .fb {
   position: fixed; z-index: 20; left: 0; right: 0; bottom: 0;
   width: 100%; max-width: 560px; margin: 0 auto;
@@ -648,3 +648,29 @@ body.in-lesson .view { padding-bottom: calc(24px + env(safe-area-inset-bottom));
 .fb .btn { margin-top: 14px; color: #08111f; box-shadow: none; }
 .fb.ok .btn { background: var(--good); }
 .fb.bad .btn { background: var(--bad); }
+
+/* ---------- Tactile buttons (a darker edge underneath that the button presses into) ---------- */
+.btn { box-shadow: 0 4px 0 #463bc4, 0 10px 22px rgba(106, 92, 255, .28); transition: transform .06s ease, box-shadow .06s ease; }
+.btn:not(:disabled):active { transform: translateY(4px); box-shadow: 0 0 0 #463bc4, 0 4px 10px rgba(106, 92, 255, .2); }
+.btn.ghost { box-shadow: 0 4px 0 #11163a; }
+.btn.ghost:not(:disabled):active { box-shadow: 0 0 0 #11163a; }
+.btn.plain, .btn.plain:active { box-shadow: none; transform: none; }
+.btn:disabled { box-shadow: 0 4px 0 rgba(0, 0, 0, .25); }
+.fb.ok .btn { box-shadow: 0 4px 0 #1d8f66; }
+.fb.bad .btn { box-shadow: 0 4px 0 #b8404f; }
+.fb .btn:not(:disabled):active { box-shadow: 0 0 0 transparent; }
+
+.opt { box-shadow: 0 4px 0 #0d1232; transition: transform .06s ease, box-shadow .06s ease, border-color .12s, background .12s; }
+.opt:not(:disabled):active { transform: translateY(3px); box-shadow: 0 1px 0 #0d1232; }
+.opt.sel:not(:disabled) { border-color: var(--brand-2); background: rgba(142, 125, 255, .26); color: #e4e0ff; box-shadow: 0 4px 0 #463bc4; }
+.opt.right { box-shadow: 0 4px 0 #1d8f66; }
+.opt.wrong { box-shadow: 0 4px 0 #b8404f; }
+
+/* Check bar: fixed at the bottom, where the feedback sheet will appear */
+body.in-lesson .view.has-check { padding-bottom: calc(132px + env(safe-area-inset-bottom)); }
+.checkbar {
+  position: fixed; z-index: 15; left: 0; right: 0; bottom: 0; width: 100%; max-width: 560px; margin: 0 auto;
+  padding: 18px max(18px, env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  background: linear-gradient(to bottom, transparent, var(--bg) 35%);
+}
+@media (prefers-reduced-motion: reduce) { .btn, .opt { transition: none; } }

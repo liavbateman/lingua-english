@@ -476,8 +476,7 @@
         </div>
         <button class="btn" id="next" hidden>${t(i === g.quiz.length - 1 ? 'btn.finish' : 'btn.next')}</button>`;
 
-      view.querySelectorAll('.opt').forEach(btn => {
-        btn.onclick = () => {
+      selectThenCheck(btn => {
           const ok = btn.textContent === answer;
           view.querySelectorAll('.opt').forEach(b => {
             b.disabled = true;
@@ -490,7 +489,6 @@
           $('#sentence').textContent = full;
           speak(full.replace(/"/g, ''));
           showFeedback({ ok, answer: ok ? '' : full, say: full.replace(/"/g, '') });
-        };
       });
       $('#next').onclick = () => { i++; i < g.quiz.length ? question() : summary(); };
     }
@@ -753,8 +751,7 @@
           });
       }
 
-      view.querySelectorAll('.opt').forEach(btn => {
-        btn.onclick = () => {
+      if (kind !== 'type') selectThenCheck(btn => {
           const ok = btn.dataset.id === w.id;
           view.querySelectorAll('.opt').forEach(b => {
             b.disabled = true;
@@ -763,7 +760,6 @@
           if (!ok) btn.classList.add('wrong');
           ok ? Feel.right() : Feel.wrong(btn);
           settle(ok);
-        };
       });
 
       if (kind === 'type') {
@@ -1070,8 +1066,38 @@
     next.focus({ preventScroll: true });
   }
 
+  // Multiple choice: tap to select, then Check (a second tap on the same answer also checks).
+  // A stray tap can be changed before it counts, as in Duolingo.
+  function selectThenCheck(onAnswer) {
+    const opts = [...view.querySelectorAll('.opt')];
+    const bar = document.createElement('div');
+    bar.className = 'checkbar';
+    bar.innerHTML = `<button class="btn" id="checkopt" disabled>${t('quiz.check')}</button>`;
+    view.appendChild(bar);
+    view.classList.add('has-check');
+    const checkBtn = bar.firstElementChild;
+    let chosen = null;
+    const check = () => {
+      if (!chosen) return;
+      bar.remove();
+      view.classList.remove('has-check');
+      opts.forEach(o => { o.classList.remove('sel'); o.removeAttribute('aria-pressed'); });
+      onAnswer(chosen);
+    };
+    opts.forEach(b => {
+      b.setAttribute('aria-pressed', 'false');
+      b.onclick = () => {
+        if (chosen === b) return check();
+        chosen = b;
+        opts.forEach(o => { o.classList.toggle('sel', o === b); o.setAttribute('aria-pressed', String(o === b)); });
+        checkBtn.disabled = false;
+      };
+    });
+    checkBtn.onclick = check;
+  }
+
   function lessonBar(fraction) {
-    view.classList.remove('has-fb');
+    view.classList.remove('has-fb', 'has-check');
     lessonDone = Math.max(0, Math.min(1, fraction));
     lbFill.style.width = (lessonDone * 100) + '%';
     lbTrack.setAttribute('aria-valuenow', String(Math.round(lessonDone * 100)));
@@ -1079,7 +1105,7 @@
   }
   function endLesson(fraction) {
     if (fraction !== undefined) lessonBar(fraction);
-    view.classList.remove('has-fb');
+    view.classList.remove('has-fb', 'has-check');
     document.body.classList.remove('in-lesson');
   }
 
