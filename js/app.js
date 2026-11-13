@@ -1102,8 +1102,9 @@
         const level = t('lv.' + b.dataset.lvl);
         sheet({
           title: t('gate.ask.title', { level }), text: t('gate.ask.text'),
-          primary: t('gate.ask.yes'), secondary: t('gate.ask.no'), onSecondary: () => b.focus(),
-          onPrimary: () => { Store.level = b.dataset.lvl; grammarRoad(); }
+          primary: t('gate.ask.yes'), secondary: t('gate.ask.no'),
+          onPrimary: () => { location.hash = `#/grammar/test-${b.dataset.lvl}/quiz`; },
+          onSecondary: () => { Store.level = b.dataset.lvl; grammarRoad(); }
         });
       };
     });
@@ -1147,14 +1148,20 @@
 
   function grammarQuiz(id) {
     // "review": questions from every rule that had mistakes, mixed, so each one asks "which rule fits here?"
+    // "test-<level>": a level check at a gate, one question from each of 6 rules of the level before
     const review = id === 'review';
-    const g = review ? null : GRAMMAR.find(x => x.id === id);
-    if (!review && !g) return notFound();
+    const test = id.startsWith('test-') ? id.slice(5) : null;
+    const ti = test ? LEVELS.findIndex(l => l.id === test) : -1;
+    if (test && ti < 1) return notFound();
+    const g = review || test ? null : GRAMMAR.find(x => x.id === id);
+    if (!review && !test && !g) return notFound();
     const weak = review ? GRAMMAR.filter(x => Store.weakRules().includes(x.id)) : [];
     if (review && !weak.length) { location.hash = '#/grammar'; return; }
     const qs = review
       ? shuffle(weak.flatMap(r => r.quiz.map(q => ({ q, r })))).slice(0, 8)
-      : g.quiz.map(q => ({ q, r: g }));
+      : test
+        ? shuffle(GRAMMAR.filter(x => x.level === LEVELS[ti - 1].id)).slice(0, 6).map(r => ({ q: r.quiz[Math.floor(Math.random() * r.quiz.length)], r }))
+        : g.quiz.map(q => ({ q, r: g }));
     let i = 0, correct = 0, streak = 0;
     const started = Date.now();
 
@@ -1162,7 +1169,7 @@
       const [q, answer, wrong] = qs[i].q;
       const rule = qs[i].r;
       view.innerHTML = `
-        <p class="sub">${review ? `🏋️ ${t('grev.title')}` : ruleTitle(g)} · ${t('quiz.count', { a: i + 1, b: qs.length })}</p>
+        <p class="sub">${review ? `🏋️ ${t('grev.title')}` : test ? `🚪 ${t('gtest.title', { level: t('lv.' + test) })}` : ruleTitle(g)} · ${t('quiz.count', { a: i + 1, b: qs.length })}</p>
         ${lessonBar(i / qs.length)}
         ${review ? `<p class="small grev-rule">${ruleTitle(rule)}</p>` : ''}
         <div class="card question">
@@ -1190,7 +1197,25 @@
           speak(full.replace(/"/g, ''));
           showFeedback({ ok, answer: ok ? '' : full, say: full.replace(/"/g, ''), combo: streak });
       });
-      $('#next').onclick = () => { i++; i < qs.length ? question() : (review ? reviewSummary() : summary()); };
+      $('#next').onclick = () => { i++; i < qs.length ? question() : (review ? reviewSummary() : test ? testSummary() : summary()); };
+    }
+
+    // Level check: 5 of 6 moves the learner up; the rules missed wait at the review stop
+    function testSummary() {
+      const passed = correct >= qs.length - 1;
+      if (passed) Store.level = test;
+      refreshChrome('grammar');
+      endLesson(1);
+      view.innerHTML = `
+        <div class="card center" style="margin-top:14px">
+          <div class="big">${passed ? '🚪' : '💪'}</div>
+          <h1>${t('quiz.score', { a: correct, b: qs.length })}</h1>
+          <p class="sub">${passed ? t('gtest.pass', { level: t('lv.' + test) }) : t('gtest.fail', { n: qs.length - 1 })}</p>
+          ${roundStats({ correct, total: qs.length, ms: Date.now() - started })}
+          <a class="btn" href="#/grammar">${t('gtest.go')}</a>
+          ${!passed && Store.weakRules().length ? `<a class="btn ghost" href="#/grammar/review/quiz">${t('gtest.review')}</a>` : ''}
+        </div>`;
+      countUp();
     }
 
     function reviewSummary() {
