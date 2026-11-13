@@ -1775,3 +1775,12 @@ body.in-lesson .view.has-fb { padding-bottom: calc(var(--fb-h, 230px) + 24px + e
 .pc-why b .en { unicode-bidi: isolate; }
 .why-line { display: block; margin-top: 3px; }
 .why-line.en { font-weight: 700; text-align: left; }
+
+/* ---------- Practice tiles: a skill tag, an edge in the tile's own colour, a due badge (design round D28) ---------- */
+.ptile { box-shadow: 0 5px 0 color-mix(in srgb, var(--c) 40%, #0b0f2c); }
+.ptile:active { box-shadow: 0 1px 0 color-mix(in srgb, var(--c) 40%, #0b0f2c); }
+.pt-skill { justify-self: start; padding: 2px 9px; border-radius: 999px; font-size: .72rem; font-weight: 800;
+  background: color-mix(in srgb, var(--c) 28%, transparent); color: color-mix(in srgb, var(--c) 45%, #fff); }
+.ptile .tile { position: relative; }
+.pt-badge { position: absolute; top: -7px; inset-inline-end: -9px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px;
+  display: grid; place-items: center; font-size: .75rem; font-weight: 900; background: #ff6b7a; color: #fff; box-shadow: 0 0 0 2px #1a2052; }

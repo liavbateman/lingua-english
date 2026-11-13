@@ -1743,12 +1743,12 @@
   function practice() {
     const due = Store.dueWords().length;
     const modes = [
-      ...(Store.trickyWords().length ? [{ title: t('tricky.title'), sub: t('tricky.some', { n: Store.trickyWords().length }), href: '#/quiz/choice/tricky', icon: 'target', color: 'rose' }] : []),
-      { title: t('practice.review'), sub: due === 1 ? t('practice.review.one') : due ? t('practice.review.some', { n: due }) : t('practice.review.none'), href: '#/quiz/choice/review', icon: 'repeat', color: 'blue' },
-      { title: t('task.speak'), sub: t('practice.speak.sub'), href: '#/speak', icon: 'mic', color: 'purple' },
-      { title: t('task.listen'), sub: t('practice.listen.sub'), href: '#/quiz/listen/level', icon: 'headphones', color: 'green' },
-      { title: t('practice.cloze'), sub: t('practice.cloze.sub'), href: '#/quiz/cloze/level', icon: 'pencil', color: 'gold' },
-      { title: t('practice.type'), sub: t('practice.type.sub'), href: '#/quiz/type/level', icon: 'keyboard', color: 'coral' }
+      ...(Store.trickyWords().length ? [{ title: t('tricky.title'), sub: t('tricky.some', { n: Store.trickyWords().length }), href: '#/quiz/choice/tricky', icon: 'target', color: 'rose', skill: 'memory' }] : []),
+      { title: t('practice.review'), sub: due === 1 ? t('practice.review.one') : due ? t('practice.review.some', { n: due }) : t('practice.review.none'), href: '#/quiz/choice/review', icon: 'repeat', color: 'blue', skill: 'memory', badge: due },
+      { title: t('task.speak'), sub: t('practice.speak.sub'), href: '#/speak', icon: 'mic', color: 'purple', skill: 'speak' },
+      { title: t('task.listen'), sub: t('practice.listen.sub'), href: '#/quiz/listen/level', icon: 'headphones', color: 'green', skill: 'listen' },
+      { title: t('practice.cloze'), sub: t('practice.cloze.sub'), href: '#/quiz/cloze/level', icon: 'pencil', color: 'gold', skill: 'context' },
+      { title: t('practice.type'), sub: t('practice.type.sub'), href: '#/quiz/type/level', icon: 'keyboard', color: 'coral', skill: 'spell' }
     ];
     view.innerHTML = `
       <h1>${t('learn.title')}</h1>
@@ -1757,8 +1757,8 @@
       <div class="pgrid">
         ${modes.map((m, i) => `
           <a class="ptile c-${m.color}${i === 0 ? ' wide' : ''}" href="${m.href}">
-            <span class="tile ${m.color}">${ICON[m.icon]}</span>
-            <span class="grow"><b>${m.title}</b><span class="small">${m.sub}</span></span>
+            <span class="tile ${m.color}">${ICON[m.icon]}${m.badge ? `<span class="pt-badge en" aria-hidden="true">${m.badge > 99 ? '99+' : m.badge}</span>` : ''}</span>
+            <span class="grow"><span class="pt-skill">${t('skill.' + m.skill)}</span><b>${m.title}</b><span class="small">${m.sub}</span></span>
           </a>`).join('')}
       </div>`;
   }
