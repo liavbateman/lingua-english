@@ -551,5 +551,20 @@ GRAMMAR.push(
     ex: [['I like coffee, but I do not like tea.', 'אני אוהב קפה, אבל אני לא אוהב תה.'], ['She stayed at home because she was sick.', 'היא נשארה בבית כי היא הייתה חולה.'], ['It was late, so we took a taxi.', 'היה מאוחר, אז לקחנו מונית.']],
     tip: 'טעות נפוצה: להוסיף that אחרי because, כמו "בגלל ש" בעברית. לא "because that I was tired" אלא "because I was tired". וגם לא משתמשים ב-because וב-so יחד: לא "Because it rained, so we stayed home" אלא "It rained, so we stayed home".',
     quiz: [['I am hungry ___ I did not eat breakfast.', 'because', ['so', 'but', 'or']], ['It was raining, ___ we stayed at home.', 'so', ['because', 'but', 'or']], ['He is rich, ___ he is not happy.', 'but', ['because', 'so', 'or']]]
+  },
+
+  // ---------- Added in round 49 ----------
+  {
+    id: 'b-adjective-position', level: 'beginner', title: 'Adjectives: before the noun', he: 'שם תואר: לפני שם העצם',
+    when: 'באנגלית שם התואר בא לפני שם העצם: a big house, "בית גדול". בעברית הסדר הפוך. חוץ מזה, שם התואר באנגלית לא משתנה: אותה מילה ליחיד ולרבים, לזכר ולנקבה.',
+    forms: [
+      ['adjective', 'a + adjective + noun: a big house · an old car'],
+      ['plural', 'big houses · old cars (the adjective stays the same)'],
+      ['description', 'be + adjective: The house is big. · The cars are old.'],
+      ['order', 'opinion → size → color: a nice big red car']
+    ],
+    ex: [['She has a new phone.', 'יש לה טלפון חדש.'], ['They are good friends.', 'הם חברים טובים.'], ['We live in a small white house.', 'אנחנו גרים בבית לבן וקטן.']],
+    tip: 'טעות נפוצה: לתרגם מילה במילה מעברית. לא "a house big" אלא "a big house". ולא מוסיפים s לשם התואר: "two big dogs", לא "two bigs dogs".',
+    quiz: [['I bought a ___ yesterday.', 'red car', ['car red', 'cars red', 'reds car']], ['They have two ___.', 'small children', ['smalls children', 'children small', 'childrens small']], ['These shoes are ___.', 'new', ['news', 'a new', 'the new']]]
   }
 );

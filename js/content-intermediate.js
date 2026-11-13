@@ -506,6 +506,42 @@ UNITS.push(
       { en: "Let's go for a run tomorrow morning.", he: 'בואו נצא לריצה מחר בבוקר.' },
       { en: 'I feel much better since I started exercising.', he: 'ההרגשה שלי הרבה יותר טובה מאז שהתחלתי להתאמן.' }
     ]
+  },
+
+  // ---------- Added in round 49 ----------
+  {
+    id: 'i-phr-flights', level: 'intermediate', kind: 'phrases', title: 'Flights & check-in', he: 'טיסות וצ׳ק-אין', emoji: '🛫',
+    words: [
+      { en: "I'd like a window seat, please.", he: 'אשמח למושב ליד החלון, בבקשה.' },
+      { en: 'How many bags can I check in?', he: 'כמה מזוודות אפשר לשלוח לבטן המטוס?' },
+      { en: 'Is this bag small enough for the cabin?', he: 'התיק הזה קטן מספיק לתא הנוסעים?' },
+      { en: 'Which gate does the flight leave from?', he: 'מאיזה שער יוצאת הטיסה?' },
+      { en: 'The flight has been delayed by an hour.', he: 'הטיסה נדחתה בשעה.' },
+      { en: 'Boarding starts in twenty minutes.', he: 'העלייה למטוס מתחילה בעוד עשרים דקות.' },
+      { en: 'I missed my connecting flight.', he: 'פספסתי את טיסת ההמשך.' },
+      { en: "My suitcase didn't arrive.", he: 'המזוודה שלי לא הגיעה.' },
+      { en: 'Where can I report lost luggage?', he: 'איפה אפשר לדווח על מזוודה שאבדה?' },
+      { en: 'Do I need to go through security again?', he: 'צריך לעבור שוב בדיקה ביטחונית?' },
+      { en: 'Could you help me find the transfer desk?', he: 'תוכלו לעזור לי למצוא את דלפק טיסות ההמשך?' },
+      { en: 'Have a safe flight!', he: 'טיסה בטוחה!' }
+    ]
+  },
+  {
+    id: 'i-phr-renting', level: 'intermediate', kind: 'phrases', title: 'Renting a flat: questions', he: 'שכירת דירה: שאלות ובקשות', emoji: '🏠',
+    words: [
+      { en: 'Is the flat still available?', he: 'הדירה עדיין פנויה?' },
+      { en: 'How much is the rent per month?', he: 'כמה עולה שכר הדירה לחודש?' },
+      { en: 'Are the bills included in the rent?', he: 'החשבונות כלולים בשכר הדירה?' },
+      { en: 'When can I come and see it?', he: 'מתי אפשר לבוא לראות אותה?' },
+      { en: 'How long is the contract?', he: 'לכמה זמן החוזה?' },
+      { en: 'Is there a deposit to pay?', he: 'צריך לשלם פיקדון?' },
+      { en: 'Are pets allowed?', he: 'מותר להחזיק חיות מחמד?' },
+      { en: 'Is the flat furnished?', he: 'הדירה מרוהטת?' },
+      { en: "The heating isn't working properly.", he: 'החימום לא עובד כמו שצריך.' },
+      { en: 'Could you send someone to fix the leak?', he: 'תוכלו לשלוח מישהו לתקן את הנזילה?' },
+      { en: "I'd like to give a month's notice.", he: 'רציתי להודיע על עזיבה חודש מראש.' },
+      { en: 'When will I get my deposit back?', he: 'מתי אקבל בחזרה את הפיקדון?' }
+    ]
   }
 );
 
