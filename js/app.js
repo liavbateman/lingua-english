@@ -1273,36 +1273,49 @@
   function grammarTopic(id) {
     const g = GRAMMAR.find(x => x.id === id);
     if (!g) return notFound();
+    // The rule page wears its level's colour, like the road: a header card, then one card per part
+    const road = LEVELS.flatMap(l => GRAMMAR.filter(x => x.level === l.id));
+    const done = Store.isGrammarDone(g.id);
     view.innerHTML = `
+      <div class="rule-page lv-${g.level}">
       <a class="back" href="#/grammar">${bwd()} ${t('grammar.back')}</a>
-      <h1>${ruleTitle(g)}</h1>
-      <p class="sub">${ruleOther(g)}</p>
+      <header class="rule-hero">
+        <div class="rule-meta">
+          <span class="rule-lvl">${t('lv.' + g.level)} · <span class="en">${t('lvl.cefr.' + g.level)}</span></span>
+          <span class="rule-num">${t('rule.num', { n: road.indexOf(g) + 1, m: road.length })}</span>
+        </div>
+        <h1>${ruleTitle(g)}${done ? ' <span class="rule-crown" aria-label="' + t('path.state.done') + '">👑</span>' : ''}</h1>
+        <p class="sub">${ruleOther(g)}</p>
+      </header>
 
-      <div class="card">
-        <div class="label">${t('grammar.when')}</div>
+      <section class="rcard">
+        <h2 class="rcard-h"><span aria-hidden="true">💡</span> ${t('grammar.when')}</h2>
         <p class="he para">${heMix(g.when)}</p>
-      </div>
+      </section>
 
-      <div class="card">
-        <div class="label">${t('grammar.structure')}</div>
-        ${g.forms.map(([tag, text]) => `<div class="form en"><span class="ftag">${formTag(tag)}</span><span class="grow">${text}</span></div>`).join('')}
-      </div>
+      <section class="rcard">
+        <h2 class="rcard-h"><span aria-hidden="true">🧩</span> ${t('grammar.structure')}</h2>
+        <div class="rforms">
+          ${g.forms.map(([tag, text]) => `<div class="rform"><span class="rtag">${formTag(tag)}</span><span class="grow en" dir="ltr">${text}</span></div>`).join('')}
+        </div>
+      </section>
 
-      <div class="card">
-        <div class="label">${t('grammar.examples')}</div>
+      <section class="rcard">
+        <h2 class="rcard-h"><span aria-hidden="true">🔊</span> ${t('grammar.examples')}</h2>
         ${g.ex.map(([en, he], n) => `
           <div class="example-row">
             <button class="speak sm" data-say="${n}" aria-label="${t('aria.listen')}">${ICON.speaker}</button>
             <div class="grow"><b class="en">${en}</b><div class="he">${he}</div></div>
           </div>`).join('')}
-      </div>
+      </section>
 
-      <div class="card tip">
-        <div class="label">⚠️ ${t('grammar.mistake')}</div>
+      <section class="rcard rtip">
+        <h2 class="rcard-h"><span aria-hidden="true">⚠️</span> ${t('grammar.mistake')}</h2>
         <p class="he para">${heMix(g.tip)}</p>
-      </div>
+      </section>
 
-      <a class="btn" href="#/grammar/${g.id}/quiz">${t('grammar.practice')}</a>`;
+      <a class="btn rule-go" href="#/grammar/${g.id}/quiz">${t('grammar.practice')}</a>
+      </div>`;
     view.querySelectorAll('[data-say]').forEach(b => { b.onclick = () => speak(g.ex[b.dataset.say][0]); });
   }
 

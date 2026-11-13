@@ -58,7 +58,7 @@ in the visual language of the paths (level colours, chunky 3D cards with a botto
 | # | Round | What | Status |
 |---|---|---|---|
 | D1 | Progress screen | Stat tiles with icons and tinted backgrounds; level cards in their own colour with a ring for the whole level and one row per part (icon, label, bar); thicker week bars, today in coral; fixed a class clash that boxed the "today" column | Done (round 78) |
-| D2 | Grammar rule page | The rule screen in its level's colour: header card, structure as a clean table, examples as speaker rows, mistake card with a clear warning style | |
+| D2 | Grammar rule page | The rule screen in its level's colour: header card, structure as a clean table, examples as speaker rows, mistake card with a clear warning style | Done (round 79): header with level, CEFR, "rule N of 66" and a crown; section cards with icons and a level-coloured edge; tags and speakers in the level colour; amber mistake card |
 | D3 | Quiz and lesson screens | Answer tiles, progress bar and feedback sheet polished to match the path cards | |
 | D4 | Tab bar and header | Active tab as a pill, softer bar with blur, consistent icon weights | |
 | D5 | Flashcards | Card faces with the unit's colour and emoji, nicer back side | |
