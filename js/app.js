@@ -225,7 +225,6 @@
       ...review,
       { id: 'vocab', title: t('task.vocab'), sub: t('task.vocab.sub', { n: (u.words.length - Store.unitProgress(u).seen) || u.words.length }), href: `#/unit/${u.id}`, icon: 'book', color: 'blue' },
       { id: 'speak', title: t('task.speak'), sub: t('task.speak.sub'), href: '#/speak', icon: 'mic', color: 'purple' },
-      { id: 'listen', title: t('task.listen'), sub: t('task.listen.sub'), href: '#/quiz/listen/level', icon: 'headphones', color: 'green' },
       { id: 'grammar', title: t('task.grammar'), sub: t('task.grammar.sub', { title: ruleTitle(g) }), href: `#/grammar/${g.id}`, icon: 'pencil', color: 'gold' }
     ];
   }
@@ -282,19 +281,16 @@
     return { stage: s + 1, n: i - s * PATH_SECTION + 1, of: stage.length, done: stage, pct, path };
   }
 
+  // ---------- Today: the opening screen ----------
+  // One question answered at a glance: "what do I do now?" A greeting with today's ring, one big card
+  // for the next lesson (words and grammar in turn), and the few tasks that make today's plan.
   function home() {
-    const lw = wordsOf(Store.level);
     const tasks = planTasks();
     const done = Store.tasks;
     const doneCount = tasks.filter(x => done[x.id]).length;
-    const single = lw.filter(w => !w.phrase);
-    // Count days on the local clock, so the word changes at midnight here and not at midnight UTC
-    const localDay = Math.floor((Date.now() - new Date().getTimezoneOffset() * 6e4) / 864e5);
-    const wotd = single[localDay % single.length];
-    const tricky = Store.trickyWords();
-
     const step = nextStep();
     view.innerHTML = `
+      ${celebration()}
       ${todayCard(tasks, doneCount)}
       <a class="continue" href="${step.href}">
         <span class="cont-top">
@@ -305,49 +301,21 @@
           <span class="cont-tile${step.spot ? ' ringed' : ''}" style="--pct:${step.spot ? step.spot.pct : 0}"><span class="tile ${step.color}">${step.emoji ? `<span class="cont-emoji">${step.emoji}</span>` : ICON[step.icon]}</span></span>
           <span class="grow"><b>${step.title}</b><span class="small">${step.sub}</span></span>
         </span>
-        ${step.spot ? `<span class="cont-dots" aria-hidden="true">${step.spot.done.map((d, k) =>
-          `<i class="${d ? 'on' : ''}${k === step.spot.n - 1 ? ' now' : ''}"></i>`).join('')}</span>` : ''}
-        <span class="cont-go">${t('cont.go')} ${fwd()}</span>
+        <span class="cont-go">${t(Store.xp > 0 ? 'cont.go' : 'cont.start')} ${fwd()}</span>
       </a>
-      ${step.spot ? `<a class="cont-path" href="${step.spot.path}">🗺️ ${t('cont.path')} ${fwd()}</a>` : ''}
-
 
       <div class="section">${ICON.calendar} ${t('home.plan')} <span class="end"><b class="en">${doneCount} / ${tasks.length}</b> ${t('home.completed')}</span></div>
       ${doneCount === tasks.length ? `<div class="plan-done">${ICON.check}<span><b>${t('goal.home')}</b> ${t('goal.home.sub')}</span></div>` : ''}
+      <div class="tasks">
       ${tasks.map(x => `
-        <a class="task" href="${x.href}">
+        <a class="task${done[x.id] ? ' is-done' : ''}" href="${x.href}">
           <span class="tile ${x.color}">${ICON[x.icon]}</span>
           <span class="grow"><b>${x.title}</b><span class="small">${x.sub}</span></span>
-          <span class="check ${done[x.id] ? 'done' : ''}">${done[x.id] ? ICON.check : ''}</span>
+          <span class="check ${done[x.id] ? 'done' : ''}" ${done[x.id] ? `aria-label="${t('path.state.done')}"` : 'aria-hidden="true"'}>${done[x.id] ? ICON.check : ''}</span>
         </a>`).join('')}
-
-      ${tricky.length ? `
-      <a class="task tricky-card" href="#/quiz/choice/tricky">
-        <span class="tile rose">${ICON.target}</span>
-        <span class="grow"><b>${t('tricky.title')}</b><span class="small">${t(tricky.length === 1 ? 'tricky.one' : 'tricky.some', { n: tricky.length })}</span></span>
-        <span class="go-chev" aria-hidden="true">${fwd()}</span>
-      </a>` : ''}
-
-      <section class="wotd">
-        <div class="wotd-head"><span>📖 ${t('home.wotd')}</span><span class="tag">${t('home.vocabTag')}</span></div>
-        <div class="wotd-main">
-          <div class="grow">
-            <div class="word en">${wotd.en}</div>
-            <div class="meaning he">${wotd.he}</div>
-          </div>
-          <button class="speak" id="wotd-speak" aria-label="${t('aria.listen')}">${ICON.speaker}</button>
-        </div>
-        <div class="quote en">“${wotd.ex}”</div>
-      </section>
-
-      <a class="cta" href="#/quiz/choice/level">
-        <span class="trophy">🏆</span>
-        <span class="grow"><b>${t('home.challenge')}</b><span class="small">${t('home.challenge.sub')}</span></span>
-        <span class="go">${t('home.start')} ${fwd()}</span>
-      </a>`;
-
-    $('#wotd-speak').onclick = () => speak(wotd.en);
+      </div>`;
     bindLevelSeg(home);
+    countUp();
   }
 
   // The top of Home is about today (as Duolingo's daily goal and Babbel's "Today"):
@@ -2751,7 +2719,7 @@
     if (inLesson) lessonBar(0);
     else if (name !== 'x') lessonExit = location.hash || '#/';
     switch (name || 'home') {
-      case 'home': refreshChrome('grammar'); grammarRoad(); break;
+      case 'home': refreshChrome('home'); home(); break;
       case 'learn': refreshChrome('learn'); learn(); break;
       case 'phrases': refreshChrome('learn'); phrases(); break;
       case 'unit': refreshChrome('learn'); lesson(a); break;
