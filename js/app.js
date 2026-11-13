@@ -1287,6 +1287,18 @@
         </section>`).join('')}`;
   }
 
+  // In a rule's example, the words the rule is about stand out: any of its quiz answers found in the sentence
+  // (longest first, whole words only, so "had been working" wins over "had")
+  function markKey(en, g) {
+    const keys = [...new Set(g.quiz.map(q => q[1]).filter(k => /[a-z]/i.test(k)))].sort((a, b) => b.length - a.length);
+    for (const k of keys) {
+      const safe = k.replace(/[.*+?^$(){}|[\]\\]/g, '\\$&');
+      const re = new RegExp("(^|[^A-Za-z'])(" + safe + ")(?![A-Za-z'])", 'i');
+      if (re.test(en)) return en.replace(re, (m, pre, word) => `${pre}<mark class="ex-key">${word}</mark>`);
+    }
+    return en;
+  }
+
   // The Grammar tab: one road through every rule of every level (as the Learn paths)
   // Rules found by a search in Hebrew or English: names first, then the structures and examples
   function ruleSearch(items, query) {
@@ -1428,9 +1440,12 @@
       <section class="rcard">
         <h2 class="rcard-h"><span aria-hidden="true">🔊</span> ${t('grammar.examples')}</h2>
         ${g.ex.map(([en, he], n) => `
-          <div class="example-row">
-            <button class="speak sm" data-say="${n}" aria-label="${t('aria.listen')}">${ICON.speaker}</button>
-            <div class="grow"><b class="en">${en}</b><div class="he">${he}</div></div>
+          <div class="ex-bubble">
+            <div class="ex-say">
+              <button class="speak sm" data-say="${n}" aria-label="${t('aria.listen')}">${ICON.speaker}</button>
+              <b class="en" dir="ltr">${markKey(en, g)}</b>
+            </div>
+            <div class="he">${he}</div>
           </div>`).join('')}
       </section>
 
