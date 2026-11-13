@@ -1952,3 +1952,14 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
 }
 @keyframes lbspark { 0%, 100% { opacity: .55; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.15); } }
 @media (prefers-reduced-motion: reduce) { .lb-track i::after { animation: none; } }
+
+/* ---------- Answer tiles after checking: the right tile pops with a green ring, the uninvolved ones step back (design round D43) ---------- */
+.opt.right { animation: right-pop .5s var(--ease-pop, cubic-bezier(.3, 1.6, .5, 1)); }
+.opt.right::before { animation: none; }
+@keyframes right-pop {
+  0% { transform: scale(1); box-shadow: 0 4px 0 #1d8f66, 0 0 0 0 rgba(47, 208, 147, .55); }
+  45% { transform: scale(1.035); box-shadow: 0 4px 0 #1d8f66, 0 0 0 8px rgba(47, 208, 147, .25); }
+  100% { transform: scale(1); box-shadow: 0 4px 0 #1d8f66, 0 0 0 12px rgba(47, 208, 147, 0); }
+}
+.opt:disabled:not(.right):not(.wrong) { opacity: .5; transition: opacity var(--dur-ui); }
+@media (prefers-reduced-motion: reduce) { .opt.right { animation: none; } }
