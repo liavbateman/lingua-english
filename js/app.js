@@ -417,14 +417,16 @@
     if (part === 'grammar') {
       items = levelGrammar().map((g, n) => {
         const done = Store.isGrammarDone(g.id);
-        return { href: `#/grammar/${g.id}`, face: `<b class="pnum">${n + 1}</b>`, label: ruleTitle(g),
-          plain: (isHe() ? g.he : g.title), done, started: done, pct: done ? 100 : 0 };
+        return { href: `#/grammar/${g.id}`, review: `#/grammar/${g.id}/quiz`, face: `<b class="pnum">${n + 1}</b>`, label: ruleTitle(g),
+          plain: (isHe() ? g.he : g.title), done, started: done, pct: done ? 100 : 0,
+          progress: t(done ? 'path.g.done' : 'path.g.sub') };
       });
     } else {
       items = levelUnits().filter(u => (u.kind === 'phrases') === (part === 'phrases')).map(u => {
         const p = Store.unitProgress(u);
-        return { href: `#/unit/${u.id}`, face: u.emoji, label: unitTitle(u), plain: unitTitle(u),
-          done: p.total > 0 && p.mastered / p.total >= 0.6, started: p.seen > 0, pct: p.pct };
+        return { href: `#/unit/${u.id}`, review: `#/quiz/choice/${u.id}`, face: u.emoji, label: unitTitle(u), plain: unitTitle(u),
+          done: p.total > 0 && p.mastered / p.total >= 0.6, started: p.seen > 0, pct: p.pct,
+          progress: t(u.kind === 'phrases' ? 'learn.sentences' : 'learn.words', { a: p.mastered, b: p.total }) };
       });
     }
     const cur = items.findIndex(x => !x.done);
@@ -484,18 +486,58 @@
     pathItems = items;
     layoutPath();
     const path = document.getElementById('path');
+    // Tapping a lesson opens a small card under it (as in Duolingo): its name, how far it is,
+    // and one clear button. A second tap, a tap elsewhere or Escape closes it.
+    let open = -1;
+    const closeCard = () => {
+      const c = path.querySelector('.pcard');
+      if (c) c.remove();
+      path.querySelectorAll('.pnode[aria-expanded]').forEach(n => n.setAttribute('aria-expanded', 'false'));
+      open = -1;
+    };
+    const openCard = i => {
+      closeCard();
+      const x = items[i], cur = items[items.cur];
+      const wrap = path.querySelector(`.pnode-wrap[data-i="${i}"]`);
+      const W = path.clientWidth, cw = Math.min(300, W - 24);
+      const nodeX = wrap.offsetLeft + wrap.offsetWidth / 2;
+      const left = Math.max(12, Math.min(W - cw - 12, nodeX - cw / 2));
+      const card = document.createElement('div');
+      card.className = 'pcard ' + x.state;
+      card.id = 'pcard';
+      card.style.cssText = `top:${wrap.offsetTop + 96}px; left:${left}px; width:${cw}px; --arrow:${nodeX - left}px`;
+      card.setAttribute('role', 'dialog');
+      card.setAttribute('aria-label', x.plain);
+      card.innerHTML = x.state === 'locked' ? `
+          <b>${x.label}</b>
+          <p>${t('path.locked.text', { title: cur ? cur.plain : '' })}</p>
+          ${cur ? `<a class="btn" href="${cur.href}">${t('path.locked.go')}</a>` : ''}
+          <a class="pcard-link" href="${x.href}">${t('path.locked.anyway')}</a>`
+        : `
+          <b>${x.label}</b>
+          <p>${x.progress}</p>
+          <a class="btn" href="${x.state === 'done' ? x.review : x.href}">${t(x.state === 'done' ? 'path.review' : x.started ? 'path.continue' : 'path.start')}</a>
+          ${x.state === 'done' ? `<a class="pcard-link" href="${x.href}">${t('path.again')}</a>` : ''}`;
+      path.appendChild(card);
+      path.querySelector(`.pnode[data-i="${i}"]`).setAttribute('aria-expanded', 'true');
+      open = i;
+      // Focus first, then scroll so the whole card is above the tab bar (focus would cancel a smooth scroll)
+      setTimeout(() => {
+        card.querySelector('.btn, .pcard-link').focus({ preventScroll: true });
+        const over = card.getBoundingClientRect().bottom + 16 - view.getBoundingClientRect().bottom;
+        if (over > 0) view.scrollBy({ top: over, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      }, 30);
+    };
     path.querySelectorAll('.pnode').forEach(b => {
-      b.onclick = () => {
-        const x = items[+b.dataset.i];
-        if (x.state !== 'locked') { location.hash = x.href; return; }
-        const cur = items[items.cur];
-        sheet({
-          title: t('path.locked.title'), text: t('path.locked.text', { title: cur.plain }),
-          primary: t('path.locked.go'), onPrimary: () => { location.hash = cur.href; },
-          secondary: t('path.locked.anyway'), onSecondary: () => { location.hash = x.href; }
-        });
+      b.setAttribute('aria-expanded', 'false');
+      b.onclick = e => {
+        e.stopPropagation();
+        const i = +b.dataset.i;
+        open === i ? closeCard() : openCard(i);
       };
     });
+    path.onclick = e => { if (!e.target.closest('.pcard')) closeCard(); };
+    view.onkeydown = e => { if (e.key === 'Escape' && open >= 0) { const i = open; closeCard(); path.querySelector(`.pnode[data-i="${i}"]`).focus(); } };
     // Open where the learner is: the current lesson in the middle of the screen
     const curEl = items.cur >= 0 && path.querySelector(`.pnode-wrap[data-i="${items.cur}"]`);
     const jump = document.getElementById('pathjump');

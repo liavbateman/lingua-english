@@ -744,7 +744,7 @@ body.in-lesson .view.has-check { padding-bottom: calc(132px + env(safe-area-inse
 .path-head::before, .path-head::after { content: ""; flex: 1; height: 2px; border-radius: 2px; background: rgba(142, 125, 255, .3); }
 .path-head small { order: 3; display: none; }
 .path-head + .path::before { content: none; }
-.path { position: relative; width: 100%; margin-bottom: 70px; }
+.path { position: relative; width: 100%; margin-bottom: 190px; }   /* room for the last lesson's card */
 .path-line { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 .path-line path { fill: none; stroke-width: 10; stroke-linecap: round; }
 .pl-base { stroke: #1d2350; }
@@ -814,3 +814,29 @@ body.in-lesson .view.has-check { padding-bottom: calc(132px + env(safe-area-inse
   background: none; border: 1.5px solid var(--line); color: var(--muted); box-shadow: none;
 }
 .seg.level-seg button.on { background: var(--brand-soft); border-color: var(--brand-2); color: var(--ink); box-shadow: none; }
+
+/* Path: the card under a tapped lesson, with a little arrow pointing up at it */
+.pcard {
+  position: absolute; z-index: 6; display: grid; gap: 8px; padding: 16px; border-radius: 18px;
+  background: #ff7a59; color: #fff; box-shadow: 0 5px 0 #c94a2e, 0 18px 40px rgba(0, 0, 0, .45);
+  animation: pop .22s cubic-bezier(.2, 1.4, .4, 1) both; transform-origin: var(--arrow) 0;
+}
+.pcard::before {
+  content: ""; position: absolute; top: -8px; left: calc(var(--arrow) - 9px); width: 18px; height: 18px;
+  background: inherit; transform: rotate(45deg); border-radius: 3px;
+}
+.pcard b { font-size: 1.1rem; position: relative; }
+.pcard p { margin: 0; opacity: .92; position: relative; }
+.pcard .btn { background: #fff; color: #e2553a; box-shadow: 0 4px 0 #f0c9bd; margin-top: 4px; }
+.pcard .btn:active { box-shadow: 0 0 0 #f0c9bd; }
+.pcard-link { text-align: center; color: inherit; opacity: .9; font-weight: 700; font-size: .9rem; padding: 6px; }
+.pcard.done { background: #ffc53d; color: #4a3200; box-shadow: 0 5px 0 #c9921a, 0 18px 40px rgba(0, 0, 0, .45); }
+.pcard.done .btn { color: #8a5a00; box-shadow: 0 4px 0 #f3dca0; }
+.pcard.open { background: #7a6bff; box-shadow: 0 5px 0 #463bc4, 0 18px 40px rgba(0, 0, 0, .45); }
+.pcard.open .btn { color: #5546e0; box-shadow: 0 4px 0 #d6d0ff; }
+.pcard.locked { background: #2b3160; color: var(--ink); box-shadow: 0 5px 0 #1b2046, 0 18px 40px rgba(0, 0, 0, .45); }
+.pcard.locked p { color: var(--muted); }
+.pcard.locked .btn { background: linear-gradient(135deg, var(--brand-2), var(--brand)); color: #fff; box-shadow: 0 4px 0 #463bc4; }
+@media (prefers-reduced-motion: reduce) { .pcard { animation: none; } }
+/* while a lesson card is open, the jump button steps aside */
+body:has(.pcard) .path-jump { display: none; }
