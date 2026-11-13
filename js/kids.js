@@ -32,6 +32,8 @@ const Kids = (() => {
       pcMode: 'מצב ילדים', pcModeText: 'שאר האפליקציה (דקדוק, לימוד, התקדמות) ומעבר השפה נעולים מאחורי שאלה להורים',
       pcPer: 'התקדמות לפי אי', pcBack: 'חזרה לעולם הילדים', pcTip: 'טיפ: 10–15 דקות ביום, כמה פעמים בשבוע, עובדות הכי טוב לילדים צעירים. שבו לידם ושחקו יחד!',
       restTitle: 'הגיע זמן לנוח!', restText: 'שיחקתם יפה היום. הינשוף הולך לישון, נתראה מחר!', restMore: 'עוד 10 דקות (להורים)',
+      wardrobe: 'המלתחה של הינשוף', wardSub: 'אספו כוכבים כדי לפתוח עוד בגדים וצבעים', colors: 'צבע', things: 'אביזרים',
+      needStars: 'צריך {n} ★', owlLooks: 'איזה ינשוף יפה!',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -57,6 +59,8 @@ const Kids = (() => {
       pcMode: 'Kids mode', pcModeText: 'The rest of the app (grammar, learn, progress) and the language switch need a grown-up answer',
       pcPer: 'Progress by island', pcBack: 'Back to the kids world', pcTip: 'Tip: 10–15 minutes a day, a few times a week, works best for young children. Sit with them and play together!',
       restTitle: 'Time to rest!', restText: 'You played so well today. The owl is going to sleep, see you tomorrow!', restMore: '10 more minutes (grown-ups)',
+      wardrobe: "The owl's wardrobe", wardSub: 'Collect stars to open more clothes and colours', colors: 'Colour', things: 'Things to wear',
+      needStars: 'Needs {n} ★', owlLooks: 'What a lovely owl!',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -145,9 +149,15 @@ const Kids = (() => {
   const BALLOONS = ['#ff5d8f', '#3fa7ff', '#ffc93c', '#2fd093', '#b98cff'];
 
   // ---------- the owl buddy ----------
+  // The owl as the child dressed it: its colour behind it and the chosen accessory on top
+  function owlAv(look = Store.kidsOwl, cls = '') {
+    const col = (KIDS_OWL_COLORS.find(x => x.id === look.color) || KIDS_OWL_COLORS[0]).c;
+    const acc = KIDS_OWL_ACC.find(x => x.id === look.acc && x.id);
+    return `<span class="k-av ${cls}" style="--oc:${col}"><img src="icons/owl-192.png" alt="" width="64" height="64">${acc ? `<i class="k-acc k-acc-${acc.id}" aria-hidden="true">${acc.pic}</i>` : ''}</span>`;
+  }
   const owl = (text, mood = '') => `
     <div class="k-owl ${mood}">
-      <img src="icons/owl-192.png" alt="" width="64" height="64">
+      ${owlAv()}
       <div class="k-bubble" role="status">${text}</div>
     </div>`;
   const starsHtml = (n, cls = '') => `<span class="k-stars ${cls}" aria-label="${n} / 3">${[1, 2, 3].map(i => `<i class="${i <= n ? 'on' : ''}">★</i>`).join('')}</span>`;
@@ -162,7 +172,10 @@ const Kids = (() => {
     K.view.innerHTML = `
       <div class="k-wrap">
         <div class="k-head">
-          ${owl(Store.kidsStickerCount ? kt('pick') : kt('hi'))}
+          <div class="k-owl">
+            <a class="k-owl-link" href="#/kids/owl" aria-label="${kt('wardrobe')}">${owlAv()}<span class="k-owl-edit" aria-hidden="true">👕</span></a>
+            <div class="k-bubble" role="status">${Store.kidsStickerCount ? kt('pick') : kt('hi')}</div>
+          </div>
           <div class="k-chips">
             <span class="k-chip star"><b>★ ${Store.kidsTotalStars}</b> ${kt('stars')}</span>
             <a class="k-chip sticker" href="#/kids/stickers"><b>🎁 ${Store.kidsStickerCount}/${KIDS_THEMES.length}</b> ${kt('stickers')}</a>
@@ -205,6 +218,43 @@ const Kids = (() => {
     });
     const cur = $('.k-isle.cur');
     if (cur) setTimeout(() => cur.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60);
+  }
+
+  // ---------- the owl's wardrobe ----------
+  function wardrobe() {
+    K.endLesson();
+    const have = Store.kidsTotalStars, look = Store.kidsOwl;
+    const item = (part, x, inner) => {
+      const open = have >= x.stars, on = look[part] === x.id;
+      return `<button class="k-ward-item ${on ? 'on' : ''} ${open ? '' : 'locked'}" data-part="${part}" data-id="${x.id}" data-stars="${x.stars}"
+        aria-pressed="${on}" aria-label="${open ? x.id || '—' : kt('needStars', { n: x.stars })}">${inner}${open ? '' : `<small>🔒 ${x.stars}★</small>`}</button>`;
+    };
+    K.view.innerHTML = `
+      <div class="k-wrap">
+        <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
+        <h1 class="k-title">👕 ${kt('wardrobe')}</h1>
+        <p class="k-sub">${kt('wardSub')} · <b>★ ${have}</b></p>
+        <div class="k-ward-stage">${owlAv(look, 'big')}</div>
+        <h2 class="k-title k-h2">${kt('colors')}</h2>
+        <div class="k-ward-row">${KIDS_OWL_COLORS.map(x => item('color', x, `<span class="k-swatch" style="background:${x.c}"></span>`)).join('')}</div>
+        <h2 class="k-title k-h2">${kt('things')}</h2>
+        <div class="k-ward-row">${KIDS_OWL_ACC.map(x => item('acc', x, `<span class="k-ward-pic">${x.pic}</span>`)).join('')}</div>
+      </div>`;
+    K.view.querySelectorAll('.k-ward-item').forEach(b => {
+      b.onclick = () => {
+        if (b.classList.contains('locked')) {
+          K.Feel.wrong(b);
+          say([['he', kt('needStars', { n: b.dataset.stars }).replace('★', 'כוכבים')]]);
+          return;
+        }
+        Store.setKidsOwl(b.dataset.part, b.dataset.id);
+        K.Feel.right();
+        sayEn(pickOne(['Wow!', 'So cool!', 'Looking good!']), 0.9);
+        wardrobe();
+        const av = $('.k-ward-stage .k-av');
+        if (av) av.classList.add('boing');
+      };
+    });
   }
 
   // ---------- grown-up check ----------
@@ -825,6 +875,7 @@ const Kids = (() => {
       else if (a === 'stickers') stickers();
       else if (a === 'abc') b ? letter(b) : abc();
       else if (a === 'abcgame') abcGame();
+      else if (a === 'owl') wardrobe();
       else map();
     },
     gate,

@@ -136,6 +136,17 @@ const KIDS_THEMES = [
 KIDS_THEMES.forEach(th => th.words.forEach(w => { w.id = th.id + '/' + w.en; w.theme = th.id; }));
 const KIDS_WORDS = KIDS_THEMES.flatMap(th => th.words);
 
+// The owl's wardrobe: items open as the child collects stars (nothing is spent, so nothing is lost)
+const KIDS_OWL_COLORS = [
+  { id: 'blue', c: '#3f7bff', stars: 0 }, { id: 'pink', c: '#ff5d8f', stars: 2 }, { id: 'green', c: '#2fbf7f', stars: 4 },
+  { id: 'orange', c: '#ff9f43', stars: 6 }, { id: 'purple', c: '#9b6bff', stars: 9 }, { id: 'gold', c: '#f4b400', stars: 12 }
+];
+const KIDS_OWL_ACC = [
+  { id: '', pic: '🚫', stars: 0 }, { id: 'bow', pic: '🎀', stars: 1 }, { id: 'flower', pic: '🌸', stars: 2 },
+  { id: 'balloon', pic: '🎈', stars: 3 }, { id: 'shades', pic: '🕶️', stars: 5 }, { id: 'tophat', pic: '🎩', stars: 7 },
+  { id: 'crown', pic: '👑', stars: 10 }, { id: 'star', pic: '🌟', stars: 13 }, { id: 'rainbow', pic: '🌈', stars: 16 }, { id: 'rocket', pic: '🚀', stars: 20 }
+];
+
 // Treasure stickers: one comes out of the daily chest (new ones first, then repeats)
 const KIDS_TREASURE = ['🦖', '🐙', '🦋', '🍩', '🚁', '🐼', '🌵', '🎸', '🦊', '🍉', '🐢', '🪐', '🧁', '🐳', '🎠', '🦒', '🍭', '🐝', '🛸', '🦜'];
 

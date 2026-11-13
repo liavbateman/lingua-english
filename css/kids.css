@@ -31,9 +31,31 @@ body.kids .offline { color: var(--k-ink); }
 
 /* the owl buddy with a speech bubble */
 .k-owl { display: flex; align-items: center; gap: 10px; margin: 6px 0 12px; }
-.k-owl img { width: 64px; height: 64px; border-radius: 20px; flex: none; box-shadow: 0 4px 0 rgba(20, 60, 140, .25); animation: k-float 3.2s ease-in-out infinite; }
-.k-owl.small img { width: 48px; height: 48px; border-radius: 15px; }
-.k-owl.happy img { animation: k-hop .5s var(--ease-pop) 2; }
+.k-av {
+  position: relative; display: block; flex: none; width: 64px; height: 64px; border-radius: 20px;
+  background: var(--oc, #3f7bff); box-shadow: 0 4px 0 rgba(20, 60, 140, .25); animation: k-float 3.2s ease-in-out infinite;
+}
+.k-av img { display: block; width: 100%; height: 100%; border-radius: inherit; mix-blend-mode: normal; }
+/* the owl picture has its own blue background: the chosen colour shows as a thick frame around it */
+.k-av { padding: 4px; }
+.k-av img { border-radius: 16px; }
+.k-acc { position: absolute; top: -14px; inset-inline-end: -10px; font-size: 1.7rem; font-style: normal; transform: rotate(12deg); filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .2)); }
+.k-acc-shades { top: auto; bottom: -8px; inset-inline-end: -8px; transform: none; }
+.k-acc-balloon, .k-acc-rocket { top: -22px; }
+.k-owl.small .k-av { width: 48px; height: 48px; border-radius: 15px; padding: 3px; }
+.k-owl.small .k-av img { border-radius: 12px; }
+.k-owl.small .k-acc { font-size: 1.3rem; top: -11px; }
+.k-owl.happy .k-av { animation: k-hop .5s var(--ease-pop) 2; }
+.k-owl-link { position: relative; display: block; flex: none; text-decoration: none; }
+.k-owl-edit {
+  position: absolute; bottom: -6px; inset-inline-start: -6px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  background: #fff; font-size: .9rem; box-shadow: 0 2px 0 var(--k-edge);
+}
+.k-av.big { width: 150px; height: 150px; border-radius: 42px; padding: 8px; }
+.k-av.big img { border-radius: 34px; }
+.k-av.big .k-acc { font-size: 3.6rem; top: -30px; inset-inline-end: -24px; }
+.k-av.big .k-acc-shades { top: auto; bottom: -14px; inset-inline-end: -16px; }
+.k-av.boing { animation: k-boing .5s var(--ease-pop); }
 .k-bubble {
   position: relative; background: #fff; color: var(--k-ink); border-radius: 18px; padding: 10px 14px;
   font-size: 1.1rem; line-height: 1.3; box-shadow: 0 4px 0 var(--k-edge);
@@ -347,3 +369,19 @@ a.k-btn { text-decoration: none; text-align: center; }
 .k-rest p { color: var(--k-muted); font-size: 1.1rem; margin: 6px 0 0; }
 .k-rest-owl { position: relative; display: inline-block; font-size: 5rem; animation: k-float 3.2s ease-in-out infinite; }
 .k-rest-owl i { position: absolute; top: -6px; inset-inline-end: -26px; font-size: 1.8rem; font-style: normal; }
+
+/* the owl's wardrobe */
+.k-ward-stage { display: grid; place-items: center; padding: 34px 0 20px; margin-top: 6px; border-radius: 32px; background: rgba(255, 255, 255, .55); }
+.k-ward-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(66px, 1fr)); gap: 10px; }
+.k-ward-item {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; aspect-ratio: 1;
+  border: 3px solid transparent; border-radius: 20px; background: #fff; cursor: pointer; font-family: var(--k-font);
+  box-shadow: 0 4px 0 var(--k-edge); transition: transform var(--dur-press), box-shadow var(--dur-press);
+}
+.k-ward-item:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--k-edge); }
+.k-ward-item.on { border-color: #ff5d8f; }
+.k-ward-item.locked { background: rgba(255, 255, 255, .6); }
+.k-ward-item.locked .k-ward-pic, .k-ward-item.locked .k-swatch { filter: grayscale(1); opacity: .35; }
+.k-ward-item small { font-size: .75rem; color: var(--k-muted); }
+.k-ward-pic { font-size: 2rem; line-height: 1; }
+.k-swatch { width: 36px; height: 36px; border-radius: 50%; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .15); }

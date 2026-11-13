@@ -135,6 +135,13 @@ const Store = (() => {
       save();
     },
     kidsWordCount: id => (state.kids && state.kids.words[id]) || 0,
+    // The owl buddy's look: a colour and an accessory, chosen in the wardrobe
+    get kidsOwl() { const o = state.kids && state.kids.owl; return { color: (o && o.color) || 'blue', acc: (o && o.acc) || '' }; },
+    setKidsOwl(part, id) {
+      state.kids = state.kids || { stars: {}, stickers: {}, words: {} };
+      state.kids.owl = Object.assign({ color: 'blue', acc: '' }, state.kids.owl, { [part]: id });
+      save();
+    },
     // Kids mode: the rest of the app (and the language switch) sits behind a grown-up check
     get kidsMode() { return !!state.kidsMode; },
     set kidsMode(v) { state.kidsMode = !!v; save(); },
