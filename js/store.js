@@ -8,6 +8,7 @@ const Store = (() => {
 
   const fresh = () => ({
     words: {}, grammar: {}, xp: 0, streak: 0, best: 0, lastDay: null,
+    history: {},   // answers per day, { 'YYYY-MM-DD': count }, kept for 60 days
     level: 'beginner', lang: 'he',
     daily: { date: null, count: 0, tasks: {} }
   });
@@ -80,11 +81,28 @@ const Store = (() => {
       if (correct) state.xp += 10;
       touchDay();
       state.daily.count++;
+      const today = dayKey();
+      state.history = state.history || {};
+      state.history[today] = (state.history[today] || 0) + 1;
+      const oldest = dayKey(new Date(Date.now() - 60 * DAY));
+      Object.keys(state.history).forEach(k => { if (k < oldest) delete state.history[k]; });
       save();
     },
 
     // Learned words whose review time has come
     dueWords: () => ALL_WORDS.filter(w => state.words[w.id] && state.words[w.id].due <= Date.now()),
+
+    // The last 7 days, oldest first: [{ date, count, today }]
+    week() {
+      const h = state.history || {};
+      return Array.from({ length: 7 }, (_, n) => {
+        const date = new Date(Date.now() - (6 - n) * DAY);
+        let count = h[dayKey(date)] || 0;
+        // answers given today before this chart existed are already in the daily counter
+        if (n === 6 && state.daily.date === dayKey()) count = Math.max(count, state.daily.count || 0);
+        return { date, count, today: n === 6 };
+      });
+    },
 
     // Tricky words: missed at least twice and not yet learned. Once learned they leave the list.
     trickyWords: () => ALL_WORDS.filter(w => {

@@ -869,7 +869,7 @@
         <div class="card stat"><b>${Store.streak}</b><span class="small">${t('progress.streak')}</span></div>
         <div class="card stat"><b>${Store.best}</b><span class="small">${t('progress.best')}</span></div>
       </div>
-      <div style="height:10px"></div>
+      ${weekCard()}
       ${LEVELS.map(levelCard).join('')}
       <div class="card backup">
         <b>💾 ${t('backup.title')}</b>
@@ -923,6 +923,33 @@
     $('#reset').onclick = () => {
       if (confirm(t('progress.confirm'))) { Store.reset(); route(); }
     };
+  }
+
+  // Answers per day for the last week: one hue, thin bars on a baseline, today labelled
+  function weekCard() {
+    const days = Store.week();
+    const max = Math.max(...days.map(d => d.count));
+    const total = days.reduce((n, d) => n + d.count, 0);
+    const active = days.filter(d => d.count > 0).length;
+    const dayName = new Intl.DateTimeFormat(Store.lang, { weekday: 'narrow' });
+    const longName = new Intl.DateTimeFormat(Store.lang, { weekday: 'long' });
+    const said = d => t('week.answers', { n: d.count });
+    return `
+      <div class="card week">
+        <div class="week-head">
+          <b>${t('week.title')}</b>
+          <span class="small">${t('week.sub', { a: active, n: total })}</span>
+        </div>
+        <div class="week-bars" role="list">
+          ${days.map(d => `
+            <div class="wb${d.today ? ' today' : ''}" role="listitem" title="${longName.format(d.date)}: ${said(d)}"
+              aria-label="${d.today ? t('week.today') : longName.format(d.date)}: ${said(d)}">
+              <span class="wv" aria-hidden="true">${d.count && (d.today || d.count === max) ? d.count : ''}</span>
+              <span class="wcol"><i style="height:${d.count ? Math.max(4, Math.round((d.count / max) * 100)) : 0}%"></i></span>
+              <span class="wd" aria-hidden="true">${d.today ? t('week.todayShort') : dayName.format(d.date)}</span>
+            </div>`).join('')}
+        </div>
+      </div>`;
   }
 
   function notFound() {

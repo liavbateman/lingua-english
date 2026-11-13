@@ -78,6 +78,8 @@ const STR = {
     'backup.saved': 'Backup ready. Keep the file somewhere safe.', 'backup.saveFailed': 'Could not create the backup.',
     'backup.confirm': 'Replace your current progress with the backup?', 'backup.bad': 'This file is not a Lingua backup. Nothing was changed.',
     'backup.restored': 'Progress restored: {n} words.',
+    'week.title': 'This week', 'week.sub': '{a} of 7 days active · {n} answers',
+    'week.answers': '{n} answers', 'week.today': 'Today', 'week.todayShort': 'Today',
     'progress.reset': 'Reset all progress', 'progress.confirm': 'Delete all progress? This cannot be undone.',
     'notfound': 'Page not found'
   },
@@ -159,6 +161,8 @@ const STR = {
     'backup.saved': 'הגיבוי מוכן. שמרו את הקובץ במקום בטוח.', 'backup.saveFailed': 'לא הצלחנו ליצור את הגיבוי.',
     'backup.confirm': 'להחליף את ההתקדמות הנוכחית בגיבוי?', 'backup.bad': 'הקובץ הזה אינו גיבוי של Lingua. לא שונה דבר.',
     'backup.restored': 'ההתקדמות שוחזרה: {n} מילים.',
+    'week.title': 'השבוע שלי', 'week.sub': '{a} מתוך 7 ימים פעילים · {n} תשובות',
+    'week.answers': '{n} תשובות', 'week.today': 'היום', 'week.todayShort': 'היום',
     'progress.reset': 'איפוס כל ההתקדמות', 'progress.confirm': 'למחוק את כל ההתקדמות? אי אפשר לבטל את הפעולה.',
     'notfound': 'הדף לא נמצא'
   }
