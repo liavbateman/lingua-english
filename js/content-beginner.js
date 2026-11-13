@@ -500,6 +500,42 @@ UNITS.push(
       { en: 'spell', he: 'לאיית', ex: 'How do you spell your name?' },
       { en: 'remember', he: 'לזכור', ex: 'I always remember her birthday.' }
     ]
+  },
+
+  // ---------- Added in round 64 ----------
+  {
+    id: 'b-phr-bank', level: 'beginner', kind: 'phrases', title: 'Bank & post office', he: 'בבנק ובדואר', emoji: '🏦',
+    words: [
+      { en: "I'd like to open a bank account.", he: 'אשמח לפתוח חשבון בנק.' },
+      { en: 'Where is the nearest cash machine?', he: 'איפה הכספומט הקרוב?' },
+      { en: 'Can I change dollars here?', he: 'אפשר להחליף כאן דולרים?' },
+      { en: 'What is the exchange rate today?', he: 'מה שער החליפין היום?' },
+      { en: "My card isn't working.", he: 'הכרטיס שלי לא עובד.' },
+      { en: 'I want to send this parcel to Israel.', he: 'אני רוצה לשלוח את החבילה הזאת לישראל.' },
+      { en: 'How much is a stamp for a letter?', he: 'כמה עולה בול למכתב?' },
+      { en: 'How long does it take to arrive?', he: 'כמה זמן לוקח לזה להגיע?' },
+      { en: 'Do I need to fill in a form?', he: 'צריך למלא טופס?' },
+      { en: 'Can I pay in cash?', he: 'אפשר לשלם במזומן?' },
+      { en: 'Please sign here.', he: 'נא לחתום כאן.' },
+      { en: 'Here is your receipt.', he: 'הנה הקבלה שלך.' }
+    ]
+  },
+  {
+    id: 'b-phr-time', level: 'beginner', kind: 'phrases', title: 'Time & dates', he: 'שעות ותאריכים', emoji: '🕐',
+    words: [
+      { en: 'What time is it?', he: 'מה השעה?' },
+      { en: "It's half past three.", he: 'השעה שלוש וחצי.' },
+      { en: "It's a quarter to eight.", he: 'השעה רבע לשמונה.' },
+      { en: "What's the date today?", he: 'מה התאריך היום?' },
+      { en: 'Today is Monday, the tenth of May.', he: 'היום יום שני, העשרה במאי.' },
+      { en: 'What time does the shop open?', he: 'באיזו שעה החנות נפתחת?' },
+      { en: 'The bank closes at five.', he: 'הבנק נסגר בחמש.' },
+      { en: "I'm sorry I'm late.", he: 'סליחה על האיחור.' },
+      { en: 'We are ten minutes early.', he: 'הגענו עשר דקות מוקדם.' },
+      { en: 'See you at noon.', he: 'נתראה בצהריים.' },
+      { en: 'My birthday is in July.', he: 'יום ההולדת שלי ביולי.' },
+      { en: 'How long is the film?', he: 'כמה זמן נמשך הסרט?' }
+    ]
   }
 );
 
