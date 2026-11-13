@@ -1438,9 +1438,9 @@
           if (!ok) Store.ruleMiss(rule.id); else if (review) Store.ruleHit(rule.id);
           streak = ok ? streak + 1 : 0;
           const full = q.replace('___', answer);
-          $('#sentence').textContent = full;
+          $('#sentence').innerHTML = q.replace('___', `<mark class="gq-ans">${answer}</mark>`);
           speak(full.replace(/"/g, ''));
-          showFeedback({ ok, answer: ok ? '' : full, say: full.replace(/"/g, ''), combo: streak });
+          showFeedback({ ok, answer: ok ? '' : full, mark: answer, say: full.replace(/"/g, ''), combo: streak });
       });
       $('#next').onclick = () => { i++; i < qs.length ? question() : (review ? reviewSummary() : saved ? savedSummary() : final ? finalSummary() : test ? testSummary() : summary()); };
     }
@@ -2217,7 +2217,9 @@
 
   // After an answer: a green or red sheet rises from the bottom with the right answer, its sound,
   // and the Continue button, always in the same place under the thumb (as in Duolingo)
-  function showFeedback({ ok, close, answer, lang = 'en', sub, say, combo = 0 }) {
+  function showFeedback({ ok, close, answer, lang = 'en', sub, say, combo = 0, mark }) {
+    // mark: the part of the answer that was the gap; it gets a highlight so the eye lands on it
+    const answerHtml = answer && mark && answer.includes(mark) ? answer.replace(mark, `<mark class="fb-mark">${mark}</mark>`) : answer;
     const next = $('#next');
     const fb = document.createElement('div');
     fb.className = 'fb ' + (ok ? 'ok' : 'bad');
@@ -2230,7 +2232,7 @@
         ${combo >= 3 ? `<span class="combo">🔥 ${t('combo', { n: combo })}</span>` : ''}
         ${say ? `<button class="speak sm fb-say" aria-label="${t('aria.listen')}">${ICON.speaker}</button>` : ''}
       </div>
-      ${answer ? `<div class="fb-answer ${lang}" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${answer}</div>` : ''}
+      ${answer ? `<div class="fb-answer ${lang}" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${answerHtml}</div>` : ''}
       ${sub ? `<div class="fb-sub">${sub}</div>` : ''}`;
     next.hidden = false;
     fb.appendChild(next);

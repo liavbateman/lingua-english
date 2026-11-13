@@ -1602,3 +1602,21 @@ button.pc-form[aria-expanded="true"] .pc-more { transform: rotate(180deg); }
 body[data-lv="beginner"] .lb-track i { background: linear-gradient(90deg, #2fb88a, #4fd8a8); }
 body[data-lv="intermediate"] .lb-track i { background: linear-gradient(90deg, #3f8be8, #6fb4ff); }
 body[data-lv="advanced"] .lb-track i { background: linear-gradient(90deg, #8e7cf0, #b9a8ff); }
+
+/* ---------- Answer feedback: a raised sheet with a glow, a popping badge, the fix highlighted (design round D20) ---------- */
+.fb { border-top-width: 3px; box-shadow: 0 -10px 30px rgba(0, 0, 0, .45); }
+.fb.ok { background: radial-gradient(120% 90% at 50% 0, rgba(47, 208, 147, .22), transparent 60%), #0f2a2a; }
+.fb.bad { background: radial-gradient(120% 90% at 50% 0, rgba(255, 107, 122, .2), transparent 60%), #2e1626; }
+.fb-icon { animation: fb-pop .38s var(--ease-pop, cubic-bezier(.3, 1.6, .5, 1)) .05s both; }
+.fb.ok .fb-icon { box-shadow: 0 0 0 5px rgba(47, 208, 147, .22), 0 3px 0 #1d8f66; }
+.fb.bad .fb-icon { box-shadow: 0 0 0 5px rgba(255, 107, 122, .22), 0 3px 0 #b8404f; }
+@keyframes fb-pop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.fb .fb-say { background: rgba(255, 255, 255, .1); color: var(--ink); }
+.fb.ok .fb-say { color: #8ff0c8; }
+.fb.bad .fb-say { color: #ffb3bb; }
+.fb-answer { display: block; padding: 10px 14px; border-radius: 14px; line-height: 1.4; text-align: left;
+  background: rgba(0, 0, 0, .25); border-inline-start: 4px solid var(--good); }
+.fb-answer.he { text-align: right; }
+.fb-mark, .gq-ans { padding: 0 4px; border-radius: 6px; background: rgba(47, 208, 147, .25); color: #b4f7da; font-weight: 800; }
+.gq-ans { color: #fff; background: color-mix(in srgb, var(--lv) 35%, transparent); box-shadow: inset 0 -2px 0 var(--lv); }
+@media (prefers-reduced-motion: reduce) { .fb-icon { animation: none; } }
