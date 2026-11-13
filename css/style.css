@@ -2009,3 +2009,14 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
 .wday-word b { font-size: 1.35rem; }
 .wday-word span { color: #d5d9f2; font-weight: 700; }
 .wday-ex { margin: 6px 0 0; padding: 6px 10px; border-radius: 10px; background: rgba(0, 0, 0, .2); font-size: .85rem; color: #d5d9f2; text-align: left; }
+
+/* ---------- Rule page header: the rule's number in a ring that fills with the level's progress (design round D48) ---------- */
+.rule-hero { position: relative; padding-inline-end: 84px; }
+.rule-ring { position: absolute; top: 14px; inset-inline-end: 14px; width: 60px; height: 60px; }
+.rule-ring::before { background: var(--lv-bg-a); }
+.rule-ring b { font-size: 1.25rem; }
+.rule-ring.done { box-shadow: 0 0 14px color-mix(in srgb, var(--lv) 45%, transparent); }
+.rule-ring-crown { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 1.05rem; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .4)); }
+.rule-hero .rule-meta { flex-direction: column; align-items: flex-start; gap: 2px; }
+.rule-hero h1 .rule-crown { display: none; }
+@media (max-width: 340px) { .rule-hero { padding-inline-end: 74px; } .rule-ring { width: 52px; height: 52px; } }

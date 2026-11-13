@@ -1514,10 +1514,17 @@
     // The rule page wears its level's colour, like the road: a header card, then one card per part
     const road = LEVELS.flatMap(l => GRAMMAR.filter(x => x.level === l.id));
     const done = Store.isGrammarDone(g.id);
+    // the ring around the rule's number fills with how much of its level is done
+    const lvlRules = GRAMMAR.filter(x => x.level === g.level);
+    const lvlPct = Math.round(lvlRules.filter(x => Store.isGrammarDone(x.id)).length / lvlRules.length * 100);
     view.innerHTML = `
       <div class="rule-page lv-${g.level}">
       <a class="back" href="#/grammar">${bwd()} ${t('grammar.back')}</a>
       <header class="rule-hero">
+        <div class="rule-ring lv-ring${done ? ' done' : ''}" style="--p:${lvlPct}" role="img"
+          aria-label="${t('rule.num', { n: road.indexOf(g) + 1, m: road.length })} · ${t('lv.' + g.level)} ${lvlPct}%">
+          <b class="en">${road.indexOf(g) + 1}</b>${done ? '<span class="rule-ring-crown" aria-hidden="true">👑</span>' : ''}
+        </div>
         <div class="rule-meta">
           <span class="rule-lvl">${t('lv.' + g.level)} · <span class="en">${t('lvl.cefr.' + g.level)}</span></span>
           <span class="rule-num">${t('rule.num', { n: road.indexOf(g) + 1, m: road.length })}</span>
