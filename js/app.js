@@ -1917,12 +1917,12 @@
       view.innerHTML = `
         <p class="sub">${t('speak.count', { a: i + 1, b: queue.length })}</p>
         ${lessonBar(i / queue.length)}
-        <div class="card flash" style="cursor:default">
+        <div class="card flash speak-card">
           <div class="small">${t(Recognition() ? 'speak.do.mic' : 'speak.do')}</div>
           <div class="word en ${w.phrase ? 'long' : ''}" style="margin-top:8px">${w.en}</div>
           <div class="speak-row">
-            <button class="speak xl" id="speak" aria-label="${t('aria.listen')}">${ICON.speaker}</button>
-            ${Recognition() ? `<button class="speak xl mic" id="mic" aria-label="${t('speak.mic')}" aria-pressed="false">${ICON.mic}</button>` : ''}
+            <span class="sp-btn"><button class="speak xl" id="speak" aria-label="${t('aria.listen')}">${ICON.speaker}</button><small aria-hidden="true">${t('aria.listen')}</small></span>
+            ${Recognition() ? `<span class="sp-btn sp-mic"><button class="speak xl mic" id="mic" aria-label="${t('speak.mic')}" aria-pressed="false">${ICON.mic}</button><small aria-hidden="true">${t('speak.mic')}</small></span>` : ''}
           </div>
           <div class="heard" id="heard" aria-live="polite"></div>
           <div class="he ${w.phrase ? 'long' : ''}">${w.he}</div>

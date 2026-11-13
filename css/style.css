@@ -1431,3 +1431,31 @@ button.pc-form[aria-expanded="true"] .pc-more { transform: rotate(180deg); }
 .ptile .small { color: #c9cdf0; font-size: .82rem; line-height: 1.35; }
 .c-blue { --c: #3f7df0; } .c-purple { --c: #7a5cf5; } .c-green { --c: #2cb98d; }
 .c-gold { --c: #f2a43c; } .c-coral { --c: #f0566e; } .c-rose { --c: #e0457b; }
+
+/* ---------- Speaking screen (design round D12) ---------- */
+.speak-card {
+  cursor: default; border: 0; border-radius: 24px;
+  background: linear-gradient(160deg, #262d68, #1a2052); box-shadow: 0 5px 0 #0d1232;
+}
+.speak-card .small { color: #b9b0ff; font-weight: 700; }
+.speak-row { align-items: flex-end; gap: 26px; margin-top: 10px; }
+.sp-btn { display: grid; justify-items: center; gap: 6px; }
+.sp-btn small { font-size: .78rem; font-weight: 700; color: #c9cdf0; max-width: 110px; line-height: 1.25; }
+.speak-row .speak.xl { margin: 0; width: 64px; height: 64px; }
+.speak-row .speak.xl svg { width: 28px; height: 28px; }
+/* the microphone is the main action: bigger, raised, rings while listening */
+.speak-row .speak.mic { position: relative; width: 92px; height: 92px; box-shadow: 0 5px 0 #463bc4; }
+.speak-row .speak.mic svg { width: 40px; height: 40px; }
+.speak-row .speak.mic:active { transform: translateY(4px); box-shadow: 0 1px 0 #463bc4; }
+.speak.mic.on { animation: none; background: linear-gradient(140deg, #ff8a6b, #f0566e); box-shadow: 0 5px 0 #b8334a; }
+.speak.mic.on::before, .speak.mic.on::after {
+  content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 3px solid rgba(255, 138, 107, .7);
+  animation: micring 1.4s ease-out infinite; pointer-events: none;
+}
+.speak.mic.on::after { animation-delay: .7s; }
+@keyframes micring { from { transform: scale(1); opacity: .9; } to { transform: scale(1.45); opacity: 0; } }
+/* what was heard, as a tinted chip */
+.heard { display: inline-block; margin-top: 14px; padding: 8px 14px; border-radius: 14px; }
+.heard.wait { background: rgba(255, 255, 255, .06); }
+.heard.ok { background: var(--good-soft); }
+.heard.bad { background: var(--bad-soft); }
