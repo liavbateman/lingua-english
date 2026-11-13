@@ -366,7 +366,7 @@ GRAMMAR.push(
   },
   {
     id: 'i-too-enough', level: 'intermediate', title: 'Too & enough', he: 'יותר מדי ומספיק: too / enough',
-    when: 'too פירושו "יותר מדי", כלומר יש בעיה. enough פירושו "מספיק". שימו לב למקום במשפט: too בא לפני שם התואר, ו-enough בא אחרי שם התואר אבל לפני שם העצם.',
+    when: 'too פירושו "יותר מדי", כלומר יש בעיה. enough פירושו "מספיק". חשוב המקום במשפט: too בא לפני שם התואר, ו-enough בא אחרי שם התואר אבל לפני שם העצם.',
     forms: [
       ['too + adj', 'too expensive · too late · too tired'],
       ['adj + enough', 'big enough · warm enough · not fast enough'],
@@ -419,7 +419,7 @@ GRAMMAR.push(
       ['look / feel', 'She looks tired. · It smells good. · I feel bad.']
     ],
     ex: [['He is a careful driver. He drives carefully.', 'הוא נהג זהיר. הוא נוהג בזהירות.'], ['She speaks English very well.', 'היא מדברת אנגלית טוב מאוד.'], ['The soup smells good.', 'למרק יש ריח טוב.']],
-    tip: 'בעברית אותה מילה משמשת לשני התפקידים ("שיר יפה", "היא שרה יפה"), ובאנגלית לא: "She sings beautifully", לא "She sings beautiful". וגם: "He speaks English well", לא "He speaks English good". שימו לב ש-hardly פירושו "כמעט לא", ולא "קשה".',
+    tip: 'בעברית אותה מילה משמשת לשני התפקידים ("שיר יפה", "היא שרה יפה"), ובאנגלית לא: "She sings beautifully", לא "She sings beautiful". וגם: "He speaks English well", לא "He speaks English good". ועוד דבר: hardly פירושו "כמעט לא", ולא "קשה".',
     quiz: [['She speaks English very ___.', 'well', ['good', 'goodly', 'best']], ['Please drive ___.', 'carefully', ['careful', 'care', 'more careful']], ['He is a ___ runner.', 'fast', ['fastly', 'quickly', 'well']]]
   },
   {

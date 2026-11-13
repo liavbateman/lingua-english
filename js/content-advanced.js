@@ -320,7 +320,7 @@ GRAMMAR.push(
   },
   {
     id: 'a-causative', level: 'advanced', title: 'Causative: have / get something done', he: 'מישהו אחר עושה בשבילי: have / get',
-    when: 'כשלא אתה מבצע את הפעולה אלא מזמין מישהו (בדרך כלל איש מקצוע) שיעשה אותה בשבילך. משמש גם למשהו רע שקרה לך.',
+    when: 'כשלא מבצעים את הפעולה בעצמנו אלא מזמינים מישהו (בדרך כלל איש מקצוע) שיעשה אותה בשבילנו. משמש גם למשהו רע שקרה לנו.',
     forms: [
       ['have', 'have + object + past participle: I had my car repaired.'],
       ['get', 'get + object + past participle (פחות רשמי): I got my hair cut.'],
@@ -330,12 +330,12 @@ GRAMMAR.push(
       ['bad event', 'She had her bag stolen on the bus.']
     ],
     ex: [['I had my car repaired last week.', 'תיקנתי את האוטו בשבוע שעבר (במוסך).'], ['We are having the kitchen renovated.', 'אנחנו משפצים את המטבח (קבלן עושה את העבודה).'], ['You should get your eyes tested.', 'כדאי שתעשה בדיקת ראייה.']],
-    tip: 'בעברית אומרים "הסתפרתי" או "תיקנתי את האוטו" גם כשמישהו אחר עשה את העבודה. באנגלית "I cut my hair" אומר שסיפרת את עצמך. אם הספר עשה זאת, אומרים "I had my hair cut". שים לב לסדר: "I had my car repaired", לא "I had repaired my car".',
+    tip: 'בעברית אומרים "הסתפרתי" או "תיקנתי את האוטו" גם כשמישהו אחר עשה את העבודה. באנגלית "I cut my hair" אומר שהסתפרתי לבד. אם הספר עשה זאת, אומרים "I had my hair cut". חשוב הסדר: "I had my car repaired", לא "I had repaired my car".',
     quiz: [['I ___ my car serviced at the same garage every year.', 'have', ['am', 'do', 'make']], ['We are having the office ___ next week.', 'painted', ['paint', 'painting', 'to paint']], ['He ___ his wallet stolen on the train yesterday.', 'had', ['was', 'has been', 'did']]]
   },
   {
     id: 'a-deduction', level: 'advanced', title: 'Modals of deduction', he: 'הסקת מסקנות: must / might / can\'t (have)',
-    when: 'כשמסיקים מסקנה לפי רמזים ולא לפי ידיעה ודאית. המודל מראה עד כמה אתה בטוח. למסקנה על העבר מוסיפים have + past participle.',
+    when: 'כשמסיקים מסקנה לפי רמזים ולא לפי ידיעה ודאית. המודל מראה עד כמה בטוחים. למסקנה על העבר מוסיפים have + past participle.',
     forms: [
       ['sure: yes', 'must + verb: She must be tired. · must have + past participle: He must have forgotten.'],
       ['possible', 'might / may / could (have): They might be late. · She may have missed the bus.'],

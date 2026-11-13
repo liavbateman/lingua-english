@@ -358,7 +358,7 @@ GRAMMAR.push(
   },
   {
     id: 'b-would-like', level: 'beginner', title: 'Like / would like', he: 'לאהוב ולרצות: like / would like',
-    when: 'like מתאר מה אתה אוהב באופן כללי. would like היא דרך מנומסת לומר "אני רוצה" עכשיו, למשל במסעדה או בחנות, והיא עדינה יותר מ-I want.',
+    when: 'like מתאר מה אוהבים באופן כללי. would like היא דרך מנומסת לומר "אני רוצה" עכשיו, למשל במסעדה או בחנות, והיא עדינה יותר מ-I want.',
     forms: [
       ['like', 'like + noun / verb-ing: I like tea. · I like cooking.'],
       ['would like', "would like + noun / to + verb: I would like (I'd like) a tea. · I'd like to pay."],
@@ -366,7 +366,7 @@ GRAMMAR.push(
       ['?', 'Do you like coffee? · Would you like a coffee?']
     ],
     ex: [['I like Italian food.', 'אני אוהב אוכל איטלקי.'], ["I'd like a glass of water, please.", 'אני רוצה כוס מים, בבקשה.'], ['Would you like to sit here?', 'תרצה לשבת כאן?']],
-    tip: `אל תתבלבל: "Do you like coffee?" שואל אם אתה אוהב קפה בכלל, ו-"Would you like a coffee?" מציע לך קפה עכשיו. ואחרי would like בא to: "I'd like to order", לא "I'd like order".`,
+    tip: `לא להתבלבל: "Do you like coffee?" שואל אם אוהבים קפה בכלל, ו-"Would you like a coffee?" מציע קפה עכשיו. ואחרי would like בא to: "I'd like to order", לא "I'd like order".`,
     quiz: [["I'd like ___ a table for two.", 'to book', ['book', 'booking', 'books']], ['___ you like a cup of tea now?', 'Would', ['Are', 'Does', 'Is']], ['She ___ dogs. She has three.', 'likes', ['like', 'liking', 'is like']]]
   },
   {
