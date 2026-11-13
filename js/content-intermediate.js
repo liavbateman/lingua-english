@@ -379,6 +379,38 @@ UNITS.push(
       { en: 'Here is the receipt.', he: 'הנה הקבלה.' },
       { en: 'Can I get a refund, or only a credit note?', he: 'אפשר לקבל החזר כספי, או רק זיכוי?' }
     ]
+  },
+
+  // ---------- Added in round 39 ----------
+  {
+    id: 'i-phr-road', level: 'intermediate', kind: 'phrases', title: 'On the road', he: 'בדרכים', emoji: '🛣️',
+    words: [
+      { en: 'Could you fill it up, please?', he: 'אפשר למלא את המיכל עד הסוף, בבקשה?' },
+      { en: 'Is there a gas station nearby?', he: 'יש תחנת דלק קרובה?' },
+      { en: 'Where can I park around here?', he: 'איפה אפשר לחנות כאן באזור?' },
+      { en: "I think we're lost. Let's check the map.", he: 'נראה לי שהלכנו לאיבוד. בואו נבדוק במפה.' },
+      { en: "There's a lot of traffic on the highway today.", he: 'יש היום הרבה תנועה בכביש המהיר.' },
+      { en: 'Can you slow down a little, please?', he: 'אפשר להאט קצת, בבקשה?' },
+      { en: 'We need to take the next exit.', he: 'צריך לצאת ביציאה הבאה.' },
+      { en: 'My car broke down on the way to work.', he: 'האוטו שלי התקלקל בדרך לעבודה.' },
+      { en: 'How much does it cost to rent a car for a week?', he: 'כמה עולה לשכור רכב לשבוע?' },
+      { en: "Don't forget to fasten your seat belt.", he: 'לא לשכוח לחגור חגורת בטיחות.' }
+    ]
+  },
+  {
+    id: 'i-phr-gym', level: 'intermediate', kind: 'phrases', title: 'At the gym', he: 'בחדר הכושר', emoji: '🏋️',
+    words: [
+      { en: 'How much is a monthly membership?', he: 'כמה עולה מנוי חודשי?' },
+      { en: 'Is this machine free?', he: 'המכשיר הזה פנוי?' },
+      { en: 'Could you show me how to use this?', he: 'אפשר להראות לי איך משתמשים בזה?' },
+      { en: 'How many sets should I do?', he: 'כמה סטים כדאי לעשות?' },
+      { en: "I'm trying to work out three times a week.", he: 'אני מנסה להתאמן שלוש פעמים בשבוע.' },
+      { en: 'I pulled a muscle yesterday.', he: 'משכתי שריר אתמול.' },
+      { en: 'What time does the yoga class start?', he: 'באיזו שעה מתחיל שיעור היוגה?' },
+      { en: 'Can I help you with that?', he: 'אפשר לעזור עם זה?' },
+      { en: "Let's go for a run tomorrow morning.", he: 'בואו נצא לריצה מחר בבוקר.' },
+      { en: 'I feel much better since I started exercising.', he: 'ההרגשה שלי הרבה יותר טובה מאז שהתחלתי להתאמן.' }
+    ]
   }
 );
 

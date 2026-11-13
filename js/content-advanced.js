@@ -366,6 +366,23 @@ UNITS.push(
       { en: "I understand it isn't your fault.", he: 'ברור לי שזו לא אשמתך.' },
       { en: 'Thank you for sorting this out so quickly.', he: 'תודה שטיפלת בזה כל כך מהר.' }
     ]
+  },
+
+  // ---------- Added in round 39 ----------
+  {
+    id: 'a-phr-feedback', level: 'advanced', kind: 'phrases', title: 'Giving & receiving feedback', he: 'לתת ולקבל משוב', emoji: '🗣️',
+    words: [
+      { en: 'Can I give you some feedback on the presentation?', he: 'אפשר לתת לך משוב על המצגת?' },
+      { en: 'Overall, I think it went really well.', he: 'באופן כללי, נראה לי שזה הלך ממש טוב.' },
+      { en: 'One thing you could improve is the timing.', he: 'דבר אחד שאפשר לשפר הוא התזמון.' },
+      { en: 'It might help to add a few real examples.', he: 'כדאי להוסיף כמה דוגמאות אמיתיות.' },
+      { en: "Thanks, that's really helpful.", he: 'תודה, זה באמת מועיל.' },
+      { en: 'Could you be a bit more specific?', he: 'אפשר לפרט קצת יותר?' },
+      { en: "I see what you mean, and I'll work on it.", he: 'הבנתי למה הכוונה, ואעבוד על זה.' },
+      { en: 'What could have been done differently?', he: 'מה היה אפשר לעשות אחרת?' },
+      { en: 'Thank you for your honesty; it means a lot.', he: 'תודה על הכנות, זה חשוב לי.' },
+      { en: "Let's set up a follow-up meeting next week.", he: 'כדאי לקבוע פגישת המשך בשבוע הבא.' }
+    ]
   }
 );
 
