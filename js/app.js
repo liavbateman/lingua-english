@@ -465,7 +465,7 @@
       const [q, answer, wrong] = g.quiz[i];
       view.innerHTML = `
         <p class="sub">${ruleTitle(g)} · ${t('quiz.count', { a: i + 1, b: g.quiz.length })}</p>
-        ${bar((i / g.quiz.length) * 100)}
+        ${lessonBar(i / g.quiz.length)}
         <div class="card question">
           <div class="small">${t('grammar.choose')}</div>
           <div class="prompt sentence en" id="sentence">${q.replace('___', '_____')}</div>
@@ -499,6 +499,7 @@
       // The daily task counts only when the rule was actually passed
       if (passed) { Store.markGrammar(g.id); Store.completeTask('grammar'); }
       refreshChrome('learn');
+      endLesson(1);
       const next = levelGrammar().find(x => !Store.isGrammarDone(x.id));
       view.innerHTML = `
         ${celebration()}
@@ -529,7 +530,7 @@
       view.innerHTML = `
         <h1>${unit.emoji} ${unitTitle(unit)}</h1>
         <p class="sub">${t('card.count', { a: i + 1, b: unit.words.length })}</p>
-        ${bar(((i + 1) / unit.words.length) * 100)}
+        ${lessonBar((i + 1) / unit.words.length)}
         <div class="card flash" id="flash">
           <div class="word en ${w.phrase ? 'long' : ''}">${w.en}</div>
           <button class="speak" id="speak" aria-label="${t('aria.listen')}">${ICON.speaker}</button>
@@ -595,6 +596,7 @@
   let lastMissed = [];
 
   function done(emoji, title, text, extra = '') {
+    endLesson(1);
     view.innerHTML = `
       ${celebration()}
       <div class="card center" style="margin-top:14px">
@@ -640,6 +642,7 @@
     const src = poolFor(source);
     if (!src || !['choice', 'listen', 'cloze', 'type'].includes(mode)) return notFound();
     if (!src.pool.length) {
+      endLesson();
       view.innerHTML = `
         <div class="card center" style="margin-top:14px">
           <div class="big">✅</div>
@@ -703,7 +706,7 @@
 
       view.innerHTML = `
         <p class="sub">${src.title} · ${t('quiz.count', { a: i + 1, b: queue.length })}</p>
-        ${bar((i / queue.length) * 100)}
+        ${lessonBar(i / queue.length)}
         <div class="card question">${retry ? `<div class="again">${ICON.repeat}${t('quiz.again')}</div>` : ''}${prompt}</div>
         ${kind === 'type' ? `
         <form class="typed" id="typed" autocomplete="off">
@@ -841,7 +844,7 @@
       let heardOk = false;
       view.innerHTML = `
         <p class="sub">${t('speak.count', { a: i + 1, b: queue.length })}</p>
-        ${bar((i / queue.length) * 100)}
+        ${lessonBar(i / queue.length)}
         <div class="card flash" style="cursor:default">
           <div class="small">${t(Recognition() ? 'speak.do.mic' : 'speak.do')}</div>
           <div class="word en ${w.phrase ? 'long' : ''}" style="margin-top:8px">${w.en}</div>
@@ -1032,7 +1035,58 @@
       </div>`;
   }
 
+  // ---------- Lesson focus mode ----------
+  // While an exercise runs, the header and tab bar give way to a close button and one thick
+  // progress bar (as in Duolingo and Babbel), so nothing competes with the question.
+  let lessonDone = 0;          // share of the current round already done, 0..1
+  let lessonExit = '#/learn';  // where the close button goes back to
+  const lbFill = document.getElementById('lb-fill');
+  const lbTrack = document.getElementById('lb-track');
+
+  function lessonBar(fraction) {
+    lessonDone = Math.max(0, Math.min(1, fraction));
+    lbFill.style.width = (lessonDone * 100) + '%';
+    lbTrack.setAttribute('aria-valuenow', String(Math.round(lessonDone * 100)));
+    return '';
+  }
+  function endLesson(fraction) {
+    if (fraction !== undefined) lessonBar(fraction);
+    document.body.classList.remove('in-lesson');
+  }
+
+  // A bottom sheet: the question, one main answer under the thumb, and a quiet second one
+  function sheet({ title, text, primary, secondary, onSecondary }) {
+    const back = document.createElement('div');
+    back.className = 'sheet-back';
+    back.innerHTML = `
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+        <b id="sheet-title">${title}</b>
+        ${text ? `<p>${text}</p>` : ''}
+        <button class="btn" id="sheet-primary">${primary}</button>
+        <button class="btn plain" id="sheet-secondary">${secondary}</button>
+      </div>`;
+    const close = () => { back.classList.add('out'); setTimeout(() => back.remove(), 200); document.removeEventListener('keydown', key); };
+    const key = e => { if (e.key === 'Escape') close(); };
+    back.onclick = e => { if (e.target === back) close(); };
+    back.querySelector('#sheet-primary').onclick = close;
+    back.querySelector('#sheet-secondary').onclick = () => { close(); onSecondary(); };
+    document.addEventListener('keydown', key);
+    document.body.appendChild(back);
+    back.querySelector('#sheet-primary').focus();
+  }
+
+  document.getElementById('lb-close').onclick = () => {
+    const leave = () => { location.hash = lessonExit; };
+    // Nothing answered yet: just leave. Mid-round: ask first.
+    if (lessonDone <= 0) return leave();
+    sheet({
+      title: t('lesson.quit.title'), text: t('lesson.quit.text'),
+      primary: t('lesson.quit.stay'), secondary: t('lesson.quit.leave'), onSecondary: leave
+    });
+  };
+
   function notFound() {
+    endLesson();
     view.innerHTML = `<div class="card center"><h1>${t('notfound')}</h1><a class="btn" href="#/">${t('btn.home')}</a></div>`;
   }
 
@@ -1056,6 +1110,11 @@
     if ('speechSynthesis' in window) speechSynthesis.cancel();
     if (recognition) recognition.abort();
     view.scrollTop = 0;
+    document.querySelectorAll('.sheet-back').forEach(s => s.remove());
+    const inLesson = ['unit', 'quiz', 'speak'].includes(name) || (name === 'grammar' && b === 'quiz');
+    document.body.classList.toggle('in-lesson', inLesson);
+    if (inLesson) lessonBar(0);
+    else if (name !== 'x') lessonExit = location.hash || '#/';
     switch (name || 'home') {
       case 'home': refreshChrome('home'); home(); break;
       case 'learn': refreshChrome('learn'); learn(); break;

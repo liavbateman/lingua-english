@@ -27,6 +27,9 @@ const STR = {
 
     'search.ph': 'Search a word in English or Hebrew', 'search.none': 'No words match “{q}”',
     'search.count': '{n} results', 'search.one': '1 result',
+    'lesson.close': 'Close the lesson', 'lesson.quit.title': 'Leave this lesson?',
+    'lesson.quit.text': "Your answers so far are saved, but this round won't count as finished.",
+    'lesson.quit.stay': 'Keep learning', 'lesson.quit.leave': 'Leave',
     'learn.title': 'Learn', 'learn.sub': '{level} lessons. Change the level on the Home screen.',
     'learn.vocab': 'Words', 'learn.phrases': 'Phrases', 'learn.grammar': 'Grammar', 'learn.practice': 'Practice',
     'learn.words': '{a} of {b} words learned', 'learn.sentences': '{a} of {b} sentences learned',
@@ -115,6 +118,9 @@ const STR = {
 
     'search.ph': 'חיפוש מילה באנגלית או בעברית', 'search.none': 'לא נמצאו מילים עבור „{q}”',
     'search.count': '{n} תוצאות', 'search.one': 'תוצאה אחת',
+    'lesson.close': 'יציאה מהשיעור', 'lesson.quit.title': 'לצאת מהשיעור?',
+    'lesson.quit.text': 'התשובות עד עכשיו נשמרו, אבל הסבב הזה לא ייחשב כגמור.',
+    'lesson.quit.stay': 'ממשיכים ללמוד', 'lesson.quit.leave': 'יציאה',
     'learn.title': 'לימוד', 'learn.sub': 'שיעורים ברמת {level}. את הרמה מחליפים במסך הבית.',
     'learn.vocab': 'מילים', 'learn.phrases': 'משפטים', 'learn.grammar': 'דקדוק', 'learn.practice': 'תרגול',
     'learn.words': '{a} מתוך {b} מילים נלמדו', 'learn.sentences': '{a} מתוך {b} משפטים נלמדו',
