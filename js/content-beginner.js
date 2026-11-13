@@ -442,6 +442,42 @@ UNITS.push(
       { en: 'Who wants coffee?', he: 'מי רוצה קפה?' },
       { en: "Let's watch a movie tonight.", he: 'בואו נראה סרט הערב.' }
     ]
+  },
+
+  // ---------- Added in round 52 ----------
+  {
+    id: 'b-phr-class', level: 'beginner', kind: 'phrases', title: 'In class: asking for help', he: 'בשיעור: לבקש עזרה', emoji: '🎒',
+    words: [
+      { en: 'How do you say this in English?', he: 'איך אומרים את זה באנגלית?' },
+      { en: 'What does this word mean?', he: 'מה המילה הזאת אומרת?' },
+      { en: 'How do you spell it?', he: 'איך מאייתים את זה?' },
+      { en: 'Could you repeat that, please?', he: 'אפשר לחזור על זה, בבקשה?' },
+      { en: "Sorry, I don't understand.", he: 'סליחה, לא הבנתי.' },
+      { en: 'Can I ask a question?', he: 'אפשר לשאול שאלה?' },
+      { en: 'Is this correct?', he: 'זה נכון?' },
+      { en: 'What page are we on?', he: 'באיזה עמוד אנחנו?' },
+      { en: 'Can you write it on the board?', he: 'אפשר לכתוב את זה על הלוח?' },
+      { en: 'I have finished the exercise.', he: 'סיימתי את התרגיל.' },
+      { en: 'What is the homework for tomorrow?', he: 'מה שיעורי הבית למחר?' },
+      { en: 'See you next lesson!', he: 'נתראה בשיעור הבא!' }
+    ]
+  },
+  {
+    id: 'b-phr-bus', level: 'beginner', kind: 'phrases', title: 'Bus, train & taxi', he: 'אוטובוס, רכבת ומונית', emoji: '🚌',
+    words: [
+      { en: 'Where is the bus stop?', he: 'איפה תחנת האוטובוס?' },
+      { en: 'Does this bus go to the city centre?', he: 'האוטובוס הזה נוסע למרכז העיר?' },
+      { en: 'One ticket to London, please.', he: 'כרטיס אחד ללונדון, בבקשה.' },
+      { en: 'A return ticket, please.', he: 'כרטיס הלוך ושוב, בבקשה.' },
+      { en: 'What time is the next train?', he: 'מתי הרכבת הבאה?' },
+      { en: 'Which platform is it?', he: 'מאיזה רציף?' },
+      { en: 'How many stops is it?', he: 'כמה תחנות זה?' },
+      { en: 'Please tell me when to get off.', he: 'תגידו לי בבקשה מתי לרדת.' },
+      { en: 'Is this seat free?', he: 'המקום הזה פנוי?' },
+      { en: 'To this address, please.', he: 'לכתובת הזאת, בבקשה.' },
+      { en: 'How much is it to the airport?', he: 'כמה עולה עד שדה התעופה?' },
+      { en: 'You can stop here, thank you.', he: 'אפשר לעצור כאן, תודה.' }
+    ]
   }
 );
 
@@ -566,5 +602,20 @@ GRAMMAR.push(
     ex: [['She has a new phone.', 'יש לה טלפון חדש.'], ['They are good friends.', 'הם חברים טובים.'], ['We live in a small white house.', 'אנחנו גרים בבית לבן וקטן.']],
     tip: 'טעות נפוצה: לתרגם מילה במילה מעברית. לא "a house big" אלא "a big house". ולא מוסיפים s לשם התואר: "two big dogs", לא "two bigs dogs".',
     quiz: [['I bought a ___ yesterday.', 'red car', ['car red', 'cars red', 'reds car']], ['They have two ___.', 'small children', ['smalls children', 'children small', 'childrens small']], ['These shoes are ___.', 'new', ['news', 'a new', 'the new']]]
+  },
+
+  // ---------- Added in round 52 ----------
+  {
+    id: 'b-lets', level: 'beginner', title: "Let's: making suggestions", he: "הצעות: Let's",
+    when: 'כשמציעים לעשות משהו ביחד: "בואו נלך", "בואו נאכל". Let\'s הוא קיצור של let us, ואחריו בא הפועל בצורת הבסיס, בלי to ובלי s. לשלילה אומרים Let\'s not.',
+    forms: [
+      ['suggestion', "Let's + verb: Let's go. · Let's eat."],
+      ['negative', "Let's not + verb: Let's not wait."],
+      ['question', 'Shall we + verb? Shall we start?'],
+      ['answer', "Yes, let's! · Good idea. · Sorry, I can't."]
+    ],
+    ex: [["Let's go to the beach.", 'בואו נלך לים.'], ["Let's not be late.", 'בואו לא נאחר.'], ['Shall we order pizza?', 'נזמין פיצה?']],
+    tip: 'טעות נפוצה: להוסיף to או ing אחרי Let\'s. לא "Let\'s to go" ולא "Let\'s going", אלא "Let\'s go". ושימו לב לגרש: Let\'s (בואו נ...) שונה מ-lets (מרשה).',
+    quiz: [["Let's ___ a movie tonight.", 'watch', ['to watch', 'watching', 'watches']], ["It's cold. Let's ___ go out.", 'not', ["don't", 'no', "doesn't"]], ['___ we start the lesson?', 'Shall', ['Let', "Let's", 'Are']]]
   }
 );
