@@ -13,7 +13,12 @@ UNITS.push(
       { en: 'recover', he: 'להחלים', ex: 'It took him two weeks to recover from the flu.' },
       { en: 'treatment', he: 'טיפול', ex: 'The new treatment helped her feel much better.' },
       { en: 'medicine', he: 'תרופה', ex: 'Take this medicine twice a day after meals.' },
-      { en: 'surgery', he: 'ניתוח', ex: 'After the surgery, he stayed in hospital for three days.' }
+      { en: 'surgery', he: 'ניתוח', ex: 'After the surgery, he stayed in hospital for three days.' },
+      { en: 'cough', he: 'שיעול', ex: 'I have had a bad cough since Monday.' },
+      { en: 'blood pressure', he: 'לחץ דם', ex: 'The nurse checked my blood pressure this morning.' },
+      { en: 'bandage', he: 'תחבושת', ex: 'Put a clean bandage on the cut every day.' },
+      { en: 'infection', he: 'זיהום', ex: 'The doctor gave him medicine for the ear infection.' },
+      { en: 'check-up', he: 'בדיקה תקופתית', ex: 'I go to the dentist for a check-up twice a year.' }
     ]
   },
   {
@@ -28,7 +33,12 @@ UNITS.push(
       { en: 'tax', he: 'מס', ex: 'You pay tax on everything you earn.' },
       { en: 'budget', he: 'תקציב', ex: 'We have a budget of 500 dollars for the trip.' },
       { en: 'account', he: 'חשבון', ex: 'I opened a bank account when I started my first job.' },
-      { en: 'cash', he: 'מזומן', ex: 'They do not take cards here, so you have to pay in cash.' }
+      { en: 'cash', he: 'מזומן', ex: 'They do not take cards here, so you have to pay in cash.' },
+      { en: 'borrow', he: 'ללוות', ex: 'Can I borrow some money until next week?' },
+      { en: 'lend', he: 'להלוות', ex: 'My brother agreed to lend me money for a car.' },
+      { en: 'credit card', he: 'כרטיס אשראי', ex: 'You can pay for the hotel with a credit card.' },
+      { en: 'withdraw', he: 'למשוך כסף', ex: 'I need to withdraw cash from the machine downstairs.' },
+      { en: 'earn', he: 'להרוויח', ex: 'She wants to earn more money at her next job.' }
     ]
   },
   {
@@ -43,7 +53,12 @@ UNITS.push(
       { en: 'skill', he: 'מיומנות', ex: 'Speaking English well is an important skill for this job.' },
       { en: 'contract', he: 'חוזה', ex: 'Read the contract carefully before you sign it.' },
       { en: 'apply', he: 'להגיש מועמדות', ex: 'I am going to apply for the job I saw online.' },
-      { en: 'employee', he: 'עובד', ex: 'Every new employee gets a laptop on the first day.' }
+      { en: 'employee', he: 'עובד', ex: 'Every new employee gets a laptop on the first day.' },
+      { en: 'unemployed', he: 'מובטל', ex: 'He has been unemployed for three months now.' },
+      { en: 'full-time', he: 'במשרה מלאה', ex: 'She has a full-time job at the hospital.' },
+      { en: 'part-time', he: 'במשרה חלקית', ex: 'Many students have a part-time job in the evenings.' },
+      { en: 'retire', he: 'לפרוש לגמלאות', ex: 'My father wants to retire when he turns sixty-five.' },
+      { en: 'qualification', he: 'הכשרה מקצועית', ex: 'This job requires a teaching qualification and good English.' }
     ]
   },
   {
@@ -58,7 +73,12 @@ UNITS.push(
       { en: 'connection', he: 'חיבור', ex: 'The internet connection here is very slow.' },
       { en: 'attach', he: 'לצרף', ex: 'Do not forget to attach the file to your message.' },
       { en: 'delete', he: 'למחוק', ex: 'I am going to delete these old photos to free up space.' },
-      { en: 'battery', he: 'סוללה', ex: 'My battery is almost empty; I need a charger.' }
+      { en: 'battery', he: 'סוללה', ex: 'My battery is almost empty; I need a charger.' },
+      { en: 'upload', he: 'להעלות', ex: 'It takes a long time to upload large videos.' },
+      { en: 'website', he: 'אתר אינטרנט', ex: 'You can find the opening hours on our website.' },
+      { en: 'keyboard', he: 'מקלדת', ex: 'My keyboard stopped working after I spilled coffee on it.' },
+      { en: 'log in', he: 'להתחבר', ex: 'You need a password to log in to the system.' },
+      { en: 'charger', he: 'מטען', ex: 'I forgot my phone charger at the hotel.' }
     ]
   },
   {
@@ -73,7 +93,12 @@ UNITS.push(
       { en: 'crowded', he: 'צפוף', ex: 'The train was so crowded that I had to stand.' },
       { en: 'departure', he: 'יציאה', ex: 'Please be at the gate thirty minutes before departure.' },
       { en: 'miss', he: 'לפספס', ex: 'Hurry up, or we will miss the train!' },
-      { en: 'refund', he: 'החזר כספי', ex: 'The hotel was terrible, so I asked for a full refund.' }
+      { en: 'refund', he: 'החזר כספי', ex: 'The hotel was terrible, so I asked for a full refund.' },
+      { en: 'get lost', he: 'ללכת לאיבוד', ex: 'It is easy to get lost in the old city.' },
+      { en: 'complain', he: 'להתלונן', ex: 'We decided to complain about the dirty hotel room.' },
+      { en: 'strike', he: 'שביתה', ex: 'All trains were cancelled because of a strike.' },
+      { en: 'stuck', he: 'תקוע', ex: 'We were stuck at the station for five hours.' },
+      { en: 'embassy', he: 'שגרירות', ex: 'If you lose your documents abroad, contact the embassy immediately.' }
     ]
   },
   {
@@ -88,7 +113,12 @@ UNITS.push(
       { en: 'deposit', he: 'פיקדון', ex: 'We paid a deposit of two months before we moved in.' },
       { en: 'electricity', he: 'חשמל', ex: 'Switch off the lights to save electricity.' },
       { en: 'leak', he: 'נזילה', ex: 'There is a leak in the bathroom, and water is on the floor.' },
-      { en: 'heating', he: 'חימום', ex: 'It is cold in here; can you switch on the heating?' }
+      { en: 'heating', he: 'חימום', ex: 'It is cold in here; can you switch on the heating?' },
+      { en: 'move in', he: 'לעבור לגור', ex: 'We will move in next month, when the apartment is ready.' },
+      { en: 'roommate', he: 'שותף לדירה', ex: 'My roommate always forgets to wash the dishes.' },
+      { en: 'lease', he: 'חוזה שכירות', ex: 'The lease ends at the end of the year.' },
+      { en: 'plumber', he: 'שרברב', ex: 'We called a plumber to fix the kitchen sink.' },
+      { en: 'balcony', he: 'מרפסת', ex: 'We often eat breakfast on the balcony in summer.' }
     ]
   },
   {
@@ -103,7 +133,12 @@ UNITS.push(
       { en: 'practice', he: 'לתרגל', ex: 'You need to practice every day if you want to speak well.' },
       { en: 'lecture', he: 'הרצאה', ex: 'The professor gave an interesting lecture about the brain.' },
       { en: 'fail', he: 'להיכשל', ex: 'If you do not study, you will fail the test.' },
-      { en: 'graduate', he: 'לסיים לימודים', ex: 'He will graduate from university next summer.' }
+      { en: 'graduate', he: 'לסיים לימודים', ex: 'He will graduate from university next summer.' },
+      { en: 'scholarship', he: 'מלגה', ex: 'She got a scholarship to study medicine abroad.' },
+      { en: 'assignment', he: 'מטלה', ex: 'I have to submit the assignment by Thursday.' },
+      { en: 'semester', he: 'סמסטר', ex: 'This semester I am taking four different courses.' },
+      { en: 'pass', he: 'לעבור מבחן', ex: 'You need seventy points to pass the final test.' },
+      { en: 'certificate', he: 'תעודה', ex: 'After the course, every student receives a certificate.' }
     ]
   },
   {
@@ -118,7 +153,12 @@ UNITS.push(
       { en: 'stubborn', he: 'עקשן', ex: 'My son is so stubborn that he never changes his mind.' },
       { en: 'embarrassed', he: 'נבוך', ex: 'I was embarrassed when I forgot her name.' },
       { en: 'jealous', he: 'מקנא', ex: 'He felt jealous when his friend bought a new car.' },
-      { en: 'curious', he: 'סקרן', ex: 'Children are curious and ask a lot of questions.' }
+      { en: 'curious', he: 'סקרן', ex: 'Children are curious and ask a lot of questions.' },
+      { en: 'anxious', he: 'חרד', ex: 'I always feel anxious before a job interview.' },
+      { en: 'grateful', he: 'אסיר תודה', ex: 'I am grateful for all your help this year.' },
+      { en: 'upset', he: 'נסער', ex: 'She was upset because nobody remembered her birthday.' },
+      { en: 'honest', he: 'כן', ex: 'Please be honest and tell me what you really think.' },
+      { en: 'shy', he: 'ביישן', ex: 'He is too shy to speak in front of the class.' }
     ]
   },
   {
@@ -133,7 +173,12 @@ UNITS.push(
       { en: 'protest', he: 'מחאה', ex: 'Thousands of people joined the protest in the city center.' },
       { en: 'economy', he: 'כלכלה', ex: 'When the economy is strong, more people find jobs.' },
       { en: 'vote', he: 'להצביע', ex: 'Who are you going to vote for this year?' },
-      { en: 'headline', he: 'כותרת', ex: 'I only read the headline, not the whole article.' }
+      { en: 'headline', he: 'כותרת', ex: 'I only read the headline, not the whole article.' },
+      { en: 'poverty', he: 'עוני', ex: 'Many families in the city still live in poverty.' },
+      { en: 'unemployment', he: 'אבטלה', ex: 'Unemployment has gone down a lot this year.' },
+      { en: 'journalist', he: 'עיתונאי', ex: 'The journalist asked the mayor several difficult questions.' },
+      { en: 'population', he: 'אוכלוסייה', ex: 'The population of the town has doubled in ten years.' },
+      { en: 'public transport', he: 'תחבורה ציבורית', ex: 'Most people here use public transport to get to work.' }
     ]
   },
   {
@@ -148,7 +193,12 @@ UNITS.push(
       { en: 'protect', he: 'להגן', ex: 'We must protect the forests for our children.' },
       { en: 'damage', he: 'נזק', ex: 'The storm caused a lot of damage to the houses.' },
       { en: 'flood', he: 'שיטפון', ex: 'After three days of heavy rain, there was a flood in the town.' },
-      { en: 'plastic', he: 'פלסטיק', ex: 'Bring your own bag so you do not need a plastic one.' }
+      { en: 'plastic', he: 'פלסטיק', ex: 'Bring your own bag so you do not need a plastic one.' },
+      { en: 'global warming', he: 'התחממות כדור הארץ', ex: 'Global warming is changing the weather around the world.' },
+      { en: 'renewable', he: 'מתחדש', ex: 'The country wants to use more renewable energy.' },
+      { en: 'wildlife', he: 'חיות בר', ex: 'The national park protects local wildlife and plants.' },
+      { en: 'drought', he: 'בצורת', ex: 'The long drought destroyed most of the farmers\' crops.' },
+      { en: 'reduce', he: 'לצמצם', ex: 'We should reduce the amount of plastic we use.' }
     ]
   },
   {
@@ -163,7 +213,12 @@ UNITS.push(
       { en: 'put off', he: 'לדחות', ex: 'We cannot put off the meeting again; it must be today.' },
       { en: 'look after', he: 'לשמור על', ex: 'My mother will look after the baby tonight.' },
       { en: 'get along with', he: 'להסתדר עם', ex: 'I get along with everyone in my team.' },
-      { en: 'carry on', he: 'להמשיך', ex: 'Take a short break and then carry on with your work.' }
+      { en: 'carry on', he: 'להמשיך', ex: 'Take a short break and then carry on with your work.' },
+      { en: 'set up', he: 'להקים', ex: 'They want to set up their own small business.' },
+      { en: 'turn down', he: 'לסרב', ex: 'I had to turn down the job offer.' },
+      { en: 'figure out', he: 'להבין', ex: 'I can\'t figure out how this machine works.' },
+      { en: 'show up', he: 'להופיע', ex: 'He didn\'t show up for the meeting yesterday.' },
+      { en: 'get over', he: 'להתגבר על', ex: 'It took her a long time to get over the breakup.' }
     ]
   },
   {
@@ -178,7 +233,12 @@ UNITS.push(
       { en: 'in addition', he: 'בנוסף', ex: 'The hotel is cheap. In addition, breakfast is free.' },
       { en: 'on the other hand', he: 'מצד שני', ex: 'The job pays well. On the other hand, the hours are long.' },
       { en: 'for example', he: 'לדוגמה', ex: 'I like team sports, for example football and basketball.' },
-      { en: 'so that', he: 'כדי ש', ex: 'Speak slowly so that everyone can understand you.' }
+      { en: 'so that', he: 'כדי ש', ex: 'Speak slowly so that everyone can understand you.' },
+      { en: 'even though', he: 'אף על פי ש', ex: 'Even though it was raining, we went for a walk.' },
+      { en: 'as a result', he: 'כתוצאה מכך', ex: 'He missed the bus and, as a result, arrived late.' },
+      { en: 'in order to', he: 'על מנת', ex: 'She saves money in order to travel next summer.' },
+      { en: 'as soon as', he: 'ברגע ש', ex: 'Call me as soon as you arrive at the hotel.' },
+      { en: 'such as', he: 'כמו למשל', ex: 'I like outdoor sports such as hiking and cycling.' }
     ]
   },
   {
@@ -193,7 +253,12 @@ UNITS.push(
       { en: 'out of stock', he: 'אזל מהמלאי', ex: 'Sorry, that model is out of stock at the moment.' },
       { en: 'bargain', he: 'מציאה', ex: 'Only fifty shekels for this coat? What a bargain!' },
       { en: 'warranty', he: 'אחריות למוצר', ex: 'The laptop comes with a two-year warranty.' },
-      { en: 'checkout', he: 'קופה', ex: 'There was a long line at the checkout.' }
+      { en: 'checkout', he: 'קופה', ex: 'There was a long line at the checkout.' },
+      { en: 'price tag', he: 'תווית מחיר', ex: 'I cut the price tag off before I wore it.' },
+      { en: 'customer', he: 'לקוח', ex: 'The customer asked to speak to the manager.' },
+      { en: 'shop assistant', he: 'מוכר בחנות', ex: 'The shop assistant helped me find a warmer coat.' },
+      { en: 'size', he: 'מידה', ex: 'Do you have these shoes in a bigger size?' },
+      { en: 'delivery', he: 'משלוח', ex: 'Delivery is free if you spend more than fifty dollars.' }
     ]
   },
   {
@@ -208,7 +273,12 @@ UNITS.push(
       { en: 'bill', he: 'החשבון', ex: 'Could we have the bill, please?' },
       { en: 'spicy', he: 'חריף', ex: 'Is this sauce very spicy?' },
       { en: 'takeaway', he: 'אוכל לקחת', ex: 'We were too tired to cook, so we ordered a takeaway.' },
-      { en: 'side dish', he: 'תוספת', ex: 'Rice comes as a side dish with every meal.' }
+      { en: 'side dish', he: 'תוספת', ex: 'Rice comes as a side dish with every meal.' },
+      { en: 'waiter', he: 'מלצר', ex: 'The waiter brought us water and fresh bread.' },
+      { en: 'menu', he: 'תפריט', ex: 'The menu has many options for vegetarians.' },
+      { en: 'delicious', he: 'טעים מאוד', ex: 'The soup was delicious, so I ordered another bowl.' },
+      { en: 'portion', he: 'מנה', ex: 'The portion was so big that I couldn\'t finish it.' },
+      { en: 'order', he: 'להזמין אוכל', ex: 'Are you ready to order, or do you need more time?' }
     ]
   },
   {
@@ -223,7 +293,12 @@ UNITS.push(
       { en: 'connecting flight', he: 'טיסת המשך', ex: 'We have a connecting flight in Athens.' },
       { en: 'aisle seat', he: 'מושב ליד המעבר', ex: 'I always ask for an aisle seat on long flights.' },
       { en: 'land', he: 'לנחות', ex: 'The plane will land in Tel Aviv at six in the morning.' },
-      { en: 'jet lag', he: 'עייפות מהפרשי שעות', ex: 'It took me three days to get over the jet lag.' }
+      { en: 'jet lag', he: 'עייפות מהפרשי שעות', ex: 'It took me three days to get over the jet lag.' },
+      { en: 'passport', he: 'דרכון', ex: 'Please have your passport ready at the counter.' },
+      { en: 'terminal', he: 'טרמינל', ex: 'Our flight leaves from terminal three this afternoon.' },
+      { en: 'take off', he: 'להמריא', ex: 'The plane will take off in twenty minutes.' },
+      { en: 'baggage claim', he: 'איסוף מזוודות', ex: 'We waited at baggage claim for almost an hour.' },
+      { en: 'arrivals', he: 'אולם הנוחתים', ex: 'My uncle will meet us in the arrivals hall.' }
     ]
   },
   {
@@ -238,7 +313,12 @@ UNITS.push(
       { en: 'relax', he: 'להירגע', ex: 'After work I like to relax with a good book.' },
       { en: 'board game', he: 'משחק קופסה', ex: 'On rainy evenings we play a board game with the kids.' },
       { en: 'exhibition', he: 'תערוכה', ex: "There's a new photography exhibition at the museum." },
-      { en: 'take up', he: 'להתחיל תחביב חדש', ex: 'I want to take up yoga this year.' }
+      { en: 'take up', he: 'להתחיל תחביב חדש', ex: 'I want to take up yoga this year.' },
+      { en: 'gardening', he: 'גינון', ex: 'My grandmother spends hours gardening every weekend.' },
+      { en: 'photography', he: 'צילום', ex: 'He became interested in photography after buying a camera.' },
+      { en: 'go out', he: 'לצאת לבלות', ex: 'Do you want to go out for dinner tonight?' },
+      { en: 'painting', he: 'ציור', ex: 'She has done oil painting since she was a child.' },
+      { en: 'spare time', he: 'זמן פנוי', ex: 'What do you usually do in your spare time?' }
     ]
   },
 
@@ -255,7 +335,12 @@ UNITS.push(
       { en: 'fine', he: 'קנס', ex: 'He got a fine for parking in the wrong place.' },
       { en: 'overtake', he: 'לעקוף', ex: "It's dangerous to overtake on a sharp bend." },
       { en: 'flat tire', he: 'פנצ׳ר', ex: 'We had a flat tire on the way to Eilat.' },
-      { en: 'rush hour', he: 'שעת עומס', ex: 'The roads are full during rush hour.' }
+      { en: 'rush hour', he: 'שעת עומס', ex: 'The roads are full during rush hour.' },
+      { en: 'brake', he: 'לבלום', ex: 'I had to brake suddenly when a dog ran out.' },
+      { en: 'intersection', he: 'צומת', ex: 'Turn left at the next busy intersection.' },
+      { en: 'highway', he: 'כביש מהיר', ex: 'The highway was closed because of the bad weather.' },
+      { en: 'pedestrian', he: 'הולך רגל', ex: 'The driver stopped to let a pedestrian cross the road.' },
+      { en: 'accident', he: 'תאונה', ex: 'Nobody was hurt in the accident this morning.' }
     ]
   },
   {
@@ -270,7 +355,12 @@ UNITS.push(
       { en: 'stretch', he: 'להתמתח', ex: 'Stretch your legs after a long run.' },
       { en: 'muscles', he: 'שרירים', ex: 'My muscles hurt after yesterday’s workout.' },
       { en: 'marathon', he: 'מרתון', ex: 'He ran his first marathon last year.' },
-      { en: 'fit', he: 'בכושר', ex: 'She stays fit by swimming every morning.' }
+      { en: 'fit', he: 'בכושר', ex: 'She stays fit by swimming every morning.' },
+      { en: 'team', he: 'קבוצה', ex: 'Our team trains three times a week.' },
+      { en: 'referee', he: 'שופט', ex: 'The referee stopped the game after a bad foul.' },
+      { en: 'tournament', he: 'טורניר', ex: 'Twelve countries are taking part in the tournament.' },
+      { en: 'draw', he: 'תיקו', ex: 'The game ended in a draw, one to one.' },
+      { en: 'train', he: 'להתאמן', ex: 'She has to train hard for the next race.' }
     ]
   },
   {
@@ -285,7 +375,12 @@ UNITS.push(
       { en: 'invite', he: 'להזמין', ex: 'We want to invite all our friends to the party.' },
       { en: 'break up', he: 'להיפרד', ex: 'They decided to break up after five years together.' },
       { en: 'close friend', he: 'חבר קרוב', ex: 'She is a close friend from school.' },
-      { en: 'keep in touch', he: 'לשמור על קשר', ex: "Let's keep in touch after the course ends." }
+      { en: 'keep in touch', he: 'לשמור על קשר', ex: "Let's keep in touch after the course ends." },
+      { en: 'engaged', he: 'מאורסים', ex: 'They got engaged after two years together.' },
+      { en: 'wedding', he: 'חתונה', ex: 'Their wedding will be at the beach in June.' },
+      { en: 'fall in love', he: 'להתאהב', ex: 'It is easy to fall in love in Paris.' },
+      { en: 'partner', he: 'בן זוג', ex: 'He lives with his partner and their two cats.' },
+      { en: 'make friends', he: 'להכיר חברים', ex: 'It is hard to make friends in a new city.' }
     ]
   },
 

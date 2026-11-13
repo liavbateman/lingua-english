@@ -13,7 +13,12 @@ UNITS.push(
       { en: 'recession', he: 'מיתון', ex: 'Thousands of people lost their jobs during the recession.' },
       { en: 'debt', he: 'חוב', ex: 'It took him five years to pay off his debt to the bank.' },
       { en: 'deficit', he: 'גירעון', ex: 'The government spends more than it collects, so the budget deficit keeps growing.' },
-      { en: 'profit margin', he: 'שולי רווח', ex: 'We sell a lot, but our profit margin is only three percent.' }
+      { en: 'profit margin', he: 'שולי רווח', ex: 'We sell a lot, but our profit margin is only three percent.' },
+      { en: 'bankruptcy', he: 'פשיטת רגל', ex: 'After years of losses, the airline finally filed for bankruptcy.' },
+      { en: 'stock market', he: 'שוק המניות', ex: 'The stock market fell sharply after the announcement.' },
+      { en: 'liquidity', he: 'נזילות', ex: 'The company has enough liquidity to cover its short-term debts.' },
+      { en: 'fiscal year', he: 'שנת כספים', ex: 'Profits rose by twelve percent in the last fiscal year.' },
+      { en: 'cash flow', he: 'תזרים מזומנים', ex: 'Many small businesses fail because of poor cash flow, not low sales.' }
     ]
   },
   {
@@ -28,7 +33,12 @@ UNITS.push(
       { en: 'dispute', he: 'סכסוך', ex: 'The two neighbours settled their dispute over the fence without going to court.' },
       { en: 'terminate', he: 'לסיים, לבטל', ex: 'Either party may terminate the agreement with thirty days of written notice.' },
       { en: 'verdict', he: 'פסק דין, הכרעת דין', ex: 'After three days of discussion, the jury reached a verdict of not guilty.' },
-      { en: 'confidential', he: 'חסוי', ex: 'This report is confidential, so please do not forward it to anyone.' }
+      { en: 'confidential', he: 'חסוי', ex: 'This report is confidential, so please do not forward it to anyone.' },
+      { en: 'plaintiff', he: 'תובע', ex: 'The plaintiff claimed that the company had ignored safety rules.' },
+      { en: 'defendant', he: 'נתבע, נאשם', ex: 'The defendant denied all the charges in court.' },
+      { en: 'testimony', he: 'עדות', ex: 'Her testimony was crucial to the outcome of the trial.' },
+      { en: 'loophole', he: 'פרצה בחוק', ex: 'The firm used a legal loophole to avoid paying the fine.' },
+      { en: 'amendment', he: 'תיקון לחוק או לחוזה', ex: 'Both parties signed an amendment to the original contract.' }
     ]
   },
   {
@@ -43,7 +53,12 @@ UNITS.push(
       { en: 'morale', he: 'מורל', ex: 'After the layoffs, morale in the office was very low.' },
       { en: 'benchmark', he: 'אמת מידה', ex: 'Their customer service has become the benchmark for the whole industry.' },
       { en: 'restructure', he: 'לבצע ארגון מחדש', ex: 'The new CEO plans to restructure the company and merge two departments.' },
-      { en: 'mentor', he: 'חונך, מנטור', ex: 'An experienced engineer acted as my mentor during my first year.' }
+      { en: 'mentor', he: 'חונך, מנטור', ex: 'An experienced engineer acted as my mentor during my first year.' },
+      { en: 'micromanage', he: 'לפקח על כל פרט קטן', ex: 'Good leaders trust their teams and do not micromanage them.' },
+      { en: 'empower', he: 'להעצים, לתת סמכות', ex: 'We want to empower employees to make decisions on their own.' },
+      { en: 'objective', he: 'יעד', ex: 'Our main objective this quarter is to reduce customer complaints.' },
+      { en: 'headcount', he: 'מצבת כוח אדם', ex: 'The department plans to increase its headcount by ten people.' },
+      { en: 'bottleneck', he: 'צוואר בקבוק', ex: 'The approval process has become a serious bottleneck for the whole team.' }
     ]
   },
   {
@@ -58,7 +73,12 @@ UNITS.push(
       { en: 'methodology', he: 'מתודולוגיה, שיטת מחקר', ex: 'Critics questioned the methodology of the study, not its conclusions.' },
       { en: 'breakthrough', he: 'פריצת דרך', ex: 'The new vaccine is a major breakthrough in the fight against malaria.' },
       { en: 'replicate', he: 'לשחזר', ex: 'Other laboratories were unable to replicate the results of the original experiment.' },
-      { en: 'peer review', he: 'ביקורת עמיתים', ex: 'Every article goes through peer review before the journal agrees to publish it.' }
+      { en: 'peer review', he: 'ביקורת עמיתים', ex: 'Every article goes through peer review before the journal agrees to publish it.' },
+      { en: 'empirical', he: 'אמפירי', ex: 'There is little empirical support for that popular theory.' },
+      { en: 'control group', he: 'קבוצת ביקורת', ex: 'The control group received a placebo instead of the new drug.' },
+      { en: 'anomaly', he: 'חריגה', ex: 'The researchers could not explain the anomaly in the data.' },
+      { en: 'data set', he: 'מערך נתונים', ex: 'The study was based on a large data set from ten hospitals.' },
+      { en: 'inconclusive', he: 'לא מכריע', ex: 'The results of the first experiment were inconclusive.' }
     ]
   },
   {
@@ -73,7 +93,12 @@ UNITS.push(
       { en: 'credible', he: 'מהימן', ex: 'The journalist refused to publish the story without a credible witness.' },
       { en: 'misleading', he: 'מטעה', ex: 'The advert was banned because its claims about weight loss were misleading.' },
       { en: 'controversy', he: 'מחלוקת ציבורית', ex: "The director's comments caused a huge controversy on social media." },
-      { en: 'source', he: 'מקור', ex: 'A reporter must never reveal the name of an anonymous source.' }
+      { en: 'source', he: 'מקור', ex: 'A reporter must never reveal the name of an anonymous source.' },
+      { en: 'press release', he: 'הודעה לעיתונות', ex: 'The company issued a press release announcing the new chief executive.' },
+      { en: 'fact-check', he: 'לבדוק עובדות', ex: 'Reporters must fact-check every claim before the story is published.' },
+      { en: 'sensationalism', he: 'סנסציוניות', ex: 'Many readers are tired of the sensationalism in online news.' },
+      { en: 'op-ed', he: 'מאמר דעה', ex: 'She wrote an op-ed arguing for better public transport.' },
+      { en: 'tabloid', he: 'צהובון', ex: 'The story first appeared in a tabloid and was later denied.' }
     ]
   },
   {
@@ -88,7 +113,12 @@ UNITS.push(
       { en: 'constraint', he: 'אילוץ', ex: 'Time is the biggest constraint on this project, since we only have two weeks.' },
       { en: 'ambiguity', he: 'עמימות', ex: 'To avoid ambiguity, the instructions were rewritten in simpler words.' },
       { en: 'notion', he: 'רעיון, מושג', ex: 'I reject the notion that success depends only on luck.' },
-      { en: 'scope', he: 'היקף', ex: 'Marketing is outside the scope of this report, which deals only with production.' }
+      { en: 'scope', he: 'היקף', ex: 'Marketing is outside the scope of this report, which deals only with production.' },
+      { en: 'significance', he: 'חשיבות, משמעות', ex: 'Few people understood the significance of the discovery at the time.' },
+      { en: 'consensus', he: 'הסכמה רחבה', ex: 'There is a broad consensus among experts on this issue.' },
+      { en: 'autonomy', he: 'עצמאות, אוטונומיה', ex: 'Employees value autonomy more than a slightly higher salary.' },
+      { en: 'legitimacy', he: 'לגיטימיות', ex: 'The committee questioned the legitimacy of the new rules.' },
+      { en: 'complexity', he: 'מורכבות', ex: 'Nobody had fully appreciated the complexity of the project.' }
     ]
   },
   {
@@ -103,7 +133,12 @@ UNITS.push(
       { en: 'enhance', he: 'לשפר, להעצים', ex: 'Good lighting can enhance the atmosphere of a restaurant.' },
       { en: 'tackle', he: 'להתמודד עם', ex: 'The city needs a new plan to tackle the problem of traffic jams.' },
       { en: 'sustain', he: 'לשמר לאורך זמן', ex: 'The company cannot sustain this rate of growth for much longer.' },
-      { en: 'overlook', he: 'להחמיץ, לא לשים לב ל', ex: 'It is easy to overlook small errors when you proofread your own writing.' }
+      { en: 'overlook', he: 'להחמיץ, לא לשים לב ל', ex: 'It is easy to overlook small errors when you proofread your own writing.' },
+      { en: 'facilitate', he: 'להקל על, לאפשר', ex: 'The new software will facilitate communication between departments.' },
+      { en: 'allocate', he: 'להקצות', ex: 'We need to allocate more funds to customer support.' },
+      { en: 'reinforce', he: 'לחזק', ex: 'Regular practice helps reinforce what you learned in class.' },
+      { en: 'mitigate', he: 'למתן, להפחית', ex: 'The company took steps to mitigate the risks of the move.' },
+      { en: 'scrutinize', he: 'לבחון בקפידה', ex: 'Investors will scrutinize every detail of the annual report.' }
     ]
   },
   {
@@ -118,7 +153,12 @@ UNITS.push(
       { en: 'provided that', he: 'בתנאי ש', ex: 'You may borrow the car provided that you return it before midnight.' },
       { en: 'regardless of', he: 'בלי קשר ל', ex: 'Everyone receives the same treatment, regardless of age or income.' },
       { en: 'to some extent', he: 'במידה מסוימת', ex: 'I agree with you to some extent, but not completely.' },
-      { en: 'thereby', he: 'ובכך', ex: 'He paid the full amount early, thereby avoiding any extra interest.' }
+      { en: 'thereby', he: 'ובכך', ex: 'He paid the full amount early, thereby avoiding any extra interest.' },
+      { en: 'moreover', he: 'זאת ועוד', ex: 'The plan is too expensive; moreover, it would take years to complete.' },
+      { en: 'albeit', he: 'אף כי', ex: 'The economy is growing, albeit more slowly than expected.' },
+      { en: 'notwithstanding', he: 'למרות', ex: 'Notwithstanding the bad weather, the event was a great success.' },
+      { en: 'in light of', he: 'לאור', ex: 'In light of recent events, the meeting has been postponed.' },
+      { en: 'accordingly', he: 'בהתאם לכך', ex: 'The rules have changed, and we must adjust our plans accordingly.' }
     ]
   },
   {
@@ -133,7 +173,12 @@ UNITS.push(
       { en: 'a steep learning curve', he: 'עקומת למידה תלולה', ex: 'The new system has a steep learning curve, so expect a difficult first month.' },
       { en: 'in the long run', he: 'בטווח הארוך', ex: 'Good equipment costs more now, but it will save us money in the long run.' },
       { en: 'think outside the box', he: 'לחשוב מחוץ לקופסה', ex: 'The usual solutions have failed, so we need to think outside the box.' },
-      { en: 'the elephant in the room', he: 'הפיל שבחדר', ex: 'Nobody mentioned the budget cuts, although they were clearly the elephant in the room.' }
+      { en: 'the elephant in the room', he: 'הפיל שבחדר', ex: 'Nobody mentioned the budget cuts, although they were clearly the elephant in the room.' },
+      { en: 'hit the ground running', he: 'להתחיל בתנופה מהרגע הראשון', ex: 'We need someone who can hit the ground running on Monday.' },
+      { en: 'a double-edged sword', he: 'חרב פיפיות', ex: 'Social media can be a double-edged sword for young professionals.' },
+      { en: 'go the extra mile', he: 'להשקיע מעבר למצופה', ex: 'Our staff always go the extra mile for customers.' },
+      { en: 'bite the bullet', he: 'להשלים עם משהו לא נעים ולעשות אותו', ex: 'We finally had to bite the bullet and replace the old roof.' },
+      { en: 'the ball is in your court', he: 'הכדור במגרש שלך', ex: 'We have made our final offer, so the ball is in your court.' }
     ]
   },
   {
@@ -148,7 +193,12 @@ UNITS.push(
       { en: 'fall through', he: 'להיכשל, לא לצאת לפועל', ex: 'If the bank refuses the loan, the whole deal will fall through.' },
       { en: 'draw up', he: 'לנסח מסמך', ex: 'Our lawyer will draw up a contract for both sides to sign.' },
       { en: 'step down', he: 'לפרוש מתפקיד', ex: 'The chairman agreed to step down after the scandal.' },
-      { en: 'account for', he: 'להסביר, להוות', ex: 'Nobody could account for the missing money in the report.' }
+      { en: 'account for', he: 'להסביר, להוות', ex: 'Nobody could account for the missing money in the report.' },
+      { en: 'put forward', he: 'להציע, להעלות הצעה', ex: 'She will put forward a plan to reduce costs by ten percent.' },
+      { en: 'set out', he: 'לפרט, להציג בבירור', ex: 'The report will set out the main reasons for the delay.' },
+      { en: 'iron out', he: 'ליישב בעיות', ex: 'We still need to iron out a few details before signing.' },
+      { en: 'follow up on', he: 'להמשיך לטפל ב', ex: 'I will follow up on your request first thing tomorrow.' },
+      { en: 'back up', he: 'לגבות, לתמוך', ex: 'Can you back up your claim with any reliable data?' }
     ]
   },
   {
@@ -163,7 +213,12 @@ UNITS.push(
       { en: 'referral', he: 'הפניה', ex: 'My family doctor gave me a referral to a skin specialist.' },
       { en: 'allergy', he: 'אלרגיה', ex: 'He has a severe allergy to peanuts, so he always reads the label.' },
       { en: 'vaccine', he: 'חיסון', ex: 'The new vaccine protects children against several diseases.' },
-      { en: 'check-up', he: 'בדיקה תקופתית', ex: "It's a good idea to have a full check-up once a year." }
+      { en: 'check-up', he: 'בדיקה תקופתית', ex: "It's a good idea to have a full check-up once a year." },
+      { en: 'outpatient', he: 'מטופל במרפאת חוץ', ex: 'The surgery was done on an outpatient basis, so she went home.' },
+      { en: 'relapse', he: 'הישנות של מחלה', ex: 'Stopping the medication too early can cause a relapse.' },
+      { en: 'contagious', he: 'מדבק', ex: 'The doctor said the infection is no longer contagious.' },
+      { en: 'dosage', he: 'מינון', ex: 'Do not exceed the recommended dosage printed on the label.' },
+      { en: 'inflammation', he: 'דלקת', ex: 'The cream helps reduce swelling and inflammation around the joint.' }
     ]
   },
   {
@@ -178,7 +233,12 @@ UNITS.push(
       { en: 'bandwidth', he: 'רוחב פס', ex: 'Video calls use a lot of bandwidth, so the connection slowed down.' },
       { en: 'cloud storage', he: 'אחסון בענן', ex: 'I keep all my photos in cloud storage, so I never lose them.' },
       { en: 'privacy settings', he: 'הגדרות פרטיות', ex: 'Check your privacy settings before you post anything personal.' },
-      { en: 'outage', he: 'הפסקת שירות', ex: 'The internet outage lasted for six hours.' }
+      { en: 'outage', he: 'הפסקת שירות', ex: 'The internet outage lasted for six hours.' },
+      { en: 'two-factor authentication', he: 'אימות דו שלבי', ex: 'Turning on two-factor authentication makes your account much harder to hack.' },
+      { en: 'malware', he: 'תוכנה זדונית', ex: 'The attachment contained malware that infected the whole network.' },
+      { en: 'firewall', he: 'חומת אש', ex: 'The firewall blocks suspicious traffic before it reaches our servers.' },
+      { en: 'phishing', he: 'הונאת התחזות, דיוג', ex: 'Never click links in phishing emails that ask for your details.' },
+      { en: 'machine learning', he: 'למידת מכונה', ex: 'The app uses machine learning to recommend new songs.' }
     ]
   },
   {
@@ -193,7 +253,12 @@ UNITS.push(
       { en: 'recycle', he: 'למחזר', ex: 'Please recycle the plastic bottles in the orange bin.' },
       { en: 'endangered species', he: 'מין בסכנת הכחדה', ex: 'The sea turtle is an endangered species, so its beaches are protected.' },
       { en: 'carbon footprint', he: 'טביעת רגל פחמנית', ex: 'Flying less is one of the fastest ways to reduce your carbon footprint.' },
-      { en: 'heatwave', he: 'גל חום', ex: 'Schools closed early because of the heatwave.' }
+      { en: 'heatwave', he: 'גל חום', ex: 'Schools closed early because of the heatwave.' },
+      { en: 'deforestation', he: 'בירוא יערות', ex: 'Deforestation is destroying the habitat of countless animals.' },
+      { en: 'biodiversity', he: 'מגוון ביולוגי', ex: 'Protecting biodiversity is essential for healthy ecosystems.' },
+      { en: 'fossil fuels', he: 'דלקים מאובנים', ex: 'Burning fossil fuels releases large amounts of carbon dioxide.' },
+      { en: 'greenhouse gases', he: 'גזי חממה', ex: 'Greenhouse gases trap heat in the atmosphere and warm the planet.' },
+      { en: 'conservation', he: 'שימור הטבע', ex: 'The charity works on wildlife conservation in East Africa.' }
     ]
   },
   {
@@ -208,7 +273,12 @@ UNITS.push(
       { en: 'resilient', he: 'בעל חוסן', ex: 'Children are often more resilient than adults think.' },
       { en: 'grateful', he: 'אסיר תודה', ex: "I'm grateful for all the help you gave me this year." },
       { en: 'envious', he: 'מקנא', ex: "He was envious of his brother's success." },
-      { en: 'self-confident', he: 'בטוח בעצמו', ex: 'After the course she became much more self-confident at work.' }
+      { en: 'self-confident', he: 'בטוח בעצמו', ex: 'After the course she became much more self-confident at work.' },
+      { en: 'conscientious', he: 'מצפוני ואחראי', ex: 'She is a conscientious worker who never misses a deadline.' },
+      { en: 'assertive', he: 'אסרטיבי', ex: 'You need to be more assertive when you ask for a raise.' },
+      { en: 'empathetic', he: 'אמפתי', ex: 'A good nurse is patient, calm and empathetic.' },
+      { en: 'arrogant', he: 'יהיר', ex: 'His arrogant attitude made him unpopular with his colleagues.' },
+      { en: 'meticulous', he: 'דקדקן', ex: 'He is meticulous about checking every number in the report.' }
     ]
   },
   {
@@ -223,7 +293,12 @@ UNITS.push(
       { en: 'paperwork', he: 'ניירת', ex: 'Opening a bank account here takes a lot of paperwork.' },
       { en: 'tax return', he: 'דוח מס', ex: 'Self-employed people must file a tax return every year.' },
       { en: 'proof of address', he: 'אישור כתובת', ex: 'The bank asked for a recent electricity bill as proof of address.' },
-      { en: 'eligible', he: 'זכאי', ex: 'You may be eligible for a discount if you are a student.' }
+      { en: 'eligible', he: 'זכאי', ex: 'You may be eligible for a discount if you are a student.' },
+      { en: 'deposit', he: 'פיקדון', ex: 'The landlord asked for a deposit of two months\' rent.' },
+      { en: 'deadline', he: 'מועד אחרון', ex: 'The deadline for submitting the form is the end of March.' },
+      { en: 'red tape', he: 'בירוקרטיה מסורבלת', ex: 'Opening a small business involves a lot of red tape.' },
+      { en: 'submit', he: 'להגיש', ex: 'You must submit the documents in person at the city office.' },
+      { en: 'property tax', he: 'ארנונה', ex: 'The property tax is paid to the local council every two months.' }
     ]
   },
 
@@ -240,7 +315,12 @@ UNITS.push(
       { en: 'notice period', he: 'תקופת הודעה מוקדמת', ex: 'My notice period is thirty days.' },
       { en: 'benefits', he: 'הטבות', ex: 'The company offers good benefits, like a gym membership.' },
       { en: 'overtime', he: 'שעות נוספות', ex: 'We worked overtime to finish the project on time.' },
-      { en: 'work-life balance', he: 'איזון בין עבודה לחיים', ex: 'A four-day week could improve work-life balance.' }
+      { en: 'work-life balance', he: 'איזון בין עבודה לחיים', ex: 'A four-day week could improve work-life balance.' },
+      { en: 'promotion', he: 'קידום', ex: 'After three years of hard work, she finally got a promotion.' },
+      { en: 'resign', he: 'להתפטר', ex: 'He decided to resign after a disagreement with the board.' },
+      { en: 'job description', he: 'הגדרת תפקיד', ex: 'Training new staff was never part of my job description.' },
+      { en: 'probation period', he: 'תקופת ניסיון', ex: 'New employees have a probation period of three months.' },
+      { en: 'severance pay', he: 'פיצויי פיטורים', ex: 'Workers who were laid off received generous severance pay.' }
     ]
   },
   {
@@ -255,7 +335,12 @@ UNITS.push(
       { en: 'currency exchange', he: 'המרת מטבע', ex: 'The currency exchange at the airport has terrible rates.' },
       { en: 'travel insurance', he: 'ביטוח נסיעות', ex: 'Never go abroad without travel insurance.' },
       { en: 'peak season', he: 'עונת שיא', ex: 'Flights are much more expensive in peak season.' },
-      { en: 'souvenir', he: 'מזכרת', ex: 'I bought a small souvenir for my sister.' }
+      { en: 'souvenir', he: 'מזכרת', ex: 'I bought a small souvenir for my sister.' },
+      { en: 'jet lag', he: 'יעפת', ex: 'It took me almost a week to recover from the jet lag.' },
+      { en: 'boarding pass', he: 'כרטיס עלייה למטוס', ex: 'Please have your passport and boarding pass ready at the gate.' },
+      { en: 'all-inclusive', he: 'הכול כלול', ex: 'We booked an all-inclusive resort so we wouldn\'t worry about meals.' },
+      { en: 'carry-on', he: 'כבודת יד', ex: 'My carry-on was too heavy, so I had to check it in.' },
+      { en: 'cancellation fee', he: 'דמי ביטול', ex: 'The hotel charges a cancellation fee if you cancel within two days.' }
     ]
   },
   {
@@ -270,7 +355,12 @@ UNITS.push(
       { en: 'humbling', he: 'מלמד ענווה', ex: 'Meeting such talented people was a humbling experience.' },
       { en: 'homesick', he: 'מתגעגע הביתה', ex: 'During my first month abroad, I was very homesick.' },
       { en: 'awkward', he: 'מביך', ex: 'There was an awkward silence after the joke.' },
-      { en: 'overjoyed', he: 'מאושר עד הגג', ex: 'They were overjoyed when their first child was born.' }
+      { en: 'overjoyed', he: 'מאושר עד הגג', ex: 'They were overjoyed when their first child was born.' },
+      { en: 'apprehensive', he: 'חושש', ex: 'She felt apprehensive about starting a new job abroad.' },
+      { en: 'indifferent', he: 'אדיש', ex: 'He seemed completely indifferent to the result of the vote.' },
+      { en: 'elated', he: 'מרומם רוח', ex: 'We were elated when we heard the good news.' },
+      { en: 'disillusioned', he: 'מפוכח מאשליות, מאוכזב', ex: 'Many young teachers become disillusioned after a few years.' },
+      { en: 'wistful', he: 'מתגעגע בעצב שקט', ex: 'He gave a wistful smile as he looked at the old photos.' }
     ]
   },
 

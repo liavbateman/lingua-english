@@ -14,7 +14,12 @@ UNITS.push(
       { en: 'husband', he: 'בעל', ex: 'Her husband works in a bank.' },
       { en: 'wife', he: 'אישה', ex: 'My wife and I have three children.' },
       { en: 'parents', he: 'הורים', ex: 'My parents live near us.' },
-      { en: 'child', he: 'ילד', ex: 'They have one child, a boy.' }
+      { en: 'child', he: 'ילד', ex: 'They have one child, a boy.' },
+      { en: 'grandmother', he: 'סבתא', ex: 'My grandmother lives in a small village.' },
+      { en: 'grandfather', he: 'סבא', ex: 'My grandfather is eighty years old.' },
+      { en: 'baby', he: 'תינוק', ex: 'The baby is sleeping in her bed.' },
+      { en: 'uncle', he: 'דוד', ex: 'My uncle has a big farm.' },
+      { en: 'aunt', he: 'דודה', ex: 'My aunt makes the best cake.' }
     ]
   },
   {
@@ -29,7 +34,12 @@ UNITS.push(
       { en: 'twenty', he: 'עשרים', ex: 'Ten plus ten is twenty.' },
       { en: 'hundred', he: 'מאה', ex: 'There are a hundred cents in a dollar.' },
       { en: 'thousand', he: 'אלף', ex: 'A thousand meters is one kilometer.' },
-      { en: 'half', he: 'חצי', ex: 'Thirty minutes is half an hour.' }
+      { en: 'half', he: 'חצי', ex: 'Thirty minutes is half an hour.' },
+      { en: 'four', he: 'ארבע', ex: 'There are four chairs in the kitchen.' },
+      { en: 'five', he: 'חמש', ex: 'I work five days a week.' },
+      { en: 'six', he: 'שש', ex: 'The shop opens at six in the morning.' },
+      { en: 'eight', he: 'שמונה', ex: 'My son is eight years old.' },
+      { en: 'nine', he: 'תשע', ex: 'The film starts at nine tonight.' }
     ]
   },
   {
@@ -44,7 +54,12 @@ UNITS.push(
       { en: 'night', he: 'לילה', ex: 'I sleep eight hours every night.' },
       { en: 'evening', he: 'ערב', ex: 'I watch TV in the evening after dinner.' },
       { en: 'yesterday', he: 'אתמול', ex: 'Today is Monday, so yesterday was Sunday.' },
-      { en: 'weekend', he: 'סוף שבוע', ex: 'I do not work on the weekend.' }
+      { en: 'weekend', he: 'סוף שבוע', ex: 'I do not work on the weekend.' },
+      { en: 'now', he: 'עכשיו', ex: 'I am busy now, call me later.' },
+      { en: 'early', he: 'מוקדם', ex: 'I get up early on Monday.' },
+      { en: 'late', he: 'מאוחר', ex: 'Sorry, I am late for the meeting.' },
+      { en: 'noon', he: 'צהריים', ex: 'We eat lunch at noon.' },
+      { en: 'calendar', he: 'לוח שנה', ex: 'Write the date in your calendar.' }
     ]
   },
   {
@@ -59,7 +74,12 @@ UNITS.push(
       { en: 'white', he: 'לבן', ex: 'Snow is white.' },
       { en: 'brown', he: 'חום', ex: 'Chocolate is usually brown.' },
       { en: 'orange', he: 'כתום', ex: 'A carrot is orange.' },
-      { en: 'pink', he: 'ורוד', ex: 'The little girl has a pink dress.' }
+      { en: 'pink', he: 'ורוד', ex: 'The little girl has a pink dress.' },
+      { en: 'purple', he: 'סגול', ex: 'She has a purple bag.' },
+      { en: 'gray', he: 'אפור', ex: 'The sky is gray today.' },
+      { en: 'gold', he: 'זהב', ex: 'He wears a gold watch.' },
+      { en: 'dark', he: 'כהה', ex: 'I like dark blue shirts.' },
+      { en: 'light', he: 'בהיר', ex: 'Her new dress is light green.' }
     ]
   },
   {
@@ -74,7 +94,12 @@ UNITS.push(
       { en: 'tooth', he: 'שן', ex: 'The dentist looked at my tooth.' },
       { en: 'doctor', he: 'רופא', ex: 'I feel bad. I need to see a doctor.' },
       { en: 'sick', he: 'חולה', ex: 'He is sick, so he is in bed today.' },
-      { en: 'medicine', he: 'תרופה', ex: 'Take this medicine twice a day.' }
+      { en: 'medicine', he: 'תרופה', ex: 'Take this medicine twice a day.' },
+      { en: 'arm', he: 'זרוע', ex: 'He broke his arm last week.' },
+      { en: 'foot', he: 'כף רגל', ex: 'My left foot hurts after the walk.' },
+      { en: 'nose', he: 'אף', ex: 'The baby has a small nose.' },
+      { en: 'mouth', he: 'פה', ex: 'Please open your mouth and say ah.' },
+      { en: 'ear', he: 'אוזן', ex: 'I have a pain in my ear.' }
     ]
   },
   {
@@ -89,7 +114,12 @@ UNITS.push(
       { en: 'window', he: 'חלון', ex: 'I can see the street from my window.' },
       { en: 'key', he: 'מפתח', ex: 'I cannot open the door without my key.' },
       { en: 'floor', he: 'רצפה', ex: 'The baby is playing on the floor.' },
-      { en: 'fridge', he: 'מקרר', ex: 'Put the milk in the fridge.' }
+      { en: 'fridge', he: 'מקרר', ex: 'Put the milk in the fridge.' },
+      { en: 'sofa', he: 'ספה', ex: 'The cat is sleeping on the sofa.' },
+      { en: 'lamp', he: 'מנורה', ex: 'Please turn on the lamp.' },
+      { en: 'wall', he: 'קיר', ex: 'There is a clock on the wall.' },
+      { en: 'garden', he: 'גינה', ex: 'We have a small garden behind the house.' },
+      { en: 'living room', he: 'סלון', ex: 'We watch TV in the living room.' }
     ]
   },
   {
@@ -104,7 +134,12 @@ UNITS.push(
       { en: 'socks', he: 'גרביים', ex: 'I put on my socks and then my shoes.' },
       { en: 'coat', he: 'מעיל', ex: 'In winter I need a long, warm coat.' },
       { en: 'bag', he: 'תיק', ex: 'My laptop is in my bag.' },
-      { en: 'wear', he: 'ללבוש', ex: 'What do you wear to work?' }
+      { en: 'wear', he: 'ללבוש', ex: 'What do you wear to work?' },
+      { en: 'skirt', he: 'חצאית', ex: 'She is wearing a long black skirt.' },
+      { en: 'sweater', he: 'סוודר', ex: 'Take a warm sweater, it is cold.' },
+      { en: 'belt', he: 'חגורה', ex: 'These pants need a belt.' },
+      { en: 'scarf', he: 'צעיף', ex: 'I wear a scarf in the winter.' },
+      { en: 'gloves', he: 'כפפות', ex: 'I need warm gloves for the snow.' }
     ]
   },
   {
@@ -119,7 +154,12 @@ UNITS.push(
       { en: 'need', he: 'להצטרך', ex: 'I need a pen. Do you have one?' },
       { en: 'see', he: 'לראות', ex: 'I cannot see without my glasses.' },
       { en: 'know', he: 'לדעת', ex: 'I do not know the answer.' },
-      { en: 'give', he: 'לתת', ex: 'Can you give me your phone number?' }
+      { en: 'give', he: 'לתת', ex: 'Can you give me your phone number?' },
+      { en: 'take', he: 'לקחת', ex: 'Please take an umbrella with you.' },
+      { en: 'put', he: 'לשים', ex: 'Put the milk in the fridge, please.' },
+      { en: 'sit', he: 'לשבת', ex: 'Can I sit next to you?' },
+      { en: 'find', he: 'למצוא', ex: 'I cannot find my keys.' },
+      { en: 'like', he: 'לאהוב', ex: 'I like pizza and ice cream.' }
     ]
   },
   {
@@ -134,7 +174,12 @@ UNITS.push(
       { en: 'close', he: 'לסגור', ex: 'Please close the window. It is cold.' },
       { en: 'help', he: 'לעזור', ex: 'This bag is heavy. Can you help me?' },
       { en: 'wait', he: 'לחכות', ex: 'Please wait here for five minutes.' },
-      { en: 'learn', he: 'ללמוד', ex: 'I want to learn English.' }
+      { en: 'learn', he: 'ללמוד', ex: 'I want to learn English.' },
+      { en: 'cook', he: 'לבשל', ex: 'My father likes to cook on Fridays.' },
+      { en: 'call', he: 'להתקשר', ex: 'I will call you after work.' },
+      { en: 'ask', he: 'לשאול', ex: 'Can I ask you a question?' },
+      { en: 'answer', he: 'לענות', ex: 'Please answer the phone, it is ringing.' },
+      { en: 'pay', he: 'לשלם', ex: 'Can I pay with cash here?' }
     ]
   },
   {
@@ -149,7 +194,12 @@ UNITS.push(
       { en: 'hot', he: 'חם', ex: 'Be careful, the tea is very hot.' },
       { en: 'cold', he: 'קר', ex: 'Put on a coat. It is cold outside.' },
       { en: 'easy', he: 'קל', ex: 'The test was easy. I finished in ten minutes.' },
-      { en: 'expensive', he: 'יקר', ex: 'This car is too expensive for me.' }
+      { en: 'expensive', he: 'יקר', ex: 'This car is too expensive for me.' },
+      { en: 'cheap', he: 'זול', ex: 'This shirt is cheap and nice.' },
+      { en: 'long', he: 'ארוך', ex: 'It was a long day at work.' },
+      { en: 'short', he: 'קצר', ex: 'My sister has short hair.' },
+      { en: 'beautiful', he: 'יפה', ex: 'What a beautiful view from the window!' },
+      { en: 'young', he: 'צעיר', ex: 'My teacher is young and friendly.' }
     ]
   },
   {
@@ -164,7 +214,12 @@ UNITS.push(
       { en: 'worried', he: 'מודאג', ex: 'I am worried about my exam tomorrow.' },
       { en: 'bored', he: 'משועמם', ex: 'I am bored. There is nothing to do.' },
       { en: 'surprised', he: 'מופתע', ex: 'I was surprised to see him there.' },
-      { en: 'calm', he: 'רגוע', ex: 'Stay calm. Everything is fine.' }
+      { en: 'calm', he: 'רגוע', ex: 'Stay calm. Everything is fine.' },
+      { en: 'lonely', he: 'בודד', ex: 'He feels lonely in the new city.' },
+      { en: 'proud', he: 'גאה', ex: 'I am very proud of my son.' },
+      { en: 'nervous', he: 'לחוץ', ex: 'I am nervous before every test.' },
+      { en: 'shy', he: 'ביישן', ex: 'My little brother is very shy.' },
+      { en: 'confused', he: 'מבולבל', ex: 'I am confused, can you explain again?' }
     ]
   },
   {
@@ -179,7 +234,12 @@ UNITS.push(
       { en: 'restaurant', he: 'מסעדה', ex: 'We ate dinner at an Italian restaurant.' },
       { en: 'supermarket', he: 'סופרמרקט', ex: 'I buy food at the supermarket.' },
       { en: 'station', he: 'תחנה', ex: 'The train leaves the station at six.' },
-      { en: 'library', he: 'ספרייה', ex: 'You can read books at the library.' }
+      { en: 'library', he: 'ספרייה', ex: 'You can read books at the library.' },
+      { en: 'post office', he: 'דואר', ex: 'The post office closes at five.' },
+      { en: 'pharmacy', he: 'בית מרקחת', ex: 'Is there a pharmacy near here?' },
+      { en: 'museum', he: 'מוזיאון', ex: 'We visited the art museum on Sunday.' },
+      { en: 'cinema', he: 'קולנוע', ex: 'Let\'s go to the cinema tonight.' },
+      { en: 'bakery', he: 'מאפייה', ex: 'I buy fresh bread at the bakery.' }
     ]
   },
   {
@@ -194,7 +254,12 @@ UNITS.push(
       { en: 'warm', he: 'חמים', ex: 'It is warm today. You do not need a coat.' },
       { en: 'summer', he: 'קיץ', ex: 'In summer we go to the beach.' },
       { en: 'winter', he: 'חורף', ex: 'It is cold and rainy in winter.' },
-      { en: 'umbrella', he: 'מטרייה', ex: 'It is raining. Take an umbrella.' }
+      { en: 'umbrella', he: 'מטרייה', ex: 'It is raining. Take an umbrella.' },
+      { en: 'spring', he: 'אביב', ex: 'The flowers open in the spring.' },
+      { en: 'autumn', he: 'סתיו', ex: 'The leaves fall in autumn.' },
+      { en: 'sunny', he: 'שמשי', ex: 'It is a sunny day today.' },
+      { en: 'rainy', he: 'גשום', ex: 'On rainy days I stay at home.' },
+      { en: 'storm', he: 'סערה', ex: 'There was a big storm last night.' }
     ]
   },
   {
@@ -209,7 +274,12 @@ UNITS.push(
       { en: 'drive', he: 'לנהוג', ex: 'I cannot drive. I do not have a license.' },
       { en: 'road', he: 'כביש', ex: 'There are many cars on the road.' },
       { en: 'traffic', he: 'תנועה', ex: 'There is a lot of traffic in the morning.' },
-      { en: 'walk', he: 'ללכת ברגל', ex: 'I walk to work. It takes ten minutes.' }
+      { en: 'walk', he: 'ללכת ברגל', ex: 'I walk to work. It takes ten minutes.' },
+      { en: 'boat', he: 'סירה', ex: 'We took a boat to the island.' },
+      { en: 'motorcycle', he: 'אופנוע', ex: 'My brother rides a motorcycle to work.' },
+      { en: 'driver', he: 'נהג', ex: 'The bus driver is very kind.' },
+      { en: 'bus stop', he: 'תחנת אוטובוס', ex: 'I wait at the bus stop every morning.' },
+      { en: 'subway', he: 'רכבת תחתית', ex: 'The subway is the fastest way downtown.' }
     ]
   },
 
@@ -286,7 +356,14 @@ UNITS.push(
       { en: 'horse', he: 'סוס', ex: 'She can ride a horse.' },
       { en: 'cow', he: 'פרה', ex: 'The cow is eating grass.' },
       { en: 'lion', he: 'אריה', ex: 'The lion is sleeping in the sun.' },
-      { en: 'monkey', he: 'קוף', ex: 'The monkey is eating a banana.' }
+      { en: 'monkey', he: 'קוף', ex: 'The monkey is eating a banana.' },
+      { en: 'sheep', he: 'כבשה', ex: 'The farmer has fifty sheep.' },
+      { en: 'goat', he: 'עז', ex: 'The goat eats grass all day.' },
+      { en: 'mouse', he: 'עכבר', ex: 'A little mouse lives under the floor.' },
+      { en: 'elephant', he: 'פיל', ex: 'The elephant has very big ears.' },
+      { en: 'rabbit', he: 'ארנב', ex: 'My daughter has a white rabbit.' },
+      { en: 'duck', he: 'ברווז', ex: 'There is a duck in the lake.' },
+      { en: 'bear', he: 'דוב', ex: 'We saw a brown bear at the zoo.' }
     ]
   },
   {

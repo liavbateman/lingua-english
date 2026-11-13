@@ -1264,7 +1264,9 @@
 
     // "Complete the sentence" and typing use single words (sentences are too long to type on a phone)
     const usable = mode === 'cloze' || mode === 'type' ? src.pool.filter(w => !w.phrase) : src.pool;
-    const queue = shuffle(usable.length ? usable : src.pool).slice(0, 8);
+    // A lesson's own practice covers all of its words; mixed rounds (level, review…) stay at 8
+    const isUnit = UNITS.some(u => u.id === source);
+    const queue = shuffle(usable.length ? usable : src.pool).slice(0, isUnit ? 15 : 8);
     const total = queue.length;           // the score counts first tries only
     const tried = new Set();              // words already answered once this round
     const retries = new Map();            // how many times each word was sent back
