@@ -1197,3 +1197,21 @@ button.pc-form[aria-expanded="true"] .pc-more { transform: rotate(180deg); }
 .pc-cheat-h small { font-weight: 600; opacity: .8; font-size: .75rem; }
 .pc-form-ex { margin: -2px 0 2px; padding: 6px 8px; border-radius: 10px; background: rgba(255, 255, 255, .3); }
 @media (prefers-reduced-motion: reduce) { .pc-more { transition: none; } }
+
+/* A quick question inside a finished rule's card */
+.pc-quick-go {
+  min-height: 44px; border-radius: 12px; border: 0; cursor: pointer; font: inherit; font-weight: 800; font-size: .9rem;
+  background: #4a3200; color: #ffd66b;
+}
+.pc-quick { display: grid; gap: 8px; padding: 10px; border-radius: 12px; background: rgba(255, 255, 255, .4); position: relative; }
+.pc-q { margin: 0; font-weight: 800; font-size: .95rem; text-align: left; }
+.pc-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.pc-opt {
+  min-height: 44px; padding: 6px 8px; border-radius: 10px; border: 2px solid rgba(74, 50, 0, .25); cursor: pointer;
+  background: #fff8e6; color: #4a3200; font: inherit; font-weight: 700; font-size: .88rem;
+}
+.pc-opt.right { background: #2fd093; border-color: #17795a; color: #08311f; }
+.pc-opt.wrong { background: #ff8a95; border-color: #c43c4b; color: #3d0a10; }
+.pc-q-msg { margin: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-weight: 800; font-size: .88rem; }
+.pc-q-msg:empty { display: none; }
+.pc-quick-more { min-height: 40px; padding: 0 12px; border-radius: 10px; border: 0; cursor: pointer; background: #4a3200; color: #ffd66b; font: inherit; font-weight: 800; font-size: .85rem; }

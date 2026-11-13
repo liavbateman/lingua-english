@@ -635,6 +635,8 @@
             ? `<button class="pc-form" data-k="${k}" aria-expanded="false"><span class="pc-tag">${formTag(tag)}</span><span class="en" dir="ltr">${text}</span><span class="pc-more" aria-hidden="true">▾</span></button>`
             : `<div class="pc-form"><span class="pc-tag">${formTag(tag)}</span><span class="en" dir="ltr">${text}</span></div>`).join('')}
           ${exampleRow(g.ex[0])}
+          <button class="pc-quick-go">⚡ ${t('quick.go')}</button>
+          <div class="pc-quick" hidden></div>
           <p class="pc-tip">⚠️ ${heMix(g.tip)}</p>
           ${relatedRules(x)}
         </div>`;
@@ -904,6 +906,31 @@
           ${x.rule ? saveBtn(x.rule.id) : ''}`, i);
       const bindSay = root => root.querySelectorAll('.pc-say').forEach(b => { b.onclick = e => { e.stopPropagation(); speak(b.dataset.say.replace(/"/g, "")); }; });
       bindSay(card);
+      // one quick question from the rule, answered right inside the card; a miss goes to the review stop
+      const quickGo = card.querySelector('.pc-quick-go'), quick = card.querySelector('.pc-quick');
+      if (quickGo && quick) {
+        const ask = () => {
+          const [q, ans, wrong] = x.rule.quiz[Math.floor(Math.random() * x.rule.quiz.length)];
+          quick.hidden = false;
+          quick.innerHTML = `
+            <p class="pc-q en" dir="ltr">${q.replace('___', '_____')}</p>
+            <div class="pc-opts">${shuffle([ans, ...wrong]).map(o => `<button class="pc-opt en" dir="ltr">${o}</button>`).join('')}</div>
+            <p class="pc-q-msg" role="status"></p>`;
+          quick.querySelectorAll('.pc-opt').forEach(b => {
+            b.onclick = e => {
+              e.stopPropagation();
+              const ok = b.textContent === ans;
+              quick.querySelectorAll('.pc-opt').forEach(o => { o.disabled = true; if (o.textContent === ans) o.classList.add('right'); });
+              if (ok) Feel.right(); else { b.classList.add('wrong'); Store.ruleMiss(x.rule.id); Feel.wrong(b); }
+              quick.querySelector('.pc-q').textContent = q.replace('___', ans);
+              quick.querySelector('.pc-q-msg').innerHTML = `<span>${ok ? '✓ ' + t('quick.right') : '✗ ' + t('quick.wrong', { a: ans })}</span>
+                <button class="pc-quick-more">${t('quick.more')}</button>`;
+              quick.querySelector('.pc-quick-more').onclick = ev => { ev.stopPropagation(); ask(); };
+            };
+          });
+        };
+        quickGo.onclick = e => { e.stopPropagation(); quickGo.hidden = true; ask(); };
+      }
       // a structure row opens the example that goes with it (one at a time)
       card.querySelectorAll('button.pc-form').forEach(b => {
         b.onclick = e => {
