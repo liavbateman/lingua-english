@@ -678,9 +678,15 @@
       return `<div class="pc-lines">${x.words.slice(0, 2).map(w => `<span class="en" dir="ltr">${w.en}</span>`).join('')}
         ${x.words.length > 2 ? `<small>${t('pc.more', { n: x.words.length - 2 })}</small>` : ''}</div>`;
     }
+    // The unit's words: a ring for how many are mastered, then each word with a dot (mastered / seen / new)
     const show = x.state === 'done' ? x.words : x.words.slice(0, 4);
-    return `<div class="pc-words">${show.map(w =>
-      `<span class="en${Store.isMastered(w.id) ? ' got' : ''}" dir="ltr">${Store.isMastered(w.id) ? '✓ ' : ''}${w.en}</span>`).join('')}
+    const got = x.words.filter(w => Store.isMastered(w.id)).length;
+    const stateOf = w => Store.isMastered(w.id) ? 'got' : Store.isSeen(w.id) ? 'seen' : 'new';
+    return `<div class="pc-unit">
+        <span class="pc-uring" style="--p:${Math.round(got / x.words.length * 100)}" role="img" aria-label="${t('pc.got', { a: got, b: x.words.length })}"><b class="en">${got}</b></span>
+        <span class="pc-key"><span class="got">✓ ${t('pc.k.got')}</span><span class="seen">${t('pc.k.seen')}</span><span class="new">${t('pc.k.new')}</span></span>
+      </div>
+      <div class="pc-words">${show.map(w => `<span class="en ${stateOf(w)}" dir="ltr">${stateOf(w) === 'got' ? '✓ ' : ''}${w.en}</span>`).join('')}
       ${x.words.length > show.length ? `<span class="more">${t('pc.more', { n: x.words.length - show.length })}</span>` : ''}</div>`;
   }
 
