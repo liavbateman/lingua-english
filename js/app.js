@@ -134,7 +134,9 @@
     const done = Store.tasks;
     const doneCount = tasks.filter(x => done[x.id]).length;
     const single = lw.filter(w => !w.phrase);
-    const wotd = single[Math.floor(Date.now() / 864e5) % single.length];
+    // Count days on the local clock, so the word changes at midnight here and not at midnight UTC
+    const localDay = Math.floor((Date.now() - new Date().getTimezoneOffset() * 6e4) / 864e5);
+    const wotd = single[localDay % single.length];
 
     view.innerHTML = `
       <section class="hero">
@@ -319,8 +321,8 @@
 
     function summary() {
       const passed = correct >= g.quiz.length - 1;
-      if (passed) Store.markGrammar(g.id);
-      Store.completeTask('grammar');
+      // The daily task counts only when the rule was actually passed
+      if (passed) { Store.markGrammar(g.id); Store.completeTask('grammar'); }
       refreshChrome('learn');
       const next = levelGrammar().find(x => !Store.isGrammarDone(x.id));
       view.innerHTML = `
@@ -348,7 +350,6 @@
       const w = unit.words[i];
       Store.markSeen(w.id);
       const last = i === unit.words.length - 1;
-      if (last) Store.completeTask('vocab');
       view.innerHTML = `
         <h1>${unit.emoji} ${unitTitle(unit)}</h1>
         <p class="sub">${t('card.count', { a: i + 1, b: unit.words.length })}</p>
@@ -450,8 +451,16 @@
       const key = toHebrew ? 'he' : 'en';
       const long = w.phrase ? 'long' : '';
       // Wrong answers are of the same kind: words for a word, sentences for a sentence
-      const others = wordsOf(w.level).filter(x => x.phrase === w.phrase && x.id !== w.id && x[key] !== w[key]);
-      const options = shuffle([w, ...shuffle(others).slice(0, 3)]);
+      // and no two buttons may show the same text (two words can share a translation)
+      const others = [];
+      const shown = new Set([w[key]]);
+      for (const x of shuffle(wordsOf(w.level))) {
+        if (others.length === 3) break;
+        if (x.phrase !== w.phrase || shown.has(x[key])) continue;
+        shown.add(x[key]);
+        others.push(x);
+      }
+      const options = shuffle([w, ...others]);
 
       let prompt;
       if (kind === 'listen') {
@@ -503,8 +512,13 @@
     }
 
     function summary() {
-      if (mode === 'listen') Store.completeTask('listen');
       const pct = Math.round((correct / queue.length) * 100);
+      // Daily tasks count only with at least half the answers right
+      if (pct >= 50) {
+        if (mode === 'listen') Store.completeTask('listen');
+        // Finishing a unit's practice (after its flashcards) completes the vocabulary task
+        if (UNITS.some(u => u.id === source)) Store.completeTask('vocab');
+      }
       done(pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '💪',
         t('quiz.score', { a: correct, b: queue.length }),
         t(pct >= 80 ? 'quiz.great' : 'quiz.keep'));
