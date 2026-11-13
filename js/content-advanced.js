@@ -151,6 +151,81 @@ UNITS.push(
       { en: 'account for', he: 'להסביר, להוות', ex: 'Nobody could account for the missing money in the report.' }
     ]
   },
+  {
+    id: 'a-health', level: 'advanced', title: 'Health & medicine', he: 'בריאות ורפואה', emoji: '🩺',
+    words: [
+      { en: 'diagnosis', he: 'אבחנה', ex: 'The doctor could not give a clear diagnosis until the test results came back.' },
+      { en: 'symptom', he: 'תסמין', ex: 'A high fever is the most common symptom of the flu.' },
+      { en: 'prescription', he: 'מרשם', ex: 'You need a prescription from your doctor to buy this medicine.' },
+      { en: 'side effect', he: 'תופעת לוואי', ex: 'Feeling tired is a common side effect of this medication.' },
+      { en: 'chronic', he: 'כרוני', ex: 'She has suffered from chronic back pain for years.' },
+      { en: 'recovery', he: 'החלמה', ex: 'After the operation, his recovery took almost three months.' },
+      { en: 'referral', he: 'הפניה', ex: 'My family doctor gave me a referral to a skin specialist.' },
+      { en: 'allergy', he: 'אלרגיה', ex: 'He has a severe allergy to peanuts, so he always reads the label.' },
+      { en: 'vaccine', he: 'חיסון', ex: 'The new vaccine protects children against several diseases.' },
+      { en: 'check-up', he: 'בדיקה תקופתית', ex: "It's a good idea to have a full check-up once a year." }
+    ]
+  },
+  {
+    id: 'a-tech', level: 'advanced', title: 'Technology & data', he: 'טכנולוגיה ונתונים', emoji: '💻',
+    words: [
+      { en: 'software update', he: 'עדכון תוכנה', ex: 'Restart your phone after the software update is installed.' },
+      { en: 'encryption', he: 'הצפנה', ex: 'With end-to-end encryption, only you and the receiver can read the messages.' },
+      { en: 'data breach', he: 'דליפת מידע', ex: 'After the data breach, millions of customers had to change their passwords.' },
+      { en: 'algorithm', he: 'אלגוריתם', ex: 'An algorithm decides which videos appear in your feed.' },
+      { en: 'artificial intelligence', he: 'בינה מלאכותית', ex: 'Artificial intelligence can now translate speech in real time.' },
+      { en: 'user-friendly', he: 'ידידותי למשתמש', ex: 'The new app is much more user-friendly than the old website.' },
+      { en: 'bandwidth', he: 'רוחב פס', ex: 'Video calls use a lot of bandwidth, so the connection slowed down.' },
+      { en: 'cloud storage', he: 'אחסון בענן', ex: 'I keep all my photos in cloud storage, so I never lose them.' },
+      { en: 'privacy settings', he: 'הגדרות פרטיות', ex: 'Check your privacy settings before you post anything personal.' },
+      { en: 'outage', he: 'הפסקת שירות', ex: 'The internet outage lasted for six hours.' }
+    ]
+  },
+  {
+    id: 'a-environment', level: 'advanced', title: 'Environment & climate', he: 'סביבה ואקלים', emoji: '🌍',
+    words: [
+      { en: 'climate change', he: 'שינויי אקלים', ex: 'Climate change is making summers hotter and longer.' },
+      { en: 'emissions', he: 'פליטות', ex: 'The factory promised to cut its carbon emissions by half.' },
+      { en: 'renewable energy', he: 'אנרגיה מתחדשת', ex: 'Solar power is a popular source of renewable energy in Israel.' },
+      { en: 'sustainable', he: 'בר קיימא', ex: 'We need a sustainable way to grow food without destroying forests.' },
+      { en: 'drought', he: 'בצורת', ex: 'The long drought left the farmers without enough water.' },
+      { en: 'pollution', he: 'זיהום', ex: 'Air pollution in big cities can cause breathing problems.' },
+      { en: 'recycle', he: 'למחזר', ex: 'Please recycle the plastic bottles in the orange bin.' },
+      { en: 'endangered species', he: 'מין בסכנת הכחדה', ex: 'The sea turtle is an endangered species, so its beaches are protected.' },
+      { en: 'carbon footprint', he: 'טביעת רגל פחמנית', ex: 'Flying less is one of the fastest ways to reduce your carbon footprint.' },
+      { en: 'heatwave', he: 'גל חום', ex: 'Schools closed early because of the heatwave.' }
+    ]
+  },
+  {
+    id: 'a-character', level: 'advanced', title: 'Personality & feelings', he: 'אישיות ורגשות', emoji: '🧠',
+    words: [
+      { en: 'easygoing', he: 'נוח, זורם', ex: 'My new flatmate is easygoing and never complains about anything.' },
+      { en: 'stubborn', he: 'עקשן', ex: 'My grandfather is too stubborn to admit he was wrong.' },
+      { en: 'ambitious', he: 'שאפתן', ex: 'He is ambitious and wants to run his own company by the age of thirty.' },
+      { en: 'considerate', he: 'מתחשב', ex: "It was considerate of you to call and say you'd be late." },
+      { en: 'frustrated', he: 'מתוסכל', ex: 'I felt frustrated when the website crashed for the third time.' },
+      { en: 'overwhelmed', he: 'מוצף, המום', ex: 'With three exams in one week, she felt completely overwhelmed.' },
+      { en: 'resilient', he: 'בעל חוסן', ex: 'Children are often more resilient than adults think.' },
+      { en: 'grateful', he: 'אסיר תודה', ex: "I'm grateful for all the help you gave me this year." },
+      { en: 'envious', he: 'מקנא', ex: "He was envious of his brother's success." },
+      { en: 'self-confident', he: 'בטוח בעצמו', ex: 'After the course she became much more self-confident at work.' }
+    ]
+  },
+  {
+    id: 'a-housing', level: 'advanced', title: 'Housing & paperwork', he: 'דיור וניירת', emoji: '🏛️',
+    words: [
+      { en: 'landlord', he: 'בעל הדירה', ex: 'The landlord agreed to fix the broken heater.' },
+      { en: 'tenant', he: 'שוכר', ex: "The tenant must give two months' notice before moving out." },
+      { en: 'lease', he: 'חוזה שכירות', ex: 'We signed a two-year lease on the apartment.' },
+      { en: 'utilities', he: 'חשבונות שוטפים', ex: "The rent doesn't include utilities like water and electricity." },
+      { en: 'application form', he: 'טופס בקשה', ex: 'Fill in the application form and attach a copy of your ID.' },
+      { en: 'renew', he: 'לחדש', ex: 'I need to renew my passport before the trip.' },
+      { en: 'paperwork', he: 'ניירת', ex: 'Opening a bank account here takes a lot of paperwork.' },
+      { en: 'tax return', he: 'דוח מס', ex: 'Self-employed people must file a tax return every year.' },
+      { en: 'proof of address', he: 'אישור כתובת', ex: 'The bank asked for a recent electricity bill as proof of address.' },
+      { en: 'eligible', he: 'זכאי', ex: 'You may be eligible for a discount if you are a student.' }
+    ]
+  },
 
   // ---------- Phrases ----------
   {
