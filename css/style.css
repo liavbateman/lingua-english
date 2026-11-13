@@ -489,3 +489,8 @@ a.card:active, .task:active { transform: scale(.985); }
 .missed { text-align: start; margin: 4px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); }
 .missed .label { margin-bottom: 4px; }
 .btn svg { width: 18px; height: 18px; vertical-align: -3px; }
+
+/* Tricky words (missed twice or more, not yet learned) */
+.tile.rose { background: linear-gradient(140deg, #ff8fb1, #e0457b); }
+.tricky-card { margin-top: 4px; border: 1px solid rgba(224, 69, 123, .35); }
+.go-chev { font-size: 1.4rem; color: var(--muted); padding: 0 4px; }

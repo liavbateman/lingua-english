@@ -73,7 +73,10 @@ const Store = (() => {
     answer(id, correct) {
       const cur = box(id);
       const next = correct ? Math.min(Math.max(cur, 1) + 1, INTERVALS.length - 1) : 1;
+      // misses counts every wrong answer, so words that keep slipping can be practised on their own
+      const misses = ((state.words[id] && state.words[id].misses) || 0) + (correct ? 0 : 1);
       state.words[id] = { box: next, due: Date.now() + INTERVALS[next] * DAY };
+      if (misses) state.words[id].misses = misses;
       if (correct) state.xp += 10;
       touchDay();
       state.daily.count++;
@@ -82,6 +85,12 @@ const Store = (() => {
 
     // Learned words whose review time has come
     dueWords: () => ALL_WORDS.filter(w => state.words[w.id] && state.words[w.id].due <= Date.now()),
+
+    // Tricky words: missed at least twice and not yet learned. Once learned they leave the list.
+    trickyWords: () => ALL_WORDS.filter(w => {
+      const s = state.words[w.id];
+      return s && (s.misses || 0) >= 2 && s.box < MASTERED_BOX;
+    }),
 
     unitProgress(unit) {
       const seen = unit.words.filter(w => box(w.id) >= 1).length;

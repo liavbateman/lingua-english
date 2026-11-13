@@ -54,6 +54,8 @@ const STR = {
     'quiz.mean': 'What does it mean?', 'quiz.say': 'How do you say it in English?',
     'quiz.score': '{a} of {b} correct',
     'quiz.again': 'One more try', 'quiz.great': 'Excellent work!', 'quiz.keep': 'Every round helps. The words you missed will come back again.',
+    'tricky.title': 'Tricky words', 'tricky.one': 'One word keeps slipping away. Practise it now',
+    'tricky.some': '{n} words keep slipping away. Practise just them',
     'quiz.missed': 'Words to go over', 'quiz.again.missed': 'Practise these words again', 'quiz.missedTitle': 'Your mistakes',
     'quiz.empty': 'Nothing to review', 'quiz.empty.sub': 'Learn a new lesson and its words will come back here at the right time.',
 
@@ -133,6 +135,8 @@ const STR = {
     'quiz.mean': 'מה הפירוש?', 'quiz.say': 'איך אומרים את זה באנגלית?',
     'quiz.score': '{a} מתוך {b} נכונות',
     'quiz.again': 'עוד ניסיון', 'quiz.great': 'עבודה מצוינת!', 'quiz.keep': 'כל סבב מקדם אותך. המילים שטעית בהן יחזרו שוב.',
+    'tricky.title': 'מילים קשות', 'tricky.one': 'מילה אחת ממשיכה לחמוק. בוא נתרגל אותה',
+    'tricky.some': '{n} מילים ממשיכות לחמוק. תרגול רק שלהן',
     'quiz.missed': 'מילים לחזור עליהן', 'quiz.again.missed': 'לתרגל שוב את המילים האלה', 'quiz.missedTitle': 'הטעויות שלך',
     'quiz.empty': 'אין מילים לחזרה', 'quiz.empty.sub': 'למד שיעור חדש, והמילים שלו יחזרו לכאן בזמן הנכון.',
 

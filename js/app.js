@@ -27,6 +27,7 @@
     speaker: svg('<path d="M4 9.500v5h3.500L12 19V5L7.500 9.500z" fill="currentColor"/><path d="M15.500 9a4.500 4.500 0 0 1 0 6M18 6.500a8 8 0 0 1 0 11"/>'),
     levels: svg('<rect x="3.500" y="13" width="4.500" height="8" rx="1.200"/><rect x="9.800" y="8" width="4.500" height="13" rx="1.200"/><rect x="16" y="3" width="4.500" height="18" rx="1.200"/>', true),
     keyboard: svg('<rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6.5 10h.01M10 10h.01M14 10h.01M17.5 10h.01M8 14.5h8"/>'),
+    target: svg('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>'),
     calendar: svg('<rect x="3.500" y="5" width="17" height="15.500" rx="3"/><path d="M3.500 10h17M8 3v4M16 3v4"/>')
   };
 
@@ -222,6 +223,7 @@
     // Count days on the local clock, so the word changes at midnight here and not at midnight UTC
     const localDay = Math.floor((Date.now() - new Date().getTimezoneOffset() * 6e4) / 864e5);
     const wotd = single[localDay % single.length];
+    const tricky = Store.trickyWords();
 
     view.innerHTML = `
       <section class="hero">
@@ -249,6 +251,13 @@
           <span class="grow"><b>${x.title}</b><span class="small">${x.sub}</span></span>
           <span class="check ${done[x.id] ? 'done' : ''}">${done[x.id] ? ICON.check : ''}</span>
         </a>`).join('')}
+
+      ${tricky.length ? `
+      <a class="task tricky-card" href="#/quiz/choice/tricky">
+        <span class="tile rose">${ICON.target}</span>
+        <span class="grow"><b>${t('tricky.title')}</b><span class="small">${t(tricky.length === 1 ? 'tricky.one' : 'tricky.some', { n: tricky.length })}</span></span>
+        <span class="go-chev" aria-hidden="true">${fwd()}</span>
+      </a>` : ''}
 
       <section class="wotd">
         <div class="wotd-head"><span>📖 ${t('home.wotd')}</span><span class="tag">${t('home.vocabTag')}</span></div>
@@ -469,6 +478,7 @@
   function practice() {
     const due = Store.dueWords().length;
     const modes = [
+      ...(Store.trickyWords().length ? [{ title: t('tricky.title'), sub: t('tricky.some', { n: Store.trickyWords().length }), href: '#/quiz/choice/tricky', icon: 'target', color: 'rose' }] : []),
       { title: t('practice.review'), sub: due === 1 ? t('practice.review.one') : due ? t('practice.review.some', { n: due }) : t('practice.review.none'), href: '#/quiz/choice/review', icon: 'repeat', color: 'blue' },
       { title: t('task.speak'), sub: t('practice.speak.sub'), href: '#/speak', icon: 'mic', color: 'purple' },
       { title: t('task.listen'), sub: t('practice.listen.sub'), href: '#/quiz/listen/level', icon: 'headphones', color: 'green' },
@@ -490,6 +500,7 @@
   function poolFor(source) {
     if (source === 'review') return { pool: Store.dueWords(), title: t('quiz.review') };
     if (source === 'missed') return { pool: lastMissed, title: t('quiz.missedTitle') };
+    if (source === 'tricky') return { pool: Store.trickyWords(), title: t('tricky.title') };
     const unit = UNITS.find(u => u.id === source);
     if (unit) return { pool: unit.words, title: `${unit.emoji} ${unitTitle(unit)}` };
     if (source === 'level') {
