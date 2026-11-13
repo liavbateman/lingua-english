@@ -26,6 +26,7 @@
     check: svg('<path d="M5 12.500l4.500 4.500L19 7.500" stroke-width="3"/>'),
     speaker: svg('<path d="M4 9.500v5h3.500L12 19V5L7.500 9.500z" fill="currentColor"/><path d="M15.500 9a4.500 4.500 0 0 1 0 6M18 6.500a8 8 0 0 1 0 11"/>'),
     levels: svg('<rect x="3.500" y="13" width="4.500" height="8" rx="1.200"/><rect x="9.800" y="8" width="4.500" height="13" rx="1.200"/><rect x="16" y="3" width="4.500" height="18" rx="1.200"/>', true),
+    keyboard: svg('<rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6.5 10h.01M10 10h.01M14 10h.01M17.5 10h.01M8 14.5h8"/>'),
     calendar: svg('<rect x="3.500" y="5" width="17" height="15.500" rx="3"/><path d="M3.500 10h17M8 3v4M16 3v4"/>')
   };
 
@@ -391,7 +392,8 @@
       { title: t('practice.review'), sub: due === 1 ? t('practice.review.one') : due ? t('practice.review.some', { n: due }) : t('practice.review.none'), href: '#/quiz/choice/review', icon: 'repeat', color: 'blue' },
       { title: t('task.speak'), sub: t('practice.speak.sub'), href: '#/speak', icon: 'mic', color: 'purple' },
       { title: t('task.listen'), sub: t('practice.listen.sub'), href: '#/quiz/listen/level', icon: 'headphones', color: 'green' },
-      { title: t('practice.cloze'), sub: t('practice.cloze.sub'), href: '#/quiz/cloze/level', icon: 'pencil', color: 'gold' }
+      { title: t('practice.cloze'), sub: t('practice.cloze.sub'), href: '#/quiz/cloze/level', icon: 'pencil', color: 'gold' },
+      { title: t('practice.type'), sub: t('practice.type.sub'), href: '#/quiz/type/level', icon: 'keyboard', color: 'coral' }
     ];
     view.innerHTML = `
       <h1>${t('learn.title')}</h1>
@@ -430,11 +432,37 @@
     refreshChrome('learn');
   }
 
+  // ---------- Typing ----------
+  // Forgiving comparison: case, extra spaces, end punctuation and curly apostrophes don't matter
+  const normalize = s => s.toLowerCase().replace(/[’‘`]/g, "'").replace(/[.,!?;:"]/g, '').replace(/\s+/g, ' ').trim();
+  function editDistance(a, b) {
+    const row = Array.from({ length: b.length + 1 }, (_, j) => j);
+    for (let i = 1; i <= a.length; i++) {
+      let prev = row[0];
+      row[0] = i;
+      for (let j = 1; j <= b.length; j++) {
+        const cur = row[j];
+        row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+        prev = cur;
+      }
+    }
+    return row[b.length];
+  }
+  // 'right', 'close' (one small typo in a word of 4+ letters, still counted) or 'wrong'.
+  // Any word of the level with the same Hebrew meaning is accepted too.
+  function gradeTyped(typed, w) {
+    const got = normalize(typed);
+    if (!got) return 'wrong';
+    const targets = [w, ...wordsOf(w.level).filter(x => !x.phrase && x.he === w.he && x.id !== w.id)].map(x => normalize(x.en));
+    if (targets.includes(got)) return 'right';
+    return targets.some(x => x.length >= 4 && editDistance(got, x) <= 1) ? 'close' : 'wrong';
+  }
+
   // ---------- Quiz ----------
-  // mode: 'choice' (translate), 'listen' (hear and pick), 'cloze' (complete the sentence)
+  // mode: 'choice' (translate), 'listen' (hear and pick), 'cloze' (complete the sentence), 'type' (write the English)
   function quiz(mode, source) {
     const src = poolFor(source);
-    if (!src || !['choice', 'listen', 'cloze'].includes(mode)) return notFound();
+    if (!src || !['choice', 'listen', 'cloze', 'type'].includes(mode)) return notFound();
     if (!src.pool.length) {
       view.innerHTML = `
         <div class="card center" style="margin-top:14px">
@@ -446,8 +474,8 @@
       return;
     }
 
-    // "Complete the sentence" needs single words that have an example sentence
-    const usable = mode === 'cloze' ? src.pool.filter(w => !w.phrase) : src.pool;
+    // "Complete the sentence" and typing use single words (sentences are too long to type on a phone)
+    const usable = mode === 'cloze' || mode === 'type' ? src.pool.filter(w => !w.phrase) : src.pool;
     const queue = shuffle(usable.length ? usable : src.pool).slice(0, 8);
     const total = queue.length;           // the score counts first tries only
     const tried = new Set();              // words already answered once this round
@@ -459,6 +487,7 @@
       const retry = tried.has(w.id);
       let kind = mode;
       if (kind === 'cloze' && (w.phrase || blankOut(w) === w.ex)) kind = 'choice';
+      if (kind === 'type' && w.phrase) kind = 'choice';
       // Translation questions go both ways: English → Hebrew and Hebrew → English
       const toHebrew = kind === 'choice' && Math.random() < 0.5;
       const key = toHebrew ? 'he' : 'en';
@@ -483,6 +512,9 @@
         prompt = `<div class="small">${t('quiz.cloze')}</div>
                   <div class="prompt sentence en" id="sentence">${blankOut(w)}</div>
                   <div class="small he">${w.he}</div>`;
+      } else if (kind === 'type') {
+        prompt = `<div class="small">${t('quiz.type')}</div>
+                  <div class="prompt he">${w.he}</div>`;
       } else if (toHebrew) {
         prompt = `<div class="small">${t('quiz.mean')}</div>
                   <div class="prompt en ${long}">${w.en}</div>
@@ -496,23 +528,24 @@
         <p class="sub">${src.title} · ${t('quiz.count', { a: i + 1, b: queue.length })}</p>
         ${bar((i / queue.length) * 100)}
         <div class="card question">${retry ? `<div class="again">${ICON.repeat}${t('quiz.again')}</div>` : ''}${prompt}</div>
+        ${kind === 'type' ? `
+        <form class="typed" id="typed" autocomplete="off">
+          <input id="answer" class="en" dir="ltr" lang="en" type="text" enterkeyhint="go"
+            autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="${t('quiz.type')}" placeholder="${t('quiz.type.ph')}">
+          <button class="btn" id="check" type="submit">${t('quiz.check')}</button>
+          <div class="typed-result" id="result" aria-live="polite"></div>
+        </form>` : `
         <div class="options">
           ${options.map(o => `<button class="opt ${toHebrew ? 'he' : 'en'} ${long}" data-id="${o.id}">${o[key]}</button>`).join('')}
-        </div>
+        </div>`}
         <button class="btn" id="next" hidden>${t(i === queue.length - 1 ? 'btn.finish' : 'btn.next')}</button>`;
 
       const sp = $('#speak');
       if (sp) sp.onclick = () => speak(w.en);
       if (kind === 'listen') speak(w.en);
 
-      view.querySelectorAll('.opt').forEach(btn => {
-        btn.onclick = () => {
-          const ok = btn.dataset.id === w.id;
-          view.querySelectorAll('.opt').forEach(b => {
-            b.disabled = true;
-            if (b.dataset.id === w.id) b.classList.add('right');
-          });
-          if (!ok) btn.classList.add('wrong');
+      // After any answer: score it, maybe send the word back, reveal "Next"
+      function settle(ok) {
           // Only the first try is scored and moves the word between review boxes
           if (!retry) {
             if (ok) correct++;
@@ -529,8 +562,39 @@
           if (kind === 'cloze') $('#sentence').textContent = w.ex;
           if (kind !== 'listen' && !toHebrew) speak(kind === 'cloze' ? w.ex : w.en);
           $('#next').hidden = false;
+      }
+
+      view.querySelectorAll('.opt').forEach(btn => {
+        btn.onclick = () => {
+          const ok = btn.dataset.id === w.id;
+          view.querySelectorAll('.opt').forEach(b => {
+            b.disabled = true;
+            if (b.dataset.id === w.id) b.classList.add('right');
+          });
+          if (!ok) btn.classList.add('wrong');
+          settle(ok);
         };
       });
+
+      if (kind === 'type') {
+        const input = $('#answer');
+        input.focus();   // runs inside the tap on "Next", so iPhone opens the keyboard
+        $('#typed').onsubmit = e => {
+          e.preventDefault();
+          if (input.readOnly) return;
+          if (!input.value.trim()) return input.focus();
+          const grade = gradeTyped(input.value, w);
+          input.readOnly = true;
+          input.classList.add(grade === 'wrong' ? 'wrong' : 'right');
+          $('#check').hidden = true;
+          $('#result').innerHTML = grade === 'right'
+            ? `<b class="ok">${t('quiz.type.right')}</b>`
+            : `<b class="${grade === 'close' ? 'ok' : 'bad'}">${t(grade === 'close' ? 'quiz.type.close' : 'quiz.type.wrong')}</b>
+               <span class="en" dir="ltr">${w.en}</span>`;
+          settle(grade !== 'wrong');
+          $('#next').focus();   // Enter again goes on to the next word
+        };
+      }
       $('#next').onclick = () => { i++; i < queue.length ? question() : summary(); };
     }
 

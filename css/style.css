@@ -299,6 +299,25 @@ a.card:active, .task:active { transform: scale(.985); }
 .opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
 .opt:disabled { cursor: default; color: var(--ink); opacity: 1; }
 
+/* Typing exercise. 16px+ text stops iPhone from zooming in on the field */
+.typed { display: grid; gap: 10px; margin-bottom: 14px; }
+.typed input {
+  width: 100%; border: 2px solid var(--line); background: var(--card); color: var(--ink);
+  border-radius: 16px; padding: 14px 16px; min-height: 56px;
+  font: inherit; font-size: 1.3rem; font-weight: 700; text-align: center;
+  -webkit-appearance: none; appearance: none; outline: none;
+}
+.typed input:focus { border-color: var(--brand); }
+.typed input::placeholder { color: var(--muted); font-weight: 500; }
+.typed input.right { border-color: var(--good); background: var(--good-soft); }
+.typed input.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.typed .btn { margin: 0; }
+.typed-result { text-align: center; display: grid; gap: 4px; }
+.typed-result:empty { display: none; }
+.typed-result .ok { color: var(--good); }
+.typed-result .bad { color: var(--bad); }
+.typed-result .en { font-size: 1.4rem; font-weight: 800; }
+
 /* ---------- learn tabs & grammar ---------- */
 .seg a {
   flex: 1; min-height: 46px; border-radius: 14px;

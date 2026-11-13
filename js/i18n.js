@@ -43,6 +43,9 @@ const STR = {
     'practice.review.none': 'Nothing to review right now',
     'practice.speak.sub': 'Listen and say it out loud',
     'practice.listen.sub': 'Hear a word, pick the right one',
+    'practice.type': 'Write the word', 'practice.type.sub': 'See it in Hebrew, type it in English',
+    'quiz.type': 'Write it in English', 'quiz.type.ph': 'Type here…', 'quiz.check': 'Check',
+    'quiz.type.right': 'Correct!', 'quiz.type.close': 'Almost! Watch the spelling:', 'quiz.type.wrong': 'The answer is:',
     'practice.cloze': 'Complete the sentence', 'practice.cloze.sub': 'Fill in the missing word',
 
     'quiz.count': 'Question {a} of {b}', 'quiz.review': 'Review',
@@ -106,6 +109,9 @@ const STR = {
     'practice.review.none': 'אין כרגע מילים לחזרה',
     'practice.speak.sub': 'מקשיבים ואומרים בקול',
     'practice.listen.sub': 'שומעים מילה ובוחרים אותה',
+    'practice.type': 'כתיבת המילה', 'practice.type.sub': 'רואים בעברית, כותבים באנגלית',
+    'quiz.type': 'כתבו את זה באנגלית', 'quiz.type.ph': 'Type here…', 'quiz.check': 'בדיקה',
+    'quiz.type.right': 'נכון!', 'quiz.type.close': 'כמעט! שימו לב לאיות:', 'quiz.type.wrong': 'התשובה היא:',
     'practice.cloze': 'השלמת משפט', 'practice.cloze.sub': 'משלימים את המילה החסרה',
 
     'quiz.count': 'שאלה {a} מתוך {b}', 'quiz.review': 'חזרה על מילים',
