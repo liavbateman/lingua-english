@@ -215,3 +215,46 @@ body.kids .offline { color: var(--k-ink); }
 @keyframes k-burst { 40% { transform: scale(1.35); opacity: 1; } 100% { transform: scale(1.7); opacity: 0; } }
 .k-balloon:disabled:not(.popped) { opacity: .5; cursor: default; }
 @media (max-width: 350px) { .k-balloon { width: 70px; height: 88px; } .k-balloon-pic { font-size: 2.1rem; } }
+
+/* ABC: the card on the map, the letter grid, one letter's page and the letter game */
+.k-abc-card {
+  display: flex; align-items: center; gap: 12px; margin: 14px 0 4px; padding: 12px 14px; border-radius: 24px;
+  background: #fff; color: var(--k-ink); text-decoration: none; box-shadow: 0 6px 0 var(--k-edge);
+  transition: transform var(--dur-press), box-shadow var(--dur-press);
+}
+.k-abc-card:active { transform: translateY(5px); box-shadow: 0 1px 0 var(--k-edge); }
+.k-abc-card .grow { display: flex; flex-direction: column; flex: 1; }
+.k-abc-card .grow b { font-size: 1.15rem; }
+.k-abc-card .grow small { color: var(--k-muted); font-size: .9rem; }
+.k-abc-letters { display: flex; direction: ltr; flex: none; }
+.k-abc-letters b {
+  display: grid; place-items: center; width: 34px; height: 40px; margin-inline-end: -4px; border-radius: 10px;
+  font: 700 1.4rem/1 var(--k-font); color: #fff; box-shadow: 0 3px 0 rgba(0, 0, 0, .18);
+}
+.k-abc-letters b:nth-child(1) { background: #ff5d8f; transform: rotate(-8deg); }
+.k-abc-letters b:nth-child(2) { background: #3fa7ff; transform: translateY(-4px); }
+.k-abc-letters b:nth-child(3) { background: #ffc93c; transform: rotate(8deg); }
+
+.k-letters { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 10px; margin-top: 16px; direction: ltr; }
+.k-letter {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; aspect-ratio: 1; border-radius: 20px;
+  background: #fff; color: var(--c); text-decoration: none; box-shadow: 0 5px 0 var(--k-edge); font-family: var(--k-font);
+  transition: transform var(--dur-press), box-shadow var(--dur-press);
+}
+.k-letter:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--k-edge); }
+.k-letter b { font-size: 2rem; line-height: 1; text-shadow: 0 2px 0 rgba(0, 0, 0, .08); }
+.k-letter small { font-size: .95rem; color: var(--k-muted); }
+
+.k-letter-big { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 18px 16px 20px; border-top: 10px solid var(--c); margin-top: 6px; }
+.k-letter-glyph { font-size: 6rem; line-height: 1; color: var(--c); font-weight: 700; text-shadow: 0 4px 0 rgba(0, 0, 0, .1); }
+.k-letter-glyph small { font-size: 3.4rem; margin-inline-start: 10px; color: var(--k-muted); }
+.k-letter-pic { font-size: 4.4rem; line-height: 1.15; }
+.k-letter-big mark { background: none; color: var(--c); }
+.k-letter-big.boing .k-letter-glyph { animation: k-boing .5s var(--ease-pop); }
+.k-letter-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; direction: ltr; }
+.k-letter-nav .k-btn { text-align: center; text-decoration: none; margin-top: 0; }
+a.k-btn { text-decoration: none; text-align: center; }
+
+.k-opt-letter { display: flex; align-items: baseline; justify-content: center; gap: 4px; font: 700 3.4rem/1 var(--k-font); color: var(--k-ink); padding-top: 18%; }
+.k-opt-letter small { font-size: 1.8rem; color: var(--k-muted); }
+.k-opt-letter.right { align-items: center; padding-top: 0; font-size: 3.6rem; }

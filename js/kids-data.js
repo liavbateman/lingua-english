@@ -135,3 +135,16 @@ const KIDS_THEMES = [
 // Each word gets a stable id: theme/word
 KIDS_THEMES.forEach(th => th.words.forEach(w => { w.id = th.id + '/' + w.en; w.theme = th.id; }));
 const KIDS_WORDS = KIDS_THEMES.flatMap(th => th.words);
+
+// The ABC: every letter with its spoken name, a word that starts with it (X: a word that has it) and a picture
+const KIDS_ABC = [
+  ['A', 'ay', 'apple', 'תפוח', '🍎'], ['B', 'bee', 'ball', 'כדור', '⚽'], ['C', 'see', 'cat', 'חתול', '🐱'],
+  ['D', 'dee', 'dog', 'כלב', '🐶'], ['E', 'ee', 'egg', 'ביצה', '🥚'], ['F', 'eff', 'fish', 'דג', '🐟'],
+  ['G', 'jee', 'grapes', 'ענבים', '🍇'], ['H', 'aitch', 'hat', 'כובע', '🧢'], ['I', 'eye', 'ice cream', 'גלידה', '🍦'],
+  ['J', 'jay', 'juice', 'מיץ', '🧃'], ['K', 'kay', 'kite', 'עפיפון', '🪁'], ['L', 'el', 'lion', 'אריה', '🦁'],
+  ['M', 'em', 'moon', 'ירח', '🌙'], ['N', 'en', 'nose', 'אף', '👃'], ['O', 'oh', 'orange', 'תפוז', '🍊'],
+  ['P', 'pee', 'pizza', 'פיצה', '🍕'], ['Q', 'cue', 'queen', 'מלכה', '👸'], ['R', 'are', 'robot', 'רובוט', '🤖'],
+  ['S', 'ess', 'sun', 'שמש', '☀️'], ['T', 'tee', 'tree', 'עץ', '🌳'], ['U', 'you', 'umbrella', 'מטרייה', '☂️'],
+  ['V', 'vee', 'violin', 'כינור', '🎻'], ['W', 'double you', 'whale', 'לווייתן', '🐳'], ['X', 'ex', 'fox', 'שועל', '🦊'],
+  ['Y', 'why', 'yo-yo', 'יו-יו', '🪀'], ['Z', 'zee', 'zebra', 'זברה', '🦓']
+].map(([L, name, word, he, pic]) => ({ L, name, word, he, pic }));

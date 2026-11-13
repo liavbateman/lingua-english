@@ -108,7 +108,8 @@ const Store = (() => {
     // Stars per island (best of 3), stickers earned, and how often each picture word was heard right
     kidsStars: id => (state.kids && state.kids.stars[id]) || 0,
     kidsHasSticker: id => !!(state.kids && state.kids.stickers[id]),
-    get kidsStickerCount() { return state.kids ? Object.keys(state.kids.stickers).length : 0; },
+    // island stickers only (the ABC sticker is a bonus and doesn't open islands)
+    get kidsStickerCount() { return state.kids ? KIDS_THEMES.filter(th => state.kids.stickers[th.id]).length : 0; },
     get kidsTotalStars() { return state.kids ? Object.values(state.kids.stars).reduce((a, b) => a + b, 0) : 0; },
     // A finished island: keeps the best stars, gives its sticker once. Returns what is new.
     kidsFinish(id, stars, xp) {
