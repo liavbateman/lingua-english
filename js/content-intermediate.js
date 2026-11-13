@@ -242,6 +242,53 @@ UNITS.push(
     ]
   },
 
+  // ---------- Added in round 35 ----------
+  {
+    id: 'i-driving', level: 'intermediate', title: 'Cars & driving', he: 'רכב ונהיגה', emoji: '🚗',
+    words: [
+      { en: "driver's license", he: 'רישיון נהיגה', ex: "Don't forget to bring your driver's license." },
+      { en: 'traffic jam', he: 'פקק תנועה', ex: 'We were stuck in a traffic jam for an hour.' },
+      { en: 'parking space', he: 'מקום חניה', ex: 'It took me twenty minutes to find a parking space.' },
+      { en: 'speed limit', he: 'מגבלת מהירות', ex: 'The speed limit on this road is 90 kilometers per hour.' },
+      { en: 'seat belt', he: 'חגורת בטיחות', ex: 'Please fasten your seat belt.' },
+      { en: 'gas station', he: 'תחנת דלק', ex: "Let's stop at the next gas station." },
+      { en: 'fine', he: 'קנס', ex: 'He got a fine for parking in the wrong place.' },
+      { en: 'overtake', he: 'לעקוף', ex: "It's dangerous to overtake on a sharp bend." },
+      { en: 'flat tire', he: 'פנצ׳ר', ex: 'We had a flat tire on the way to Eilat.' },
+      { en: 'rush hour', he: 'שעת עומס', ex: 'The roads are full during rush hour.' }
+    ]
+  },
+  {
+    id: 'i-sport', level: 'intermediate', title: 'Sport & fitness', he: 'ספורט וכושר', emoji: '🏃',
+    words: [
+      { en: 'coach', he: 'מאמן', ex: 'The coach told us to train harder.' },
+      { en: 'match', he: 'משחק (תחרות)', ex: 'We watched the match on TV last night.' },
+      { en: 'score', he: 'להבקיע', ex: 'Who do you think will score first?' },
+      { en: 'win', he: 'לנצח', ex: 'I hope our team will win tonight.' },
+      { en: 'lose', he: 'להפסיד', ex: 'Nobody likes to lose a game.' },
+      { en: 'warm up', he: 'להתחמם', ex: 'Always warm up before you run.' },
+      { en: 'stretch', he: 'להתמתח', ex: 'Stretch your legs after a long run.' },
+      { en: 'muscles', he: 'שרירים', ex: 'My muscles hurt after yesterday’s workout.' },
+      { en: 'marathon', he: 'מרתון', ex: 'He ran his first marathon last year.' },
+      { en: 'fit', he: 'בכושר', ex: 'She stays fit by swimming every morning.' }
+    ]
+  },
+  {
+    id: 'i-relationships', level: 'intermediate', title: 'Relationships & social life', he: 'קשרים וחיי חברה', emoji: '💞',
+    words: [
+      { en: 'relationship', he: 'מערכת יחסים', ex: 'They have been in a relationship for two years.' },
+      { en: 'get married', he: 'להתחתן', ex: 'They want to get married next summer.' },
+      { en: 'divorced', he: 'גרושים', ex: 'Her parents are divorced, but they are still friends.' },
+      { en: 'argue', he: 'להתווכח', ex: 'My brother and I sometimes argue about politics.' },
+      { en: 'apologize', he: 'להתנצל', ex: 'It is never too late to apologize.' },
+      { en: 'trust', he: 'לסמוך על', ex: 'I trust my best friend completely.' },
+      { en: 'invite', he: 'להזמין', ex: 'We want to invite all our friends to the party.' },
+      { en: 'break up', he: 'להיפרד', ex: 'They decided to break up after five years together.' },
+      { en: 'close friend', he: 'חבר קרוב', ex: 'She is a close friend from school.' },
+      { en: 'keep in touch', he: 'לשמור על קשר', ex: "Let's keep in touch after the course ends." }
+    ]
+  },
+
   // ---------- Phrases ----------
   {
     id: 'i-phr-doctor', level: 'intermediate', kind: 'phrases', title: 'At the doctor', he: 'אצל הרופא', emoji: '👨‍⚕️',
