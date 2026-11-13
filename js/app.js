@@ -1632,11 +1632,13 @@
       <h1>${t('learn.title')}</h1>
       <p class="sub">${t('practice.sub', { level: levelLabel() })}</p>
       ${learnTabs('practice')}
-      ${modes.map(m => `
-        <a class="task" href="${m.href}">
-          <span class="tile ${m.color}">${ICON[m.icon]}</span>
-          <span class="grow"><b>${m.title}</b><span class="small">${m.sub}</span></span>
-        </a>`).join('')}`;
+      <div class="pgrid">
+        ${modes.map((m, i) => `
+          <a class="ptile c-${m.color}${i === 0 ? ' wide' : ''}" href="${m.href}">
+            <span class="tile ${m.color}">${ICON[m.icon]}</span>
+            <span class="grow"><b>${m.title}</b><span class="small">${m.sub}</span></span>
+          </a>`).join('')}
+      </div>`;
   }
 
   // Words for an exercise: a unit, the due words, or the current level

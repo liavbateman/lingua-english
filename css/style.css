@@ -1414,3 +1414,20 @@ button.pc-form[aria-expanded="true"] .pc-more { transform: rotate(180deg); }
 .learn-tabs a:not(.on):active { background: rgba(255, 255, 255, .06); transform: translateY(1px); }
 .lt-ico { font-size: 1.05rem; line-height: 1; }
 @media (max-width: 340px) { .learn-tabs a { gap: 4px; font-size: .88rem; } .lt-ico { font-size: .95rem; } }
+
+/* ---------- Practice hub (design round D11): tinted raised tiles ---------- */
+.pgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ptile {
+  display: grid; gap: 10px; align-content: start; padding: 14px; border-radius: 20px; min-height: 140px;
+  color: var(--ink); text-decoration: none; border: 1px solid rgba(255, 255, 255, .07);
+  background: #1d2352; background: linear-gradient(160deg, color-mix(in srgb, var(--c) 30%, #1a2052), #171d48);
+  box-shadow: 0 5px 0 #0d1232; transition: transform var(--dur-press) var(--ease-press), box-shadow var(--dur-press) var(--ease-press);
+}
+.ptile:active { transform: translateY(4px); box-shadow: 0 1px 0 #0d1232; }
+.ptile.wide { grid-column: 1 / -1; min-height: 0; grid-template-columns: auto 1fr; align-items: center; }
+.ptile .tile { width: 50px; height: 50px; box-shadow: 0 4px 0 rgba(0, 0, 0, .25); }
+.ptile .grow { display: grid; gap: 4px; }
+.ptile b { font-size: 1.02rem; line-height: 1.25; }
+.ptile .small { color: #c9cdf0; font-size: .82rem; line-height: 1.35; }
+.c-blue { --c: #3f7df0; } .c-purple { --c: #7a5cf5; } .c-green { --c: #2cb98d; }
+.c-gold { --c: #f2a43c; } .c-coral { --c: #f0566e; } .c-rose { --c: #e0457b; }
