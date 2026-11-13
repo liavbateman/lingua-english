@@ -181,6 +181,66 @@ UNITS.push(
       { en: 'so that', he: 'כדי ש', ex: 'Speak slowly so that everyone can understand you.' }
     ]
   },
+  {
+    id: 'i-shopping', level: 'intermediate', title: 'Shopping & returns', he: 'קניות והחזרות', emoji: '🛍️',
+    words: [
+      { en: 'receipt', he: 'קבלה', ex: 'Keep the receipt in case you want to return the shirt.' },
+      { en: 'exchange', he: 'להחליף מוצר', ex: 'Can I exchange these shoes for a bigger size?' },
+      { en: 'discount', he: 'הנחה', ex: 'Students get a ten percent discount on all books.' },
+      { en: 'on sale', he: 'במבצע', ex: 'These jackets are on sale this week.' },
+      { en: 'try on', he: 'למדוד', ex: 'Can I try on this dress before I buy it?' },
+      { en: 'fitting room', he: 'תא מדידה', ex: 'The fitting room is at the back of the store.' },
+      { en: 'out of stock', he: 'אזל מהמלאי', ex: 'Sorry, that model is out of stock at the moment.' },
+      { en: 'bargain', he: 'מציאה', ex: 'Only fifty shekels for this coat? What a bargain!' },
+      { en: 'warranty', he: 'אחריות למוצר', ex: 'The laptop comes with a two-year warranty.' },
+      { en: 'checkout', he: 'קופה', ex: 'There was a long line at the checkout.' }
+    ]
+  },
+  {
+    id: 'i-restaurant', level: 'intermediate', title: 'Eating out', he: 'אוכלים בחוץ', emoji: '🍽️',
+    words: [
+      { en: 'book a table', he: 'להזמין שולחן', ex: "Let's book a table for eight o'clock." },
+      { en: 'starter', he: 'מנה ראשונה', ex: "I'll have the soup as a starter." },
+      { en: 'main course', he: 'מנה עיקרית', ex: "For the main course, I'd like the grilled fish." },
+      { en: 'dessert', he: 'קינוח', ex: 'We were too full to order dessert.' },
+      { en: 'vegetarian', he: 'צמחוני', ex: 'Do you have any vegetarian dishes?' },
+      { en: 'tip', he: 'טיפ', ex: 'In Israel people usually leave a tip of about twelve percent.' },
+      { en: 'bill', he: 'החשבון', ex: 'Could we have the bill, please?' },
+      { en: 'spicy', he: 'חריף', ex: 'Is this sauce very spicy?' },
+      { en: 'takeaway', he: 'אוכל לקחת', ex: 'We were too tired to cook, so we ordered a takeaway.' },
+      { en: 'side dish', he: 'תוספת', ex: 'Rice comes as a side dish with every meal.' }
+    ]
+  },
+  {
+    id: 'i-airport', level: 'intermediate', title: 'At the airport', he: 'בשדה התעופה', emoji: '✈️',
+    words: [
+      { en: 'boarding pass', he: 'כרטיס עלייה למטוס', ex: 'Please have your boarding pass and passport ready.' },
+      { en: 'check in', he: 'לעשות צ׳ק-אין', ex: 'You can check in online a day before the flight.' },
+      { en: 'gate', he: 'שער', ex: 'Our flight leaves from gate 12.' },
+      { en: 'carry-on', he: 'תיק יד', ex: 'You can take one carry-on bag onto the plane.' },
+      { en: 'luggage', he: 'מזוודות', ex: "My luggage didn't arrive with me in Rome." },
+      { en: 'security check', he: 'בדיקה ביטחונית', ex: 'Take your laptop out of the bag at the security check.' },
+      { en: 'connecting flight', he: 'טיסת המשך', ex: 'We have a connecting flight in Athens.' },
+      { en: 'aisle seat', he: 'מושב ליד המעבר', ex: 'I always ask for an aisle seat on long flights.' },
+      { en: 'land', he: 'לנחות', ex: 'The plane will land in Tel Aviv at six in the morning.' },
+      { en: 'jet lag', he: 'עייפות מהפרשי שעות', ex: 'It took me three days to get over the jet lag.' }
+    ]
+  },
+  {
+    id: 'i-free-time', level: 'intermediate', title: 'Free time & hobbies', he: 'פנאי ותחביבים', emoji: '🎨',
+    words: [
+      { en: 'hobby', he: 'תחביב', ex: 'Photography has been my hobby since I was a teenager.' },
+      { en: 'hiking', he: 'טיולים רגליים', ex: 'We go hiking in the Galilee every spring.' },
+      { en: 'join', he: 'להצטרף', ex: "I'd like to join a running club." },
+      { en: 'gym', he: 'חדר כושר', ex: 'She goes to the gym three times a week.' },
+      { en: 'concert', he: 'הופעה', ex: 'We bought tickets for a concert in the park.' },
+      { en: 'volunteer', he: 'להתנדב', ex: 'I volunteer at an animal shelter on Fridays.' },
+      { en: 'relax', he: 'להירגע', ex: 'After work I like to relax with a good book.' },
+      { en: 'board game', he: 'משחק קופסה', ex: 'On rainy evenings we play a board game with the kids.' },
+      { en: 'exhibition', he: 'תערוכה', ex: "There's a new photography exhibition at the museum." },
+      { en: 'take up', he: 'להתחיל תחביב חדש', ex: 'I want to take up yoga this year.' }
+    ]
+  },
 
   // ---------- Phrases ----------
   {
