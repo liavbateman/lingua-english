@@ -23,6 +23,7 @@
 }
 
 button, input, select, textarea { font-family: var(--font); }
+input, textarea { -webkit-user-select: text; user-select: text; }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -32,14 +33,19 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
 html {
   -webkit-text-size-adjust: 100%;
   background: var(--bg);
+  touch-action: pan-x pan-y;   /* scrolling only: no pinch or double-tap zoom */
 }
 
 button, a { touch-action: manipulation; }
 
 body {
-  height: 100dvh;
+  /* Pinned to the real screen edges, so nothing is left below the tab bar on iPhone */
+  position: fixed; inset: 0;
+  height: auto;
   overscroll-behavior: none;
   -webkit-touch-callout: none;
+  /* A long press doesn't select or copy text (typing fields still can) */
+  -webkit-user-select: none; user-select: none;
   background:
     radial-gradient(120% 50% at 50% 0%, #131a4a 0%, transparent 70%),
     var(--bg);
@@ -94,7 +100,9 @@ body {
 .tabbar {
   display: flex; background: var(--bg-2); border-top: 1px solid var(--line);
   border-radius: 22px 22px 0 0;
-  padding: 6px env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);  /* above the home indicator */
+  padding: 6px env(safe-area-inset-right) 0 env(safe-area-inset-left);
+  /* The home indicator only needs a thin strip: the full 34px inset left a large empty gap */
+  padding-bottom: max(6px, calc(env(safe-area-inset-bottom) - 18px));
 }
 .tabbar a {
   flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
@@ -298,7 +306,18 @@ a.card:active, .task:active { transform: scale(.985); }
   font: inherit; font-size: 1.08rem; font-weight: 600; cursor: pointer;
   -webkit-appearance: none; appearance: none;
 }
+.opt { transition: transform .08s ease; }
+.opt:not(:disabled):active { transform: scale(.97); }
 .opt.right { border-color: var(--good); background: var(--good-soft); }
+/* Wrong answer: a short sideways shake */
+.shake { animation: shake .36s cubic-bezier(.36, .07, .19, .97); }
+@keyframes shake {
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(3px); }
+}
+@media (prefers-reduced-motion: reduce) { .shake { animation: none; } }
 .opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
 .opt:disabled { cursor: default; color: var(--ink); opacity: 1; }
 
