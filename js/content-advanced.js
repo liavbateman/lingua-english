@@ -545,6 +545,28 @@ UNITS.push(
       { en: 'Apology accepted.', he: 'ההתנצלות התקבלה.' },
       { en: "Let's put it behind us.", he: 'בואו נשאיר את זה מאחורינו.' }
     ]
+  },
+
+  // ---------- Added in round 58 ----------
+  {
+    id: 'a-culture', level: 'advanced', title: 'Arts & culture', he: 'אמנות ותרבות', emoji: '🎭',
+    words: [
+      { en: 'exhibition', he: 'תערוכה', ex: 'The exhibition attracted thousands of visitors.' },
+      { en: 'masterpiece', he: 'יצירת מופת', ex: 'Many consider it his greatest masterpiece.' },
+      { en: 'critic', he: 'מבקר', ex: 'One critic called the novel a triumph.' },
+      { en: 'performance', he: 'הופעה, ביצוע', ex: 'Her performance in the final scene was outstanding.' },
+      { en: 'audience', he: 'קהל', ex: 'The audience gave the cast a standing ovation.' },
+      { en: 'genre', he: "ז'אנר", ex: 'Science fiction is my favourite genre.' },
+      { en: 'plot', he: 'עלילה', ex: 'The plot was too complicated to follow.' },
+      { en: 'portrayal', he: 'גילום, תיאור', ex: 'His portrayal of the king won an award.' },
+      { en: 'acclaimed', he: 'זוכה לשבחים', ex: 'She is an internationally acclaimed author.' },
+      { en: 'contemporary', he: 'עכשווי', ex: 'The museum focuses on contemporary art.' },
+      { en: 'heritage', he: 'מורשת', ex: 'The old city is part of our cultural heritage.' },
+      { en: 'sculpture', he: 'פסל, פיסול', ex: 'A bronze sculpture stands in the main square.' },
+      { en: 'composer', he: 'מלחין', ex: 'The composer wrote the score in just three weeks.' },
+      { en: 'premiere', he: 'הקרנת בכורה', ex: "The film's premiere was held in Cannes." },
+      { en: 'provocative', he: 'מעורר מחשבה, פרובוקטיבי', ex: 'The play raises some provocative questions.' }
+    ]
   }
 );
 

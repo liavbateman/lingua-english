@@ -639,5 +639,20 @@ GRAMMAR.push(
     ex: [["Let's go to the beach.", 'בואו נלך לים.'], ["Let's not be late.", 'בואו לא נאחר.'], ['Shall we order pizza?', 'נזמין פיצה?']],
     tip: 'טעות נפוצה: להוסיף to או ing אחרי Let\'s. לא "Let\'s to go" ולא "Let\'s going", אלא "Let\'s go". ושימו לב לגרש: Let\'s (בואו נ...) שונה מ-lets (מרשה).',
     quiz: [["Let's ___ a movie tonight.", 'watch', ['to watch', 'watching', 'watches']], ["It's cold. Let's ___ go out.", 'not', ["don't", 'no', "doesn't"]], ['___ we start the lesson?', 'Shall', ['Let', "Let's", 'Are']]]
+  },
+
+  // ---------- Added in round 58 ----------
+  {
+    id: 'b-want-need', level: 'beginner', title: 'Want to / need to', he: 'לרצות ולהצטרך: want to / need to',
+    when: 'אחרי want ו-need בא to ואז הפועל: I want to eat. כשרוצים דבר, אין to: I want a coffee. וכשרוצים שמישהו אחר יעשה משהו, אומרים want ואז האדם ואז to: I want you to come.',
+    forms: [
+      ['verb', 'want / need + to + verb: I need to go.'],
+      ['noun', 'want / need + noun: I want a coffee.'],
+      ['person', 'want + person + to: I want you to stay.'],
+      ['negative', "don't want to · doesn't need to: She doesn't need to wait."]
+    ],
+    ex: [['I want to learn English.', 'אני רוצה ללמוד אנגלית.'], ['We need to leave at eight.', 'עלינו לצאת בשמונה.'], ['My boss wants me to work late.', 'הבוס רוצה שאעבוד עד מאוחר.']],
+    tip: 'טעות נפוצה: לתרגם "אני רוצה שתבוא" מילה במילה: "I want that you come". באנגלית אומרים "I want you to come". ולא שוכחים את to: "I need to go", לא "I need go".',
+    quiz: [['I want ___ a new phone.', 'to buy', ['buy', 'buying', 'that I buy']], ['She wants ___ to help her.', 'me', ['that I', 'I', 'my']], ["You don't ___ to bring anything.", 'need', ['needs', 'needing', 'to need']]]
   }
 );
