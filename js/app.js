@@ -117,7 +117,16 @@
   function planTasks() {
     const u = nextUnit();
     const g = nextGrammar();
+    // Review comes first: words due today are the ones about to be forgotten.
+    // It stays on the list once done today, so the count doesn't jump back.
+    const due = Store.dueWords().length;
+    const review = due || Store.tasks.review
+      ? [{ id: 'review', title: t('task.review'),
+          sub: Store.tasks.review && !due ? t('task.review.done') : due === 1 ? t('task.review.one') : t('task.review.sub', { n: due }),
+          href: '#/quiz/choice/review', icon: 'repeat', color: 'coral' }]
+      : [];
     return [
+      ...review,
       { id: 'vocab', title: t('task.vocab'), sub: t('task.vocab.sub', { n: u.words.length }), href: `#/unit/${u.id}`, icon: 'book', color: 'blue' },
       { id: 'speak', title: t('task.speak'), sub: t('task.speak.sub'), href: '#/speak', icon: 'mic', color: 'purple' },
       { id: 'listen', title: t('task.listen'), sub: t('task.listen.sub'), href: '#/quiz/listen/level', icon: 'headphones', color: 'green' },
@@ -516,6 +525,7 @@
       // Daily tasks count only with at least half the answers right
       if (pct >= 50) {
         if (mode === 'listen') Store.completeTask('listen');
+        if (source === 'review') Store.completeTask('review');
         // Finishing a unit's practice (after its flashcards) completes the vocabulary task
         if (UNITS.some(u => u.id === source)) Store.completeTask('vocab');
       }

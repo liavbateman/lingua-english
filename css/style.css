@@ -208,6 +208,7 @@ a.card:active, .task:active { transform: scale(.985); }
 .tile.purple { background: linear-gradient(140deg, #b09bff, #7a5cf5); }
 .tile.green { background: linear-gradient(140deg, #6fe6c0, #2cb98d); }
 .tile.gold { background: linear-gradient(140deg, #ffd27a, #f2a43c); }
+.tile.coral { background: linear-gradient(140deg, #ff9a8b, #f0566e); }
 .tile.dim { background: var(--card-2); }
 .task .grow { flex: 1; min-width: 0; }
 .task b { display: block; font-size: 1.02rem; }

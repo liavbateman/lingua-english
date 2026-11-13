@@ -1,5 +1,5 @@
 // עבודה לא מקוונת: קודם מנסים רשת (כדי לקבל עדכונים), ואם אין - מהמטמון.
-const CACHE = 'english-app-v7';
+const CACHE = 'english-app-v8';
 const FILES = [
   './', 'index.html', 'css/style.css',
   'js/data.js', 'js/grammar.js', 'js/content-beginner.js', 'js/content-intermediate.js', 'js/content-advanced.js', 'js/content-index.js',
