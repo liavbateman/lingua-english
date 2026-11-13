@@ -396,10 +396,10 @@
   }
 
   const learnTabs = on => `
-    <div class="seg" style="margin-bottom:14px">
-      ${[['vocab', '#/learn'], ['phrases', '#/phrases'], ['practice', '#/practice']].map(([id, href]) =>
-        `<a href="${href}" class="${on === id ? 'on' : ''}"${on === id ? ' aria-current="page"' : ''}>${t('learn.' + id)}</a>`).join('')}
-    </div>`;
+    <nav class="seg learn-tabs" aria-label="${t('learn.title')}">
+      ${[['vocab', '#/learn', '📖'], ['phrases', '#/phrases', '💬'], ['practice', '#/practice', '🏋️']].map(([id, href, icon]) =>
+        `<a href="${href}" class="${on === id ? 'on' : ''}"${on === id ? ' aria-current="page"' : ''}><span class="lt-ico" aria-hidden="true">${icon}</span>${t('learn.' + id)}</a>`).join('')}
+    </nav>`;
 
   // ---------- Search: every word and sentence of every level, in English or Hebrew ----------
   const searchKey = s => s.toLowerCase()
