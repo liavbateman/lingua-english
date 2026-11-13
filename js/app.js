@@ -125,7 +125,17 @@
       el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
     }
 
+    // iPhone only lets sound start inside a tap. Call this in the tap when the result comes later
+    // (speech recognition answers a few seconds after the microphone button is pressed).
+    function prime() {
+      try {
+        ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === 'suspended') ctx.resume();
+      } catch (e) { /* no sound is fine */ }
+    }
+
     return {
+      prime,
       right() { buzz(12); ting(); },
       wrong(el) { buzz([18, 50, 28]); shake(el); }
     };
@@ -755,6 +765,7 @@
       mic.onclick = () => {
         if (recognition) { recognition.abort(); return; }   // second tap stops listening
         if ('speechSynthesis' in window) speechSynthesis.cancel();
+        Feel.prime();
         const Rec = Recognition();
         const rec = new Rec();
         rec.lang = 'en-US';
@@ -771,10 +782,12 @@
           if (heardScore(w.en, best) >= 0.8) {
             heardOk = true;
             show(`<b>${t('speak.great')}</b>`, 'ok');
+            Feel.right();
             $('#said').textContent = t('btn.next');
             $('#said').focus();
           } else {
             show(`${t('speak.heard')} <b class="en" dir="ltr">“${best.replace(/[<>&"]/g, '')}”</b><br>${t('speak.again')}`, 'bad');
+            Feel.wrong($('#heard'));
           }
         };
         rec.onerror = e => {
