@@ -65,6 +65,14 @@ const Store = (() => {
     // Grammar rules whose practice was passed
     isGrammarDone: id => !!(state.grammar && state.grammar[id]),
     markGrammar(id) { state.grammar = state.grammar || {}; state.grammar[id] = true; save(); },
+    // Rules with mistakes: every wrong answer adds one, every right answer in a rule review takes one off
+    ruleMiss(id) { state.gmiss = state.gmiss || {}; state.gmiss[id] = (state.gmiss[id] || 0) + 1; save(); },
+    ruleHit(id) {
+      if (!state.gmiss || !state.gmiss[id]) return;
+      if (--state.gmiss[id] <= 0) delete state.gmiss[id];
+      save();
+    },
+    weakRules: () => Object.keys(state.gmiss || {}).filter(id => state.gmiss[id] > 0),
 
     // Stage chests on the lesson path: each one opens once and gives a points bonus
     chestOpened: key => !!(state.chests && state.chests[key]),

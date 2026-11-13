@@ -489,6 +489,15 @@
     items.cur = cur;
     items.part = part;
     // Review stop: words from this path's earlier lessons that were learned once and are due again
+    if (part === 'gall' && cur >= 0) {
+      const weak = new Set(Store.weakRules());
+      const rules = items.filter((x, i) => i !== cur && weak.has(x.href.split('/').pop()));
+      if (rules.length) {
+        items.review = rules;
+        items.reviewHref = '#/grammar/review/quiz';
+        items.reviewAria = t('grev.aria', { n: rules.length });
+      }
+    }
     if (part !== 'grammar' && part !== 'gall' && cur >= 0) {
       const curUnit = items[cur].href.split('/').pop();
       const units = new Set(levelUnits().filter(u => (u.kind === 'phrases') === (part === 'phrases') && u.id !== curUnit).map(u => u.id));
@@ -612,7 +621,7 @@
         ${Array.from({ length: sections }, (_, s) => sectionBanner(items, s)).join('')}
         ${items.review ? `
           <div class="prev-wrap" id="prevwrap">
-            <a class="prev-node" href="#/quiz/choice/pathreview" aria-label="${t('rstop.aria', { n: items.review.length })}">
+            <a class="prev-node" href="${items.reviewHref || '#/quiz/choice/pathreview'}" aria-label="${items.reviewAria || t('rstop.aria', { n: items.review.length })}">
               <span aria-hidden="true">🏋️</span><b class="prev-count" aria-hidden="true">${items.review.length}</b>
             </a>
             <span class="plabel">${t('rstop.label')}</span>
@@ -1075,16 +1084,25 @@
   }
 
   function grammarQuiz(id) {
-    const g = GRAMMAR.find(x => x.id === id);
-    if (!g) return notFound();
+    // "review": questions from every rule that had mistakes, mixed, so each one asks "which rule fits here?"
+    const review = id === 'review';
+    const g = review ? null : GRAMMAR.find(x => x.id === id);
+    if (!review && !g) return notFound();
+    const weak = review ? GRAMMAR.filter(x => Store.weakRules().includes(x.id)) : [];
+    if (review && !weak.length) { location.hash = '#/grammar'; return; }
+    const qs = review
+      ? shuffle(weak.flatMap(r => r.quiz.map(q => ({ q, r })))).slice(0, 8)
+      : g.quiz.map(q => ({ q, r: g }));
     let i = 0, correct = 0, streak = 0;
     const started = Date.now();
 
     function question() {
-      const [q, answer, wrong] = g.quiz[i];
+      const [q, answer, wrong] = qs[i].q;
+      const rule = qs[i].r;
       view.innerHTML = `
-        <p class="sub">${ruleTitle(g)} · ${t('quiz.count', { a: i + 1, b: g.quiz.length })}</p>
-        ${lessonBar(i / g.quiz.length)}
+        <p class="sub">${review ? `🏋️ ${t('grev.title')}` : ruleTitle(g)} · ${t('quiz.count', { a: i + 1, b: qs.length })}</p>
+        ${lessonBar(i / qs.length)}
+        ${review ? `<p class="small grev-rule">${ruleTitle(rule)}</p>` : ''}
         <div class="card question">
           <div class="small">${t('grammar.choose')}</div>
           <div class="prompt sentence en" id="sentence">${q.replace('___', '_____')}</div>
@@ -1092,7 +1110,7 @@
         <div class="options">
           ${shuffle([answer, ...wrong]).map(o => `<button class="opt en">${o}</button>`).join('')}
         </div>
-        <button class="btn" id="next" hidden>${t(i === g.quiz.length - 1 ? 'btn.finish' : 'btn.next')}</button>`;
+        <button class="btn" id="next" hidden>${t(i === qs.length - 1 ? 'btn.finish' : 'btn.next')}</button>`;
 
       selectThenCheck(btn => {
           const ok = btn.textContent === answer;
@@ -1103,17 +1121,34 @@
           if (!ok) btn.classList.add('wrong');
           ok ? Feel.right() : Feel.wrong(btn);
           if (ok) correct++;
+          if (!ok) Store.ruleMiss(rule.id); else if (review) Store.ruleHit(rule.id);
           streak = ok ? streak + 1 : 0;
           const full = q.replace('___', answer);
           $('#sentence').textContent = full;
           speak(full.replace(/"/g, ''));
           showFeedback({ ok, answer: ok ? '' : full, say: full.replace(/"/g, ''), combo: streak });
       });
-      $('#next').onclick = () => { i++; i < g.quiz.length ? question() : summary(); };
+      $('#next').onclick = () => { i++; i < qs.length ? question() : (review ? reviewSummary() : summary()); };
+    }
+
+    function reviewSummary() {
+      refreshChrome('grammar');
+      endLesson(1);
+      const left = Store.weakRules().length;
+      view.innerHTML = `
+        <div class="card center" style="margin-top:14px">
+          <div class="big">${left ? '💪' : '🏆'}</div>
+          <h1>${t('quiz.score', { a: correct, b: qs.length })}</h1>
+          <p class="sub">${left ? t(left === 1 ? 'grev.left.one' : 'grev.left', { n: left }) : t('grev.clear')}</p>
+          ${roundStats({ correct, total: qs.length, ms: Date.now() - started })}
+          ${left ? `<a class="btn" href="#/grammar/review/quiz">${t('grev.again')}</a>` : ''}
+          <a class="btn${left ? ' ghost' : ''}" href="#/grammar">${t('grammar.all')}</a>
+        </div>`;
+      countUp();
     }
 
     function summary() {
-      const passed = correct >= g.quiz.length - 1;
+      const passed = correct >= qs.length - 1;
       // The daily task counts only when the rule was actually passed
       if (passed) { Store.markGrammar(g.id); Store.completeTask('grammar'); }
       refreshChrome('learn');
@@ -1123,9 +1158,9 @@
         ${celebration()}
         <div class="card center" style="margin-top:14px">
           <div class="big">${passed ? '🏆' : '💪'}</div>
-          <h1>${t('quiz.score', { a: correct, b: g.quiz.length })}</h1>
+          <h1>${t('quiz.score', { a: correct, b: qs.length })}</h1>
           <p class="sub">${t(passed ? 'grammar.done' : 'grammar.retry')}</p>
-          ${roundStats({ correct, total: g.quiz.length, ms: Date.now() - started })}
+          ${roundStats({ correct, total: qs.length, ms: Date.now() - started })}
           ${passed
             ? (next ? `<a class="btn" href="#/grammar/${next.id}">${t('grammar.next', { title: ruleTitle(next) })}</a>` : `<a class="btn" href="#/">${t('btn.home')}</a>`)
             : `<a class="btn" href="#/grammar/${g.id}">${t('grammar.again')}</a>`}

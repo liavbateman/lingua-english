@@ -1101,3 +1101,6 @@ button.path-head:active span { background: rgba(142, 125, 255, .22); }
 }
 .pgate-go:active { transform: translateY(3px); box-shadow: none; }
 @media (max-width: 340px) { .pgate { gap: 8px; padding: 10px 12px; } .pgate-icon { font-size: 1.5rem; } .pgate-go { padding: 0 10px; font-size: .8rem; } }
+
+/* Rule review: which rule this question comes from */
+.grev-rule { margin: -4px 0 8px; color: #b9b0ff; font-weight: 700; }
