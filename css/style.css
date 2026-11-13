@@ -1002,3 +1002,19 @@ button.path-head:active span { background: rgba(142, 125, 255, .22); }
 .lvl-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #ffc53d, #ffde85); }
 .lvl-pct { font-size: .8rem; font-weight: 800; color: #ffd27a; }
 .level-sheet { max-height: calc(100% - 20px); overflow-y: auto; }   /* larger text sizes: the sheet scrolls instead of going off screen */
+
+/* Lesson card preview: what's inside */
+.pc-words { display: flex; flex-wrap: wrap; gap: 6px; position: relative; }
+.pc-words span {
+  padding: 3px 10px; border-radius: 999px; font-size: .85rem; font-weight: 700;
+  background: rgba(255, 255, 255, .22); color: inherit;
+}
+.pc-words span.got { background: rgba(255, 255, 255, .9); color: #17795a; }
+.pc-words span.more { background: none; opacity: .85; }
+.pc-lines, .pc-ex { display: grid; gap: 4px; position: relative; }
+.pc-lines span, .pc-ex b {
+  font-size: .88rem; font-weight: 700; padding: 6px 10px; border-radius: 10px; background: rgba(255, 255, 255, .18); text-align: left;
+}
+.pc-lines small { opacity: .85; }
+.pc-ex span { font-size: .85rem; opacity: .9; }
+.pcard.locked .pc-words span, .pcard.locked .pc-lines span, .pcard.locked .pc-ex b { background: rgba(255, 255, 255, .08); }

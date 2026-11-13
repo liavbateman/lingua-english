@@ -418,13 +418,13 @@
       items = levelGrammar().map((g, n) => {
         const done = Store.isGrammarDone(g.id);
         return { href: `#/grammar/${g.id}`, review: `#/grammar/${g.id}/quiz`, face: `<b class="pnum">${n + 1}</b>`, label: ruleTitle(g),
-          plain: (isHe() ? g.he : g.title), done, started: done, pct: done ? 100 : 0,
+          plain: (isHe() ? g.he : g.title), done, started: done, pct: done ? 100 : 0, example: g.ex[0],
           progress: t(done ? 'path.g.done' : 'path.g.sub') };
       });
     } else {
       items = levelUnits().filter(u => (u.kind === 'phrases') === (part === 'phrases')).map(u => {
         const p = Store.unitProgress(u);
-        return { href: `#/unit/${u.id}`, review: `#/quiz/choice/${u.id}`, face: u.emoji, label: unitTitle(u), plain: unitTitle(u),
+        return { href: `#/unit/${u.id}`, review: `#/quiz/choice/${u.id}`, face: u.emoji, label: unitTitle(u), plain: unitTitle(u), words: u.words,
           done: p.total > 0 && p.mastered / p.total >= 0.6, started: p.seen > 0, pct: p.pct,
           progress: t(u.kind === 'phrases' ? 'learn.sentences' : 'learn.words', { a: p.mastered, b: p.total }) };
       });
@@ -472,6 +472,21 @@
         </div>
         ${status}
       </div>`;
+  }
+
+  // What is inside a lesson, shown in its card: the first words (a check on the ones already
+  // mastered), the first sentences of a sentence lesson, or a rule's first example
+  function lessonPreview(x) {
+    if (x.example) return `<div class="pc-ex"><b class="en" dir="ltr">${x.example[0]}</b><span>${x.example[1]}</span></div>`;
+    if (!x.words) return '';
+    if (x.words[0].phrase) {
+      return `<div class="pc-lines">${x.words.slice(0, 2).map(w => `<span class="en" dir="ltr">${w.en}</span>`).join('')}
+        ${x.words.length > 2 ? `<small>${t('pc.more', { n: x.words.length - 2 })}</small>` : ''}</div>`;
+    }
+    const show = x.state === 'done' ? x.words : x.words.slice(0, 4);
+    return `<div class="pc-words">${show.map(w =>
+      `<span class="en${Store.isMastered(w.id) ? ' got' : ''}" dir="ltr">${Store.isMastered(w.id) ? '✓ ' : ''}${w.en}</span>`).join('')}
+      ${x.words.length > show.length ? `<span class="more">${t('pc.more', { n: x.words.length - show.length })}</span>` : ''}</div>`;
   }
 
   // A slim map of all stages that stays at the top while the path scrolls: how full each stage is,
@@ -685,6 +700,7 @@
         : `
           <b>${x.label}</b>
           <p>${x.progress}</p>
+          ${lessonPreview(x)}
           <a class="btn" href="${x.state === 'done' ? x.review : x.href}">${t(x.state === 'done' ? 'path.review' : x.started ? 'path.continue' : 'path.start')}</a>
           ${x.state === 'done' ? `<a class="pcard-link" href="${x.href}">${t('path.again')}</a>` : ''}`, i);
       path.querySelector(`.pnode[data-i="${i}"]`).setAttribute('aria-expanded', 'true');

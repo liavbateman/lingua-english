@@ -20,6 +20,7 @@ borrowing proven patterns from leading language apps, and adapts them to a Hebre
 | P6 | Path: review stops | A "review" node that appears on the road when words from earlier lessons are due | Duolingo practice nodes | Done (round 40): beside the current lesson, dotted side path, count badge, 3+ due words learned once |
 | P7 | Path: stage mini-map | A slim sticky bar of all stages: fill per stage, current stage ringed, the stage on screen framed, tap to jump | Duolingo course overview | Done (round 42) |
 | P8 | Path: level sheet | The level heading above the path opens a sheet with the three levels, what each covers (CEFR), and how far this part is done; replaces the level chips | Reference app, Duolingo course picker | Done (round 44) |
+| P9 | Path: lesson preview | The lesson card shows what's inside: first words (all of them, with a check on mastered ones, for a done lesson), first sentences, or a rule's example | Memrise course preview | Done (round 46) |
 | 7 | Owl reactions | The owl mascot reacts in feedback, empty states and celebrations | Duolingo | |
 | 8 | First-run setup | Three short screens: level, daily goal, reminder time | Babbel, Busuu | |
 | 9 | Streak calendar | A month view of practiced days on the Progress screen | Duolingo | |
