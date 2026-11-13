@@ -2020,3 +2020,11 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
 .rule-hero .rule-meta { flex-direction: column; align-items: flex-start; gap: 2px; }
 .rule-hero h1 .rule-crown { display: none; }
 @media (max-width: 340px) { .rule-hero { padding-inline-end: 74px; } .rule-ring { width: 52px; height: 52px; } }
+
+/* ---------- Review stop: a repeat icon, a gloss and a dashed ring like the open lessons (design round D49) ---------- */
+.prev-node { background: radial-gradient(circle at 35% 30%, #4fd8bf, #2fb8a0 60%); }
+.prev-node::before { content: ""; position: absolute; inset: -8px; border-radius: 50%; border: 3px dashed rgba(111, 230, 192, .55); pointer-events: none; }
+.prev-node::after { content: ""; position: absolute; inset: 6px 12px auto; height: 30%; border-radius: 999px; background: linear-gradient(rgba(255, 255, 255, .45), transparent); pointer-events: none; }
+.prev-ico { display: grid; place-items: center; color: #fff; filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .2)); }
+.prev-ico svg { width: 28px; height: 28px; }
+.prev-count { z-index: 1; }

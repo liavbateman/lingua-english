@@ -784,7 +784,7 @@
         ${items.review ? `
           <div class="prev-wrap" id="prevwrap">
             <a class="prev-node" href="${items.reviewHref || '#/quiz/choice/pathreview'}" aria-label="${items.reviewAria || t('rstop.aria', { n: items.review.length })}">
-              <span aria-hidden="true">🏋️</span><b class="prev-count" aria-hidden="true">${items.review.length}</b>
+              <span class="prev-ico" aria-hidden="true">${ICON.repeat}</span><b class="prev-count" aria-hidden="true">${items.review.length}</b>
             </a>
             <span class="plabel">${t('rstop.label')}</span>
           </div>` : ''}
