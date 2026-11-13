@@ -287,6 +287,38 @@ UNITS.push(
       { en: 'What would success look like in the first six months?', he: 'איך תיראה הצלחה בששת החודשים הראשונים?' },
       { en: 'I look forward to hearing from you.', he: 'אשמח לשמוע ממך.' }
     ]
+  },
+
+  // ---------- Added in round 31 ----------
+  {
+    id: 'a-phr-networking', level: 'advanced', kind: 'phrases', title: 'Networking', he: 'נטוורקינג והיכרויות מקצועיות', emoji: '🥂',
+    words: [
+      { en: 'What brings you to this conference?', he: 'מה הביא אותך לכנס הזה?' },
+      { en: "I've heard a lot about your work.", he: 'שמעתי הרבה על העבודה שלך.' },
+      { en: 'We should definitely stay in touch.', he: 'כדאי מאוד שנשמור על קשר.' },
+      { en: 'Could I get your contact details?', he: 'אפשר לקבל את פרטי הקשר שלך?' },
+      { en: "I'd be happy to introduce you to a colleague of mine.", he: 'אשמח להכיר לך עמית שלי.' },
+      { en: 'What are you focusing on at the moment?', he: 'במה העבודה שלך מתמקדת עכשיו?' },
+      { en: 'That sounds like a fascinating project.', he: 'זה נשמע כמו פרויקט מרתק.' },
+      { en: "Let's grab a coffee sometime next week.", he: 'כדאי שנשב על קפה בשבוע הבא.' },
+      { en: "I'll send you a follow-up email tomorrow.", he: 'אשלח לך מחר מייל המשך.' },
+      { en: 'It was a pleasure meeting you.', he: 'היה תענוג להכיר.' }
+    ]
+  },
+  {
+    id: 'a-phr-complaints', level: 'advanced', kind: 'phrases', title: 'Complaining politely', he: 'להתלונן בנימוס', emoji: '🧾',
+    words: [
+      { en: 'There seems to be a problem with my order.', he: 'נראה שיש בעיה בהזמנה שלי.' },
+      { en: 'I was charged twice for the same item.', he: 'חייבו אותי פעמיים על אותו מוצר.' },
+      { en: "This isn't what I was promised.", he: 'זה לא מה שהבטיחו לי.' },
+      { en: "I'd appreciate it if you could look into this.", he: 'אודה לך אם אפשר לבדוק את זה.' },
+      { en: "I've been waiting for over an hour.", he: 'אני מחכה כבר יותר משעה.' },
+      { en: 'Could I speak to someone who can help me with this?', he: 'אפשר לדבר עם מישהו שיכול לעזור לי בזה?' },
+      { en: "I'd like a full refund.", he: 'אבקש החזר כספי מלא.' },
+      { en: 'What can be done to fix this?', he: 'מה אפשר לעשות כדי לתקן את זה?' },
+      { en: "I understand it isn't your fault.", he: 'ברור לי שזו לא אשמתך.' },
+      { en: 'Thank you for sorting this out so quickly.', he: 'תודה שטיפלת בזה כל כך מהר.' }
+    ]
   }
 );
 

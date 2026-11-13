@@ -273,6 +273,51 @@ UNITS.push(
       { en: 'I do not understand.', he: 'אני לא מבין.' },
       { en: 'Can you speak more slowly, please?', he: 'אתה יכול לדבר לאט יותר, בבקשה?' }
     ]
+  },
+
+  // ---------- Added in round 31 ----------
+  {
+    id: 'b-animals', level: 'beginner', title: 'Animals', he: 'בעלי חיים', emoji: '🐾',
+    words: [
+      { en: 'dog', he: 'כלב', ex: 'The dog is sleeping on the sofa.' },
+      { en: 'cat', he: 'חתול', ex: 'My cat likes to sit by the window.' },
+      { en: 'bird', he: 'ציפור', ex: 'A small bird is singing in the tree.' },
+      { en: 'fish', he: 'דג', ex: 'There is a red fish in the water.' },
+      { en: 'horse', he: 'סוס', ex: 'She can ride a horse.' },
+      { en: 'cow', he: 'פרה', ex: 'The cow is eating grass.' },
+      { en: 'lion', he: 'אריה', ex: 'The lion is sleeping in the sun.' },
+      { en: 'monkey', he: 'קוף', ex: 'The monkey is eating a banana.' }
+    ]
+  },
+  {
+    id: 'b-phr-hotel', level: 'beginner', kind: 'phrases', title: 'At the hotel', he: 'במלון', emoji: '🏨',
+    words: [
+      { en: 'I have a reservation under the name Cohen.', he: 'יש לי הזמנה על השם כהן.' },
+      { en: 'What time is check-out?', he: 'באיזו שעה צריך לפנות את החדר?' },
+      { en: 'Is breakfast included?', he: 'ארוחת הבוקר כלולה?' },
+      { en: 'Could I have another towel, please?', he: 'אפשר לקבל עוד מגבת, בבקשה?' },
+      { en: "The air conditioner in my room doesn't work.", he: 'המזגן בחדר שלי לא עובד.' },
+      { en: 'What is the password for the internet?', he: 'מה הסיסמה לאינטרנט?' },
+      { en: 'Can I leave my bags here until the evening?', he: 'אפשר להשאיר כאן את התיקים עד הערב?' },
+      { en: 'Could you call a taxi for me, please?', he: 'אפשר להזמין לי מונית, בבקשה?' },
+      { en: 'I would like a room with a sea view.', he: 'אני רוצה חדר עם נוף לים.' },
+      { en: 'Thank you, we really enjoyed our stay.', he: 'תודה, נהנינו מאוד מהשהות.' }
+    ]
+  },
+  {
+    id: 'b-phr-smalltalk', level: 'beginner', kind: 'phrases', title: 'Small talk', he: 'שיחת חולין', emoji: '💬',
+    words: [
+      { en: "Nice weather today, isn't it?", he: 'מזג אוויר נעים היום, נכון?' },
+      { en: 'Where did you come from?', he: 'מאיפה באת?' },
+      { en: 'I come from Israel.', he: 'אני מישראל.' },
+      { en: 'What do you do for work?', he: 'במה העבודה שלך?' },
+      { en: 'How long have you lived here?', he: 'כמה זמן גרת כאן?' },
+      { en: 'Do you have any plans for the weekend?', he: 'יש לך תוכניות לסוף השבוע?' },
+      { en: 'This city is beautiful.', he: 'העיר הזאת יפהפייה.' },
+      { en: 'It was nice talking to you.', he: 'היה נעים לדבר איתך.' },
+      { en: 'See you around!', he: 'נתראה!' },
+      { en: 'Have a great weekend!', he: 'סוף שבוע נעים!' }
+    ]
   }
 );
 
