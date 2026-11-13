@@ -318,6 +318,53 @@ UNITS.push(
       { en: 'See you around!', he: 'נתראה!' },
       { en: 'Have a great weekend!', he: 'סוף שבוע נעים!' }
     ]
+  },
+
+  // ---------- Added in round 41 ----------
+  {
+    id: 'b-phr-sick', level: 'beginner', kind: 'phrases', title: 'Feeling sick', he: 'כשלא מרגישים טוב', emoji: '🤒',
+    words: [
+      { en: "I don't feel well.", he: 'לא טוב לי.' },
+      { en: 'I have a headache.', he: 'יש לי כאב ראש.' },
+      { en: 'My stomach hurts.', he: 'כואבת לי הבטן.' },
+      { en: 'I have a fever.', he: 'יש לי חום.' },
+      { en: 'I need to see a doctor.', he: 'צריך ללכת לרופא.' },
+      { en: 'Where is the nearest pharmacy?', he: 'איפה בית המרקחת הקרוב?' },
+      { en: 'Do you have something for a cold?', he: 'יש לכם משהו נגד הצטננות?' },
+      { en: "I'm allergic to nuts.", he: 'יש לי אלרגיה לאגוזים.' },
+      { en: 'Can I have some water, please?', he: 'אפשר לקבל קצת מים, בבקשה?' },
+      { en: 'I feel better today, thank you.', he: 'היום יותר טוב לי, תודה.' }
+    ]
+  },
+  {
+    id: 'b-phr-phone', level: 'beginner', kind: 'phrases', title: 'Texting & calling', he: 'הודעות ושיחות', emoji: '📱',
+    words: [
+      { en: 'Can I call you later?', he: 'אפשר להתקשר אליך אחר כך?' },
+      { en: 'Sorry, I missed your call.', he: 'סליחה, פספסתי את השיחה שלך.' },
+      { en: 'Can you text me when you get home?', he: 'אפשר לשלוח לי הודעה כשמגיעים הביתה?' },
+      { en: "What's your phone number?", he: 'מה מספר הטלפון שלך?' },
+      { en: 'My battery is almost dead.', he: 'הסוללה שלי כמעט נגמרה.' },
+      { en: "I can't hear you very well.", he: 'לא שומעים אותך טוב.' },
+      { en: "I'll call you back in five minutes.", he: 'אחזור אליך בעוד חמש דקות.' },
+      { en: 'Who is speaking, please?', he: 'מי מדבר, בבקשה?' },
+      { en: 'Did you get my message?', he: 'קיבלת את ההודעה שלי?' },
+      { en: 'Talk to you soon, bye!', he: 'נדבר בקרוב, ביי!' }
+    ]
+  },
+  {
+    id: 'b-phr-home', level: 'beginner', kind: 'phrases', title: 'At home', he: 'בבית', emoji: '🛋️',
+    words: [
+      { en: 'Dinner is ready!', he: 'ארוחת הערב מוכנה!' },
+      { en: 'Can you open the window, please?', he: 'אפשר לפתוח את החלון, בבקשה?' },
+      { en: 'Where are my keys?', he: 'איפה המפתחות שלי?' },
+      { en: "It's cold in here.", he: 'קר פה.' },
+      { en: 'Can you turn off the light, please?', he: 'אפשר לכבות את האור, בבקשה?' },
+      { en: "We're going to bed.", he: 'אנחנו הולכים לישון.' },
+      { en: 'Good night, sleep well!', he: 'לילה טוב, שינה נעימה!' },
+      { en: 'Is there anything to eat?', he: 'יש משהו לאכול?' },
+      { en: 'Who wants coffee?', he: 'מי רוצה קפה?' },
+      { en: "Let's watch a movie tonight.", he: 'בואו נראה סרט הערב.' }
+    ]
   }
 );
 
