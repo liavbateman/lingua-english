@@ -1188,3 +1188,12 @@ button.path-head:active span { background: rgba(142, 125, 255, .22); }
   display: inline-flex; align-items: center; min-height: 40px; margin-top: 8px; padding: 0 12px; border-radius: 12px;
   background: #ffc53d; color: #4a3200; font-weight: 800; font-size: .85rem; text-decoration: none;
 }
+
+/* Cheat sheet: structure rows are buttons that open a matching example */
+button.pc-form { width: 100%; border: 0; cursor: pointer; font: inherit; color: inherit; text-align: start; min-height: 44px; }
+button.pc-form[aria-expanded="true"] { background: rgba(255, 255, 255, .75); }
+.pc-more { flex: none; font-size: .75rem; opacity: .7; transition: transform .2s; }
+button.pc-form[aria-expanded="true"] .pc-more { transform: rotate(180deg); }
+.pc-cheat-h small { font-weight: 600; opacity: .8; font-size: .75rem; }
+.pc-form-ex { margin: -2px 0 2px; padding: 6px 8px; border-radius: 10px; background: rgba(255, 255, 255, .3); }
+@media (prefers-reduced-motion: reduce) { .pc-more { transition: none; } }

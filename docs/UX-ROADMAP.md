@@ -47,6 +47,7 @@ Home's screen (H1, H2 below) is no longer shown; its code stays, in case the dai
 | G10 | Saved rules | "Save for review" in a rule's card; a star on saved rules on the road; a star button next to the search filters to the saved list (and combines with the search) | Memrise difficult words, Babbel review | Done (round 69) |
 | G11 | Practise saved rules | The saved filter starts with "Practise my saved rules (n)": up to 8 mixed questions from the saved rules, rule name shown; mistakes go to the review stop | Memrise difficult words | Done (round 71) |
 | G12 | Level complete | A finished level turns its gate into a certificate (🎓, gold frame) with a 10-question level review; a 🏁 finish line closes the road after advanced; gates grow to fit | Duolingo unit review, Busuu certificates | Done (round 73) |
+| G13 | Structure rows open an example | In a finished rule's cheat sheet, a structure row opens the rule example that matches it (same kind of sentence: statement / negative / question, most shared words), with a speaker; rows with no true match stay plain (182 of 282 rows open) | Babbel grammar tips | Done (round 75) |
 
 ## Home: what it was for (until round 51)
 

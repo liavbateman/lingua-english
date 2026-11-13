@@ -604,14 +604,36 @@
   const saveBtn = id => Store.isRuleSaved(id)
     ? `<button class="pc-save on" data-id="${id}" aria-pressed="true">★ ${t('saved.on')}</button>`
     : `<button class="pc-save" data-id="${id}" aria-pressed="false">☆ ${t('saved.add')}</button>`;
+  // The rule's example that goes with one structure row: same kind of sentence (statement, negative,
+  // question) and the most shared words. No good match → null, and that row simply doesn't open.
+  const sentenceKind = s => (s.includes('?') ? 'q' : /\b(not|never)\b|n't/i.test(s) ? 'neg' : 'pos');
+  const FILLER = new Set(['that', 'the', 'and', 'you', 'are', 'for', 'with', 'this', 'not', 'she', 'his', 'her', 'they']);
+  function rowExample(g, k) {
+    const [tag, text] = g.forms[k];
+    if (tag === 'answer') return null;
+    const kind = ['?', 'question'].includes(tag) ? 'q' : ['–', '-', 'negative'].includes(tag) ? 'neg' : sentenceKind(text);
+    const words = s => new Set((s.toLowerCase().match(/[a-z']+/g) || []).filter(w => w.length > 2 && !FILLER.has(w)));
+    const fw = words(text);
+    let best = null, score = -1;
+    g.ex.forEach(e => {
+      if (sentenceKind(e[0]) !== kind) return;
+      const ew = words(e[0]);
+      let n = 0;
+      fw.forEach(w => { if (ew.has(w) || (w.length > 3 && [...ew].some(v => v.startsWith(w) || w.startsWith(v) && v.length > 3))) n++; });
+      if (n > score) { score = n; best = e; }
+    });
+    return best && (kind !== 'pos' || score > 0) ? best : null;
+  }
   const sayBtn = text => `<button class="speak sm pc-say" data-say="${text.replace(/"/g, '&quot;')}" aria-label="${t('aria.listen')}">${ICON.speaker}</button>`;
   const exampleRow = ex => `<div class="pc-ex">${sayBtn(ex[0])}<div class="grow"><b class="en" dir="ltr">${ex[0]}</b><span>${ex[1]}</span></div></div>`;
   function lessonPreview(x) {
     if (x.rule && x.state === 'done') {
       const g = x.rule;
       return `<div class="pc-cheat">
-          <span class="pc-cheat-h">👑 ${t('cheat.title')}</span>
-          ${g.forms.map(([tag, text]) => `<div class="pc-form"><span class="pc-tag">${formTag(tag)}</span><span class="en" dir="ltr">${text}</span></div>`).join('')}
+          <span class="pc-cheat-h">👑 ${t('cheat.title')} <small>${t('cheat.tap')}</small></span>
+          ${g.forms.map(([tag, text], k) => rowExample(g, k)
+            ? `<button class="pc-form" data-k="${k}" aria-expanded="false"><span class="pc-tag">${formTag(tag)}</span><span class="en" dir="ltr">${text}</span><span class="pc-more" aria-hidden="true">▾</span></button>`
+            : `<div class="pc-form"><span class="pc-tag">${formTag(tag)}</span><span class="en" dir="ltr">${text}</span></div>`).join('')}
           ${exampleRow(g.ex[0])}
           <p class="pc-tip">⚠️ ${heMix(g.tip)}</p>
           ${relatedRules(x)}
@@ -880,7 +902,21 @@
           <a class="btn" href="${x.state === 'done' ? x.review : x.href}">${t(x.state === 'done' ? 'path.review' : x.started ? 'path.continue' : 'path.start')}</a>
           ${x.state === 'done' ? `<a class="pcard-link" href="${x.href}">${t('path.again')}</a>` : ''}
           ${x.rule ? saveBtn(x.rule.id) : ''}`, i);
-      card.querySelectorAll('.pc-say').forEach(b => { b.onclick = e => { e.stopPropagation(); speak(b.dataset.say.replace(/"/g, "")); }; });
+      const bindSay = root => root.querySelectorAll('.pc-say').forEach(b => { b.onclick = e => { e.stopPropagation(); speak(b.dataset.say.replace(/"/g, "")); }; });
+      bindSay(card);
+      // a structure row opens the example that goes with it (one at a time)
+      card.querySelectorAll('button.pc-form').forEach(b => {
+        b.onclick = e => {
+          e.stopPropagation();
+          const open = b.getAttribute('aria-expanded') === 'true';
+          card.querySelectorAll('.pc-form-ex').forEach(n => n.remove());
+          card.querySelectorAll('button.pc-form').forEach(f => f.setAttribute('aria-expanded', 'false'));
+          if (open) return;
+          b.setAttribute('aria-expanded', 'true');
+          b.insertAdjacentHTML('afterend', `<div class="pc-form-ex">${exampleRow(rowExample(x.rule, +b.dataset.k))}</div>`);
+          bindSay(b.nextElementSibling);
+        };
+      });
       // saving a rule: the button, the star on the road and the saved count all follow
       card.querySelectorAll('.pc-save').forEach(b => {
         b.onclick = e => {
