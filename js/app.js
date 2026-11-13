@@ -1153,7 +1153,9 @@
       if (!on) { layoutPath(); results.innerHTML = ''; return; }
       let found = q ? ruleSearch(items, q) : items.map((x, i) => ({ x, i }));
       if (onlySaved) found = found.filter(o => Store.isRuleSaved(o.x.rule.id));
-      results.innerHTML = found.length
+      const practice = onlySaved && Store.savedRules().length
+        ? `<a class="btn gpractice" href="#/grammar/saved/quiz">🏋️ ${t('saved.practice', { n: Store.savedRules().length })}</a>` : '';
+      results.innerHTML = practice + (found.length
         ? `<p class="small search-count" role="status">${t(found.length === 1 ? 'gsearch.one' : 'gsearch.count', { n: found.length })}</p>` +
           found.map(o => `
             <button class="gres" data-i="${o.i}">
@@ -1161,7 +1163,7 @@
               <span class="grow"><b>${o.x.label}</b><small>${Store.isRuleSaved(o.x.rule.id) ? '⭐ ' : ''}${t('lv.' + o.x.lvl)} · ${t('path.state.' + o.x.state)}</small></span>
               <span class="go-chev" aria-hidden="true">${fwd()}</span>
             </button>`).join('')
-        : `<p class="sub center search-empty">${onlySaved && !q ? t('saved.none') : t('gsearch.none', { q: q.replace(/[<>&"]/g, '') })}</p>`;
+        : `<p class="sub center search-empty">${onlySaved && !q ? t('saved.none') : t('gsearch.none', { q: q.replace(/[<>&"]/g, '') })}</p>`);
       results.querySelectorAll('.gres').forEach(b => {
         b.onclick = () => {
           input.value = '';
@@ -1235,14 +1237,16 @@
     // "review": questions from every rule that had mistakes, mixed, so each one asks "which rule fits here?"
     // "test-<level>": a level check at a gate, one question from each of 6 rules of the level before
     const review = id === 'review';
+    const saved = id === 'saved';                   // practice of the learner's saved rules
     const test = id.startsWith('test-') ? id.slice(5) : null;
     const ti = test ? LEVELS.findIndex(l => l.id === test) : -1;
     if (test && ti < 1) return notFound();
-    const g = review || test ? null : GRAMMAR.find(x => x.id === id);
-    if (!review && !test && !g) return notFound();
-    const weak = review ? GRAMMAR.filter(x => Store.weakRules().includes(x.id)) : [];
-    if (review && !weak.length) { location.hash = '#/grammar'; return; }
-    const qs = review
+    const g = review || saved || test ? null : GRAMMAR.find(x => x.id === id);
+    if (!review && !saved && !test && !g) return notFound();
+    const weak = review ? GRAMMAR.filter(x => Store.weakRules().includes(x.id))
+      : saved ? GRAMMAR.filter(x => Store.isRuleSaved(x.id)) : [];
+    if ((review || saved) && !weak.length) { location.hash = '#/grammar'; return; }
+    const qs = review || saved
       ? shuffle(weak.flatMap(r => r.quiz.map(q => ({ q, r })))).slice(0, 8)
       : test
         ? shuffle(GRAMMAR.filter(x => x.level === LEVELS[ti - 1].id)).slice(0, 6).map(r => ({ q: r.quiz[Math.floor(Math.random() * r.quiz.length)], r }))
@@ -1254,9 +1258,9 @@
       const [q, answer, wrong] = qs[i].q;
       const rule = qs[i].r;
       view.innerHTML = `
-        <p class="sub">${review ? `🏋️ ${t('grev.title')}` : test ? `🚪 ${t('gtest.title', { level: t('lv.' + test) })}` : ruleTitle(g)} · ${t('quiz.count', { a: i + 1, b: qs.length })}</p>
+        <p class="sub">${review ? `🏋️ ${t('grev.title')}` : saved ? `⭐ ${t('saved.chip')}` : test ? `🚪 ${t('gtest.title', { level: t('lv.' + test) })}` : ruleTitle(g)} · ${t('quiz.count', { a: i + 1, b: qs.length })}</p>
         ${lessonBar(i / qs.length)}
-        ${review ? `<p class="small grev-rule">${ruleTitle(rule)}</p>` : ''}
+        ${review || saved ? `<p class="small grev-rule">${ruleTitle(rule)}</p>` : ''}
         <div class="card question">
           <div class="small">${t('grammar.choose')}</div>
           <div class="prompt sentence en" id="sentence">${q.replace('___', '_____')}</div>
@@ -1282,7 +1286,22 @@
           speak(full.replace(/"/g, ''));
           showFeedback({ ok, answer: ok ? '' : full, say: full.replace(/"/g, ''), combo: streak });
       });
-      $('#next').onclick = () => { i++; i < qs.length ? question() : (review ? reviewSummary() : test ? testSummary() : summary()); };
+      $('#next').onclick = () => { i++; i < qs.length ? question() : (review ? reviewSummary() : saved ? savedSummary() : test ? testSummary() : summary()); };
+    }
+
+    function savedSummary() {
+      refreshChrome('grammar');
+      endLesson(1);
+      view.innerHTML = `
+        <div class="card center" style="margin-top:14px">
+          <div class="big">${correct === qs.length ? '🏆' : '⭐'}</div>
+          <h1>${t('quiz.score', { a: correct, b: qs.length })}</h1>
+          <p class="sub">${t(correct === qs.length ? 'saved.perfect' : 'saved.keep')}</p>
+          ${roundStats({ correct, total: qs.length, ms: Date.now() - started })}
+          <a class="btn" href="#/grammar/saved/quiz">${t('saved.again')}</a>
+          <a class="btn ghost" href="#/grammar">${t('grammar.all')}</a>
+        </div>`;
+      countUp();
     }
 
     // Level check: 5 of 6 moves the learner up; the rules missed wait at the review stop
