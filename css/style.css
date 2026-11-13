@@ -72,10 +72,8 @@ body {
   color: var(--ink); text-decoration: none; font-weight: 800; font-size: 1.25rem; letter-spacing: .02em;
 }
 .logo {
-  width: 36px; height: 36px; border-radius: 11px; transform: rotate(-6deg);
-  background: linear-gradient(140deg, #9a8bff, #5a49f0);
-  display: grid; place-items: center; font-size: 1.2rem; font-weight: 900;
-  box-shadow: 0 6px 18px rgba(106, 92, 255, .45);
+  width: 36px; height: 36px; border-radius: 10px; display: block; flex: none;
+  box-shadow: 0 6px 18px rgba(30, 90, 200, .45);
 }
 .topbar-side { display: flex; align-items: center; gap: 10px; }
 .streak {
