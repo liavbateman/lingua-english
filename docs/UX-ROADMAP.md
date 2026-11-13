@@ -65,7 +65,7 @@ in the visual language of the paths (level colours, chunky 3D cards with a botto
 | D6 | Type and contrast audit | Measured every text on the main screens: size under 12px, contrast under WCAG AA | Done (round 83): stage banners, hero button, active Learn tab and mini-map numbers raised to 4.5:1+ (white text); current-node number to 3.3:1 (large text); nothing under 12px |
 | D7 | End-of-lesson screen | The result screen after a lesson or quiz: a celebration header in the level colour, the stat tiles as raised cards, clear next step | Done (round 84): all 8 result screens share a raised card with a soft glow, the emoji in a warm halo, stat tiles as raised cards with icons; the Grammar tab now stays marked after a rule quiz |
 | D8 | Empty and edge states | Search with no results, nothing saved, all done: a friendly owl illustration and one helpful action each | Done (round 85): word search, rule search and the saved filter show the owl, one line and one action (clear the search / back to the road) |
-| D9 | Motion tokens | One set of durations and easings for presses, cards, sheets and rings; all respect Reduce Motion | |
+| D9 | Motion tokens | One set of durations and easings for presses, cards, sheets and rings; all respect Reduce Motion | Done (round 86): --dur-press .07s, --dur-quick .15s, --dur-ui .22s, --ease-pop for all pop-ins (raw values 44 → 16, the rest purposeful: shake, flip, progress); a global Reduce Motion rule stops every animation and transition |
 | D10 | Learn screen header | The words/sentences/practice tabs and the owl hero aligned with the grammar road's look | |
 
 ## Home: what it was for (until round 51)
