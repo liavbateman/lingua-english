@@ -2,6 +2,9 @@
 // To change a text, edit it here; {name} marks a value filled in by the app.
 const STR = {
   en: {
+    'gate.title': 'New level: {level}', 'gate.prev': '{level}: {a} of {b} rules done', 'gate.mine': 'Your level', 'gate.jump': 'Jump here',
+    'gate.ask.title': 'Move to {level}?', 'gate.ask.text': "Rules you haven't finished in easier levels stay open, so you can go back to them any time.",
+    'gate.ask.yes': 'Move', 'gate.ask.no': 'Not now',
     'nav.grammar': 'Grammar', 'gr.title': 'All grammar rules', 'gr.head': 'All grammar · {a} / {b}', 'nav.home': 'Home', 'nav.learn': 'Learn', 'nav.progress': 'Progress',
     'streak.one': 'day streak', 'streak.many': 'day streak',
     'aria.lang': 'Switch language', 'aria.listen': 'Listen',
@@ -132,6 +135,9 @@ const STR = {
   },
 
   he: {
+    'gate.title': 'רמה חדשה: {level}', 'gate.prev': '{level}: {a} מתוך {b} כללים הושלמו', 'gate.mine': 'הרמה שלך', 'gate.jump': 'לקפוץ לכאן',
+    'gate.ask.title': 'לעבור לרמה: {level}?', 'gate.ask.text': 'כללים שלא הושלמו ברמות הקלות יותר יישארו פתוחים, ואפשר לחזור אליהם בכל רגע.',
+    'gate.ask.yes': 'עוברים', 'gate.ask.no': 'לא עכשיו',
     'nav.grammar': 'דקדוק', 'gr.title': 'כל חוקי הדקדוק', 'gr.head': 'כל הדקדוק · {a} / {b}', 'nav.home': 'בית', 'nav.learn': 'לימוד', 'nav.progress': 'התקדמות',
     'streak.one': 'יום ברצף', 'streak.many': 'ימים ברצף',
     'aria.lang': 'החלפת שפה', 'aria.listen': 'השמעה',

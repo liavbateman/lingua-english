@@ -36,7 +36,7 @@ Home's screen (H1, H2 below) is no longer shown; its code stays, in case the dai
 | # | Round | Pattern | Inspired by | Status |
 |---|---|---|---|---|
 | G1 | All-levels grammar road | One road, stages split by level, level names on banners, rule cards with an example | User's request, Duolingo | Done (round 51) |
-| G2 | Level gates | A gate between levels ("Intermediate starts here") with a short check that can unlock the next level early | Duolingo jump-ahead | |
+| G2 | Level gates | A gate before every new level: CEFR band, how much of the level before is done, "your level" tag or "Jump here" with a confirm sheet (rules left behind stay open) | Duolingo jump-ahead | Done (round 53); a short placement check before jumping is still open |
 | G3 | Rule review nodes | A review stop on the road for rules whose quiz had mistakes | Duolingo practice nodes | |
 | G4 | Rule cheat sheet | A crown on finished rules; tapping it opens the rule's one-line summary for quick recall | Babbel grammar tips | |
 

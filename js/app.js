@@ -521,6 +521,31 @@
     return stageItems(items, s).every(x => x.done) ? 'ready' : 'locked';
   }
   const PATH_BANNER = 112;
+  const PATH_GATE = 128;
+
+  // On the all-levels grammar road, a gate opens every level after the first: the level and its CEFR band,
+  // how much of the level before it is done, and either "your level" or a way to jump there
+  function levelGates(items) {
+    if (items.part !== 'gall') return '';
+    const at = LEVELS.findIndex(l => l.id === Store.level);
+    return LEVELS.slice(1).map((l, n) => {
+      const prev = LEVELS[n];
+      const list = items.filter(x => x.lvl === prev.id);
+      const done = list.filter(x => x.done).length;
+      const reached = at >= n + 1;
+      return `
+        <div class="pgate${reached ? ' open' : ''}" data-lvl="${l.id}" role="heading" aria-level="2">
+          <span class="pgate-icon" aria-hidden="true">${reached ? '🚪' : '🔒'}</span>
+          <div class="grow">
+            <b>${t('gate.title', { level: t('lv.' + l.id) })} <small class="en">${t('lvl.cefr.' + l.id)}</small></b>
+            <span class="pgate-prev">${t('gate.prev', { level: t('lv.' + prev.id), a: done, b: list.length })}</span>
+            <span class="pgate-bar" aria-hidden="true"><i style="width:${list.length ? Math.round(done / list.length * 100) : 0}%"></i></span>
+          </div>
+          ${at === n + 1 ? `<span class="pgate-tag">${t('gate.mine')}</span>`
+            : !reached ? `<button class="pgate-go" data-lvl="${l.id}">${t('gate.jump')}</button>` : ''}
+        </div>`;
+    }).join('');
+  }
   const SECTION_COLORS = ['coral', 'blue', 'green', 'gold', 'purple'];
 
   function sectionBanner(items, s) {
@@ -583,6 +608,7 @@
       </button>`}
       <div class="path" id="path">
         <svg class="path-line" id="pathline" aria-hidden="true"></svg>
+        ${levelGates(items)}
         ${Array.from({ length: sections }, (_, s) => sectionBanner(items, s)).join('')}
         ${items.review ? `
           <div class="prev-wrap" id="prevwrap">
@@ -627,6 +653,13 @@
     path.querySelectorAll('.pnode-wrap').forEach((el, i) => {
       const s = stageAt(pathItems, i), k = i - stages[s][0];   // stage, and place inside it
       if (k === 0) {                                      // a stage banner before every stage
+        const lvl = pathItems[i].lvl;
+        const gate = i > 0 && lvl && lvl !== pathItems[i - 1].lvl && path.querySelector(`.pgate[data-lvl="${lvl}"]`);
+        if (gate) {                                       // and a level gate before a new level
+          y += 12;
+          gate.style.top = y + 'px';
+          y += PATH_GATE;
+        }
         banners[s].style.top = y + 'px';
         y += PATH_BANNER;
       }
@@ -991,6 +1024,18 @@
       ${pathHero(items)}
       ${pathHtml(items)}`;
     bindPath(items);
+    // Jumping ahead to a level: rules left behind stay open, and the road reopens at the new level
+    view.querySelectorAll('.pgate-go').forEach(b => {
+      b.onclick = e => {
+        e.stopPropagation();
+        const level = t('lv.' + b.dataset.lvl);
+        sheet({
+          title: t('gate.ask.title', { level }), text: t('gate.ask.text'),
+          primary: t('gate.ask.yes'), secondary: t('gate.ask.no'), onSecondary: () => b.focus(),
+          onPrimary: () => { Store.level = b.dataset.lvl; grammarRoad(); }
+        });
+      };
+    });
   }
 
   function grammarTopic(id) {
