@@ -152,7 +152,7 @@ UNITS.push(
     ]
   },
   {
-    id: 'a-health', level: 'advanced', title: 'Health & medicine', he: 'בריאות ורפואה', emoji: '🩺',
+    id: 'a-health', level: 'advanced', title: 'Diagnosis & treatment', he: 'אבחון וטיפול רפואי', emoji: '🩺',
     words: [
       { en: 'diagnosis', he: 'אבחנה', ex: 'The doctor could not give a clear diagnosis until the test results came back.' },
       { en: 'symptom', he: 'תסמין', ex: 'A high fever is the most common symptom of the flu.' },
@@ -167,7 +167,7 @@ UNITS.push(
     ]
   },
   {
-    id: 'a-tech', level: 'advanced', title: 'Technology & data', he: 'טכנולוגיה ונתונים', emoji: '💻',
+    id: 'a-tech', level: 'advanced', title: 'Data, privacy & AI', he: 'מידע, פרטיות ובינה מלאכותית', emoji: '💻',
     words: [
       { en: 'software update', he: 'עדכון תוכנה', ex: 'Restart your phone after the software update is installed.' },
       { en: 'encryption', he: 'הצפנה', ex: 'With end-to-end encryption, only you and the receiver can read the messages.' },
@@ -182,7 +182,7 @@ UNITS.push(
     ]
   },
   {
-    id: 'a-environment', level: 'advanced', title: 'Environment & climate', he: 'סביבה ואקלים', emoji: '🌍',
+    id: 'a-environment', level: 'advanced', title: 'The climate crisis', he: 'משבר האקלים', emoji: '🌍',
     words: [
       { en: 'climate change', he: 'שינויי אקלים', ex: 'Climate change is making summers hotter and longer.' },
       { en: 'emissions', he: 'פליטות', ex: 'The factory promised to cut its carbon emissions by half.' },
@@ -197,7 +197,7 @@ UNITS.push(
     ]
   },
   {
-    id: 'a-character', level: 'advanced', title: 'Personality & feelings', he: 'אישיות ורגשות', emoji: '🧠',
+    id: 'a-character', level: 'advanced', title: 'Describing character in depth', he: 'תיאור אופי לעומק', emoji: '🧠',
     words: [
       { en: 'easygoing', he: 'נוח, זורם', ex: 'My new flatmate is easygoing and never complains about anything.' },
       { en: 'stubborn', he: 'עקשן', ex: 'My grandfather is too stubborn to admit he was wrong.' },
@@ -212,7 +212,7 @@ UNITS.push(
     ]
   },
   {
-    id: 'a-housing', level: 'advanced', title: 'Housing & paperwork', he: 'דיור וניירת', emoji: '🏛️',
+    id: 'a-housing', level: 'advanced', title: 'Bureaucracy & paperwork', he: 'בירוקרטיה וניירת', emoji: '🏛️',
     words: [
       { en: 'landlord', he: 'בעל הדירה', ex: 'The landlord agreed to fix the broken heater.' },
       { en: 'tenant', he: 'שוכר', ex: "The tenant must give two months' notice before moving out." },

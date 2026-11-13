@@ -304,7 +304,7 @@ UNITS.push(
     ]
   },
   {
-    id: 'i-phr-restaurant', level: 'intermediate', kind: 'phrases', title: 'At a restaurant', he: 'במסעדה', emoji: '🍝',
+    id: 'i-phr-restaurant', level: 'intermediate', kind: 'phrases', title: 'Restaurant: requests & problems', he: 'במסעדה: בקשות ובעיות', emoji: '🍝',
     words: [
       { en: 'A table for two, please.', he: 'שולחן לשניים, בבקשה.' },
       { en: 'Could we see the menu, please?', he: 'אפשר לראות את התפריט, בבקשה?' },
@@ -319,7 +319,7 @@ UNITS.push(
     ]
   },
   {
-    id: 'i-phr-shop', level: 'intermediate', kind: 'phrases', title: 'In a shop', he: 'בחנות', emoji: '🏷️',
+    id: 'i-phr-shop', level: 'intermediate', kind: 'phrases', title: 'Shopping: sizes & returns', he: 'בחנות: מידות והחזרות', emoji: '🏷️',
     words: [
       { en: "I'm just looking, thanks.", he: 'אני רק מסתכל, תודה.' },
       { en: 'Do you have this in a smaller size?', he: 'יש לכם את זה במידה קטנה יותר?' },

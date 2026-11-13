@@ -53,6 +53,17 @@ for (const u of UNITS) {
   }
 }
 
+// two lessons may not share a name (English or Hebrew), or the learner can't tell them apart
+for (const key of ['title', 'he']) {
+  const names = new Map();
+  for (const u of UNITS) {
+    if (!str(u[key])) continue;
+    const k = u[key].trim().toLowerCase();
+    if (names.has(k)) errors.push(`units "${names.get(k)}" and "${u.id}" have the same ${key === 'he' ? 'Hebrew' : 'English'} name "${u[key]}"`);
+    else names.set(k, u.id);
+  }
+}
+
 // the same English word must not appear twice inside one level (it confuses the quizzes)
 for (const lv of levels) {
   const seen = new Map();
