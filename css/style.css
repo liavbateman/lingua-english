@@ -972,3 +972,33 @@ body:has(.pcard) .path-jump { display: none; }
 .mm-seg.here { box-shadow: none; }
 .mm-seg.here .mm-bar { box-shadow: 0 3px 0 #11163a, inset 0 0 0 2px rgba(255, 255, 255, .7); }
 .minimap { padding: 4px 4px 2px; }
+
+/* The level heading above the path is a button that opens the level sheet */
+button.path-head {
+  width: 100%; background: none; border: 0; padding: 6px 0; font: inherit; font-weight: 800; font-size: 1.15rem;
+  color: #b9b0ff; cursor: pointer;
+}
+button.path-head span {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px;
+  border: 1.5px solid rgba(142, 125, 255, .45); background: rgba(142, 125, 255, .1);
+}
+button.path-head:active span { background: rgba(142, 125, 255, .22); }
+.lvl-caret { font-style: normal; font-size: .85rem; }
+.level-sheet { text-align: start; gap: 10px; }
+.level-sheet > b { text-align: center; margin-bottom: 4px; }
+.lvl-opt {
+  display: grid; gap: 6px; width: 100%; padding: 14px; border-radius: 16px; cursor: pointer; text-align: start;
+  font: inherit; color: var(--ink); background: var(--card-2); border: 2px solid var(--line); box-shadow: 0 4px 0 #11163a;
+}
+.lvl-opt.on { border-color: var(--brand-2); background: rgba(142, 125, 255, .16); box-shadow: 0 4px 0 #463bc4; }
+.lvl-opt:active { transform: translateY(3px); box-shadow: 0 1px 0 #11163a; }
+.lvl-top { display: flex; align-items: center; gap: 8px; }
+.lvl-top b { font-size: 1.1rem; }
+.lvl-top small { color: var(--muted); font-weight: 700; direction: ltr; }
+.lvl-check { margin-inline-start: auto; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--brand-2); color: #fff; }
+.lvl-check svg { width: 14px; height: 14px; }
+.lvl-desc { color: var(--muted); font-size: .9rem; }
+.lvl-bar { height: 8px; border-radius: 999px; background: #1a1f4a; overflow: hidden; }
+.lvl-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #ffc53d, #ffde85); }
+.lvl-pct { font-size: .8rem; font-weight: 800; color: #ffd27a; }
+.level-sheet { max-height: calc(100% - 20px); overflow-y: auto; }   /* larger text sizes: the sheet scrolls instead of going off screen */

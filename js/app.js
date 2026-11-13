@@ -496,7 +496,9 @@
     const sections = Math.ceil(items.length / PATH_SECTION);
     return `
       ${sections > 1 ? miniMap(items, sections) : ''}
-      <div class="path-head"><span>${levelLabel()}</span><small>${t('path.count', { a: doneCount, b: items.length })}</small></div>
+      <button class="path-head" id="levelbtn" aria-haspopup="dialog" aria-label="${t('lvl.change', { level: levelLabel() })}">
+        <span>${levelLabel()} <i class="lvl-caret" aria-hidden="true">▾</i></span>
+      </button>
       <div class="path" id="path">
         <svg class="path-line" id="pathline" aria-hidden="true"></svg>
         ${Array.from({ length: sections }, (_, s) => sectionBanner(items, s)).join('')}
@@ -804,16 +806,53 @@
       </section>`;
   }
 
-  // The level can be changed right here, above the path
-  function levelSeg() {
-    return `<div class="seg level-seg" role="group" aria-label="${t('home.level')}">
-      ${LEVELS.map(l => `<button data-level="${l.id}" class="${l.id === Store.level ? 'on' : ''}" aria-pressed="${l.id === Store.level}">${t('lv.' + l.id)}</button>`).join('')}
-    </div>`;
+  // The level is changed from the heading above the path ("— Beginner ▾ —"): a bottom sheet lists
+  // the three levels with what each covers and how far this part of the course is done
+  function levelSeg() { return ''; }
+  function partDone(level, part) {
+    if (part === 'grammar') {
+      const list = GRAMMAR.filter(g => g.level === level);
+      return list.length ? list.filter(g => Store.isGrammarDone(g.id)).length / list.length : 0;
+    }
+    const list = UNITS.filter(u => u.level === level && (u.kind === 'phrases') === (part === 'phrases'));
+    const done = list.filter(u => { const p = Store.unitProgress(u); return p.total && p.mastered / p.total >= 0.6; }).length;
+    return list.length ? done / list.length : 0;
   }
   function bindLevelSeg(redraw) {
-    view.querySelectorAll('.level-seg button').forEach(b => {
-      b.onclick = () => { Store.level = b.dataset.level; redraw(); };
-    });
+    const btn = document.getElementById('levelbtn');
+    if (!btn) return;
+    btn.onclick = () => {
+      const part = pathItems.part;
+      const back = document.createElement('div');
+      back.className = 'sheet-back';
+      back.innerHTML = `
+        <div class="sheet level-sheet" role="dialog" aria-modal="true" aria-labelledby="lvl-title">
+          <b id="lvl-title">${t('lvl.title')}</b>
+          ${LEVELS.map(l => {
+            const pct = Math.round(partDone(l.id, part) * 100);
+            const on = l.id === Store.level;
+            return `<button class="lvl-opt${on ? ' on' : ''}" data-level="${l.id}" aria-pressed="${on}">
+              <span class="lvl-top"><b>${t('lv.' + l.id)}</b><small>${t('lvl.cefr.' + l.id)}</small>${on ? `<span class="lvl-check">${ICON.check}</span>` : ''}</span>
+              <span class="lvl-desc">${t('lvl.desc.' + l.id)}</span>
+              <span class="lvl-bar"><i style="width:${pct}%"></i></span>
+              <span class="lvl-pct">${t('lvl.pct', { n: pct })}</span>
+            </button>`;
+          }).join('')}
+        </div>`;
+      const close = () => { back.classList.add('out'); setTimeout(() => back.remove(), 200); document.removeEventListener('keydown', key); btn.focus(); };
+      const key = e => { if (e.key === 'Escape') close(); };
+      back.onclick = e => { if (e.target === back) close(); };
+      back.querySelectorAll('.lvl-opt').forEach(o => {
+        o.onclick = () => {
+          document.removeEventListener('keydown', key);
+          back.remove();
+          if (o.dataset.level !== Store.level) { Store.level = o.dataset.level; redraw(); }
+        };
+      });
+      document.addEventListener('keydown', key);
+      document.body.appendChild(back);
+      back.querySelector('.lvl-opt.on').focus();
+    };
   }
 
   function learn() {
