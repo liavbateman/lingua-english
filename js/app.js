@@ -415,6 +415,36 @@
         `<a href="${href}" class="${on === id ? 'on' : ''}"${on === id ? ' aria-current="page"' : ''}><span class="lt-ico" aria-hidden="true">${icon}</span>${t('learn.' + id)}</a>`).join('')}
     </nav>`;
 
+  // The Learn tabs share one pill that slides from the tab you came from to the one you opened
+  let tabPill = null;
+  function slideTabs() {
+    const nav = view.querySelector('.learn-tabs');
+    if (!nav) { tabPill = null; return; }
+    const on = nav.querySelector('a.on');
+    if (!on) return;
+    const pill = document.createElement('span');
+    pill.className = 'lt-pill';
+    pill.setAttribute('aria-hidden', 'true');
+    nav.prepend(pill);
+    nav.classList.add('has-pill');
+    const to = { x: on.offsetLeft, w: on.offsetWidth };
+    const from = tabPill || to;
+    const place = p => { pill.style.width = p.w + 'px'; pill.style.transform = `translateX(${p.x}px)`; };
+    pill.style.transition = 'none';   // the starting spot appears at once; only the move is animated
+    place(from);
+    void pill.offsetWidth;
+    pill.style.transition = '';
+    if (from !== to) setTimeout(() => place(to), 20);   // a timer, not rAF: it also runs when the tab is in the background
+    tabPill = to;
+  }
+  window.addEventListener('resize', () => {   // a turned phone: the pill follows its tab
+    const nav = view.querySelector('.learn-tabs'), pill = nav && nav.querySelector('.lt-pill'), on = nav && nav.querySelector('a.on');
+    if (!pill || !on) return;
+    tabPill = { x: on.offsetLeft, w: on.offsetWidth };
+    pill.style.width = tabPill.w + 'px';
+    pill.style.transform = `translateX(${tabPill.x}px)`;
+  });
+
   // ---------- Search: every word and sentence of every level, in English or Hebrew ----------
   const searchKey = s => s.toLowerCase()
     .replace(/[\u0591-\u05C7]/g, '')            // Hebrew vowel marks
@@ -2652,6 +2682,7 @@
       case 'tenses': refreshChrome('grammar'); tenses(); break;
       default: refreshChrome(''); notFound();
     }
+    slideTabs();
     // After a screen change, put keyboard and screen-reader focus on its heading (not on the first load)
     if (!firstRoute) {
       const head = view.querySelector('h1') || view.querySelector('.sub') || view;
