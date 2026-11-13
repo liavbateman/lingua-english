@@ -1798,7 +1798,9 @@
   function lesson(unitId) {
     const unit = UNITS.find(u => u.id === unitId);
     if (!unit) return notFound();
-    const words = unit.words;
+    // The very first lesson is a short one: 8 cards, then a short practice of just those words
+    const firstEver = !ALL_WORDS.some(w => Store.isSeen(w.id));
+    const words = firstEver ? unit.words.slice(0, 8) : unit.words;
     let i = 0, known = 0;
 
     function finish() {
@@ -1808,8 +1810,13 @@
           <div class="big">🃏</div>
           <h1>${t('cards.done.title')}</h1>
           <p class="sub">${t('cards.done', { a: known, b: words.length })}</p>
+          <ol class="steps2" aria-label="${t('steps.aria')}">
+            <li class="done"><span aria-hidden="true">✓</span>${t('steps.met', { n: words.length })}</li>
+            <li class="now"><span aria-hidden="true">2</span>${t('steps.practice')}</li>
+          </ol>
           <a class="btn" href="#/quiz/choice/${unit.id}">${t('card.practice')}</a>
-          <button class="btn ghost" id="restart">${t('cards.restart')}</button>
+          <a class="btn ghost" href="#/">${t('btn.home')}</a>
+          <button class="btn plain" id="restart">${t('cards.restart')}</button>
         </div>`;
       $('#restart').onclick = () => { i = 0; known = 0; document.body.classList.add('in-lesson'); draw(); };
     }
@@ -1968,7 +1975,10 @@
     if (source === 'tricky') return { pool: Store.trickyWords(), title: t('tricky.title') };
     if (source === 'pathreview') return { pool: (pathItems && pathItems.review) || [], title: t('rstop.label') };
     const unit = UNITS.find(u => u.id === source);
-    if (unit) return { pool: unit.words, title: `${unit.emoji} ${unitTitle(unit)}` };
+    if (unit) {
+      const met = unit.words.filter(w => Store.isSeen(w.id));
+      return { pool: met.length >= 4 ? met : unit.words, title: `${unit.emoji} ${unitTitle(unit)}` };
+    }
     if (source === 'level') {
       const all = wordsOf(Store.level);
       const seen = all.filter(w => Store.isSeen(w.id));
@@ -1990,10 +2000,21 @@
         <h1>${title}</h1>
         <p class="sub">${text}</p>
         ${extra}
+        ${nextCard()}
         <a class="btn" href="#/">${t('btn.home')}</a>
         <a class="btn ghost" href="#/practice">${t('btn.more')}</a>
       </div>`;
     refreshChrome('learn');
+  }
+
+  // At the end of a round: the step the app picked next, one tap away
+  function nextCard() {
+    const n = nextStep();
+    return `<a class="next-card" href="${n.href}">
+      <span class="tile ${n.color}">${n.emoji ? `<span class="cont-emoji">${n.emoji}</span>` : ICON[n.icon]}</span>
+      <span class="grow"><small>${t('next.kicker')}</small><b>${n.title}</b></span>
+      <span class="go-chev" aria-hidden="true">${fwd()}</span>
+    </a>`;
   }
 
   // ---------- Typing ----------
