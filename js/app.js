@@ -14,8 +14,8 @@
   };
 
   const svg = (body, filled) => filled
-    ? `<svg viewBox="0 0 24 24" fill="currentColor">${body}</svg>`
-    : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
+    ? `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${body}</svg>`
+    : `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
 
   const ICON = {
     book: svg('<path d="M12 6.5C10 5 7 4.5 3.5 5v13.5c3.500-.5 6.500 0 8.500 1.500 2-1.500 5-2 8.500-1.500V5C17 4.500 14 5 12 6.500zM12 6.500V20"/>'),
@@ -112,7 +112,10 @@
     const s = Store.streak;
     document.getElementById('stat-streak').textContent = s;
     document.getElementById('stat-streak-label').textContent = t(s === 1 ? 'streak.one' : 'streak.many');
-    document.querySelectorAll('.tabbar a').forEach(a => a.classList.toggle('active', a.dataset.tab === tab));
+    document.querySelectorAll('.tabbar a').forEach(a => {
+      a.classList.toggle('active', a.dataset.tab === tab);
+      if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
   }
 
   // Today's plan: the four daily activities
@@ -164,8 +167,8 @@
       </section>
 
       <div class="section">${ICON.levels} ${t('home.level')} <span class="end">${levelLabel()}</span></div>
-      <div class="seg" role="tablist">
-        ${LEVELS.map(l => `<button data-level="${l.id}" class="${l.id === Store.level ? 'on' : ''}">${t('lv.' + l.id)}</button>`).join('')}
+      <div class="seg" role="group" aria-label="${t('home.level')}">
+        ${LEVELS.map(l => `<button data-level="${l.id}" class="${l.id === Store.level ? 'on' : ''}" aria-pressed="${l.id === Store.level}">${t('lv.' + l.id)}</button>`).join('')}
       </div>
 
       <div class="section">${ICON.calendar} ${t('home.plan')} <span class="end"><b class="en">${doneCount} / ${tasks.length}</b> ${t('home.completed')}</span></div>
@@ -196,7 +199,11 @@
 
     $('#wotd-speak').onclick = () => speak(wotd.en);
     view.querySelectorAll('.seg button').forEach(b => {
-      b.onclick = () => { Store.level = b.dataset.level; home(); };
+      b.onclick = () => {
+        Store.level = b.dataset.level;
+        home();
+        view.querySelector(`.seg [data-level="${b.dataset.level}"]`).focus();   // keep the keyboard where it was
+      };
     });
   }
 
@@ -218,10 +225,8 @@
 
   const learnTabs = on => `
     <div class="seg" style="margin-bottom:14px">
-      <a href="#/learn" class="${on === 'vocab' ? 'on' : ''}">${t('learn.vocab')}</a>
-      <a href="#/phrases" class="${on === 'phrases' ? 'on' : ''}">${t('learn.phrases')}</a>
-      <a href="#/grammar" class="${on === 'grammar' ? 'on' : ''}">${t('learn.grammar')}</a>
-      <a href="#/practice" class="${on === 'practice' ? 'on' : ''}">${t('learn.practice')}</a>
+      ${[['vocab', '#/learn'], ['phrases', '#/phrases'], ['grammar', '#/grammar'], ['practice', '#/practice']].map(([id, href]) =>
+        `<a href="${href}" class="${on === id ? 'on' : ''}"${on === id ? ' aria-current="page"' : ''}>${t('learn.' + id)}</a>`).join('')}
     </div>`;
 
   function learn() {
@@ -357,7 +362,7 @@
     if (!unit) return notFound();
     let i = 0, flipped = false;
 
-    function draw() {
+    function draw(focusId) {
       const w = unit.words[i];
       Store.markSeen(w.id);
       const last = i === unit.words.length - 1;
@@ -368,9 +373,10 @@
         <div class="card flash" id="flash">
           <div class="word en ${w.phrase ? 'long' : ''}">${w.en}</div>
           <button class="speak" id="speak" aria-label="${t('aria.listen')}">${ICON.speaker}</button>
-          ${flipped
+          <div aria-live="polite">${flipped
             ? `<div class="he ${w.phrase ? 'long' : ''}">${w.he}</div>${w.ex ? `<div class="example en">${w.ex}</div>` : ''}`
-            : `<div class="hint">${t('card.hint')}</div>`}
+            : ''}</div>
+          <button class="hint" id="flip" aria-expanded="${flipped}">${t(flipped ? 'card.hide' : 'card.hint')}</button>
         </div>
         <div class="pager">
           <button class="btn ghost" id="prev" ${i === 0 ? 'disabled' : ''}>${t('btn.back')}</button>
@@ -378,10 +384,11 @@
             ? `<a class="btn" href="#/quiz/choice/${unit.id}">${t('card.practice')}</a>`
             : `<button class="btn" id="next">${t('btn.next')}</button>`}
         </div>`;
-      $('#flash').onclick = () => { flipped = !flipped; draw(); };
+      $('#flash').onclick = () => { flipped = !flipped; draw('flip'); };
       $('#speak').onclick = e => { e.stopPropagation(); speak(w.en); };
-      $('#prev').onclick = () => { i--; flipped = false; draw(); };
-      if (!last) $('#next').onclick = () => { i++; flipped = false; draw(); };
+      $('#prev').onclick = () => { i--; flipped = false; draw(i === 0 ? 'next' : 'prev'); };
+      if (!last) $('#next').onclick = () => { i++; flipped = false; draw(i === unit.words.length - 1 ? 'prev' : 'next'); };
+      if (focusId && $('#' + focusId)) $('#' + focusId).focus();
     }
     draw();
   }
@@ -547,6 +554,7 @@
 
       // After any answer: score it, maybe send the word back, reveal "Next"
       function settle(ok) {
+          announce(ok ? t('sr.right') : t('sr.wrong', { answer: w[kind === 'choice' && toHebrew ? 'he' : 'en'] }));
           // Only the first try is scored and moves the word between review boxes
           if (!retry) {
             if (ok) correct++;
@@ -563,6 +571,7 @@
           if (kind === 'cloze') $('#sentence').textContent = w.ex;
           if (kind !== 'listen' && !toHebrew) speak(kind === 'cloze' ? w.ex : w.en);
           $('#next').hidden = false;
+          if (kind !== 'type') $('#next').focus();
       }
 
       view.querySelectorAll('.opt').forEach(btn => {
@@ -740,7 +749,21 @@
     view.innerHTML = `<div class="card center"><h1>${t('notfound')}</h1><a class="btn" href="#/">${t('btn.home')}</a></div>`;
   }
 
+  // ---------- Screen reader helpers ----------
+  const live = document.getElementById('sr-live');
+  function announce(text) {
+    live.textContent = '';
+    setTimeout(() => { live.textContent = text; }, 50);   // clearing first makes the same text be read again
+  }
+  // English and Hebrew are marked with their language, so VoiceOver reads each with the right voice
+  function markLanguages(root) {
+    root.querySelectorAll('.en:not([lang]), bdi[dir="ltr"]:not([lang])').forEach(el => { el.lang = 'en'; });
+    root.querySelectorAll('.he:not([lang])').forEach(el => { el.lang = 'he'; });
+  }
+  new MutationObserver(() => markLanguages(view)).observe(view, { childList: true, subtree: true });
+
   // ---------- Router ----------
+  let firstRoute = true;
   function route() {
     const [name, a, b] = location.hash.replace(/^#\/?/, '').split('/');
     if ('speechSynthesis' in window) speechSynthesis.cancel();
@@ -760,6 +783,13 @@
       case 'progress': refreshChrome('progress'); progress(); break;
       default: refreshChrome(''); notFound();
     }
+    // After a screen change, put keyboard and screen-reader focus on its heading (not on the first load)
+    if (!firstRoute) {
+      const head = view.querySelector('h1') || view.querySelector('.sub') || view;
+      head.setAttribute('tabindex', '-1');
+      head.focus({ preventScroll: true });
+    }
+    firstRoute = false;
   }
 
   // Language switch in the header

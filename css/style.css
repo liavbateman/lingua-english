@@ -280,7 +280,10 @@ a.card:active, .task:active { transform: scale(.985); }
 }
 .flash .word { font-size: 2.3rem; font-weight: 800; margin-bottom: 12px; }
 .flash .example { margin-top: 12px; color: var(--muted); font-style: italic; }
-.flash .hint { margin-top: 16px; font-size: .85rem; color: var(--muted); }
+.flash .hint {
+  margin-top: 16px; font: inherit; font-size: .85rem; color: var(--muted);
+  background: none; border: 0; padding: 8px 12px; min-height: 44px; cursor: pointer;
+}
 .pager { display: flex; gap: 10px; }
 .pager .btn { margin-top: 0; }
 
@@ -431,4 +434,20 @@ a.card:active, .task:active { transform: scale(.985); }
 .update button {
   border: 0; border-radius: 12px; padding: 10px 16px; min-height: 44px;
   background: var(--brand); color: #fff; font: inherit; font-weight: 700; cursor: pointer;
+}
+
+/* ---------- Accessibility ---------- */
+/* A clear ring for keyboard users only (mouse and touch taps don't show it) */
+:focus-visible { outline: 3px solid var(--brand-2); outline-offset: 3px; border-radius: 12px; }
+[tabindex="-1"]:focus { outline: none; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+/* Right and wrong are shown with a mark too, not only by colour */
+.opt.right::after { content: " ✓"; color: var(--good); font-weight: 800; }
+.opt.wrong::after { content: " ✗"; color: var(--bad); font-weight: 800; }
+/* Respect "Reduce Motion" */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }

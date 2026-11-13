@@ -33,7 +33,8 @@ const STR = {
     'grammar.done': 'Rule completed.', 'grammar.retry': 'Read the rule again and give it another try.',
     'grammar.next': 'Next rule: {title}', 'grammar.again': 'Read the rule again', 'grammar.all': 'All grammar rules',
 
-    'card.count': '{a} of {b}', 'card.hint': 'Tap the card to see the translation',
+    'card.count': '{a} of {b}', 'card.hint': 'Tap the card to see the translation', 'card.hide': 'Hide the translation',
+    'sr.right': 'Correct', 'sr.wrong': 'Not quite. The answer is {answer}',
     'card.practice': 'Practice these words',
     'btn.next': 'Next', 'btn.back': 'Back', 'btn.finish': 'Finish',
     'btn.home': 'Back to Home', 'btn.more': 'More practice', 'btn.lessons': 'Go to lessons',
@@ -105,7 +106,8 @@ const STR = {
     'grammar.done': 'הכלל הושלם.', 'grammar.retry': 'קרא שוב את הכלל ונסה פעם נוספת.',
     'grammar.next': 'הכלל הבא: {title}', 'grammar.again': 'לקרוא שוב את הכלל', 'grammar.all': 'כל כללי הדקדוק',
 
-    'card.count': '{a} מתוך {b}', 'card.hint': 'הקש על הכרטיס כדי לראות את התרגום',
+    'card.count': '{a} מתוך {b}', 'card.hint': 'הקש על הכרטיס כדי לראות את התרגום', 'card.hide': 'הסתרת התרגום',
+    'sr.right': 'נכון', 'sr.wrong': 'לא בדיוק. התשובה היא {answer}',
     'card.practice': 'לתרגל את המילים',
     'btn.next': 'הבא', 'btn.back': 'הקודם', 'btn.finish': 'סיום',
     'btn.home': 'חזרה לבית', 'btn.more': 'עוד תרגול', 'btn.lessons': 'לשיעורים',
