@@ -536,6 +536,28 @@ UNITS.push(
       { en: 'My birthday is in July.', he: 'יום ההולדת שלי ביולי.' },
       { en: 'How long is the film?', he: 'כמה זמן נמשך הסרט?' }
     ]
+  },
+
+  // ---------- Added in round 70 ----------
+  {
+    id: 'b-hobbies', level: 'beginner', title: 'Hobbies & sport', he: 'תחביבים וספורט', emoji: '⚽',
+    words: [
+      { en: 'football', he: 'כדורגל', ex: 'We play football in the park on Fridays.' },
+      { en: 'tennis', he: 'טניס', ex: 'She plays tennis twice a week.' },
+      { en: 'swim', he: 'לשחות', ex: 'I like to swim in the sea in summer.' },
+      { en: 'dance', he: 'לרקוד', ex: 'Do you want to dance?' },
+      { en: 'sing', he: 'לשיר', ex: 'My sister can sing very well.' },
+      { en: 'music', he: 'מוזיקה', ex: 'I listen to music on the bus.' },
+      { en: 'guitar', he: 'גיטרה', ex: 'He is learning to play the guitar.' },
+      { en: 'piano', he: 'פסנתר', ex: 'There is an old piano in our living room.' },
+      { en: 'game', he: 'משחק', ex: "Let's play a game after dinner." },
+      { en: 'team', he: 'קבוצה', ex: 'Which team do you support?' },
+      { en: 'ball', he: 'כדור', ex: 'The children are playing with a ball.' },
+      { en: 'film', he: 'סרט', ex: 'We watched a funny film last night.' },
+      { en: 'draw', he: 'לצייר (בעיפרון)', ex: 'My son loves to draw animals.' },
+      { en: 'paint', he: 'לצייר בצבעים', ex: 'She likes to paint flowers.' },
+      { en: 'camera', he: 'מצלמה', ex: 'I took this photo with my new camera.' }
+    ]
   }
 );
 
