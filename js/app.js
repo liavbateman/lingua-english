@@ -184,8 +184,15 @@
     document.getElementById('lang').textContent = isHe() ? 'EN' : 'עב';
   }
 
+  let shownStreak = null;   // the streak pill bumps when the number grows while the app is open
   function refreshChrome(tab) {
     const s = Store.streak;
+    const pill = document.querySelector('.streak');
+    if (shownStreak !== null && s > shownStreak) {
+      pill.classList.remove('bump'); void pill.offsetWidth; pill.classList.add('bump');
+      setTimeout(() => pill.classList.remove('bump'), 900);
+    }
+    shownStreak = s;
     document.getElementById('stat-streak').textContent = s;
     document.getElementById('stat-streak-label').textContent = t(s === 1 ? 'streak.one' : 'streak.many');
     document.querySelector('.streak').classList.toggle('lit', s > 0);   // a live streak glows, 0 stays quiet
