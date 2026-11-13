@@ -1625,7 +1625,7 @@
         <p class="he para">${heMix(g.tip)}</p>
       </section>
 
-      <a class="btn rule-go" href="#/grammar/${g.id}/quiz">${t('grammar.practice')}</a>
+      <a class="btn rule-go" href="#/grammar/${g.id}/quiz">✏️ ${t('grammar.practice')} <small class="rule-go-n">${t('grammar.qcount', { n: g.quiz.length })}</small></a>
       </div>`;
     view.querySelectorAll('[data-say]').forEach(b => { b.onclick = () => speak(g.ex[b.dataset.say][0]); });
   }
