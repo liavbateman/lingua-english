@@ -1371,6 +1371,7 @@
         </div>
         <button class="btn" id="next" hidden>${t(i === qs.length - 1 ? 'btn.finish' : 'btn.next')}</button>`;
 
+      speak(q.replace('___', '…').replace(/"/g, ''));   // every new question starts with its sentence, the blank as a pause
       selectThenCheck(btn => {
           const ok = btn.textContent === answer;
           view.querySelectorAll('.opt').forEach(b => {
@@ -1535,6 +1536,7 @@
 
       const wrap = $('#fcwrap'), fc = $('#fc'), btns = $('#fcbtns');
       const front = fc.querySelector('.front'), back = fc.querySelector('.back');
+      speak(w.en);   // every new card starts with the sound of the word
 
       function buttons() {
         btns.innerHTML = flipped
@@ -1761,17 +1763,20 @@
       } else if (kind === 'cloze') {
         prompt = `<div class="small">${t('quiz.cloze')}</div>
                   <div class="prompt sentence en" id="sentence">${blankOut(w)}</div>
-                  <div class="small he">${w.he}</div>`;
+                  <div class="small he">${w.he}</div>
+                  <button class="speak" id="speak" style="margin:6px auto 0" aria-label="${t('aria.listen')}">${ICON.speaker}</button>`;
       } else if (kind === 'type') {
         prompt = `<div class="small">${t('quiz.type')}</div>
-                  <div class="prompt he">${w.he}</div>`;
+                  <div class="prompt he">${w.he}</div>
+                  <button class="speak" id="speak" style="margin:6px auto 0" aria-label="${t('aria.listen')}">${ICON.speaker}</button>`;
       } else if (toHebrew) {
         prompt = `<div class="small">${t('quiz.mean')}</div>
                   <div class="prompt en ${long}">${w.en}</div>
                   <button class="speak" id="speak" style="margin:6px auto 0" aria-label="${t('aria.listen')}">${ICON.speaker}</button>`;
       } else {
         prompt = `<div class="small">${t('quiz.say')}</div>
-                  <div class="prompt he ${long}">${w.he}</div>`;
+                  <div class="prompt he ${long}">${w.he}</div>
+                  <button class="speak" id="speak" style="margin:6px auto 0" aria-label="${t('aria.listen')}">${ICON.speaker}</button>`;
       }
 
       view.innerHTML = `
@@ -1791,7 +1796,7 @@
 
       const sp = $('#speak');
       if (sp) sp.onclick = () => speak(w.en);
-      if (kind === 'listen') speak(w.en);
+      speak(w.en);   // every new question starts with the sound of the word
 
       // After any answer: score it, maybe send the word back, reveal "Next"
       function settle(ok, close = false) {
@@ -1934,6 +1939,7 @@
           <button class="btn" id="said">${t('speak.said')}</button>
         </div>`;
       $('#speak').onclick = () => speak(w.en);
+      speak(w.en);   // hear it first, then say it
       const step = ok => () => {
         if (recognition) recognition.abort();
         if (ok) good++;
