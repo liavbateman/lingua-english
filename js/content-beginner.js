@@ -654,5 +654,20 @@ GRAMMAR.push(
     ex: [['I want to learn English.', 'אני רוצה ללמוד אנגלית.'], ['We need to leave at eight.', 'עלינו לצאת בשמונה.'], ['My boss wants me to work late.', 'הבוס רוצה שאעבוד עד מאוחר.']],
     tip: 'טעות נפוצה: לתרגם "אני רוצה שתבוא" מילה במילה: "I want that you come". באנגלית אומרים "I want you to come". ולא שוכחים את to: "I need to go", לא "I need go".',
     quiz: [['I want ___ a new phone.', 'to buy', ['buy', 'buying', 'that I buy']], ['She wants ___ to help her.', 'me', ['that I', 'I', 'my']], ["You don't ___ to bring anything.", 'need', ['needs', 'needing', 'to need']]]
+  },
+
+  // ---------- Added in round 62 ----------
+  {
+    id: 'b-dates', level: 'beginner', title: 'Dates & ordinal numbers', he: 'תאריכים ומספרים סודרים',
+    when: 'מספרים סודרים (first, second, third) מציינים מקום בסדר, וגם תאריכים. ברוב המספרים מוסיפים th: fourth, tenth. יוצאי הדופן הם first, second ו-third, וגם twenty-first ו-twenty-second. בתאריך אומרים "the fifth of May" או "May fifth", וכותבים 5th.',
+    forms: [
+      ['irregular', 'first (1st) · second (2nd) · third (3rd)'],
+      ['regular', 'fourth (4th) · tenth (10th) · twentieth (20th)'],
+      ['date', 'on the 5th of May · on May 5th'],
+      ['year', 'in 2024 (twenty twenty-four)']
+    ],
+    ex: [['My birthday is on the third of June.', 'יום ההולדת שלי בשלושה ביוני.'], ['Our flat is on the second floor.', 'הדירה שלנו בקומה השנייה.'], ['It was her first day at work.', 'זה היה היום הראשון שלה בעבודה.']],
+    tip: 'טעות נפוצה: "the twenty-one of May". בתאריך משתמשים במספר הסודר: "the twenty-first of May". ושימו לב לאיות: fifth, ninth ו-twelfth, לא "fiveth", "nineth" או "twelveth".',
+    quiz: [['Today is the ___ of April.', 'second', ['two', 'twoth', 'secondth']], ['This is my ___ time in London.', 'fifth', ['fiveth', 'five', 'fifeth']], ['Christmas is on the ___ of December.', 'twenty-fifth', ['twenty-five', 'twenty-fiveth', 'twentieth-five']]]
   }
 );

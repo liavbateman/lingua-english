@@ -767,5 +767,20 @@ GRAMMAR.push(
     ex: [['I should have studied harder.', 'היה עליי ללמוד יותר.'], ['You could have hurt yourself!', 'יכולת להיפגע!'], ['We would have come if we had known.', 'היינו באים אילו ידענו.']],
     tip: 'טעות נפוצה: לכתוב "should of", כי כך זה נשמע בדיבור (should\'ve). הצורה הנכונה היא should have. ואחרי have תמיד V3: "should have gone", לא "should have went".',
     quiz: [['You ___ told me earlier. Now it is too late.', 'should have', ['should', 'should of', 'must']], ['We could have ___ the train if we had left earlier.', 'caught', ['catch', 'catching', 'to catch']], ["I ___ said that. I'm sorry.", "shouldn't have", ["shouldn't", 'should have not', "didn't should"]]]
+  },
+
+  // ---------- Added in round 62 ----------
+  {
+    id: 'a-subjunctive', level: 'advanced', title: 'Subjunctive: suggest that he go', he: 'דרישה והמלצה רשמית: suggest / insist that',
+    when: 'בשפה רשמית, אחרי פעלים כמו suggest, recommend, insist ו-demand, ואחרי ביטויים כמו It\'s essential that, הפועל בא בצורת הבסיס, גם בגוף שלישי וגם כשמדברים על העבר: "I suggest that he leave early". אין s ואין to.',
+    forms: [
+      ['verb', 'suggest / recommend / insist + that + subject + base verb'],
+      ['expression', 'It is essential / vital / important that + subject + base verb'],
+      ['negative', 'that + subject + not + base verb: that he not be late'],
+      ['informal', 'should + verb: I suggest that he should leave.']
+    ],
+    ex: [['The doctor recommended that she rest for a week.', 'הרופאה המליצה שתנוח שבוע.'], ['It is essential that every student attend the meeting.', 'חיוני שכל הסטודנטים ישתתפו בפגישה.'], ['They insisted that he not be told.', 'הם עמדו על כך שלא יספרו לו.']],
+    tip: 'טעות נפוצה: להוסיף s או to מתוך הרגל: "I suggest that he goes" או "that he to go". בסגנון הרשמי אומרים "that he go". באנגלית בריטית מדוברת מקובל גם "that he should go".',
+    quiz: [['The manager insisted that everyone ___ on time.', 'arrive', ['arrives', 'arrived', 'to arrive']], ['It is vital that she ___ informed immediately.', 'be', ['is', 'was', 'being']], ['I recommend that he ___ a lawyer.', 'consult', ['consults', 'consulting', 'to consult']]]
   }
 );

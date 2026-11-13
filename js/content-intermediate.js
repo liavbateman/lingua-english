@@ -754,5 +754,20 @@ GRAMMAR.push(
     ex: [['Be careful, you might cut yourself.', 'זהירות, שלא תיחתכו.'], ['We built the shed ourselves.', 'בנינו את המחסן בעצמנו.'], ['She lives by herself in a small flat.', 'היא גרה לבד בדירה קטנה.']],
     tip: 'טעות נפוצה: לתרגם פעלי התפעל עם כינוי חוזר. אומרים "I feel relaxed" ו-"I met him", לא "I relaxed myself" או "I met myself with him". וגם: themselves ו-himself, לא "theirselves" או "hisself".',
     quiz: [['Did you enjoy ___ at the party?', 'yourself', ['you', 'yours', 'yourselfs']], ['The children made the cake ___.', 'themselves', ['theirselves', 'themself', 'them']], ['He lives by ___ near the sea.', 'himself', ['hisself', 'him', 'his']]]
+  },
+
+  // ---------- Added in round 62 ----------
+  {
+    id: 'i-so-neither', level: 'intermediate', title: 'So do I / Neither do I', he: 'גם אני / גם אני לא: So do I / Neither do I',
+    when: 'כדי להסכים עם מישהו בקצרה. אחרי משפט חיובי אומרים So, פועל עזר ואז הנושא: "So do I". אחרי משפט שלילי אומרים Neither, פועל עזר ואז הנושא: "Neither can I". פועל העזר תלוי בזמן ובפועל של המשפט הראשון.',
+    forms: [
+      ['positive', 'So + do / am / can / have + I: So do I. · So am I.'],
+      ['negative', 'Neither / Nor + auxiliary + I: Neither can I.'],
+      ['past', 'So did I. · Neither was I.'],
+      ['informal', 'Me too. · Me neither.']
+    ],
+    ex: [['"I didn\'t sleep well." "Neither did I."', '"לא ישנתי טוב." "גם אני לא."'], ['"We went to Spain last year." "So did we!"', '"נסענו לספרד בשנה שעברה." "גם אנחנו!"'], ['"Tom has never been to Japan." "Neither have I."', '"טום אף פעם לא היה ביפן." "גם אני לא."']],
+    tip: 'טעות נפוצה: לענות "So I do" או "Neither I can". אחרי So ו-Neither הסדר הפוך: קודם פועל העזר ואז הנושא. וגם לא "Neither don\'t I": אחרי Neither הפועל חיובי.',
+    quiz: [['"I like jazz." "So ___ I."', 'do', ['am', 'like', 'does']], ['"I wasn\'t at home." "Neither ___ I."', 'was', ['did', "wasn't", 'am']], ['"She can swim." "So ___ her brother."', 'can', ['does', 'is', 'swims']]]
   }
 );
