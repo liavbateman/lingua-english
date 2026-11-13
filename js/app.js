@@ -437,12 +437,35 @@
     return items;
   }
 
+  // The path is split into stages of 5 lessons, each opened by a coloured banner (as Duolingo's units)
+  const PATH_SECTION = 5;
+  const PATH_BANNER = 112;
+  const SECTION_COLORS = ['coral', 'blue', 'green', 'gold', 'purple'];
+
+  function sectionBanner(items, s) {
+    const part = items.slice(s * PATH_SECTION, (s + 1) * PATH_SECTION);
+    const done = part.filter(x => x.done).length;
+    const reached = part.some(x => x.state !== 'locked');
+    const status = done === part.length ? `<span class="psec-pill ok">${ICON.check} ${t('path.sec.done')}</span>`
+      : `<span class="psec-pill">${done}/${part.length}</span>`;
+    return `
+      <div class="psec ${SECTION_COLORS[s % SECTION_COLORS.length]}${reached ? '' : ' locked'}" data-s="${s}" role="heading" aria-level="2">
+        <div class="grow">
+          <span class="psec-kicker">${t('path.sec', { n: s + 1 })}</span>
+          <span class="psec-faces" aria-hidden="true">${part.map(x => `<i class="${x.done ? 'd' : ''}">${x.face}</i>`).join('')}</span>
+        </div>
+        ${status}
+      </div>`;
+  }
+
   function pathHtml(items) {
     const doneCount = items.filter(x => x.done).length;
+    const sections = Math.ceil(items.length / PATH_SECTION);
     return `
       <div class="path-head"><span>${levelLabel()}</span><small>${t('path.count', { a: doneCount, b: items.length })}</small></div>
-      <div class="path" id="path" style="height:${items.length * PATH_ROW + 90}px">
+      <div class="path" id="path">
         <svg class="path-line" id="pathline" aria-hidden="true"></svg>
+        ${Array.from({ length: sections }, (_, s) => sectionBanner(items, s)).join('')}
         ${items.map((x, i) => `
           <div class="pnode-wrap" data-i="${i}">
             ${x.state === 'current' ? `<span class="pbubble">${t(x.started ? 'path.continue' : 'path.start')}</span>` : ''}
@@ -463,23 +486,38 @@
     if (!path) return;
     const W = path.clientWidth, half = Math.max(0, W / 2 - 64);
     const pts = [];
+    const banners = path.querySelectorAll('.psec');
+    let y = 8;
     path.querySelectorAll('.pnode-wrap').forEach((el, i) => {
-      // extra room above the current lesson for its "Start" bubble
-      const gap = pathItems.cur >= 0 && i >= pathItems.cur ? 30 : 0;
-      const x = W / 2 + PATH_SWAY[i % PATH_SWAY.length] * half, y = 56 + i * PATH_ROW + gap;
+      if (i % PATH_SECTION === 0) {                       // a stage banner before every 5 lessons
+        banners[i / PATH_SECTION].style.top = y + 'px';
+        y += PATH_BANNER;
+      }
+      if (i === pathItems.cur) y += 30;                   // room for the "Start" bubble
+      const x = W / 2 + PATH_SWAY[i % PATH_SECTION % PATH_SWAY.length] * half;
       el.style.left = (x - 66) + 'px';
       el.style.top = y + 'px';
       pts.push([x, y + 38]);
+      y += PATH_ROW;
     });
+    path.style.height = y + 'px';
     const curve = list => list.map(([x, y], i) => {
       if (!i) return `M${x} ${y}`;
       const [px, py] = list[i - 1], my = (py + y) / 2;
       return `C${px} ${my} ${x} ${my} ${x} ${y}`;
     }).join(' ');
+    // one road per stage, so it doesn't run under the banners
     const reach = pathItems.cur < 0 ? pts.length : pathItems.cur + 1;
+    let d = '', done = '';
+    for (let s = 0; s < pts.length; s += PATH_SECTION) {
+      const seg = pts.slice(s, s + PATH_SECTION);
+      d += curve(seg) + ' ';
+      const upto = Math.min(seg.length, reach - s);
+      if (upto > 1) done += curve(seg.slice(0, upto)) + ' ';
+    }
     const svg = document.getElementById('pathline');
-    svg.setAttribute('viewBox', `0 0 ${W} ${path.clientHeight}`);
-    svg.innerHTML = `<path class="pl-base" d="${curve(pts)}"/>` + (reach > 1 ? `<path class="pl-done" d="${curve(pts.slice(0, reach))}"/>` : '');
+    svg.setAttribute('viewBox', `0 0 ${W} ${y}`);
+    svg.innerHTML = `<path class="pl-base" d="${d}"/>` + (done ? `<path class="pl-done" d="${done}"/>` : '');
   }
 
   function bindPath(items) {
