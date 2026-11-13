@@ -727,7 +727,7 @@
         // Finishing a unit's practice (after its flashcards) completes the vocabulary task
         if (UNITS.some(u => u.id === source)) Store.completeTask('vocab');
       }
-      // The words to fix, each with its sound and meaning, and one tap to practise just them
+      // The words to fix, each with its sound and meaning, and one tap to practice just them
       lastMissed = missed.slice();
       const fix = missed.length ? `
         <div class="missed">
@@ -952,7 +952,7 @@
     const active = days.filter(d => d.count > 0).length;
     const dayName = new Intl.DateTimeFormat(Store.lang, { weekday: 'narrow' });
     const longName = new Intl.DateTimeFormat(Store.lang, { weekday: 'long' });
-    const said = d => t('week.answers', { n: d.count });
+    const said = d => t(d.count === 1 ? 'week.answer.one' : 'week.answers', { n: d.count });
     return `
       <div class="card week">
         <div class="week-head">

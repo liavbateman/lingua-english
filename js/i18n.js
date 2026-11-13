@@ -3,14 +3,14 @@
 const STR = {
   en: {
     'nav.home': 'Home', 'nav.learn': 'Learn', 'nav.progress': 'Progress',
-    'streak.one': 'day streak', 'streak.many': 'days streak',
+    'streak.one': 'day streak', 'streak.many': 'day streak',
     'aria.lang': 'Switch language', 'aria.listen': 'Listen',
     'lv.beginner': 'Beginner', 'lv.intermediate': 'Intermediate', 'lv.advanced': 'Advanced',
 
     'home.journey': 'YOUR LEARNING JOURNEY',
     'home.title': 'Master English.<br><em>One day</em> at a time.',
     'home.sub': 'Your next step towards confident English starts here.',
-    'home.overall': 'Level progress', 'home.record': 'Day streak record', 'home.learned': 'Words learned',
+    'home.overall': 'Level progress', 'home.record': 'Best streak', 'home.learned': 'Words learned',
     'home.level': 'Your learning level',
     'goal.done': "Today's goal is done!", 'goal.streak': '{n} days in a row. See you tomorrow!',
     'goal.streak.one': 'Day one of your streak. See you tomorrow!',
@@ -56,10 +56,10 @@ const STR = {
     'quiz.listen': 'Listen and choose the word you hear', 'quiz.cloze': 'Complete the sentence',
     'quiz.mean': 'What does it mean?', 'quiz.say': 'How do you say it in English?',
     'quiz.score': '{a} of {b} correct',
-    'quiz.again': 'One more try', 'quiz.great': 'Excellent work!', 'quiz.keep': 'Every round helps. The words you missed will come back again.',
-    'tricky.title': 'Tricky words', 'tricky.one': 'One word keeps slipping away. Practise it now',
-    'tricky.some': '{n} words keep slipping away. Practise just them',
-    'quiz.missed': 'Words to go over', 'quiz.again.missed': 'Practise these words again', 'quiz.missedTitle': 'Your mistakes',
+    'quiz.again': 'One more try', 'quiz.great': 'Excellent work!', 'quiz.keep': 'Every round helps. The words you missed will come back.',
+    'tricky.title': 'Tricky words', 'tricky.one': 'One word keeps slipping away. Practice it now',
+    'tricky.some': '{n} words keep slipping away. Practice just them',
+    'quiz.missed': 'Words to go over', 'quiz.again.missed': 'Practice these words again', 'quiz.missedTitle': 'Your mistakes',
     'quiz.empty': 'Nothing to review', 'quiz.empty.sub': 'Learn a new lesson and its words will come back here at the right time.',
 
     'speak.count': 'Speaking Practice · {a} of {b}', 'speak.do': 'Listen, then say it out loud',
@@ -68,7 +68,7 @@ const STR = {
     'speak.listening': 'Listening…', 'speak.great': 'Excellent! That was clear ✓',
     'speak.heard': 'What I heard:', 'speak.again': 'Listen again and try once more.',
     'speak.nothing': "I didn't catch that. Tap the microphone and try again.",
-    'speak.blocked': 'The microphone is blocked. You can still practise and rate yourself.',
+    'speak.blocked': 'The microphone is blocked. You can still practice and rate yourself.',
     'speak.score': '{a} of {b} said with confidence',
     'speak.sub': 'Saying words out loud is the fastest way to remember them.',
 
@@ -76,13 +76,13 @@ const STR = {
     'progress.streak': 'Day streak', 'progress.best': 'Best streak',
     'progress.words': '{a} of {b} words', 'progress.phrases': '{a} of {b} sentences', 'progress.rules': '{a} of {b} grammar rules',
     'update.ready': 'A new version is ready', 'update.reload': 'Update',
-    'backup.title': 'Backup', 'backup.sub': 'Keep a copy of your progress, to restore it on a new phone or after clearing Safari.',
+    'backup.title': 'Backup', 'backup.sub': 'Keep a copy of your progress so you can restore it on a new phone or after clearing Safari.',
     'backup.save': 'Save backup', 'backup.restore': 'Restore',
     'backup.saved': 'Backup ready. Keep the file somewhere safe.', 'backup.saveFailed': 'Could not create the backup.',
     'backup.confirm': 'Replace your current progress with the backup?', 'backup.bad': 'This file is not a Lingua backup. Nothing was changed.',
     'backup.restored': 'Progress restored: {n} words.',
     'week.title': 'This week', 'week.sub': '{a} of 7 days active · {n} answers',
-    'week.answers': '{n} answers', 'week.today': 'Today', 'week.todayShort': 'Today',
+    'week.answers': '{n} answers', 'week.answer.one': '1 answer', 'week.today': 'Today', 'week.todayShort': 'Today',
     'progress.reset': 'Reset all progress', 'progress.confirm': 'Delete all progress? This cannot be undone.',
     'notfound': 'Page not found'
   },
@@ -168,7 +168,7 @@ const STR = {
     'backup.confirm': 'להחליף את ההתקדמות הנוכחית בגיבוי?', 'backup.bad': 'הקובץ הזה אינו גיבוי של Lingua. לא שונה דבר.',
     'backup.restored': 'ההתקדמות שוחזרה: {n} מילים.',
     'week.title': 'השבוע שלי', 'week.sub': '{a} מתוך 7 ימים פעילים · {n} תשובות',
-    'week.answers': '{n} תשובות', 'week.today': 'היום', 'week.todayShort': 'היום',
+    'week.answers': '{n} תשובות', 'week.answer.one': 'תשובה אחת', 'week.today': 'היום', 'week.todayShort': 'היום',
     'progress.reset': 'איפוס כל ההתקדמות', 'progress.confirm': 'למחוק את כל ההתקדמות? אי אפשר לבטל את הפעולה.',
     'notfound': 'הדף לא נמצא'
   }
