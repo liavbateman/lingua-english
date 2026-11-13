@@ -94,7 +94,11 @@ in the visual language of the paths (level colours, chunky 3D cards with a botto
 | D35 | Topbar | The header: the streak pill in flame colours with a small count-up when it grows, the language button as a flag-free pill | Done (round 112): a lit streak pill is raised with a warm glow and a glowing flame; when the streak grows while the app is open the pill bumps and the flame wiggles (off under Reduce Motion); the language button is a raised pill; the logo got a matching edge |
 | D36 | Grammar road nodes | The grammar road's nodes in their level colour, with the rule's short tag (e.g. "s/es") under the node | Done (round 113): open nodes take their level's colour and ring, locked nodes a faint tint of it with the number in the level colour (done stays gold, current coral). The English tag was tried and dropped: the Hebrew labels already carry the English name, and the extra line touched the next node on half the road |
 | D37 | Week chart | The week chart's bars with rounded caps, today's bar glowing, a dashed goal line | Done (round 114): bars with fully rounded caps and a gloss, today's bar glowing coral; there is no per-day answer goal in the app, so the dashed gold line marks the week's daily average ("avg 4") and the days at or above it are drawn full strength, the rest softer |
-| D38 | Path banners | Stage banners with a soft pattern, the stage's progress as a thin bar along the bottom edge | |
+| D38 | Path banners | Stage banners with a soft pattern, the stage's progress as a thin bar along the bottom edge | Done (round 115): a soft dotted pattern fading in from one side of each banner, and a thin white bar along the bottom edge that fills with the stage's lessons done (from the right in Hebrew) |
+| D39 | Chest card | The stage chest on the path: a closed chest that wiggles gently when ready, a soft glow ring around it | |
+| D40 | Rule search results | Search matches highlighted in the result titles, the level chip on each result | |
+| D41 | Backup card | The backup card on Progress as a calm raised card with icons for save and restore and a clear last-saved line | |
+| D42 | Lesson bar | The lesson top bar: the close button as a round soft button, the progress track with a small spark at its tip | |
 
 ## Home: what it was for (until round 51)
 

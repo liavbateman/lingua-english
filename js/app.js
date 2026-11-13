@@ -619,6 +619,7 @@
           <span class="psec-faces" aria-hidden="true">${part.map(x => `<i class="${x.done ? 'd' : ''}">${x.face}</i>`).join('')}</span>
         </div>
         ${status}
+        <span class="psec-bar" aria-hidden="true"><i style="width:${Math.round(done / part.length * 100)}%"></i></span>
       </div>`;
   }
 
