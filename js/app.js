@@ -70,6 +70,67 @@
     speechSynthesis.speak(u);
   }
 
+  // ---------- answer feedback: a small buzz on tap, a "ting" when right, a shake when wrong ----------
+  const Feel = (() => {
+    // iPhone has no navigator.vibrate. Since iOS 18, toggling a switch-style checkbox
+    // gives a light haptic tick, so a hidden one is toggled inside the tap.
+    let sw = null;
+    function iosTick() {
+      if (!sw) {
+        const label = document.createElement('label');
+        label.setAttribute('aria-hidden', 'true');
+        label.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none';
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.setAttribute('switch', '');
+        input.tabIndex = -1;
+        label.appendChild(input);
+        document.body.appendChild(label);
+        sw = label;
+      }
+      sw.click();
+    }
+    function buzz(pattern) {
+      if (navigator.vibrate) navigator.vibrate(pattern);
+      else iosTick();
+    }
+
+    let ctx = null;
+    function ting() {
+      try {
+        ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === 'suspended') ctx.resume();
+        const now = ctx.currentTime;
+        // Two bell-like tones, quiet and short
+        [[1318.5, 0, .14], [1975.5, .07, .1]].forEach(([freq, delay, vol]) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0, now + delay);
+          gain.gain.linearRampToValueAtTime(vol, now + delay + .005);
+          gain.gain.exponentialRampToValueAtTime(.0001, now + delay + .35);
+          osc.connect(gain).connect(ctx.destination);
+          osc.start(now + delay);
+          osc.stop(now + delay + .4);
+        });
+      } catch (e) { /* no sound is fine */ }
+    }
+
+    function shake(el) {
+      if (!el) return;
+      el.classList.remove('shake');
+      void el.offsetWidth;   // restart the animation
+      el.classList.add('shake');
+      el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+    }
+
+    return {
+      right() { buzz(12); ting(); },
+      wrong(el) { buzz([18, 50, 28]); shake(el); }
+    };
+  })();
+
   // ---------- helpers ----------
   const levelUnits = () => UNITS.filter(u => u.level === Store.level);
   const wordsOf = level => ALL_WORDS.filter(w => w.level === level);
@@ -325,6 +386,7 @@
             if (b.textContent === answer) b.classList.add('right');
           });
           if (!ok) btn.classList.add('wrong');
+          ok ? Feel.right() : Feel.wrong(btn);
           if (ok) correct++;
           const full = q.replace('___', answer);
           $('#sentence').textContent = full;
@@ -582,6 +644,7 @@
             if (b.dataset.id === w.id) b.classList.add('right');
           });
           if (!ok) btn.classList.add('wrong');
+          ok ? Feel.right() : Feel.wrong(btn);
           settle(ok);
         };
       });
@@ -596,6 +659,7 @@
           const grade = gradeTyped(input.value, w);
           input.readOnly = true;
           input.classList.add(grade === 'wrong' ? 'wrong' : 'right');
+          grade === 'wrong' ? Feel.wrong(input) : Feel.right();
           $('#check').hidden = true;
           $('#result').innerHTML = grade === 'right'
             ? `<b class="ok">${t('quiz.type.right')}</b>`
