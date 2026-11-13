@@ -24,6 +24,8 @@ const Kids = (() => {
       say: 'עכשיו תגידו!', sayTip: 'לחצו על המיקרופון ואמרו את המילה באנגלית', listening: 'מקשיב…',
       sayGood: ['שמעתי! מעולה!', 'איזה יופי של אנגלית!', 'בדיוק ככה!'], sayRetry: 'בואו ננסה עוד פעם 🙂', sayTry: 'ניסיון יפה! ממשיכים',
       skip: 'דלג', sayHe: 'עכשיו אתם! תגידו',
+      chest: 'האוצר של היום', chestLocked: 'שחקו באי אחד כדי לפתוח את האוצר', chestReady: 'האוצר מוכן! לחצו לפתוח',
+      chestOpened: 'נפתח היום! חזרו מחר לאוצר חדש', chestGot: 'מצאתם מדבקה!', chestDays: '☀️ {n} ימי אוצר', treasure: 'מדבקות אוצר',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -41,6 +43,8 @@ const Kids = (() => {
       say: 'Now you say it!', sayTip: 'Tap the microphone and say the word', listening: 'Listening…',
       sayGood: ['I heard you! Great!', 'Lovely English!', 'Just like that!'], sayRetry: "Let's try once more 🙂", sayTry: 'Nice try! Let’s go on',
       skip: 'Skip', sayHe: 'Now you! Say',
+      chest: "Today's treasure", chestLocked: 'Play one island to open the treasure', chestReady: 'The treasure is ready! Tap to open',
+      chestOpened: 'Opened today! Come back tomorrow for a new one', chestGot: 'You found a sticker!', chestDays: '☀️ {n} treasure days', treasure: 'Treasure stickers',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -153,6 +157,7 @@ const Kids = (() => {
           </div>
         </div>
         <h1 class="sr-only">${kt('title')}</h1>
+        ${chestCard()}
         <a class="k-abc-card" href="#/kids/abc">
           <span class="k-abc-letters" aria-hidden="true"><b>A</b><b>B</b><b>C</b></span>
           <span class="grow"><b>${kt('abc')}</b><small>${kt('abcSub')}</small></span>
@@ -174,6 +179,8 @@ const Kids = (() => {
           }).join('')}
         </ol>
       </div>`;
+    const chest = $('#k-chest');
+    if (chest) chest.onclick = () => openChest(chest);
     K.view.querySelectorAll('.k-isle.locked .k-isle-btn').forEach(a => {
       a.onclick = e => {
         e.preventDefault();
@@ -184,6 +191,49 @@ const Kids = (() => {
     });
     const cur = $('.k-isle.cur');
     if (cur) setTimeout(() => cur.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60);
+  }
+
+  // ---------- daily treasure ----------
+  function chestCard() {
+    const tr = Store.kidsTreasure;
+    const state = tr.ready ? 'ready' : tr.opened ? 'opened' : 'locked';
+    const text = kt(tr.ready ? 'chestReady' : tr.opened ? 'chestOpened' : 'chestLocked');
+    return `
+      <button class="k-chest-card ${state}" id="k-chest" ${tr.ready ? '' : 'aria-disabled="true"'}>
+        <span class="k-chest" aria-hidden="true">${tr.opened ? '🎉' : '🎁'}</span>
+        <span class="grow"><b>${kt('chest')}</b><small>${text}</small></span>
+        ${tr.days ? `<span class="k-chest-days">${kt('chestDays', { n: tr.days })}</span>` : ''}
+      </button>`;
+  }
+  function openChest(btn) {
+    const tr = Store.kidsTreasure;
+    if (!tr.ready) {
+      K.Feel.wrong(btn);
+      say([['he', kt(tr.opened ? 'chestOpened' : 'chestLocked')]]);
+      return;
+    }
+    // a sticker the child doesn't have yet, while there are any
+    const fresh = KIDS_TREASURE.filter(x => !tr.items.includes(x));
+    const item = pickOne(fresh.length ? fresh : KIDS_TREASURE);
+    if (!Store.kidsOpenTreasure(item)) return;
+    K.Feel.right();
+    K.confetti('kids');
+    const back = document.createElement('div');
+    back.className = 'k-reveal';
+    back.setAttribute('role', 'dialog');
+    back.setAttribute('aria-modal', 'true');
+    back.innerHTML = `
+      <div class="k-reveal-card">
+        <span class="k-reveal-chest" aria-hidden="true">🎁</span>
+        <span class="k-sticker pop" aria-hidden="true">${item}</span>
+        <b>${kt('chestGot')}</b>
+        <button class="k-btn" id="k-reveal-ok">${kt('next')} <span aria-hidden="true">⭐</span></button>
+      </div>`;
+    document.body.appendChild(back);
+    sayEn('Wow! A new sticker!', 0.9);
+    const close = () => { back.remove(); map(); };
+    back.querySelector('#k-reveal-ok').onclick = close;
+    back.querySelector('#k-reveal-ok').focus({ preventScroll: true });
   }
 
   // ---------- a play session: meet → find the picture → memory game → reward ----------
@@ -632,6 +682,13 @@ const Kids = (() => {
             <span class="k-slot-name">ABC</span>
             ${Store.kidsHasSticker('abc') ? starsHtml(Store.kidsStars('abc'), 'sm') : ''}
           </div>
+        </div>
+        <h2 class="k-title k-h2">🎁 ${kt('treasure')} · ${new Set(Store.kidsTreasure.items).size}/${KIDS_TREASURE.length}</h2>
+        <div class="k-album k-album-small">
+          ${KIDS_TREASURE.map(x => {
+            const got = Store.kidsTreasure.items.includes(x);
+            return `<div class="k-slot ${got ? 'got' : ''}" style="--c:#ffc93c"><span class="k-sticker" aria-hidden="true">${got ? x : '❔'}</span></div>`;
+          }).join('')}
         </div>
       </div>`;
   }

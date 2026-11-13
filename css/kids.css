@@ -278,3 +278,36 @@ a.k-btn { text-decoration: none; text-align: center; }
 @keyframes k-ring { from { transform: scale(.9); opacity: 1; } to { transform: scale(1.45); opacity: 0; } }
 .k-mic:disabled { opacity: .6; cursor: default; }
 .k-skip { display: block; margin: 8px auto 0; padding: 8px 16px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .7); color: var(--k-muted); font: 1rem var(--k-font); cursor: pointer; }
+
+/* daily treasure: a chest card on the map and the reveal */
+.k-chest-card {
+  display: flex; align-items: center; gap: 12px; width: 100%; margin: 14px 0 0; padding: 12px 14px; border: 0; border-radius: 24px;
+  font: inherit; text-align: start; cursor: pointer; color: var(--k-ink);
+  background: linear-gradient(135deg, #fff6d6, #ffe3a3); box-shadow: 0 6px 0 #e9b949;
+  transition: transform var(--dur-press), box-shadow var(--dur-press);
+}
+.k-chest-card:active { transform: translateY(5px); box-shadow: 0 1px 0 #e9b949; }
+.k-chest-card .grow { display: flex; flex-direction: column; flex: 1; }
+.k-chest-card .grow b { font-size: 1.15rem; }
+.k-chest-card .grow small { color: #7a5a12; font-size: .9rem; }
+.k-chest { font-size: 2.6rem; flex: none; }
+.k-chest-card.ready .k-chest { animation: k-wiggle 1.2s ease-in-out infinite; }
+.k-chest-card.locked { background: rgba(255, 255, 255, .75); box-shadow: 0 6px 0 var(--k-edge); }
+.k-chest-card.locked .k-chest { filter: grayscale(.8); opacity: .6; }
+.k-chest-card.locked .grow small, .k-chest-card.opened .grow small { color: var(--k-muted); }
+.k-chest-days { flex: none; font-size: .85rem; color: #7a5a12; background: rgba(255, 255, 255, .7); padding: 4px 8px; border-radius: 999px; }
+@keyframes k-wiggle { 0%, 60%, 100% { transform: rotate(0); } 70% { transform: rotate(-12deg) scale(1.08); } 80% { transform: rotate(12deg) scale(1.08); } 90% { transform: rotate(-6deg); } }
+
+.k-reveal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: rgba(20, 40, 110, .45); font-family: var(--k-font); }
+.k-reveal-card {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; width: min(340px, 100%);
+  padding: 26px 18px 18px; border-radius: 32px; background: #fff; color: var(--k-ink); text-align: center;
+  box-shadow: 0 8px 0 var(--k-edge), 0 24px 48px rgba(20, 40, 110, .35); animation: k-pop .45s var(--ease-pop) both;
+}
+.k-reveal-chest { font-size: 3rem; animation: k-wiggle .8s ease-in-out 2; }
+.k-reveal-card .k-sticker { font-size: 6rem; }
+.k-reveal-card b { font-size: 1.4rem; color: #ff5d8f; }
+.k-h2 { font-size: 1.25rem; margin: 22px 0 10px; }
+.k-album-small { grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 8px; }
+.k-album-small .k-slot { padding: 8px 4px; }
+.k-album-small .k-sticker { font-size: 2.2rem; }

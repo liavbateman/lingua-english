@@ -136,6 +136,9 @@ const KIDS_THEMES = [
 KIDS_THEMES.forEach(th => th.words.forEach(w => { w.id = th.id + '/' + w.en; w.theme = th.id; }));
 const KIDS_WORDS = KIDS_THEMES.flatMap(th => th.words);
 
+// Treasure stickers: one comes out of the daily chest (new ones first, then repeats)
+const KIDS_TREASURE = ['🦖', '🐙', '🦋', '🍩', '🚁', '🐼', '🌵', '🎸', '🦊', '🍉', '🐢', '🪐', '🧁', '🐳', '🎠', '🦒', '🍭', '🐝', '🛸', '🦜'];
+
 // The ABC: every letter with its spoken name, a word that starts with it (X: a word that has it) and a picture
 const KIDS_ABC = [
   ['A', 'ay', 'apple', 'תפוח', '🍎'], ['B', 'bee', 'ball', 'כדור', '⚽'], ['C', 'see', 'cat', 'חתול', '🐱'],

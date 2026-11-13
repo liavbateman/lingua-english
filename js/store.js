@@ -119,6 +119,7 @@ const Store = (() => {
       const better = stars > (k.stars[id] || 0);
       k.stickers[id] = true;
       if (better) k.stars[id] = stars;
+      k.played = dayKey();   // today's treasure can be opened
       state.xp += xp;
       touchDay();
       state.daily.count++;
@@ -134,6 +135,25 @@ const Store = (() => {
       save();
     },
     kidsWordCount: id => (state.kids && state.kids.words[id]) || 0,
+    // Daily treasure: once a day, after finishing something, a chest gives a bonus sticker.
+    // No streak to lose: the count of treasure days only ever grows.
+    get kidsTreasure() {
+      const k = state.kids || {}, tr = k.treasure || { day: null, items: [], days: 0 };
+      const today = dayKey();
+      return { ready: k.played === today && tr.day !== today, opened: tr.day === today, items: tr.items || [], days: tr.days || 0 };
+    },
+    kidsOpenTreasure(item) {
+      const k = state.kids;
+      if (!k || k.played !== dayKey()) return false;
+      k.treasure = k.treasure || { day: null, items: [], days: 0 };
+      if (k.treasure.day === dayKey()) return false;
+      k.treasure.day = dayKey();
+      k.treasure.days = (k.treasure.days || 0) + 1;
+      k.treasure.items.push(item);
+      state.xp += 15;
+      save();
+      return true;
+    },
 
     box,
     isSeen: id => box(id) >= 1,
