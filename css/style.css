@@ -382,3 +382,11 @@ a.card:active, .task:active { transform: scale(.985); }
 .opt.long { font-size: 1rem; line-height: 1.35; }
 /* four sections on the Learn screen */
 .seg a { font-size: .92rem; padding: 0 4px; }
+
+/* "One more try" tag on a question that came back after a mistake */
+.again {
+  display: inline-flex; align-items: center; gap: 6px; margin: 0 auto 10px;
+  padding: 4px 12px; border-radius: 999px; font-size: .8rem; font-weight: 700;
+  color: #ffb4a8; background: rgba(240, 86, 110, .16);
+}
+.again svg { width: 15px; height: 15px; }

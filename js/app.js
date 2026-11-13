@@ -449,10 +449,14 @@
     // "Complete the sentence" needs single words that have an example sentence
     const usable = mode === 'cloze' ? src.pool.filter(w => !w.phrase) : src.pool;
     const queue = shuffle(usable.length ? usable : src.pool).slice(0, 8);
+    const total = queue.length;           // the score counts first tries only
+    const tried = new Set();              // words already answered once this round
+    const retries = new Map();            // how many times each word was sent back
     let i = 0, correct = 0;
 
     function question() {
       const w = queue[i];
+      const retry = tried.has(w.id);
       let kind = mode;
       if (kind === 'cloze' && (w.phrase || blankOut(w) === w.ex)) kind = 'choice';
       // Translation questions go both ways: English → Hebrew and Hebrew → English
@@ -491,7 +495,7 @@
       view.innerHTML = `
         <p class="sub">${src.title} · ${t('quiz.count', { a: i + 1, b: queue.length })}</p>
         ${bar((i / queue.length) * 100)}
-        <div class="card question">${prompt}</div>
+        <div class="card question">${retry ? `<div class="again">${ICON.repeat}${t('quiz.again')}</div>` : ''}${prompt}</div>
         <div class="options">
           ${options.map(o => `<button class="opt ${toHebrew ? 'he' : 'en'} ${long}" data-id="${o.id}">${o[key]}</button>`).join('')}
         </div>
@@ -509,9 +513,19 @@
             if (b.dataset.id === w.id) b.classList.add('right');
           });
           if (!ok) btn.classList.add('wrong');
-          if (ok) correct++;
-          Store.answer(w.id, ok);
-          refreshChrome('learn');
+          // Only the first try is scored and moves the word between review boxes
+          if (!retry) {
+            if (ok) correct++;
+            Store.answer(w.id, ok);
+            tried.add(w.id);
+            refreshChrome('learn');
+          }
+          // A missed word comes back a few questions later (at most twice), while the answer is still fresh
+          if (!ok && (retries.get(w.id) || 0) < 2) {
+            retries.set(w.id, (retries.get(w.id) || 0) + 1);
+            queue.splice(Math.min(i + 3, queue.length), 0, w);
+          }
+          $('#next').textContent = t(i === queue.length - 1 ? 'btn.finish' : 'btn.next');
           if (kind === 'cloze') $('#sentence').textContent = w.ex;
           if (kind !== 'listen' && !toHebrew) speak(kind === 'cloze' ? w.ex : w.en);
           $('#next').hidden = false;
@@ -521,7 +535,7 @@
     }
 
     function summary() {
-      const pct = Math.round((correct / queue.length) * 100);
+      const pct = Math.round((correct / total) * 100);
       // Daily tasks count only with at least half the answers right
       if (pct >= 50) {
         if (mode === 'listen') Store.completeTask('listen');
@@ -530,7 +544,7 @@
         if (UNITS.some(u => u.id === source)) Store.completeTask('vocab');
       }
       done(pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '💪',
-        t('quiz.score', { a: correct, b: queue.length }),
+        t('quiz.score', { a: correct, b: total }),
         t(pct >= 80 ? 'quiz.great' : 'quiz.keep'));
     }
 

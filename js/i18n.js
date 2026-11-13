@@ -49,7 +49,7 @@ const STR = {
     'quiz.listen': 'Listen and choose the word you hear', 'quiz.cloze': 'Complete the sentence',
     'quiz.mean': 'What does it mean?', 'quiz.say': 'How do you say it in English?',
     'quiz.score': '{a} of {b} correct',
-    'quiz.great': 'Excellent work!', 'quiz.keep': 'Every round helps. The words you missed will come back again.',
+    'quiz.again': 'One more try', 'quiz.great': 'Excellent work!', 'quiz.keep': 'Every round helps. The words you missed will come back again.',
     'quiz.empty': 'Nothing to review', 'quiz.empty.sub': 'Learn a new lesson and its words will come back here at the right time.',
 
     'speak.count': 'Speaking Practice · {a} of {b}', 'speak.do': 'Listen, then say it out loud',
@@ -112,7 +112,7 @@ const STR = {
     'quiz.listen': 'הקשב ובחר את המילה ששמעת', 'quiz.cloze': 'השלם את המשפט',
     'quiz.mean': 'מה הפירוש?', 'quiz.say': 'איך אומרים את זה באנגלית?',
     'quiz.score': '{a} מתוך {b} נכונות',
-    'quiz.great': 'עבודה מצוינת!', 'quiz.keep': 'כל סבב מקדם אותך. המילים שטעית בהן יחזרו שוב.',
+    'quiz.again': 'עוד ניסיון', 'quiz.great': 'עבודה מצוינת!', 'quiz.keep': 'כל סבב מקדם אותך. המילים שטעית בהן יחזרו שוב.',
     'quiz.empty': 'אין מילים לחזרה', 'quiz.empty.sub': 'למד שיעור חדש, והמילים שלו יחזרו לכאן בזמן הנכון.',
 
     'speak.count': 'תרגול דיבור · {a} מתוך {b}', 'speak.do': 'הקשב, ואז אמור בקול',
