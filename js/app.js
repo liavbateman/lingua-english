@@ -489,6 +489,7 @@
   // Words for an exercise: a unit, the due words, or the current level
   function poolFor(source) {
     if (source === 'review') return { pool: Store.dueWords(), title: t('quiz.review') };
+    if (source === 'missed') return { pool: lastMissed, title: t('quiz.missedTitle') };
     const unit = UNITS.find(u => u.id === source);
     if (unit) return { pool: unit.words, title: `${unit.emoji} ${unitTitle(unit)}` };
     if (source === 'level') {
@@ -500,12 +501,16 @@
     return null;
   }
 
-  function done(emoji, title, text) {
+  // Words answered wrong (first try) in the last quiz round, for "Practice these again"
+  let lastMissed = [];
+
+  function done(emoji, title, text, extra = '') {
     view.innerHTML = `
       <div class="card center" style="margin-top:14px">
         <div class="big">${emoji}</div>
         <h1>${title}</h1>
         <p class="sub">${text}</p>
+        ${extra}
         <a class="btn" href="#/">${t('btn.home')}</a>
         <a class="btn ghost" href="#/practice">${t('btn.more')}</a>
       </div>`;
@@ -560,6 +565,7 @@
     const total = queue.length;           // the score counts first tries only
     const tried = new Set();              // words already answered once this round
     const retries = new Map();            // how many times each word was sent back
+    const missed = [];                    // words answered wrong on the first try
     let i = 0, correct = 0;
 
     function question() {
@@ -629,7 +635,7 @@
           announce(ok ? t('sr.right') : t('sr.wrong', { answer: w[kind === 'choice' && toHebrew ? 'he' : 'en'] }));
           // Only the first try is scored and moves the word between review boxes
           if (!retry) {
-            if (ok) correct++;
+            if (ok) correct++; else missed.push(w);
             Store.answer(w.id, ok);
             tried.add(w.id);
             refreshChrome('learn');
@@ -691,9 +697,24 @@
         // Finishing a unit's practice (after its flashcards) completes the vocabulary task
         if (UNITS.some(u => u.id === source)) Store.completeTask('vocab');
       }
+      // The words to fix, each with its sound and meaning, and one tap to practise just them
+      lastMissed = missed.slice();
+      const fix = missed.length ? `
+        <div class="missed">
+          <div class="label">${t('quiz.missed')}</div>
+          ${missed.map((w, n) => `
+            <div class="example-row">
+              <button class="speak sm" data-say="${n}" aria-label="${t('aria.listen')}">${ICON.speaker}</button>
+              <div class="grow"><b class="en">${w.en}</b><div class="he">${w.he}</div></div>
+            </div>`).join('')}
+        </div>
+        <a class="btn" href="#/quiz/${mode}/missed">${ICON.repeat} ${t('quiz.again.missed')}</a>` : '';
       done(pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '💪',
         t('quiz.score', { a: correct, b: total }),
-        t(pct >= 80 ? 'quiz.great' : 'quiz.keep'));
+        t(pct >= 80 ? 'quiz.great' : 'quiz.keep'), fix);
+      view.querySelectorAll('.missed [data-say]').forEach(b => { b.onclick = () => speak(missed[b.dataset.say].en); });
+      // with mistakes, "Practice these again" is the main button, so Home becomes the quiet one
+      if (missed.length) view.querySelector('a.btn[href="#/"]').classList.add('ghost');
     }
 
     question();

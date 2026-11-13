@@ -484,3 +484,8 @@ a.card:active, .task:active { transform: scale(.985); }
 .heard.ok { color: var(--good); }
 .heard.bad { color: var(--bad); }
 .heard .en { color: var(--ink); }
+
+/* End of a quiz round: the words that were missed */
+.missed { text-align: start; margin: 4px 0 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+.missed .label { margin-bottom: 4px; }
+.btn svg { width: 18px; height: 18px; vertical-align: -3px; }
