@@ -596,6 +596,9 @@
     return `<div class="pc-rel"><span>↔ ${t('rel.title')}</span>
       ${links.map(i => `<button class="pc-rel-go" data-i="${i}">${pathItems[i].label} ${fwd()}</button>`).join('')}</div>`;
   }
+  const saveBtn = id => Store.isRuleSaved(id)
+    ? `<button class="pc-save on" data-id="${id}" aria-pressed="true">★ ${t('saved.on')}</button>`
+    : `<button class="pc-save" data-id="${id}" aria-pressed="false">☆ ${t('saved.add')}</button>`;
   const sayBtn = text => `<button class="speak sm pc-say" data-say="${text.replace(/"/g, '&quot;')}" aria-label="${t('aria.listen')}">${ICON.speaker}</button>`;
   const exampleRow = ex => `<div class="pc-ex">${sayBtn(ex[0])}<div class="grow"><b class="en" dir="ltr">${ex[0]}</b><span>${ex[1]}</span></div></div>`;
   function lessonPreview(x) {
@@ -692,6 +695,7 @@
                 : x.state === 'done' ? (x.rule ? `<span class="pbadge crown" aria-hidden="true">👑</span>` : `<span class="pbadge ok">${ICON.check}</span>`) : ''}
             </button>
             <span class="plabel">${x.label}</span>
+            ${x.rule && Store.isRuleSaved(x.rule.id) ? '<span class="pstar" aria-hidden="true">⭐</span>' : ''}
           </div>`).join('')}
       </div>
       <button class="path-jump" id="pathjump" hidden aria-label="${t('path.jump')}">${ICON.arrowUp}</button>`;
@@ -864,8 +868,25 @@
           <p>${x.progress}</p>
           ${lessonPreview(x)}
           <a class="btn" href="${x.state === 'done' ? x.review : x.href}">${t(x.state === 'done' ? 'path.review' : x.started ? 'path.continue' : 'path.start')}</a>
-          ${x.state === 'done' ? `<a class="pcard-link" href="${x.href}">${t('path.again')}</a>` : ''}`, i);
+          ${x.state === 'done' ? `<a class="pcard-link" href="${x.href}">${t('path.again')}</a>` : ''}
+          ${x.rule ? saveBtn(x.rule.id) : ''}`, i);
       card.querySelectorAll('.pc-say').forEach(b => { b.onclick = e => { e.stopPropagation(); speak(b.dataset.say.replace(/"/g, "")); }; });
+      // saving a rule: the button, the star on the road and the saved count all follow
+      card.querySelectorAll('.pc-save').forEach(b => {
+        b.onclick = e => {
+          e.stopPropagation();
+          const on = Store.toggleRuleSaved(b.dataset.id);
+          b.outerHTML = saveBtn(b.dataset.id);
+          card.querySelector('.pc-save').onclick = b.onclick;
+          const wrap = path.querySelector(`.pnode-wrap[data-i="${i}"]`);
+          const star = wrap.querySelector('.pstar');
+          if (on && !star) wrap.insertAdjacentHTML('beforeend', '<span class="pstar" aria-hidden="true">⭐</span>');
+          if (!on && star) star.remove();
+          const n = document.getElementById('gsaved-n');
+          if (n) n.textContent = Store.savedRules().length;
+          Feel.tap && Feel.tap();
+        };
+      });
       // a confused-with link goes to that rule on the road and opens its card
       card.querySelectorAll('.pc-rel-go').forEach(b => {
         b.onclick = e => {
@@ -1107,38 +1128,51 @@
     view.innerHTML = `
       <h1 class="sr-only">${t('gr.title')}</h1>
       ${pathHero(items)}
-      <div class="search">
-        ${ICON.search}
-        <input id="gsearch" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-          placeholder="${t('gsearch.ph')}" aria-label="${t('gsearch.ph')}">
+      <div class="gsearch-row">
+        <div class="search">
+          ${ICON.search}
+          <input id="gsearch" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+            placeholder="${t('gsearch.ph')}" aria-label="${t('gsearch.ph')}">
+        </div>
+        <button class="gsaved" id="gsaved" aria-pressed="false" aria-label="${t('saved.chip')}">⭐ <b id="gsaved-n" class="en">${Store.savedRules().length}</b></button>
       </div>
       <div id="gresults" hidden></div>
       <div id="groad">${pathHtml(items)}</div>`;
     bindPath(items);
     // Search: the road steps aside for the results; a result goes back to the road, on that rule, with its card open
-    const input = $('#gsearch'), results = $('#gresults'), road = $('#groad');
+    const input = $('#gsearch'), results = $('#gresults'), road = $('#groad'), savedBtn = $('#gsaved');
+    let onlySaved = false;
+    savedBtn.onclick = () => { onlySaved = !onlySaved; input.oninput(); };
     input.oninput = () => {
       const q = input.value.trim();
-      road.hidden = !!q;
-      results.hidden = !q;
-      if (!q) { layoutPath(); results.innerHTML = ''; return; }
-      const found = ruleSearch(items, q);
+      const on = !!q || onlySaved;
+      savedBtn.classList.toggle('on', onlySaved);
+      savedBtn.setAttribute('aria-pressed', String(onlySaved));
+      road.hidden = on;
+      results.hidden = !on;
+      if (!on) { layoutPath(); results.innerHTML = ''; return; }
+      let found = q ? ruleSearch(items, q) : items.map((x, i) => ({ x, i }));
+      if (onlySaved) found = found.filter(o => Store.isRuleSaved(o.x.rule.id));
       results.innerHTML = found.length
         ? `<p class="small search-count" role="status">${t(found.length === 1 ? 'gsearch.one' : 'gsearch.count', { n: found.length })}</p>` +
           found.map(o => `
             <button class="gres" data-i="${o.i}">
               <b class="gres-num ${o.x.state}">${o.x.done ? '👑' : o.i + 1}</b>
-              <span class="grow"><b>${o.x.label}</b><small>${t('lv.' + o.x.lvl)} · ${t('path.state.' + o.x.state)}</small></span>
+              <span class="grow"><b>${o.x.label}</b><small>${Store.isRuleSaved(o.x.rule.id) ? '⭐ ' : ''}${t('lv.' + o.x.lvl)} · ${t('path.state.' + o.x.state)}</small></span>
               <span class="go-chev" aria-hidden="true">${fwd()}</span>
             </button>`).join('')
-        : `<p class="sub center search-empty">${t('gsearch.none', { q: q.replace(/[<>&"]/g, '') })}</p>`;
+        : `<p class="sub center search-empty">${onlySaved && !q ? t('saved.none') : t('gsearch.none', { q: q.replace(/[<>&"]/g, '') })}</p>`;
       results.querySelectorAll('.gres').forEach(b => {
         b.onclick = () => {
           input.value = '';
+          onlySaved = false;
+          savedBtn.classList.remove('on');
+          savedBtn.setAttribute('aria-pressed', 'false');
           results.hidden = true;
           results.innerHTML = '';
           road.hidden = false;
           layoutPath();
+          $('#path').click();                     // close a card left open, so the tap below opens this one
           const node = $(`#path .pnode[data-i="${b.dataset.i}"]`);
           node.scrollIntoView({ block: 'center' });
           setTimeout(() => node.click(), 0);

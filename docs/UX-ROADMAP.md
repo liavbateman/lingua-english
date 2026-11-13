@@ -44,6 +44,7 @@ Home's screen (H1, H2 below) is no longer shown; its code stays, in case the dai
 | G7 | Mini-map by level | The grammar road's sticky map groups its stages by level, with each level's name and done count above its group; the name jumps to that level's gate; the current level is highlighted | Duolingo course overview | Done (round 63) |
 | G8 | Hear the example | A speaker next to the rule's example in its card (and in a finished rule's cheat sheet), without opening the lesson | Duolingo, Busuu audio examples | Done (round 65) |
 | G9 | Easy to mix up | 27 pairs of rules that are often confused (present simple/continuous, past simple/present perfect, will/going to…); a rule's card links to up to 2 partners, and a tap opens that rule's card on the road | Babbel grammar tips, Busuu | Done (round 67) |
+| G10 | Saved rules | "Save for review" in a rule's card; a star on saved rules on the road; a star button next to the search filters to the saved list (and combines with the search) | Memrise difficult words, Babbel review | Done (round 69) |
 
 ## Home: what it was for (until round 51)
 

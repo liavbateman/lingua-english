@@ -2,7 +2,9 @@
 // To change a text, edit it here; {name} marks a value filled in by the app.
 const STR = {
   en: {
-    'gsearch.ph': 'Find a rule: past, would, a / an…', 'gsearch.none': 'No rule found for "{q}"', 'gsearch.one': '1 rule', 'gsearch.count': '{n} rules',
+    'gsearch.ph': 'Find a rule: past, would…', 'gsearch.none': 'No rule found for "{q}"', 'gsearch.one': '1 rule', 'gsearch.count': '{n} rules',
+    'saved.chip': 'My saved rules', 'saved.add': 'Save for review', 'saved.on': 'Saved · tap to remove',
+    'saved.none': "No saved rules yet. Tap ☆ in a rule's card to save it.",
     'cheat.title': 'Quick reminder', 'rel.title': 'Easy to mix up with', 'grev.title': 'Rule review', 'grev.aria': 'Rule review: {n} rules had mistakes', 'grev.again': 'Another review round',
     'grev.left': '{n} rules still need practice', 'grev.left.one': 'One rule still needs practice', 'grev.clear': 'All rules are clear. Well done!',
     'gate.title': 'New level: {level}', 'gate.prev': '{level}: {a} of {b} rules done', 'gate.mine': 'Your level', 'gate.jump': 'Jump here',
@@ -141,7 +143,9 @@ const STR = {
   },
 
   he: {
-    'gsearch.ph': 'חיפוש כלל: עבר, would, a / an…', 'gsearch.none': 'לא נמצא כלל עבור "{q}"', 'gsearch.one': 'כלל אחד', 'gsearch.count': '{n} כללים',
+    'gsearch.ph': 'חיפוש כלל: עבר, would…', 'gsearch.none': 'לא נמצא כלל עבור "{q}"', 'gsearch.one': 'כלל אחד', 'gsearch.count': '{n} כללים',
+    'saved.chip': 'הכללים השמורים שלי', 'saved.add': 'לשמור לחזרה', 'saved.on': 'נשמר · נגיעה להסרה',
+    'saved.none': 'עוד אין כללים שמורים. אפשר לשמור כלל עם ☆ בכרטיס שלו.',
     'cheat.title': 'תזכורת מהירה', 'rel.title': 'קל להתבלבל עם', 'grev.title': 'חזרה על כללים', 'grev.aria': 'חזרה על כללים: ב-{n} כללים היו טעויות', 'grev.again': 'עוד סבב חזרה',
     'grev.left': 'עוד {n} כללים צריכים תרגול', 'grev.left.one': 'עוד כלל אחד צריך תרגול', 'grev.clear': 'כל הכללים ברורים. כל הכבוד!',
     'gate.title': 'רמה חדשה: {level}', 'gate.prev': '{level}: {a} מתוך {b} כללים הושלמו', 'gate.mine': 'הרמה שלך', 'gate.jump': 'לקפוץ לכאן',

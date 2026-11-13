@@ -73,6 +73,15 @@ const Store = (() => {
       save();
     },
     weakRules: () => Object.keys(state.gmiss || {}).filter(id => state.gmiss[id] > 0),
+    // Rules the learner saved for review (a personal list)
+    isRuleSaved: id => !!(state.gsaved && state.gsaved[id]),
+    toggleRuleSaved(id) {
+      state.gsaved = state.gsaved || {};
+      if (state.gsaved[id]) delete state.gsaved[id]; else state.gsaved[id] = true;
+      save();
+      return !!state.gsaved[id];
+    },
+    savedRules: () => Object.keys(state.gsaved || {}),
 
     // Stage chests on the lesson path: each one opens once and gives a points bonus
     chestOpened: key => !!(state.chests && state.chests[key]),
