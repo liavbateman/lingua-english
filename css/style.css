@@ -1283,3 +1283,26 @@ button.pc-form[aria-expanded="true"] .pc-more { transform: rotate(180deg); }
 .rule-page .speak { background: color-mix(in srgb, var(--lv) 22%, transparent); color: var(--lv); }
 .rtip { border-inline-start-color: #ffc53d; background: linear-gradient(160deg, rgba(255, 197, 61, .14), var(--card)); }
 .rule-go { margin-top: 6px; }
+
+/* ---------- Quiz polish (design round D3) ---------- */
+/* progress: a clearer track and a green fill with a highlight, the colour of "getting there" */
+.lb-track { height: 18px; background: rgba(255, 255, 255, .1); }
+.lb-track i { background: linear-gradient(90deg, #2fd093, #6ff0bd); }
+/* the question as a raised card */
+.question {
+  border: 0; border-radius: 24px; padding: 26px 18px 24px;
+  background: linear-gradient(160deg, #262d68, #1a2052); box-shadow: 0 5px 0 #0d1232;
+}
+.question .small { color: #b9b0ff; font-weight: 700; }
+.question .prompt { font-size: 2.1rem; }
+/* answer tiles: a touch lighter, a softer border, more room */
+.options { gap: 12px; }
+.opt { border-radius: 18px; min-height: 58px; background: #1b2152; border-color: rgba(255, 255, 255, .08); }
+.opt.sel:not(:disabled) { background: rgba(142, 125, 255, .32); }
+.opt.right { background: rgba(47, 208, 147, .22); }
+.opt.wrong { background: rgba(255, 107, 122, .2); }
+/* feedback sheet: rounder, a larger icon, the answer as a chip */
+.fb { border-radius: 26px 26px 0 0; }
+.fb-icon { width: 40px; height: 40px; }
+.fb-icon svg { width: 22px; height: 22px; }
+.fb-answer { display: inline-block; margin-top: 10px; padding: 8px 12px; border-radius: 12px; background: rgba(255, 255, 255, .08); }
