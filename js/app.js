@@ -996,11 +996,16 @@
           b.classList.remove('ready');
           b.classList.add('opening', 'opened');
           b.firstElementChild.textContent = '✨';
+          // a burst of coloured sparks from the chest (pure decoration; gone after the animation)
+          const SPARK = ['#ffd27a', '#ff8a6b', '#6fb4ff', '#4fd8a8', '#b9a8ff'];
+          wrap.insertAdjacentHTML('beforeend', `<span class="sparks" aria-hidden="true">${Array.from({ length: 14 }, (_, k) =>
+            `<i style="--a:${Math.round(k * 360 / 14)}deg;--d:${50 + (k % 3) * 18}px;background:${SPARK[k % SPARK.length]}"></i>`).join('')}</span>`);
+          setTimeout(() => wrap.querySelector('.sparks')?.remove(), 1200);
           Feel.right();
           refreshChrome(items.part === 'gall' ? 'grammar' : 'learn');
           placeCard(wrap, 84, 'chest', t('chest.aria', { n: s + 1 }), `
             <b>🎉 ${t('chest.won.title', { n: s + 1 })}</b>
-            <p class="chest-xp">+${CHEST_XP} ${t('chest.xp')}</p>
+            <p class="chest-xp"><span class="chest-coin" aria-hidden="true">⭐</span><span>+${CHEST_XP} ${t('chest.xp')}</span></p>
             <button class="btn" id="chest-ok">${t('chest.ok')}</button>`, key);
           $('#chest-ok').onclick = ev => { ev.stopPropagation(); closeCard(); };
           announce(t('chest.won.title', { n: s + 1 }));
