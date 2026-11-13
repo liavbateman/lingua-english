@@ -25,7 +25,22 @@ borrowing proven patterns from leading language apps, and adapts them to a Hebre
 | 8 | First-run setup | Three short screens: level, daily goal, reminder time | Babbel, Busuu | |
 | 9 | Streak calendar | A month view of practiced days on the Progress screen | Duolingo | |
 
-## Home: what it is for
+## Grammar tab (round 51)
+
+At the user's request, the first tab is now **Grammar**: one road through every grammar rule of all three
+levels (59 rules), built on the lesson path. Each level starts its own stages, banners and the mini-map
+name the level ("Intermediate · Stage 5"), and the current rule is the first one not done at the chosen
+level or above (rules left in easier levels stay open). The grammar sub-tab under Learn is gone.
+Home's screen (H1, H2 below) is no longer shown; its code stays, in case the daily plan moves elsewhere.
+
+| # | Round | Pattern | Inspired by | Status |
+|---|---|---|---|---|
+| G1 | All-levels grammar road | One road, stages split by level, level names on banners, rule cards with an example | User's request, Duolingo | Done (round 51) |
+| G2 | Level gates | A gate between levels ("Intermediate starts here") with a short check that can unlock the next level early | Duolingo jump-ahead | |
+| G3 | Rule review nodes | A review stop on the road for rules whose quiz had mistakes | Duolingo practice nodes | |
+| G4 | Rule cheat sheet | A crown on finished rules; tapping it opens the rule's one-line summary for quick recall | Babbel grammar tips | |
+
+## Home: what it was for (until round 51)
 
 Since the lesson path (round 29), the course map lives in the Learn tab. Home now has one job: **today**.
 In one look it answers "have I done enough today, and what is the single next thing?" It doesn't

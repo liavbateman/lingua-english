@@ -396,7 +396,7 @@
 
   const learnTabs = on => `
     <div class="seg" style="margin-bottom:14px">
-      ${[['vocab', '#/learn'], ['phrases', '#/phrases'], ['grammar', '#/grammar'], ['practice', '#/practice']].map(([id, href]) =>
+      ${[['vocab', '#/learn'], ['phrases', '#/phrases'], ['practice', '#/practice']].map(([id, href]) =>
         `<a href="${href}" class="${on === id ? 'on' : ''}"${on === id ? ' aria-current="page"' : ''}>${t('learn.' + id)}</a>`).join('')}
     </div>`;
 
@@ -459,6 +459,14 @@
           plain: (isHe() ? g.he : g.title), done, started: done, pct: done ? 100 : 0, example: g.ex[0],
           progress: t(done ? 'path.g.done' : 'path.g.sub') };
       });
+    } else if (part === 'gall') {
+      // Every grammar rule of every level on one road, beginner first
+      items = LEVELS.flatMap(l => GRAMMAR.filter(g => g.level === l.id)).map((g, n) => {
+        const done = Store.isGrammarDone(g.id);
+        return { href: `#/grammar/${g.id}`, review: `#/grammar/${g.id}/quiz`, face: `<b class="pnum">${n + 1}</b>`, label: ruleTitle(g),
+          plain: (isHe() ? g.he : g.title), done, started: done, pct: done ? 100 : 0, example: g.ex[0], lvl: g.level,
+          progress: `${t('lv.' + g.level)} · ${t(done ? 'path.g.done' : 'path.g.sub')}` };
+      });
     } else {
       items = levelUnits().filter(u => (u.kind === 'phrases') === (part === 'phrases')).map(u => {
         const p = Store.unitProgress(u);
@@ -467,14 +475,21 @@
           progress: t(u.kind === 'phrases' ? 'learn.sentences' : 'learn.words', { a: p.mastered, b: p.total }) };
       });
     }
-    const cur = items.findIndex(x => !x.done);
+    let cur = items.findIndex(x => !x.done);
+    if (part === 'gall') {
+      // the current rule is the first one not done at the learner's level or above;
+      // rules left behind in easier levels stay open, not locked
+      const from = LEVELS.findIndex(l => l.id === Store.level);
+      const up = items.findIndex(x => !x.done && LEVELS.findIndex(l => l.id === x.lvl) >= from);
+      if (up >= 0) cur = up;
+    }
     items.forEach((x, i) => {
       x.state = x.done ? 'done' : i === cur ? 'current' : (x.started || i < cur) ? 'open' : 'locked';
     });
     items.cur = cur;
     items.part = part;
     // Review stop: words from this path's earlier lessons that were learned once and are due again
-    if (part !== 'grammar' && cur >= 0) {
+    if (part !== 'grammar' && part !== 'gall' && cur >= 0) {
       const curUnit = items[cur].href.split('/').pop();
       const units = new Set(levelUnits().filter(u => (u.kind === 'phrases') === (part === 'phrases') && u.id !== curUnit).map(u => u.id));
       const due = Store.dueWords().filter(w => units.has(w.unit) && Store.box(w.id) >= 2);
@@ -487,25 +502,38 @@
   const PATH_SECTION = 5;
   const PATH_CHEST = 104;
   const CHEST_XP = 20;
-  const chestKey = (items, s) => `${Store.level}:${items.part}:${s}`;
+  const chestKey = (items, s) => items.part === 'gall' ? `all:gall:${s}` : `${Store.level}:${items.part}:${s}`;
+  // Stages are runs of up to 5 lessons; on the all-levels grammar road every level starts a new stage
+  function stagesOf(items) {
+    if (items.stages) return items.stages;
+    const out = [];
+    let start = 0;
+    for (let i = 1; i <= items.length; i++) {
+      if (i === items.length || i - start === PATH_SECTION || items[i].lvl !== items[start].lvl) { out.push([start, i]); start = i; }
+    }
+    return (items.stages = out);
+  }
+  const stageItems = (items, s) => items.slice(...stagesOf(items)[s]);
+  const stageAt = (items, i) => stagesOf(items).findIndex(([a, b]) => i >= a && i < b);
   // locked until every lesson of the stage is done, then ready to open, then opened (once)
   function chestState(items, s) {
     if (Store.chestOpened(chestKey(items, s))) return 'opened';
-    return items.slice(s * PATH_SECTION, (s + 1) * PATH_SECTION).every(x => x.done) ? 'ready' : 'locked';
+    return stageItems(items, s).every(x => x.done) ? 'ready' : 'locked';
   }
   const PATH_BANNER = 112;
   const SECTION_COLORS = ['coral', 'blue', 'green', 'gold', 'purple'];
 
   function sectionBanner(items, s) {
-    const part = items.slice(s * PATH_SECTION, (s + 1) * PATH_SECTION);
+    const part = stageItems(items, s);
     const done = part.filter(x => x.done).length;
     const reached = part.some(x => x.state !== 'locked');
+    const lvl = part[0].lvl;
     const status = done === part.length ? `<span class="psec-pill ok">${ICON.check} ${t('path.sec.done')}</span>`
       : `<span class="psec-pill">${done}/${part.length}</span>`;
     return `
       <div class="psec ${SECTION_COLORS[s % SECTION_COLORS.length]}${reached ? '' : ' locked'}" data-s="${s}" role="heading" aria-level="2">
         <div class="grow">
-          <span class="psec-kicker">${t('path.sec', { n: s + 1 })}</span>
+          <span class="psec-kicker">${lvl ? `${t('lv.' + lvl)} · ` : ''}${t('path.sec', { n: s + 1 })}</span>
           <span class="psec-faces" aria-hidden="true">${part.map(x => `<i class="${x.done ? 'd' : ''}">${x.face}</i>`).join('')}</span>
         </div>
         ${status}
@@ -530,11 +558,11 @@
   // A slim map of all stages that stays at the top while the path scrolls: how full each stage is,
   // which one is current, which one is on screen; a tap jumps to that stage
   function miniMap(items, sections) {
-    const curS = items.cur >= 0 ? Math.floor(items.cur / PATH_SECTION) : -1;
+    const curS = items.cur >= 0 ? stageAt(items, items.cur) : -1;
     return `
       <nav class="minimap" id="minimap" aria-label="${t('mm.aria')}">
         ${Array.from({ length: sections }, (_, s) => {
-          const part = items.slice(s * PATH_SECTION, (s + 1) * PATH_SECTION);
+          const part = stageItems(items, s);
           const done = part.filter(x => x.done).length;
           return `<button class="mm-seg ${SECTION_COLORS[s % SECTION_COLORS.length]}${s === curS ? ' cur' : ''}${done === part.length ? ' full' : ''}"
               data-s="${s}" aria-label="${t('mm.seg', { n: s + 1, a: done, b: part.length })}">
@@ -546,12 +574,13 @@
 
   function pathHtml(items) {
     const doneCount = items.filter(x => x.done).length;
-    const sections = Math.ceil(items.length / PATH_SECTION);
+    const sections = stagesOf(items).length;
     return `
       ${sections > 1 ? miniMap(items, sections) : ''}
+      ${items.part === 'gall' ? `<div class="path-head"><span>${t('gr.head', { a: doneCount, b: items.length })}</span></div>` : `
       <button class="path-head" id="levelbtn" aria-haspopup="dialog" aria-label="${t('lvl.change', { level: levelLabel() })}">
         <span>${levelLabel()} <i class="lvl-caret" aria-hidden="true">▾</i></span>
-      </button>
+      </button>`}
       <div class="path" id="path">
         <svg class="path-line" id="pathline" aria-hidden="true"></svg>
         ${Array.from({ length: sections }, (_, s) => sectionBanner(items, s)).join('')}
@@ -594,20 +623,21 @@
     const count = path.querySelectorAll('.pnode-wrap').length;
     const chestPts = [];
     let y = 8;
+    const stages = stagesOf(pathItems);
     path.querySelectorAll('.pnode-wrap').forEach((el, i) => {
-      if (i % PATH_SECTION === 0) {                       // a stage banner before every 5 lessons
-        banners[i / PATH_SECTION].style.top = y + 'px';
+      const s = stageAt(pathItems, i), k = i - stages[s][0];   // stage, and place inside it
+      if (k === 0) {                                      // a stage banner before every stage
+        banners[s].style.top = y + 'px';
         y += PATH_BANNER;
       }
       if (i === pathItems.cur) y += 30;                   // room for the "Start" bubble
-      const x = W / 2 + PATH_SWAY[i % PATH_SECTION % PATH_SWAY.length] * half;
+      const x = W / 2 + PATH_SWAY[k % PATH_SWAY.length] * half;
       el.style.left = (x - 66) + 'px';
       el.style.top = y + 'px';
       pts.push([x, y + 38]);
       y += PATH_ROW;
-      if (i % PATH_SECTION === PATH_SECTION - 1 || i === count - 1) {   // the stage's chest
-        const s = Math.floor(i / PATH_SECTION);
-        const cx = W / 2 + PATH_SWAY[(i % PATH_SECTION + 1) % PATH_SWAY.length] * half;
+      if (i === stages[s][1] - 1 || i === count - 1) {   // the stage's chest
+        const cx = W / 2 + PATH_SWAY[(k + 1) % PATH_SWAY.length] * half;
         const chest = path.querySelector(`.pchest-wrap[data-s="${s}"]`);
         chest.style.left = (cx - 40) + 'px';
         chest.style.top = y + 'px';
@@ -624,13 +654,13 @@
     // one road per stage, so it doesn't run under the banners; gold up to `reach`
     const roads = reach => {
       let d = '', done = '';
-      for (let s = 0; s < pts.length; s += PATH_SECTION) {
-        const lessons = pts.slice(s, s + PATH_SECTION);
-        const seg = lessons.concat([chestPts[s / PATH_SECTION]]);     // the road ends at the chest
+      stages.forEach(([a, b], s) => {
+        const lessons = pts.slice(a, b);
+        const seg = lessons.concat([chestPts[s]]);        // the road ends at the chest
         d += curve(seg) + ' ';
-        const upto = Math.min(lessons.length, reach - s) + (reach - s > lessons.length ? 1 : 0);
+        const upto = Math.min(lessons.length, reach - a) + (reach - a > lessons.length ? 1 : 0);
         if (upto > 1) done += curve(seg.slice(0, upto)) + ' ';
-      }
+      });
       return { d, done };
     };
     const reach = pathItems.cur < 0 ? pts.length : pathItems.cur + 1;
@@ -668,7 +698,7 @@
   }
 
   // What the path looked like last time, per level and part, to show what changed since
-  const pathMemKey = items => `lingua-path:${Store.level}:${items.part}`;
+  const pathMemKey = items => `lingua-path:${items.part === 'gall' ? 'all' : Store.level}:${items.part}`;
   function pathMemory(items) {
     let before = null;
     try { before = JSON.parse(localStorage.getItem(pathMemKey(items)) || 'null'); } catch (e) { /* private mode */ }
@@ -752,7 +782,7 @@
         const wrap = b.parentElement;
         const st = chestState(items, s);
         if (st === 'locked') {
-          const left = items.slice(s * PATH_SECTION, (s + 1) * PATH_SECTION).filter(x => !x.done).length;
+          const left = stageItems(items, s).filter(x => !x.done).length;
           placeCard(wrap, 84, 'locked', t('chest.aria', { n: s + 1 }), `
             <b>🎁 ${t('chest.locked.title', { n: s + 1 })}</b>
             <p>${t(left === 1 ? 'chest.left.one' : 'chest.left', { n: left })}</p>`, key);
@@ -763,7 +793,7 @@
           b.classList.add('opening', 'opened');
           b.firstElementChild.textContent = '✨';
           Feel.right();
-          refreshChrome('learn');
+          refreshChrome(items.part === 'gall' ? 'grammar' : 'learn');
           placeCard(wrap, 84, 'chest', t('chest.aria', { n: s + 1 }), `
             <b>🎉 ${t('chest.won.title', { n: s + 1 })}</b>
             <p class="chest-xp">+${CHEST_XP} ${t('chest.xp')}</p>
@@ -840,8 +870,8 @@
       say = t('ph.alldone');
       go = `<a class="ph-go" href="#/practice">${t('ph.practice')}</a>`;
     } else {
-      const s = Math.floor(items.cur / PATH_SECTION);
-      const left = items.slice(s * PATH_SECTION, (s + 1) * PATH_SECTION).filter(x => !x.done).length;
+      const s = stageAt(items, items.cur);
+      const left = stageItems(items, s).filter(x => !x.done).length;
       say = !items.some(x => x.started) ? t('ph.hello')
         : left === 1 ? t('ph.one', { n: s + 1 }) : t('ph.left', { n: left, s: s + 1 });
       go = `<a class="ph-go" href="${cur.href}">▶ ${t(cur.started ? 'ph.continue' : 'ph.start', { title: cur.plain })}</a>`;
@@ -852,7 +882,7 @@
         <div class="ph-side">
           <div class="ph-chips">
             <span class="ph-chip">🔥 ${Store.streak}</span>
-            <span class="ph-chip">${levelLabel()}</span>
+            <span class="ph-chip">${items.part === 'gall' ? (cur ? t('lv.' + cur.lvl) : '✓') : levelLabel()}</span>
           </div>
           <p class="ph-say">${say}</p>
           ${go}
@@ -953,16 +983,14 @@
   }
 
   // ---------- Grammar ----------
-  function grammarList() {
-    const items = pathFor('grammar');
+  // The Grammar tab: one road through every rule of every level (as the Learn paths)
+  function grammarRoad() {
+    const items = pathFor('gall');
     view.innerHTML = `
-      <h1 class="sr-only">${t('learn.title')}</h1>
+      <h1 class="sr-only">${t('gr.title')}</h1>
       ${pathHero(items)}
-      ${learnTabs('grammar')}
-      ${levelSeg()}
       ${pathHtml(items)}`;
     bindPath(items);
-    bindLevelSeg(grammarList);
   }
 
   function grammarTopic(id) {
@@ -1855,13 +1883,13 @@
     if (inLesson) lessonBar(0);
     else if (name !== 'x') lessonExit = location.hash || '#/';
     switch (name || 'home') {
-      case 'home': refreshChrome('home'); home(); break;
+      case 'home': refreshChrome('grammar'); grammarRoad(); break;
       case 'learn': refreshChrome('learn'); learn(); break;
       case 'phrases': refreshChrome('learn'); phrases(); break;
       case 'unit': refreshChrome('learn'); lesson(a); break;
       case 'grammar':
-        refreshChrome('learn');
-        if (!a) grammarList(); else if (b === 'quiz') grammarQuiz(a); else grammarTopic(a);
+        refreshChrome('grammar');
+        if (!a) grammarRoad(); else if (b === 'quiz') grammarQuiz(a); else grammarTopic(a);
         break;
       case 'practice': refreshChrome('learn'); practice(); break;
       case 'quiz': refreshChrome('learn'); quiz(a, b); break;

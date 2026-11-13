@@ -2,7 +2,7 @@
 // To change a text, edit it here; {name} marks a value filled in by the app.
 const STR = {
   en: {
-    'nav.home': 'Home', 'nav.learn': 'Learn', 'nav.progress': 'Progress',
+    'nav.grammar': 'Grammar', 'gr.title': 'All grammar rules', 'gr.head': 'All grammar · {a} / {b}', 'nav.home': 'Home', 'nav.learn': 'Learn', 'nav.progress': 'Progress',
     'streak.one': 'day streak', 'streak.many': 'day streak',
     'aria.lang': 'Switch language', 'aria.listen': 'Listen',
     'lv.beginner': 'Beginner', 'lv.intermediate': 'Intermediate', 'lv.advanced': 'Advanced',
@@ -132,7 +132,7 @@ const STR = {
   },
 
   he: {
-    'nav.home': 'בית', 'nav.learn': 'לימוד', 'nav.progress': 'התקדמות',
+    'nav.grammar': 'דקדוק', 'gr.title': 'כל חוקי הדקדוק', 'gr.head': 'כל הדקדוק · {a} / {b}', 'nav.home': 'בית', 'nav.learn': 'לימוד', 'nav.progress': 'התקדמות',
     'streak.one': 'יום ברצף', 'streak.many': 'ימים ברצף',
     'aria.lang': 'החלפת שפה', 'aria.listen': 'השמעה',
     'lv.beginner': 'מתחילים', 'lv.intermediate': 'בינוני', 'lv.advanced': 'מתקדמים',
@@ -183,14 +183,14 @@ const STR = {
     'rstop.label': 'חזרה', 'rstop.aria': 'תחנת חזרה: {n} מילים משיעורים קודמים מחכות לחזרה',
     'ph.hello': 'מוכנים להתחיל? השיעור הראשון מחכה.', 'ph.left': 'עוד {n} שיעורים לתיבה של שלב {s}!',
     'ph.one': 'עוד שיעור אחד לתיבה של שלב {n}!', 'ph.alldone': 'סיימת את כל המסלול הזה. מדהים!',
-    'ph.start': 'מתחילים: {title}', 'ph.continue': 'ממשיכים: {title}', 'ph.practice': 'תרגול חופשי',
+    'ph.start': 'קדימה: {title}', 'ph.continue': 'ממשיכים: {title}', 'ph.practice': 'תרגול חופשי',
     'chest.aria': 'התיבה של שלב {n}', 'chest.state.locked': 'נעולה', 'chest.state.ready': 'מוכנה לפתיחה', 'chest.state.opened': 'נפתחה',
     'chest.locked.title': 'התיבה של שלב {n}', 'chest.left': 'עוד {n} שיעורים והיא נפתחת', 'chest.left.one': 'עוד שיעור אחד והיא נפתחת',
     'chest.won.title': 'שלב {n} הושלם!', 'chest.xp': 'נקודות בונוס', 'chest.ok': 'מעולה!',
     'chest.opened.title': 'התיבה של שלב {n}', 'chest.opened.text': 'כבר נפתחה. ממשיכים לשלב הבא!',
     'path.review': 'תרגול חוזר', 'path.again': 'לעבור שוב על השיעור',
     'path.g.sub': 'הכלל, דוגמאות ו-3 שאלות', 'path.g.done': 'הכלל הושלם',
-    'path.count': '{a} מתוך {b} הושלמו', 'path.start': 'מתחילים', 'path.continue': 'ממשיכים',
+    'path.count': '{a} מתוך {b} הושלמו', 'path.start': 'קדימה', 'path.continue': 'ממשיכים',
     'path.state.done': 'הושלם', 'path.state.current': 'הבא בתור', 'path.state.open': 'בתהליך', 'path.state.locked': 'נעול',
     'path.jump': 'חזרה לשיעור שלי', 'path.locked.title': 'השיעור הזה עדיין נעול',
     'path.locked.text': 'הדרך עובדת הכי טוב לפי הסדר. הבא בתור: {title}.',
