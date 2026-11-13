@@ -703,5 +703,20 @@ GRAMMAR.push(
     ex: [['We have lived in Haifa since 2019.', 'אנחנו גרים בחיפה מאז 2019.'], ['She called about an hour ago.', 'היא התקשרה לפני בערך שעה.'], ['They have been friends for many years.', 'הם חברים כבר הרבה שנים.']],
     tip: 'בעברית אומרים "אני גר כאן מ-2019" בהווה, ולכן כותבים בטעות "I live here since 2019". נכון: "I have lived here since 2019". ו-ago בא אחרי הזמן: "three days ago", לא "before three days".',
     quiz: [['I have known her ___ ten years.', 'for', ['since', 'ago', 'during']], ["We've been here ___ eight o'clock.", 'since', ['for', 'ago', 'from']], ['They moved to Eilat three years ___.', 'ago', ['before', 'since', 'for']]]
+  },
+
+  // ---------- Added in round 56 ----------
+  {
+    id: 'i-reflexive', level: 'intermediate', title: 'Reflexive pronouns: myself, yourself', he: 'כינויים חוזרים: myself / yourself',
+    when: 'כשהנושא והמושא הם אותו אדם: "I hurt myself", כלומר "נפגעתי" או "פגעתי בעצמי". גם להדגשה: "I made it myself", "הכנתי את זה בעצמי". ו-by myself פירושו "לבד".',
+    forms: [
+      ['singular', 'myself · yourself · himself · herself · itself'],
+      ['plural', 'ourselves · yourselves · themselves'],
+      ['by myself', 'by + myself: I live by myself.'],
+      ['emphasis', 'I did it myself. · The manager herself called.']
+    ],
+    ex: [['Be careful, you might cut yourself.', 'זהירות, שלא תיחתכו.'], ['We built the shed ourselves.', 'בנינו את המחסן בעצמנו.'], ['She lives by herself in a small flat.', 'היא גרה לבד בדירה קטנה.']],
+    tip: 'טעות נפוצה: לתרגם פעלי התפעל עם כינוי חוזר. אומרים "I feel relaxed" ו-"I met him", לא "I relaxed myself" או "I met myself with him". וגם: themselves ו-himself, לא "theirselves" או "hisself".',
+    quiz: [['Did you enjoy ___ at the party?', 'yourself', ['you', 'yours', 'yourselfs']], ['The children made the cake ___.', 'themselves', ['theirselves', 'themself', 'them']], ['He lives by ___ near the sea.', 'himself', ['hisself', 'him', 'his']]]
   }
 );

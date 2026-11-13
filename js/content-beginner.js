@@ -478,6 +478,28 @@ UNITS.push(
       { en: 'How much is it to the airport?', he: 'כמה עולה עד שדה התעופה?' },
       { en: 'You can stop here, thank you.', he: 'אפשר לעצור כאן, תודה.' }
     ]
+  },
+
+  // ---------- Added in round 56 ----------
+  {
+    id: 'b-school', level: 'beginner', title: 'School & classroom', he: 'בית ספר וכיתה', emoji: '🏫',
+    words: [
+      { en: 'subject', he: 'מקצוע לימוד', ex: 'My favourite subject at school was history.' },
+      { en: 'teacher', he: 'מורה', ex: 'Our teacher is very patient.' },
+      { en: 'classroom', he: 'כיתה', ex: 'The classroom has big windows.' },
+      { en: 'lesson', he: 'שיעור', ex: 'The English lesson starts at nine.' },
+      { en: 'notebook', he: 'מחברת', ex: 'Write the new words in your notebook.' },
+      { en: 'pencil', he: 'עיפרון', ex: 'Can I borrow a pencil, please?' },
+      { en: 'eraser', he: 'מחק', ex: 'I need an eraser for this mistake.' },
+      { en: 'ruler', he: 'סרגל', ex: 'Use a ruler to draw a straight line.' },
+      { en: 'board', he: 'לוח', ex: 'The teacher writes the date on the board.' },
+      { en: 'homework', he: 'שיעורי בית', ex: 'I do my homework after dinner.' },
+      { en: 'exam', he: 'מבחן', ex: 'We have a math exam on Monday.' },
+      { en: 'mistake', he: 'טעות', ex: 'Everyone makes a mistake sometimes.' },
+      { en: 'practice', he: 'לתרגל', ex: 'I practice English every day.' },
+      { en: 'spell', he: 'לאיית', ex: 'How do you spell your name?' },
+      { en: 'remember', he: 'לזכור', ex: 'I always remember her birthday.' }
+    ]
   }
 );
 
