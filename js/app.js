@@ -1278,14 +1278,21 @@
       if (!on) { layoutPath(); results.innerHTML = ''; return; }
       let found = q ? ruleSearch(items, q) : items.map((x, i) => ({ x, i }));
       if (onlySaved) found = found.filter(o => Store.isRuleSaved(o.x.rule.id));
-      const practice = onlySaved && Store.savedRules().length
-        ? `<a class="btn gpractice" href="#/grammar/saved/quiz">🏋️ ${t('saved.practice', { n: Store.savedRules().length })}</a>` : '';
+      // Saved rules: a header with how many are saved in each level (in the level's colour), then the practice button
+      const savedIds = Store.savedRules();
+      const perLevel = LEVELS.map(l => [l.id, GRAMMAR.filter(g => g.level === l.id && savedIds.includes(g.id)).length]).filter(p => p[1]);
+      const practice = onlySaved && savedIds.length
+        ? `<div class="gsv-head"><span class="gsv-ico" aria-hidden="true">🔖</span>
+            <div class="grow"><b>${t('saved.chip')}</b>
+              <div class="gsv-lv">${perLevel.map(([lv, n]) => `<span class="lv-${lv}">${t('lv.' + lv)} · <span class="en">${n}</span></span>`).join('')}</div></div></div>
+          <a class="btn gpractice" href="#/grammar/saved/quiz">🏋️ ${t('saved.practice', { n: savedIds.length })}</a>` : '';
       results.innerHTML = practice + (found.length
         ? `<p class="small search-count" role="status">${t(found.length === 1 ? 'gsearch.one' : 'gsearch.count', { n: found.length })}</p>` +
           found.map(o => `
-            <button class="gres" data-i="${o.i}">
+            <button class="gres lv-${o.x.lvl}${savedIds.includes(o.x.rule.id) ? ' is-saved' : ''}" data-i="${o.i}">
+              ${savedIds.includes(o.x.rule.id) ? '<span class="gres-rib" aria-hidden="true"></span>' : ''}
               <b class="gres-num ${o.x.state}">${o.x.done ? '👑' : o.i + 1}</b>
-              <span class="grow"><b>${o.x.label}</b><small>${Store.isRuleSaved(o.x.rule.id) ? '⭐ ' : ''}${t('lv.' + o.x.lvl)} · ${t('path.state.' + o.x.state)}</small></span>
+              <span class="grow"><b>${o.x.label}</b><small>${savedIds.includes(o.x.rule.id) ? `<span class="gres-saved">${t('saved.tag')}</span> · ` : ''}<span class="gres-lv">${t('lv.' + o.x.lvl)}</span> · ${t('path.state.' + o.x.state)}</small></span>
               <span class="go-chev" aria-hidden="true">${fwd()}</span>
             </button>`).join('')
         : emptyState(onlySaved && !q ? t('saved.none') : t('gsearch.none', { q: q.replace(/[<>&"]/g, '') }),
