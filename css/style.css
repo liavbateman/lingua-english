@@ -1743,3 +1743,17 @@ body[data-lv="advanced"] .lb-track i { background: linear-gradient(90deg, #8e7cf
 .st.time { box-shadow: 0 4px 0 #2a5a9a; }
 .st span { display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
 @media (prefers-reduced-motion: reduce) { .res-ring::before { animation: none; } }
+
+/* ---------- Learn header: the owl card in the learner's level colour, with a level ring and today's goal (design round D27) ---------- */
+.path-hero.ph-lv {
+  background: radial-gradient(120% 90% at 20% 30%, color-mix(in srgb, var(--lv) 42%, var(--lv-bg-a)) 0%, var(--lv-bg-a) 55%, var(--lv-bg-b) 100%);
+  box-shadow: 0 6px 0 var(--lv-edge);
+}
+.ph-lvchip { display: inline-flex; align-items: center; gap: 6px; }
+.ph-ring {
+  width: 16px; height: 16px; border-radius: 50%; flex: none;
+  background: conic-gradient(var(--lv) calc(var(--p) * 1%), rgba(255, 255, 255, .25) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+}
+.ph-goal-done { background: rgba(47, 208, 147, .35); }

@@ -1117,13 +1117,21 @@
         : left === 1 ? t('ph.one', { n: s + 1 }) : t('ph.left', { n: left, s: s + 1 });
       go = `<a class="ph-go" href="${cur.href}">▶ ${t(cur.started ? 'ph.continue' : 'ph.start', { title: cur.plain })}</a>`;
     }
+    // On the Learn paths the card wears the learner's level colour: a ring for how much of this part
+    // of the level is done, the level's name, and today's plan (tasks done of the day's plan)
+    const lv = items.part === 'gall' ? '' : Store.level;
+    const pct = lv ? Math.round(partDone(lv, items.part === 'phrases' ? 'phrases' : 'vocab') * 100) : 0;
+    const plan = lv ? planTasks() : [];
+    const planDone = plan.filter(x => Store.tasks[x.id]).length;
     return `
-      <section class="path-hero">
+      <section class="path-hero${lv ? ' ph-lv lv-' + lv : ''}">
         <img class="ph-owl" src="icons/owl-512.png" alt="" width="112" height="112">
         <div class="ph-side">
           <div class="ph-chips">
             <span class="ph-chip">🔥 ${Store.streak}</span>
-            <span class="ph-chip">${items.part === 'gall' ? (cur ? t('lv.' + cur.lvl) : '✓') : levelLabel()}</span>
+            ${lv ? `<span class="ph-chip ph-lvchip"><span class="ph-ring" style="--p:${pct}" aria-hidden="true"></span>${levelLabel()} · <span class="en">${pct}%</span></span>
+              ${plan.length ? `<span class="ph-chip${planDone === plan.length ? ' ph-goal-done' : ''}"><span aria-hidden="true">🎯</span> <span class="sr-only">${t('today.goal')}:</span> <span class="en">${planDone}/${plan.length}</span></span>` : ''}`
+              : `<span class="ph-chip">${cur ? t('lv.' + cur.lvl) : '✓'}</span>`}
           </div>
           <p class="ph-say">${say}</p>
           ${go}
