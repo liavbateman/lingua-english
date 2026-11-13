@@ -474,10 +474,28 @@
       </div>`;
   }
 
+  // A slim map of all stages that stays at the top while the path scrolls: how full each stage is,
+  // which one is current, which one is on screen; a tap jumps to that stage
+  function miniMap(items, sections) {
+    const curS = items.cur >= 0 ? Math.floor(items.cur / PATH_SECTION) : -1;
+    return `
+      <nav class="minimap" id="minimap" aria-label="${t('mm.aria')}">
+        ${Array.from({ length: sections }, (_, s) => {
+          const part = items.slice(s * PATH_SECTION, (s + 1) * PATH_SECTION);
+          const done = part.filter(x => x.done).length;
+          return `<button class="mm-seg ${SECTION_COLORS[s % SECTION_COLORS.length]}${s === curS ? ' cur' : ''}${done === part.length ? ' full' : ''}"
+              data-s="${s}" aria-label="${t('mm.seg', { n: s + 1, a: done, b: part.length })}">
+            <b class="mm-bar"><i style="width:${Math.round((done / part.length) * 100)}%"></i><span>${s + 1}</span></b>
+          </button>`;
+        }).join('')}
+      </nav>`;
+  }
+
   function pathHtml(items) {
     const doneCount = items.filter(x => x.done).length;
     const sections = Math.ceil(items.length / PATH_SECTION);
     return `
+      ${sections > 1 ? miniMap(items, sections) : ''}
       <div class="path-head"><span>${levelLabel()}</span><small>${t('path.count', { a: doneCount, b: items.length })}</small></div>
       <div class="path" id="path">
         <svg class="path-line" id="pathline" aria-hidden="true"></svg>
@@ -719,6 +737,27 @@
       const back = typeof k === 'string' ? path.querySelector(`.pchest[data-s="${k.slice(1)}"]`) : path.querySelector(`.pnode[data-i="${k}"]`);
       if (back) back.focus();
     };
+    // Mini-map: a tap scrolls to that stage's banner, just below the map; the stage on screen is marked
+    const mm = document.getElementById('minimap');
+    if (mm) {
+      const banners = [...path.querySelectorAll('.psec')];
+      mm.querySelectorAll('.mm-seg').forEach(b => {
+        b.onclick = () => {
+          const target = banners[+b.dataset.s];
+          const top = target.getBoundingClientRect().top - view.getBoundingClientRect().top + view.scrollTop - mm.offsetHeight - 12;
+          view.scrollTo({ top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+        };
+      });
+      const markSeen = () => {
+        const line = view.getBoundingClientRect().top + mm.offsetHeight + 40;
+        let s = 0;
+        banners.forEach((b, i) => { if (b.getBoundingClientRect().top <= line) s = i; });
+        mm.querySelectorAll('.mm-seg').forEach((b, i) => b.classList.toggle('here', i === s));
+      };
+      view.onscroll = markSeen;
+      markSeen();
+    }
+
     // Open where the learner is: the current lesson in the middle of the screen
     const curEl = items.cur >= 0 && path.querySelector(`.pnode-wrap[data-i="${items.cur}"]`);
     const jump = document.getElementById('pathjump');
@@ -1715,6 +1754,7 @@
     view.scrollTop = 0;
     document.querySelectorAll('.sheet-back').forEach(s => s.remove());
     view.onkeydown = null;
+    view.onscroll = null;
     const inLesson = ['unit', 'quiz', 'speak'].includes(name) || (name === 'grammar' && b === 'quiz');
     document.body.classList.toggle('in-lesson', inLesson);
     if (inLesson) lessonBar(0);
