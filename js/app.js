@@ -425,9 +425,13 @@
       .slice(0, 30).map(x => x.w);
   }
 
+  // An empty result: the owl, one friendly line and one way forward (instead of a lone grey sentence)
+  const emptyState = (text, action = '') =>
+    `<div class="empty-state" role="status"><img src="icons/owl-192.png" alt="" width="92" height="92"><p>${text}</p>${action}</div>`;
+
   function searchResults(query) {
     const found = searchWords(query);
-    if (!found.length) return `<p class="sub center search-empty">${t('search.none', { q: query.replace(/[<>&"]/g, '') })}</p>`;
+    if (!found.length) return emptyState(t('search.none', { q: query.replace(/[<>&"]/g, '') }), `<button class="btn ghost empty-act">${t('empty.clear')}</button>`);
     return `<p class="small search-count" role="status">${t(found.length === 1 ? 'search.one' : 'search.count', { n: found.length })}</p>` +
       found.map((w, n) => {
         const unit = UNITS.find(u => u.id === w.unit);
@@ -1165,6 +1169,8 @@
       results.innerHTML = searchResults(q);
       const found = searchWords(q);
       results.querySelectorAll('[data-say]').forEach(b => { b.onclick = () => speak(found[b.dataset.say].en); });
+      const clear = results.querySelector('.empty-act');
+      if (clear) clear.onclick = () => { input.value = ''; input.oninput(); input.focus(); };
     };
     input.onkeydown = e => { if (e.key === 'Enter') input.blur(); };   // "Search" on the keyboard closes it
   }
@@ -1237,7 +1243,10 @@
               <span class="grow"><b>${o.x.label}</b><small>${Store.isRuleSaved(o.x.rule.id) ? '⭐ ' : ''}${t('lv.' + o.x.lvl)} · ${t('path.state.' + o.x.state)}</small></span>
               <span class="go-chev" aria-hidden="true">${fwd()}</span>
             </button>`).join('')
-        : `<p class="sub center search-empty">${onlySaved && !q ? t('saved.none') : t('gsearch.none', { q: q.replace(/[<>&"]/g, '') })}</p>`);
+        : emptyState(onlySaved && !q ? t('saved.none') : t('gsearch.none', { q: q.replace(/[<>&"]/g, '') }),
+            `<button class="btn ghost empty-act">${t(onlySaved && !q ? 'empty.road' : 'empty.clear')}</button>`));
+      const act = results.querySelector('.empty-act');
+      if (act) act.onclick = () => { if (q) input.value = ''; else onlySaved = false; input.oninput(); };
       results.querySelectorAll('.gres').forEach(b => {
         b.onclick = () => {
           input.value = '';
