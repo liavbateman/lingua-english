@@ -98,7 +98,11 @@ in the visual language of the paths (level colours, chunky 3D cards with a botto
 | D39 | Chest card | The stage chest on the path: a closed chest that wiggles gently when ready, a soft glow ring around it | Done (round 116): the ready chest already wiggled (round 33); now it glows, two gold rings pulse out from it, and an "Open me!" bubble sits under it (under, not above, so it never covers the lesson label above); the rings hold still under Reduce Motion; an opened chest is a little quieter |
 | D40 | Rule search results | Search matches highlighted in the result titles, the level chip on each result | Done (round 117): the typed text is marked in gold inside the result titles (on text nodes, so the Hebrew/English markup stays intact); a rule found through its structure or examples shows the matching line under its title with the match marked; the level chip was already there (D21) |
 | D41 | Backup card | The backup card on Progress as a calm raised card with icons for save and restore and a clear last-saved line | Done (round 118): a raised card with a 💾 icon tile; under the title "Last backup: <date>" or "No backup yet" (the date is kept on this phone each time a backup file is made); the buttons carry 📂 / ⬇️ icons, hidden under 360px so "Save backup" stays on one line |
-| D42 | Lesson bar | The lesson top bar: the close button as a round soft button, the progress track with a small spark at its tip | |
+| D42 | Lesson bar | The lesson top bar: the close button as a round soft button, the progress track with a small spark at its tip | Done (round 119): the close button is a soft round raised button; a glowing white spark pulses at the leading tip of the progress (still under Reduce Motion). Found and fixed on the way: in Hebrew the track was flipped but its fill also started from the right, so the two cancelled out and progress grew from the left; the track is now ltr inside, so it fills from the right as intended |
+| D43 | Answer tiles feedback | After checking, the wrong tile shakes once and the right tile gets a soft green pulse; both settle (no motion under Reduce Motion) | |
+| D44 | Tenses map | The 12-tense table: each cell with a tiny timeline icon (past / now / future dot), done tenses crowned | |
+| D45 | Learn tabs | The words / sentences / practice tabs as a segmented control with a sliding pill | |
+| D46 | Celebration | The end-of-lesson celebration: a confetti burst in the level's colours, gentle and short | |
 
 ## Home: what it was for (until round 51)
 

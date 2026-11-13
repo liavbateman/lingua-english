@@ -610,7 +610,7 @@ body.in-lesson .view { padding-bottom: calc(24px + env(safe-area-inset-bottom));
   box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .12), inset 0 5px 0 -2px rgba(255, 255, 255, .28);
   transition: width .45s cubic-bezier(.3, 1.3, .5, 1);
 }
-[dir="rtl"] .lb-track { transform: scaleX(-1); }   /* fills from the right in Hebrew */
+[dir="rtl"] .lb-track { transform: scaleX(-1); direction: ltr; }   /* fills from the right in Hebrew (ltr inside, so the flip is not undone) */
 
 /* Bottom sheet */
 .sheet-back {
@@ -1939,3 +1939,16 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
 .bk-last { display: block; font-size: .8rem; font-weight: 700; color: #9fd0ff; }
 .backup .pager .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 @media (max-width: 360px) { .backup .pager .btn > span[aria-hidden] { display: none; } }
+
+/* ---------- Lesson bar: a soft round close button, a spark at the tip of the progress (design round D42) ---------- */
+.lb-close { width: 42px; height: 42px; margin-inline-start: -4px; border-radius: 50%; color: #c9cdf0;
+  background: rgba(255, 255, 255, .08); box-shadow: 0 3px 0 rgba(0, 0, 0, .35); }
+.lb-close svg { width: 20px; height: 20px; }
+.lb-close:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0, 0, 0, .35); background: rgba(255, 255, 255, .14); }
+.lb-track i { position: relative; }
+.lb-track i::after {
+  content: ""; position: absolute; right: 4px; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%;
+  background: #fff; box-shadow: 0 0 6px 2px rgba(255, 255, 255, .8); animation: lbspark 1.6s ease-in-out infinite;
+}
+@keyframes lbspark { 0%, 100% { opacity: .55; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.15); } }
+@media (prefers-reduced-motion: reduce) { .lb-track i::after { animation: none; } }
