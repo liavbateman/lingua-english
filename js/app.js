@@ -1322,6 +1322,33 @@
     }).filter(o => o.s >= 0).sort((a, b) => a.s - b.s || a.i - b.i).slice(0, 12);
   }
 
+  // Search results: the typed text is marked where it appears (text nodes only, so the markup stays intact);
+  // a rule found through its structure or examples shows the line it was found in
+  function markText(el, q) {
+    const needle = q.toLowerCase();
+    const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walk.nextNode()) nodes.push(walk.currentNode);
+    nodes.forEach(n => {
+      const at = n.nodeValue.toLowerCase().indexOf(needle);
+      if (at < 0) return;
+      const mark = document.createElement('mark');
+      mark.className = 'gres-mark';
+      const hit = n.splitText(at);
+      hit.splitText(needle.length);
+      mark.textContent = hit.nodeValue;
+      hit.replaceWith(mark);
+    });
+  }
+  function hitLine(g, q) {
+    const needle = q.toLowerCase();
+    const line = [...g.forms.map(f => f[1]), ...g.ex.map(e => e[0])].find(s => s.toLowerCase().includes(needle));
+    if (!line) return '';
+    const at = line.toLowerCase().indexOf(needle);
+    const from = Math.max(0, at - 18), to = Math.min(line.length, at + needle.length + 22);
+    return `<small class="gres-hit en" dir="ltr">${from ? '…' : ''}${esc(line.slice(from, to))}${to < line.length ? '…' : ''}</small>`;
+  }
+
   function grammarRoad() {
     const items = pathFor('gall');
     view.innerHTML = `
@@ -1368,13 +1395,14 @@
             <button class="gres lv-${o.x.lvl}${savedIds.includes(o.x.rule.id) ? ' is-saved' : ''}" data-i="${o.i}">
               ${savedIds.includes(o.x.rule.id) ? '<span class="gres-rib" aria-hidden="true"></span>' : ''}
               <b class="gres-num ${o.x.state}">${o.x.done ? '👑' : o.i + 1}</b>
-              <span class="grow"><b>${o.x.label}</b><small>${savedIds.includes(o.x.rule.id) ? `<span class="gres-saved">${t('saved.tag')}</span> · ` : ''}<span class="gres-lv">${t('lv.' + o.x.lvl)}</span> · ${t('path.state.' + o.x.state)}</small></span>
+              <span class="grow"><b>${o.x.label}</b><small>${savedIds.includes(o.x.rule.id) ? `<span class="gres-saved">${t('saved.tag')}</span> · ` : ''}<span class="gres-lv">${t('lv.' + o.x.lvl)}</span> · ${t('path.state.' + o.x.state)}</small>${o.s === 2 && q ? hitLine(o.x.rule, q) : ''}</span>
               <span class="go-chev" aria-hidden="true">${fwd()}</span>
             </button>`).join('')
         : emptyState(onlySaved && !q ? t('saved.none') : t('gsearch.none', { q: q.replace(/[<>&"]/g, '') }),
             `<button class="btn ghost empty-act">${t(onlySaved && !q ? 'empty.road' : 'empty.clear')}</button>`));
       const act = results.querySelector('.empty-act');
       if (act) act.onclick = () => { if (q) input.value = ''; else onlySaved = false; input.oninput(); };
+      if (q) results.querySelectorAll('.gres .grow > b, .gres-hit').forEach(el => markText(el, q));
       results.querySelectorAll('.gres').forEach(b => {
         b.onclick = () => {
           input.value = '';

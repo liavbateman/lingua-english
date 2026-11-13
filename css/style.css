@@ -1924,3 +1924,8 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
 .pchest.ready { filter: drop-shadow(0 0 10px rgba(255, 197, 61, .45)); }
 .pchest.opened span { opacity: .75; }
 @media (prefers-reduced-motion: reduce) { .pchest-wrap.is-ready::before, .pchest-wrap.is-ready::after { animation: none; opacity: .6; } }
+
+/* ---------- Rule search: the typed text marked in the results, and the line a rule was found in (design round D40) ---------- */
+.gres-mark { padding: 0 2px; border-radius: 4px; background: rgba(255, 214, 107, .35); color: #fff; }
+.gres-hit { display: block; margin-top: 4px; padding: 4px 8px; border-radius: 8px; background: rgba(0, 0, 0, .22);
+  font-size: .78rem; font-weight: 700; color: #d5d9f2; text-align: left; overflow-wrap: anywhere; }
