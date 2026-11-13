@@ -21,6 +21,9 @@ const Kids = (() => {
       pop: 'פוצצו את הבלון', popTip: 'הקשיבו ופוצצו את הבלון הנכון', sayPop: 'פוצצו את הבלון של',
       abc: 'ABC: האותיות', abcSub: '26 אותיות, לכל אחת מילה ותמונה', abcGame: 'משחק האותיות', abcFind: 'מצאו את האות',
       abcTip: 'לחצו על אות כדי לשמוע אותה', letterTip: 'הקשיבו ולחצו על האות הנכונה', isFor: '{L} כמו {word}', sayAbcFind: 'איפה האות',
+      say: 'עכשיו תגידו!', sayTip: 'לחצו על המיקרופון ואמרו את המילה באנגלית', listening: 'מקשיב…',
+      sayGood: ['שמעתי! מעולה!', 'איזה יופי של אנגלית!', 'בדיוק ככה!'], sayRetry: 'בואו ננסה עוד פעם 🙂', sayTry: 'ניסיון יפה! ממשיכים',
+      skip: 'דלג', sayHe: 'עכשיו אתם! תגידו',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -35,6 +38,9 @@ const Kids = (() => {
       pop: 'Pop the balloon', popTip: 'Listen and pop the right balloon', sayPop: 'Pop the',
       abc: 'ABC: the letters', abcSub: '26 letters, each with a word and a picture', abcGame: 'Letter game', abcFind: 'Find the letter',
       abcTip: 'Tap a letter to hear it', letterTip: 'Listen and tap the right letter', isFor: '{L} is for {word}', sayAbcFind: 'Find the letter',
+      say: 'Now you say it!', sayTip: 'Tap the microphone and say the word', listening: 'Listening…',
+      sayGood: ['I heard you! Great!', 'Lovely English!', 'Just like that!'], sayRetry: "Let's try once more 🙂", sayTry: 'Nice try! Let’s go on',
+      skip: 'Skip', sayHe: 'Now you! Say',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -97,6 +103,29 @@ const Kids = (() => {
       n.start(now);
     } catch (e) { /* no sound is fine */ }
   }
+  // ---------- listening (speech recognition), where the browser has it ----------
+  const Rec = () => window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null;
+  function stopRec() { if (rec) { try { rec.abort(); } catch (e) {} rec = null; } }
+  // Children's speech is often recognised as a similar word, so be generous:
+  // the word itself, or a word at most 1 letter off (2 for long words), or the same start
+  const clean = x => x.toLowerCase().replace(/[^a-z ]/g, '').trim();
+  function dist(a, b) {
+    const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+    for (let j = 1; j <= b.length; j++) d[0][j] = j;
+    for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    return d[a.length][b.length];
+  }
+  function closeEnough(target, heard) {
+    const t = clean(target), h = clean(heard);
+    if (!h) return false;
+    if (h.includes(t)) return true;
+    const words = h.split(' ');
+    const allow = t.length >= 6 ? 2 : 1;
+    return words.some(x => dist(t, x) <= allow || (t.length >= 4 && x.length >= 3 && t.slice(0, 3) === x.slice(0, 3))) || dist(t, h) <= allow;
+  }
+
   const BALLOONS = ['#ff5d8f', '#3fa7ff', '#ffc93c', '#2fd093', '#b98cff'];
 
   // ---------- the owl buddy ----------
@@ -173,6 +202,7 @@ const Kids = (() => {
       ...words.map(w => ({ kind: 'meet', w })),
       ...order.slice(0, half).map(w => ({ kind: 'tap', w })),
       ...order.slice(half).map(w => ({ kind: 'pop', w })),
+      ...(Rec() ? K.shuffle(words).slice(0, 3).map(w => ({ kind: 'say', w })) : []),
       { kind: 'match' }
     ];
     let at = 0, firstTry = 0, tapped = 0;
@@ -186,6 +216,7 @@ const Kids = (() => {
       if (s.kind === 'meet') meet(s.w, words.indexOf(s.w));
       else if (s.kind === 'tap') tap(s.w);
       else if (s.kind === 'pop') pop(s.w);
+      else if (s.kind === 'say') sayIt(s.w);
       else match();
     }
 
@@ -310,6 +341,74 @@ const Kids = (() => {
           }
         };
       });
+    }
+
+    // Say it: hear the word, tap the big microphone and say it. Very lenient: anything close counts,
+    // and after two tries the owl praises the try and moves on, so a child is never stuck.
+    let saysShown = 0;
+    function sayIt(w) {
+      saysShown++;
+      let tries = 0;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🗣️</span> ${kt('say')}</p>
+          <button class="k-card k-meet k-say-card" id="k-pic" aria-label="${kt('listen')}: ${w.en}">
+            <span class="k-pic" aria-hidden="true">${w.pic}</span>
+            <span class="k-word en" lang="en">${w.en}</span>
+            <span class="k-ear" aria-hidden="true">🔊</span>
+          </button>
+          <div class="k-mic-row">
+            <button class="k-mic" id="k-mic" aria-label="${kt('sayTip')}"><span aria-hidden="true">🎤</span></button>
+          </div>
+          <button class="k-skip" id="k-skip">${kt('skip')} <span aria-hidden="true">${isHe() ? '←' : '→'}</span></button>
+          ${owl(kt('sayTip'), 'small')}
+        </div>`;
+      const pic = $('#k-pic'), mic = $('#k-mic'), bub = () => $('.k-bubble');
+      const hear = () => { sayEn(w.en); pic.classList.remove('boing'); void pic.offsetWidth; pic.classList.add('boing'); };
+      pic.onclick = hear;
+      $('#k-skip').onclick = () => { stopRec(); nextStep(); };
+      setTimeout(() => say(saysShown === 1 ? [['he', kt('sayHe')], ['en', w.en]] : [['en', w.en]]), 200);
+      const done = text => {
+        mic.disabled = true;
+        bub().textContent = text;
+        $('.k-owl').classList.add('happy');
+        K.announce(text);
+        setTimeout(nextStep, 1600);
+      };
+      mic.onclick = () => {
+        if (rec) { stopRec(); return; }   // a second tap stops listening
+        K.Feel.prime();
+        speechSynthesis.cancel();
+        const r = new (Rec())();
+        r.lang = 'en-US';
+        r.interimResults = false;
+        r.maxAlternatives = 5;
+        rec = r;
+        let heard = false;
+        mic.classList.add('on');
+        bub().textContent = kt('listening');
+        r.onresult = e => {
+          heard = true;
+          const alts = Array.from(e.results[0]).map(a => a.transcript);
+          if (alts.some(a => closeEnough(w.en, a))) {
+            K.Feel.right();
+            Store.kidsWordRight(w.id);
+            done(pickOne(kt('sayGood')));
+          } else if (++tries >= 2) {
+            done(kt('sayTry'));
+          } else {
+            bub().textContent = kt('sayRetry');
+            setTimeout(() => sayEn(w.en), 300);
+          }
+        };
+        r.onerror = () => {};
+        r.onend = () => {
+          mic.classList.remove('on');
+          if (rec === r) rec = null;
+          if (!heard && !mic.disabled) bub().textContent = kt('sayTip');
+        };
+        try { r.start(); } catch (err) { rec = null; mic.classList.remove('on'); }
+      };
     }
 
     // Memory game: 4 pairs, each a picture card and a word card, face down
@@ -542,6 +641,7 @@ const Kids = (() => {
     // First meeting: the owl greets the child (Hebrew when there is a Hebrew voice, then English)
     hello() { say([['he', 'היי! אני הינשוף. בואו נלמד אנגלית ביחד!'], ['en', "Hello! Let's play!"]]); },
     show(a, b) {
+      stopRec();
       document.body.classList.add('kids');
       if (a === 'play') play(b);
       else if (a === 'stickers') stickers();
@@ -549,6 +649,6 @@ const Kids = (() => {
       else if (a === 'abcgame') abcGame();
       else map();
     },
-    leave() { document.body.classList.remove('kids'); document.body.style.removeProperty('--kc'); }
+    leave() { stopRec(); document.body.classList.remove('kids'); document.body.style.removeProperty('--kc'); }
   };
 })();
