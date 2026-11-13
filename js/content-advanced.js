@@ -509,6 +509,42 @@ UNITS.push(
       { en: 'Have a good evening, see you tomorrow!', he: 'ערב טוב, נתראה מחר!' },
       { en: 'Thanks for your help today; it made a real difference.', he: 'תודה על העזרה היום, זה ממש עזר.' }
     ]
+  },
+
+  // ---------- Added in round 54 ----------
+  {
+    id: 'a-phr-news', level: 'advanced', kind: 'phrases', title: 'Discussing the news', he: 'לדבר על החדשות', emoji: '📰',
+    words: [
+      { en: 'Did you see the news this morning?', he: 'ראית את החדשות הבוקר?' },
+      { en: 'Apparently, prices are going up again.', he: 'מסתבר שהמחירים שוב עולים.' },
+      { en: 'I read an interesting article about it.', he: 'קראתי כתבה מעניינת על זה.' },
+      { en: 'It depends on which source you trust.', he: 'זה תלוי באיזה מקור בוחרים לסמוך.' },
+      { en: 'That headline is a bit misleading.', he: 'הכותרת הזאת קצת מטעה.' },
+      { en: "I doubt that's the whole story.", he: 'ספק אם זה כל הסיפור.' },
+      { en: 'There are two sides to every story.', he: 'לכל סיפור יש שני צדדים.' },
+      { en: "It's been all over social media.", he: 'זה בכל הרשתות החברתיות.' },
+      { en: "What's your take on it?", he: 'מה דעתך על זה?' },
+      { en: 'I find it hard to believe.', he: 'קשה לי להאמין לזה.' },
+      { en: "Let's wait until all the facts come out.", he: 'בואו נחכה עד שכל העובדות ייצאו לאור.' },
+      { en: 'Either way, it affects all of us.', he: 'כך או כך, זה משפיע על כולנו.' }
+    ]
+  },
+  {
+    id: 'a-phr-apologising', level: 'advanced', kind: 'phrases', title: 'Apologising properly', he: 'להתנצל כמו שצריך', emoji: '🙏',
+    words: [
+      { en: 'I owe you an apology.', he: 'מגיעה לך התנצלות ממני.' },
+      { en: "I'm really sorry about what happened.", he: 'צר לי מאוד על מה שקרה.' },
+      { en: 'That was completely my fault.', he: 'זו הייתה לגמרי אשמתי.' },
+      { en: "I didn't mean to upset you.", he: 'לא התכוונתי לפגוע בך.' },
+      { en: 'I should have told you earlier.', he: 'היה עליי לספר לך קודם.' },
+      { en: "It won't happen again.", he: 'זה לא יקרה שוב.' },
+      { en: 'How can I make it up to you?', he: 'איך אפשר לפצות אותך על זה?' },
+      { en: 'I hope you can forgive me.', he: 'מקווה שאפשר לסלוח לי.' },
+      { en: 'Please accept my apologies for the delay.', he: 'אנא קבלו את התנצלותי על העיכוב.' },
+      { en: 'No worries, these things happen.', he: 'אין בעיה, דברים כאלה קורים.' },
+      { en: 'Apology accepted.', he: 'ההתנצלות התקבלה.' },
+      { en: "Let's put it behind us.", he: 'בואו נשאיר את זה מאחורינו.' }
+    ]
   }
 );
 
@@ -694,5 +730,20 @@ GRAMMAR.push(
     ex: [["You can stay as long as you're quiet.", 'אפשר להישאר בתנאי ששומרים על שקט.'], ["We'll start at nine unless the train is late.", 'נתחיל בתשע, אלא אם כן הרכבת תאחר.'], ['Provided that everyone agrees, the change will start in May.', 'בתנאי שכולם מסכימים, השינוי יתחיל במאי.']],
     tip: 'unless כבר מכיל את השלילה, ולכן לא מוסיפים not: "unless you hurry", לא "unless you don\'t hurry". ואחרי as long as לא בא will: "as long as it doesn\'t rain", לא "as long as it won\'t rain".',
     quiz: [["You'll miss the bus ___ you leave right now.", 'unless', ['unless not', 'except', 'without']], ['You can use my laptop as long as you ___ careful with it.', 'are', ['will be', 'would be', 'be']], ['We will sign the contract, ___ the price is right.', 'provided that', ['provide that', 'despite', 'in case of']]]
+  },
+
+  // ---------- Added in round 54 ----------
+  {
+    id: 'a-should-have', level: 'advanced', title: 'Should have, could have, would have', he: 'חרטה וביקורת על העבר: should have / could have',
+    when: 'כשמדברים על העבר ועל מה שהיה ראוי או אפשרי לעשות, אבל לא קרה. should have הוא "היה צריך" (חרטה או ביקורת), could have הוא "היה אפשר" (אפשרות שלא נוצלה), ו-would have הוא "היה ... אילו" (תוצאה שלא קרתה). אחרי כולם בא have ואז צורת V3 של הפועל.',
+    forms: [
+      ['regret', 'should have + V3: You should have called me.'],
+      ['possible', 'could have + V3: We could have won.'],
+      ['result', 'would have + V3: I would have helped.'],
+      ['negative', "shouldn't have + V3: I shouldn't have said that."]
+    ],
+    ex: [['I should have studied harder.', 'היה עליי ללמוד יותר.'], ['You could have hurt yourself!', 'יכולת להיפגע!'], ['We would have come if we had known.', 'היינו באים אילו ידענו.']],
+    tip: 'טעות נפוצה: לכתוב "should of", כי כך זה נשמע בדיבור (should\'ve). הצורה הנכונה היא should have. ואחרי have תמיד V3: "should have gone", לא "should have went".',
+    quiz: [['You ___ told me earlier. Now it is too late.', 'should have', ['should', 'should of', 'must']], ['We could have ___ the train if we had left earlier.', 'caught', ['catch', 'catching', 'to catch']], ["I ___ said that. I'm sorry.", "shouldn't have", ["shouldn't", 'should have not', "didn't should"]]]
   }
 );
