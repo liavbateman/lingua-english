@@ -1538,3 +1538,5 @@ button.pc-form[aria-expanded="true"] .pc-more { transform: rotate(180deg); }
 .cal-d.now { box-shadow: 0 0 0 2px #ffb199; }
 .cal-key { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 10px; }
 .cal-key .cal-d { width: 14px; height: 14px; border-radius: 4px; aspect-ratio: auto; }
+/* tags take their direction from their first letter: "+ s" reads left to right, "תנועה + y" right to left */
+.rtag, .pc-tag, .ftag { unicode-bidi: plaintext; }

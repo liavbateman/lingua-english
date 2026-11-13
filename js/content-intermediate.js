@@ -827,5 +827,20 @@ GRAMMAR.push(
     ex: [['"I didn\'t sleep well." "Neither did I."', '"לא ישנתי טוב." "גם אני לא."'], ['"We went to Spain last year." "So did we!"', '"נסענו לספרד בשנה שעברה." "גם אנחנו!"'], ['"Tom has never been to Japan." "Neither have I."', '"טום אף פעם לא היה ביפן." "גם אני לא."']],
     tip: 'טעות נפוצה: לענות "So I do" או "Neither I can". אחרי So ו-Neither הסדר הפוך: קודם פועל העזר ואז הנושא. וגם לא "Neither don\'t I": אחרי Neither הפועל חיובי.',
     quiz: [['"I like jazz." "So ___ I."', 'do', ['am', 'like', 'does']], ['"I wasn\'t at home." "Neither ___ I."', 'was', ['did', "wasn't", 'am']], ['"She can swim." "So ___ her brother."', 'can', ['does', 'is', 'swims']]]
+  },
+
+  // ---------- Spelling of endings (user request) ----------
+  {
+    id: 'i-spell-ed', level: 'intermediate', title: 'Adding -ed', he: 'איך מוסיפים ed בעבר: played, stopped, studied',
+    when: 'בעבר פשוט, פעלים רגילים מקבלים ed. כללי הכתיב דומים לאלה של ing: אם הפועל נגמר ב-e מוסיפים רק d, אחרי עיצור ו-y כותבים ied, ובפועל קצר שנגמר בתנועה אחת ועיצור אחד מכפילים את העיצור.',
+    forms: [
+      ['+ ed', 'work → worked · play → played · open → opened'],
+      ['+ d', 'ends in e: like → liked · live → lived · use → used'],
+      ['y → ied', 'consonant + y: study → studied · cry → cried · try → tried'],
+      ['double', 'one short vowel + one consonant: stop → stopped · plan → planned']
+    ],
+    ex: [['We played football yesterday.', 'שיחקנו כדורגל אתמול.'], ['She studied all night.', 'היא למדה כל הלילה.'], ['The bus stopped near the bank.', 'האוטובוס עצר ליד הבנק.']],
+    tip: 'טעות נפוצה: "studyed" או "stoped". אחרי עיצור ו-y כותבים ied (studied), ועיצור אחרי תנועה קצרה מוכפל (stop → stopped). אחרי תנועה ו-y רק מוסיפים ed: played, enjoyed.',
+    quiz: [['They ___ in Haifa for ten years.', 'lived', ['liveed', 'livd', 'lifed']], ['I ___ hard for the exam.', 'studied', ['studyed', 'studdied', 'studyied']], ['The car ___ at the red light.', 'stopped', ['stoped', 'stopt', 'stoppd']]]
   }
 );

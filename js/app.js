@@ -595,7 +595,8 @@
     ['a-wish', 'a-should-have'], ['to-be', 'b-was-were'], ['b-have', 'there-is'], ['articles', 'a-articles-general'],
     ['b-would-like', 'b-want-need'], ['b-would-like', 'a-would-rather'], ['can', 'modals'], ['modals', 'a-deduction'],
     ['b-adjective-position', 'i-adjectives-adverbs'], ['gerund-infinitive', 'b-want-need'], ['b-connectors', 'a-concession'],
-    ['passive', 'a-causative'], ['reported-speech', 'past-perfect'], ['i-so-neither', 'i-question-tags'], ['plurals', 'quantity']
+    ['passive', 'a-causative'], ['reported-speech', 'past-perfect'], ['i-so-neither', 'i-question-tags'], ['plurals', 'quantity'],
+    ['b-spell-s', 'present-simple'], ['b-spell-s', 'plurals'], ['b-spell-ing', 'present-continuous'], ['i-spell-ed', 'past-simple']
   ];
   const rulePartners = id => RULE_PAIRS.filter(p => p.includes(id)).map(p => p[0] === id ? p[1] : p[0]);
   function relatedRules(x) {

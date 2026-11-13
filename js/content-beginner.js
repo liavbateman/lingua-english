@@ -727,5 +727,34 @@ GRAMMAR.push(
     ex: [['My birthday is on the third of June.', 'יום ההולדת שלי בשלושה ביוני.'], ['Our flat is on the second floor.', 'הדירה שלנו בקומה השנייה.'], ['It was her first day at work.', 'זה היה היום הראשון שלה בעבודה.']],
     tip: 'טעות נפוצה: "the twenty-one of May". בתאריך משתמשים במספר הסודר: "the twenty-first of May". ושימו לב לאיות: fifth, ninth ו-twelfth, לא "fiveth", "nineth" או "twelveth".',
     quiz: [['Today is the ___ of April.', 'second', ['two', 'twoth', 'secondth']], ['This is my ___ time in London.', 'fifth', ['fiveth', 'five', 'fifeth']], ['Christmas is on the ___ of December.', 'twenty-fifth', ['twenty-five', 'twenty-fiveth', 'twentieth-five']]]
+  },
+
+  // ---------- Spelling of endings (user request) ----------
+  {
+    id: 'b-spell-s', level: 'beginner', title: 'Adding -s, -es or -ies', he: 'מתי מוסיפים s, es או ies',
+    when: 'בהווה פשוט, בגוף שלישי יחיד (he / she / it), מוסיפים לפועל s. אותם כללי כתיב חלים גם על שמות עצם ברבים. ברוב המילים מוסיפים s, אבל אחרי צלילים "שורקים" (s, sh, ch, x) ואחרי o מוסיפים es, ואחרי עיצור ו-y הופכים את ה-y ל-ies.',
+    forms: [
+      ['+ s', 'work → works · read → reads · book → books'],
+      ['+ es', 'after s, sh, ch, x, o: watch → watches · wash → washes · go → goes · box → boxes'],
+      ['y → ies', 'consonant + y: study → studies · fly → flies · city → cities'],
+      ['vowel + y', 'y stays, just add s: play → plays · buy → buys · day → days'],
+      ['irregular', 'have → has · do → does']
+    ],
+    ex: [['She watches TV every evening.', 'היא צופה בטלוויזיה כל ערב.'], ['My brother studies at night.', 'אחי לומד בלילה.'], ['He goes to work by bus.', 'הוא נוסע לעבודה באוטובוס.'], ['Dana plays the piano.', 'דנה מנגנת בפסנתר.']],
+    tip: 'טעות נפוצה: "he gos" או "she studys". אחרי o מוסיפים es (goes, does), ואחרי עיצור ו-y מחליפים ל-ies (studies). אבל אחרי תנועה ו-y רק מוסיפים s: plays, buys.',
+    quiz: [['She ___ her hands before dinner.', 'washes', ['washs', 'washies', 'wash']], ['He ___ English at university.', 'studies', ['studys', 'studyes', 'study']], ['My dad ___ the guitar.', 'plays', ['plaies', 'playes', 'play']]]
+  },
+  {
+    id: 'b-spell-ing', level: 'beginner', title: 'Adding -ing', he: 'איך מוסיפים ing: making, running',
+    when: 'כשמוסיפים ing לפועל (למשל בהווה ממושך: I am working) יש שלושה כללי כתיב. e שקטה בסוף הפועל נופלת. בפועל קצר שנגמר בתנועה אחת ועיצור אחד מכפילים את העיצור. ו-ie בסוף הופך ל-ying.',
+    forms: [
+      ['+ ing', 'work → working · read → reading · play → playing'],
+      ['drop e', 'silent e drops: make → making · write → writing · come → coming'],
+      ['double', 'one short vowel + one consonant: run → running · sit → sitting · stop → stopping'],
+      ['ie → ying', 'lie → lying · die → dying · tie → tying']
+    ],
+    ex: [['She is writing an email.', 'היא כותבת מייל.'], ['They are swimming in the sea.', 'הם שוחים בים.'], ['Dad is making dinner.', 'אבא מכין ארוחת ערב.']],
+    tip: 'טעות נפוצה: "writeing" או "runing". e שקטה בסוף נופלת (write → writing), ועיצור אחרי תנועה קצרה אחת מוכפל (run → running). אבל לא מכפילים w, x או y: snowing, fixing, playing.',
+    quiz: [['She is ___ a letter.', 'writing', ['writeing', 'writting', 'write']], ['The kids are ___ in the park.', 'running', ['runing', 'runnning', 'run']], ['Why are you ___ on the floor?', 'lying', ['lieing', 'liing', 'lie']]]
   }
 );
