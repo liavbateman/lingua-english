@@ -515,3 +515,22 @@ a.card:active, .task:active { transform: scale(.985); }
 .wcol i { display: block; width: 14px; background: #8e7dff; border-radius: 4px 4px 0 0; }
 .wd { margin-top: 6px; font-size: .75rem; color: var(--muted); white-space: nowrap; }
 .wb.today .wd { color: var(--ink); font-weight: 700; }
+
+/* Daily goal: a one-time celebration, and a calm "done" bar on Home */
+.celebrate {
+  display: grid; justify-items: center; gap: 4px; text-align: center;
+  margin-top: 14px; padding: 18px 16px; border-radius: var(--radius);
+  background: linear-gradient(140deg, rgba(47, 208, 147, .22), rgba(106, 92, 255, .22));
+  border: 1px solid rgba(47, 208, 147, .45);
+  animation: pop .45s cubic-bezier(.2, 1.4, .4, 1) both;
+}
+.celebrate .burst { font-size: 2.6rem; line-height: 1; animation: pop .6s .1s cubic-bezier(.2, 1.6, .4, 1) both; }
+.celebrate b { font-size: 1.25rem; }
+.celebrate span { color: var(--muted); }
+@keyframes pop { from { transform: scale(.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.plan-done {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  padding: 10px 14px; border-radius: 14px; background: var(--good-soft); color: var(--ink);
+}
+.plan-done svg { width: 20px; height: 20px; color: var(--good); flex: none; }
+.plan-done b { color: var(--good); }

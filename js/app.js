@@ -211,6 +211,22 @@
     ];
   }
 
+  // Every item of today's plan is checked off
+  const planDone = () => planTasks().every(x => Store.tasks[x.id]);
+
+  // Shown once, on the screen where the last task of the day gets finished
+  function celebration() {
+    if (Store.celebrated || !planDone()) return '';
+    Store.markCelebrated();
+    setTimeout(() => Feel.right(), 250);
+    return `
+      <div class="celebrate" role="status">
+        <div class="burst" aria-hidden="true">🎉</div>
+        <b>${t('goal.done')}</b>
+        <span>🔥 ${t(Store.streak === 1 ? 'goal.streak.one' : 'goal.streak', { n: Store.streak })}</span>
+      </div>`;
+  }
+
   // ---------- Home ----------
   function home() {
     const lw = wordsOf(Store.level);
@@ -245,6 +261,7 @@
       </div>
 
       <div class="section">${ICON.calendar} ${t('home.plan')} <span class="end"><b class="en">${doneCount} / ${tasks.length}</b> ${t('home.completed')}</span></div>
+      ${doneCount === tasks.length ? `<div class="plan-done">${ICON.check}<span><b>${t('goal.home')}</b> ${t('goal.home.sub')}</span></div>` : ''}
       ${tasks.map(x => `
         <a class="task" href="${x.href}">
           <span class="tile ${x.color}">${ICON[x.icon]}</span>
@@ -423,6 +440,7 @@
       refreshChrome('learn');
       const next = levelGrammar().find(x => !Store.isGrammarDone(x.id));
       view.innerHTML = `
+        ${celebration()}
         <div class="card center" style="margin-top:14px">
           <div class="big">${passed ? '🏆' : '💪'}</div>
           <h1>${t('quiz.score', { a: correct, b: g.quiz.length })}</h1>
@@ -517,6 +535,7 @@
 
   function done(emoji, title, text, extra = '') {
     view.innerHTML = `
+      ${celebration()}
       <div class="card center" style="margin-top:14px">
         <div class="big">${emoji}</div>
         <h1>${title}</h1>

@@ -58,6 +58,9 @@ const Store = (() => {
     // Today's finished plan items, e.g. { vocab: true }
     get tasks() { return state.daily.date === dayKey() ? (state.daily.tasks || {}) : {}; },
     completeTask(id) { touchDay(); state.daily.tasks[id] = true; save(); },
+    // The "goal done" celebration is shown once a day
+    get celebrated() { return state.daily.date === dayKey() && !!state.daily.celebrated; },
+    markCelebrated() { touchDay(); state.daily.celebrated = true; save(); },
 
     // Grammar rules whose practice was passed
     isGrammarDone: id => !!(state.grammar && state.grammar[id]),
