@@ -409,3 +409,11 @@ a.card:active, .task:active { transform: scale(.985); }
   color: #ffb4a8; background: rgba(240, 86, 110, .16);
 }
 .again svg { width: 15px; height: 15px; }
+
+/* Backup card on the Progress screen */
+.backup .small { margin: 6px 0 12px; }
+.backup .pager { margin: 0; }
+.backup-msg { margin: 10px 0 0 !important; }
+.backup-msg:empty { display: none; }
+.backup-msg.ok { color: var(--good); }
+.backup-msg.bad { color: var(--bad); }

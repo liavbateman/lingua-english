@@ -682,7 +682,55 @@
       </div>
       <div style="height:10px"></div>
       ${LEVELS.map(levelCard).join('')}
+      <div class="card backup">
+        <b>💾 ${t('backup.title')}</b>
+        <p class="small">${t('backup.sub')}</p>
+        <div class="pager">
+          <button class="btn ghost" id="restore">${t('backup.restore')}</button>
+          <button class="btn" id="save">${t('backup.save')}</button>
+        </div>
+        <input type="file" id="backup-file" accept=".json,application/json,text/plain" hidden>
+        <p class="small backup-msg" id="backup-msg" role="status"></p>
+      </div>
       <button class="btn plain" id="reset">${t('progress.reset')}</button>`;
+    const msg = (text, ok) => { const m = $('#backup-msg'); m.textContent = text; m.className = 'small backup-msg ' + (ok ? 'ok' : 'bad'); };
+
+    // On iPhone the share sheet offers "Save to Files", Notes, Mail…; elsewhere the file is downloaded
+    $('#save').onclick = async () => {
+      const name = `lingua-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      const file = new File([Store.exportData()], name, { type: 'application/json' });
+      try {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: 'Lingua' });
+        } else {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(file);
+          a.download = name;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        }
+        msg(t('backup.saved'), true);
+      } catch (e) {
+        if (e.name !== 'AbortError') msg(t('backup.saveFailed'), false);   // closing the share sheet is not an error
+      }
+    };
+
+    $('#restore').onclick = () => $('#backup-file').click();
+    $('#backup-file').onchange = async e => {
+      const f = e.target.files[0];
+      e.target.value = '';
+      if (!f) return;
+      let text;
+      try { text = await f.text(); JSON.parse(text); } catch (err) { return msg(t('backup.bad'), false); }
+      if (!confirm(t('backup.confirm'))) return;
+      try {
+        const r = Store.importData(text);
+        progress();
+        refreshChrome('progress');
+        msg(t('backup.restored', { n: r.words }), true);
+      } catch (err) { msg(t('backup.bad'), false); }
+    };
+
     $('#reset').onclick = () => {
       if (confirm(t('progress.confirm'))) { Store.reset(); route(); }
     };

@@ -63,6 +63,11 @@ const STR = {
     'progress.title': 'My progress', 'progress.sub': '{x} points so far',
     'progress.streak': 'Day streak', 'progress.best': 'Best streak',
     'progress.words': '{a} of {b} words', 'progress.phrases': '{a} of {b} sentences', 'progress.rules': '{a} of {b} grammar rules',
+    'backup.title': 'Backup', 'backup.sub': 'Keep a copy of your progress, to restore it on a new phone or after clearing Safari.',
+    'backup.save': 'Save backup', 'backup.restore': 'Restore',
+    'backup.saved': 'Backup ready. Keep the file somewhere safe.', 'backup.saveFailed': 'Could not create the backup.',
+    'backup.confirm': 'Replace your current progress with the backup?', 'backup.bad': 'This file is not a Lingua backup. Nothing was changed.',
+    'backup.restored': 'Progress restored: {n} words.',
     'progress.reset': 'Reset all progress', 'progress.confirm': 'Delete all progress? This cannot be undone.',
     'notfound': 'Page not found'
   },
@@ -129,6 +134,11 @@ const STR = {
     'progress.title': 'ההתקדמות שלי', 'progress.sub': '{x} נקודות עד עכשיו',
     'progress.streak': 'ימים ברצף', 'progress.best': 'שיא רצף',
     'progress.words': '{a} מתוך {b} מילים', 'progress.phrases': '{a} מתוך {b} משפטים', 'progress.rules': '{a} מתוך {b} כללי דקדוק',
+    'backup.title': 'גיבוי', 'backup.sub': 'שמרו עותק של ההתקדמות, כדי לשחזר אותה בטלפון חדש או אחרי ניקוי של Safari.',
+    'backup.save': 'שמירת גיבוי', 'backup.restore': 'שחזור',
+    'backup.saved': 'הגיבוי מוכן. שמרו את הקובץ במקום בטוח.', 'backup.saveFailed': 'לא הצלחנו ליצור את הגיבוי.',
+    'backup.confirm': 'להחליף את ההתקדמות הנוכחית בגיבוי?', 'backup.bad': 'הקובץ הזה אינו גיבוי של Lingua. לא שונה דבר.',
+    'backup.restored': 'ההתקדמות שוחזרה: {n} מילים.',
     'progress.reset': 'איפוס כל ההתקדמות', 'progress.confirm': 'למחוק את כל ההתקדמות? אי אפשר לבטל את הפעולה.',
     'notfound': 'הדף לא נמצא'
   }
