@@ -35,7 +35,7 @@ Order on screen: today's goal → the next step → today's plan → one place f
 | # | Round | Pattern | Inspired by | Status |
 |---|---|---|---|---|
 | H1 | Today header | Greeting by time of day, level chip (opens the level sheet), a ring for today's plan, a message (tasks left / keep the streak / done) and the last 7 days. Replaces the welcome card with duplicate stats and the level buttons | Duolingo daily goal, Babbel "Today" | Done (round 48) |
-| H2 | Continue = the path | The next-step card shows where it sits on the path (stage, lesson N of M, progress ring like the path node) and links to the path | Duolingo, Babbel | |
+| H2 | Continue = the path | The next-step card shows where it sits on the path (stage, lesson N of M, progress ring like the path node) and links to the path | Duolingo, Babbel | Done (round 50): "Stage 1 · lesson 3 of 5", stage bar in path colors, ringed icon, "See it on the path" |
 | H3 | Plan as daily quests | Each task shows its own progress bar (e.g. "6 / 15 words"); finishing all of them opens a small daily chest | Duolingo daily quests | |
 | H4 | Word of the day you practise | The Hebrew is hidden until tapped (active recall), with "add to my review" | Drops, Memrise | |
 | H5 | Evening streak nudge | After 18:00 with nothing done, the owl asks for one short lesson, with a 3-minute review button | Duolingo | |

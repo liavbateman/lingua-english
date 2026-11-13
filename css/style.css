@@ -1057,3 +1057,24 @@ button.path-head:active span { background: rgba(142, 125, 255, .22); }
 .td-day.now small { color: var(--ink); font-weight: 800; }
 @media (max-width: 340px) { .td-main { gap: 10px; } .td-ring { width: 62px; height: 62px; } .td-day i { width: 19px; height: 19px; } }
 @media (prefers-reduced-motion: reduce) { .td-fill { transition: none; } }
+
+/* Home: the next step shows where it sits on the path */
+.cont-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.cont-where { font-size: .78rem; font-weight: 700; color: var(--muted); }
+.cont-tile { position: relative; flex: none; display: grid; place-items: center; }
+.cont-tile.ringed { padding: 5px; }
+.cont-tile.ringed::before {   /* the same progress ring the lesson has on the path */
+  content: ""; position: absolute; inset: 0; border-radius: 22px;
+  background: conic-gradient(#ffb199 calc(var(--pct) * 1%), rgba(255, 255, 255, .12) 0);
+  -webkit-mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  padding: 3px;
+}
+.cont-dots { display: flex; gap: 6px; }
+.cont-dots i { flex: 1; height: 6px; border-radius: 999px; background: rgba(255, 255, 255, .14); }
+.cont-dots i.on { background: #ffc94d; }
+.cont-dots i.now { background: linear-gradient(90deg, #ffb199, #ff7e8a); }
+.cont-path {
+  display: flex; align-items: center; justify-content: center; min-height: 44px; margin: -8px 0 10px;
+  color: #b9b0ff; font-weight: 700; font-size: .9rem; text-decoration: none;
+}

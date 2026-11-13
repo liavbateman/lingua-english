@@ -208,7 +208,7 @@
       : [];
     return [
       ...review,
-      { id: 'vocab', title: t('task.vocab'), sub: t('task.vocab.sub', { n: u.words.length }), href: `#/unit/${u.id}`, icon: 'book', color: 'blue' },
+      { id: 'vocab', title: t('task.vocab'), sub: t('task.vocab.sub', { n: (u.words.length - Store.unitProgress(u).seen) || u.words.length }), href: `#/unit/${u.id}`, icon: 'book', color: 'blue' },
       { id: 'speak', title: t('task.speak'), sub: t('task.speak.sub'), href: '#/speak', icon: 'mic', color: 'purple' },
       { id: 'listen', title: t('task.listen'), sub: t('task.listen.sub'), href: '#/quiz/listen/level', icon: 'headphones', color: 'green' },
       { id: 'grammar', title: t('task.grammar'), sub: t('task.grammar.sub', { title: ruleTitle(g) }), href: `#/grammar/${g.id}`, icon: 'pencil', color: 'gold' }
@@ -240,18 +240,31 @@
     const due = Store.dueWords().length;
     if (due && !done.review) return { href: '#/quiz/choice/review', icon: 'repeat', color: 'coral',
       title: t('cont.review', { n: due }), sub: t('cont.review.sub') };
-    const u = levelUnits().find(x => x.kind !== 'phrases' && Store.unitProgress(x).seen < x.words.length);
+    const wordUnits = levelUnits().filter(x => x.kind !== 'phrases');
+    const u = wordUnits.find(x => Store.unitProgress(x).seen < x.words.length);
     if (u && !done.vocab) {
       const fresh = u.words.length - Store.unitProgress(u).seen;
+      const unitDone = x => { const p = Store.unitProgress(x); return p.total > 0 && p.mastered / p.total >= 0.6; };
       return { href: `#/unit/${u.id}`, icon: 'book', color: 'blue', emoji: u.emoji,
-        title: t('cont.lesson', { title: unitTitle(u) }), sub: t('cont.lesson.sub', { n: fresh }) };
+        title: t('cont.lesson', { title: unitTitle(u) }), sub: t('cont.lesson.sub', { n: fresh }),
+        spot: pathSpot(wordUnits.map(unitDone), wordUnits.indexOf(u), Store.unitProgress(u).pct, '#/learn') };
     }
-    const g = levelGrammar().find(x => !Store.isGrammarDone(x.id));
+    const rules = levelGrammar();
+    const g = rules.find(x => !Store.isGrammarDone(x.id));
     if (g && !done.grammar) return { href: `#/grammar/${g.id}`, icon: 'pencil', color: 'gold',
-      title: t('cont.grammar', { title: ruleTitle(g) }), sub: t('cont.grammar.sub') };
+      title: t('cont.grammar', { title: ruleTitle(g) }), sub: t('cont.grammar.sub'),
+      spot: pathSpot(rules.map(x => Store.isGrammarDone(x.id)), rules.indexOf(g), 0, '#/grammar') };
     const left = planTasks().find(x => !done[x.id]);
     if (left) return { href: left.href, icon: left.icon, color: left.color, title: left.title, sub: left.sub };
     return { href: '#/practice', icon: 'levels', color: 'purple', title: t('cont.free'), sub: t('cont.free.sub') };
+  }
+
+  // Where a lesson sits on the path: its stage, its place in the stage, which lessons of the
+  // stage are done, and how far the lesson itself is (the same ring the path node shows)
+  function pathSpot(doneList, i, pct, path) {
+    const s = Math.floor(i / PATH_SECTION);
+    const stage = doneList.slice(s * PATH_SECTION, (s + 1) * PATH_SECTION);
+    return { stage: s + 1, n: i - s * PATH_SECTION + 1, of: stage.length, done: stage, pct, path };
   }
 
   function home() {
@@ -269,13 +282,19 @@
     view.innerHTML = `
       ${todayCard(tasks, doneCount)}
       <a class="continue" href="${step.href}">
-        <span class="cont-kicker">${t('cont.kicker')}</span>
+        <span class="cont-top">
+          <span class="cont-kicker">${t('cont.kicker')}</span>
+          ${step.spot ? `<span class="cont-where">${t('cont.where', { s: step.spot.stage, n: step.spot.n, m: step.spot.of })}</span>` : ''}
+        </span>
         <span class="cont-row">
-          <span class="tile ${step.color}">${step.emoji ? `<span class="cont-emoji">${step.emoji}</span>` : ICON[step.icon]}</span>
+          <span class="cont-tile${step.spot ? ' ringed' : ''}" style="--pct:${step.spot ? step.spot.pct : 0}"><span class="tile ${step.color}">${step.emoji ? `<span class="cont-emoji">${step.emoji}</span>` : ICON[step.icon]}</span></span>
           <span class="grow"><b>${step.title}</b><span class="small">${step.sub}</span></span>
         </span>
+        ${step.spot ? `<span class="cont-dots" aria-hidden="true">${step.spot.done.map((d, k) =>
+          `<i class="${d ? 'on' : ''}${k === step.spot.n - 1 ? ' now' : ''}"></i>`).join('')}</span>` : ''}
         <span class="cont-go">${t('cont.go')} ${fwd()}</span>
       </a>
+      ${step.spot ? `<a class="cont-path" href="${step.spot.path}">🗺️ ${t('cont.path')} ${fwd()}</a>` : ''}
 
 
       <div class="section">${ICON.calendar} ${t('home.plan')} <span class="end"><b class="en">${doneCount} / ${tasks.length}</b> ${t('home.completed')}</span></div>
