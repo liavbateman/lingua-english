@@ -603,6 +603,28 @@ UNITS.push(
       { en: 'Please accept our sincere apologies for the inconvenience.', he: 'אנא קבלו את התנצלותנו הכנה על אי-הנוחות.' },
       { en: 'Yours sincerely,', he: 'בכבוד רב,' }
     ]
+  },
+
+  // ---------- Added in round 72 ----------
+  {
+    id: 'a-politics', level: 'advanced', title: 'Politics & government', he: 'פוליטיקה וממשל', emoji: '🏛️',
+    words: [
+      { en: 'election', he: 'בחירות', ex: 'The next election will be held in the spring.' },
+      { en: 'candidate', he: 'מועמד, מועמדת', ex: 'Each candidate gave a short speech.' },
+      { en: 'campaign', he: 'מערכת בחירות, קמפיין', ex: 'The campaign focused on housing costs.' },
+      { en: 'policy', he: 'מדיניות', ex: 'The new policy affects all public schools.' },
+      { en: 'parliament', he: 'פרלמנט', ex: 'The bill was debated in parliament for weeks.' },
+      { en: 'coalition', he: 'קואליציה', ex: 'The coalition has a majority of just two seats.' },
+      { en: 'opposition', he: 'אופוזיציה', ex: 'The opposition voted against the budget.' },
+      { en: 'minister', he: 'שר, שרה (בממשלה)', ex: 'The minister announced new tax cuts.' },
+      { en: 'ballot', he: 'פתק הצבעה', ex: 'Voters cast their ballot before noon.' },
+      { en: 'referendum', he: 'משאל עם', ex: 'The country held a referendum on the issue.' },
+      { en: 'legislation', he: 'חקיקה', ex: 'New legislation protects online privacy.' },
+      { en: 'reform', he: 'רפורמה', ex: 'The government promised a major tax reform.' },
+      { en: 'diplomacy', he: 'דיפלומטיה', ex: 'The crisis was solved through quiet diplomacy.' },
+      { en: 'sanctions', he: 'סנקציות', ex: 'The sanctions hit the economy hard.' },
+      { en: 'turnout', he: 'שיעור ההצבעה', ex: 'Voter turnout was the highest in decades.' }
+    ]
   }
 );
 
