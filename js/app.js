@@ -1600,9 +1600,14 @@
       Store.markSeen(w.id);
       const long = w.phrase ? 'long' : '';
       let flipped = false, busy = false;
+      document.body.dataset.lv = unit.level;   // the progress track in the unit's level colour
       view.innerHTML = `
-        <p class="sub">${unit.emoji} ${unitTitle(unit)} · ${t('card.count', { a: i + 1, b: words.length })}</p>
+        <div class="gq-head lv-${unit.level}">
+          <span class="gq-title">${unit.emoji} ${unitTitle(unit)}</span>
+          <span class="gq-count">${t('card.count', { a: i + 1, b: words.length })}</span>
+        </div>
         ${lessonBar(i / words.length)}
+        <div class="fc-deck lv-${unit.level}${i < words.length - 1 ? ' has-more' : ''}">
         <div class="fc-wrap lv-${unit.level}" id="fcwrap">
           <span class="fc-tag know" aria-hidden="true">${t('cards.know')} ✓</span>
           <span class="fc-tag again" aria-hidden="true">↺ ${t('cards.again')}</span>
@@ -1622,8 +1627,9 @@
             </div>
           </div>
         </div>
+        </div>
         <p class="fc-help small" id="fchelp" aria-live="polite"></p>
-        <div class="pager" id="fcbtns"></div>
+        <div class="pager fc-btns lv-${unit.level}" id="fcbtns"></div>
         ${i > 0 ? `<button class="btn plain" id="prev">${bwd()} ${t('cards.prev')}</button>` : ''}`;
 
       const wrap = $('#fcwrap'), fc = $('#fc'), btns = $('#fcbtns');
@@ -1634,9 +1640,9 @@
         btns.innerHTML = flipped
           // "Knew it" sits on the right in both languages, the side a "knew it" swipe goes to
           ? (isHe()
-            ? `<button class="btn" id="know">${t('cards.know')} ✓</button><button class="btn ghost" id="again">↺ ${t('cards.again')}</button>`
-            : `<button class="btn ghost" id="again">↺ ${t('cards.again')}</button><button class="btn" id="know">${t('cards.know')} ✓</button>`)
-          : `<button class="btn" id="show">${t('cards.show')}</button>`;
+            ? `<button class="btn fc-know" id="know">${t('cards.know')} ✓</button><button class="btn fc-again" id="again">↺ ${t('cards.again')}</button>`
+            : `<button class="btn fc-again" id="again">↺ ${t('cards.again')}</button><button class="btn fc-know" id="know">${t('cards.know')} ✓</button>`)
+          : `<button class="btn fc-show" id="show">${t('cards.show')}</button>`;
         if (flipped) {
           $('#again').onclick = () => fly(false);
           $('#know').onclick = () => fly(true);

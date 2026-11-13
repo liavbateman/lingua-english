@@ -1666,3 +1666,21 @@ body[data-lv="advanced"] .lb-track i { background: linear-gradient(90deg, #8e7cf
   font-size: .85rem; font-weight: 800; }
 .cert-next small { color: #c9cdf0; font-size: .72rem; }
 .cert-next .pgate-tag, .cert-next .pgate-go { margin-inline-start: auto; }
+
+/* ---------- Flashcards: a stack of the cards to come, raised know / again tiles (design round D23) ---------- */
+.fc-deck { position: relative; }
+.fc-deck .fc-wrap { z-index: 1; }
+.fc-deck.has-more::before, .fc-deck.has-more::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 14px; height: 300px; border-radius: var(--radius); pointer-events: none;
+  background: var(--lv-edge); border: 1px solid rgba(255, 255, 255, .06);
+}
+.fc-deck.has-more::before { transform: translateY(9px) scale(.95); opacity: .9; }
+.fc-deck.has-more::after { transform: translateY(17px) scale(.9); opacity: .5; }
+.fc-deck.has-more { padding-bottom: 18px; }
+.fc-btns .btn { min-height: 56px; border-radius: 18px; font-weight: 800; }
+.fc-btns .fc-show { background: var(--lv); color: #0b1430; box-shadow: 0 4px 0 var(--lv-edge), 0 10px 22px rgba(0, 0, 0, .25); }
+.fc-btns .fc-show:not(:disabled):active { box-shadow: 0 0 0 var(--lv-edge); }
+.fc-btns .fc-know { background: linear-gradient(#3be0a2, #22b884); color: #06291a; box-shadow: 0 4px 0 #17795a, 0 10px 20px rgba(47, 208, 147, .2); }
+.fc-btns .fc-know:not(:disabled):active { box-shadow: 0 0 0 #17795a; }
+.fc-btns .fc-again { background: #3a2a14; color: #ffc46b; border: 2px solid rgba(255, 179, 74, .45); box-shadow: 0 4px 0 #22180a; }
+.fc-btns .fc-again:not(:disabled):active { box-shadow: 0 0 0 #22180a; }
