@@ -421,5 +421,47 @@ GRAMMAR.push(
     ex: [['It was my brother who paid for the trip.', 'זה אחי ששילם על הטיול.'], ['What I really like about this job is the freedom.', 'מה שאני באמת אוהב בעבודה הזאת הוא החופש.'], ['It was only yesterday that I heard the news.', 'רק אתמול שמעתי את החדשות.']],
     tip: 'בעברית אומרים "מה שאני צריך זה חופשה", ולכן נוטים להוסיף it מיותר. באנגלית אומרים "What I need is a holiday", לא "What I need it is a holiday". וגם לא חוזרים על הכינוי אחרי who: "It was Dana who called", לא "It was Dana who she called".',
     quiz: [['It was the manager ___ approved the budget.', 'who', ['what', 'whose', 'where']], ['___ I really need is a week off.', 'What', ['That', 'It', 'Which']], ['It ___ in 2015 that we moved to Tel Aviv.', 'was', ['were', 'did', 'has']]]
+  },
+
+  // ---------- Added in round 33 ----------
+  {
+    id: 'a-would-rather', level: 'advanced', title: 'Would rather & had better', he: 'העדפות ועצות: would rather / had better',
+    when: 'would rather מביע העדפה ("עדיף לי"), ו-had better נותן עצה חזקה או אזהרה ("כדאי מאוד"). אחרי שניהם בא פועל בצורת הבסיס, בלי to.',
+    forms: [
+      ['prefer', "would rather + verb: I'd rather stay home tonight."],
+      ['than', "would rather A than B: I'd rather walk than take the bus."],
+      ['others', "would rather + past simple: I'd rather you didn't smoke here."],
+      ['advice', "had better + verb: You'd better leave now or you'll miss the train."],
+      ['negative', "had better not + verb: We'd better not be late."]
+    ],
+    ex: [["I'd rather have tea, thanks.", 'עדיף לי תה, תודה.'], ["You'd better call her before it gets too late.", 'כדאי מאוד להתקשר אליה לפני שיהיה מאוחר מדי.'], ["I'd rather hear the truth from you.", 'עדיף לי לשמוע ממך את האמת.']],
+    tip: 'אחרי would rather ו-had better לא בא to: "I\'d rather go", לא "I\'d rather to go". ולמרות ה-had, had better מדבר על עכשיו או על העתיד: "You\'d better hurry", לא "You had better hurried".',
+    quiz: [["I'd rather ___ at home tonight.", 'stay', ['to stay', 'staying', 'stayed']], ["You'd better ___ late again, or the manager will be angry.", 'not be', ["don't be", 'not to be', "won't be"]], ["I'd rather you ___ my phone without asking.", "didn't use", ["don't use", "won't use", 'not use']]]
+  },
+  {
+    id: 'a-concession', level: 'advanced', title: 'Although, despite, in spite of', he: 'ניגוד: although / despite / in spite of',
+    when: 'כדי לחבר שני רעיונות סותרים ("למרות ש..."). although ו-even though באים לפני משפט שלם עם נושא ופועל. despite ו-in spite of באים לפני שם עצם או לפני פועל עם ing.',
+    forms: [
+      ['clause', 'although / even though + subject + verb: Although it was raining, we went out.'],
+      ['noun', 'despite / in spite of + noun: Despite the rain, we went out.'],
+      ['-ing', 'despite + verb-ing: Despite feeling tired, she finished the report.'],
+      ['the fact', 'despite the fact that + clause: Despite the fact that it was late, he called.']
+    ],
+    ex: [['Although the hotel was expensive, it was worth it.', 'למרות שהמלון היה יקר, הוא היה שווה את זה.'], ['Despite the traffic, we arrived on time.', 'למרות הפקקים, הגענו בזמן.'], ['She got the job in spite of having little experience.', 'היא קיבלה את העבודה למרות שהיה לה מעט ניסיון.']],
+    tip: 'בעברית "למרות" מתאים לכל מקרה, ולכן מתבלבלים. אחרי despite לא בא משפט שלם: "Despite it was raining" שגוי. אומרים "Although it was raining" או "Despite the rain". ואין despite of: "despite the rain", לא "despite of the rain".',
+    quiz: [['___ it was cold, we went swimming.', 'Although', ['Despite', 'In spite of', 'However']], ['We enjoyed the trip ___ the bad weather.', 'despite', ['although', 'even though', 'despite of']], ["___ having a degree, he couldn't find a job.", 'In spite of', ['Although', 'Even though', 'In spite']]]
+  },
+  {
+    id: 'a-articles-general', level: 'advanced', title: 'Articles: general or specific', he: 'the או בלי the: כללי לעומת מסוים',
+    when: 'כשמדברים על משהו באופן כללי (כלבים, החיים, כסף), באנגלית לא שמים the. the בא רק כשמדובר במשהו מסוים שכבר ידוע. בעברית אומרים "הכסף לא קונה אושר" עם ה׳ הידיעה, ובאנגלית אומרים "Money doesn\'t buy happiness".',
+    forms: [
+      ['general', 'no article + plural or uncountable: Dogs are loyal. · Life is short.'],
+      ['specific', 'the + noun: The dogs next door bark all night.'],
+      ['unique', 'the + one of a kind: the sun, the internet, the government'],
+      ['places', 'no article: go to work, at home, in bed, by bus']
+    ],
+    ex: [["Coffee doesn't let me fall asleep.", 'קפה לא נותן לי להירדם.'], ['The coffee in this café is excellent.', 'הקפה בבית הקפה הזה מצוין.'], ['People say that history repeats itself.', 'אומרים שההיסטוריה חוזרת על עצמה.']],
+    tip: 'הטעות הנפוצה היא להעתיק את ה׳ הידיעה מעברית: "The life is beautiful", או "I love the music" כשמתכוונים למוזיקה באופן כללי. נכון: "Life is beautiful", "I love music". the בא רק כשאפשר לשאול "איזה?" ולענות: "the music in this film".',
+    quiz: [['___ is the most important thing in my life.', 'Family', ['The family', 'A family', 'The families']], ["I can't stand ___ music they play at this gym.", 'the', ['a', 'an', 'these']], ['Most ___ want to live a long and healthy life.', 'people', ['the people', 'of people', 'peoples']]]
   }
 );

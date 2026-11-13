@@ -237,7 +237,9 @@ const FORM_HE = {
   subject: 'נושא', object: 'מושא', possessive: 'שייכות', alone: 'עצמאי',
   countable: 'ספיר', uncountable: 'לא ספיר', both: 'שניהם', preposition: 'מילת יחס',
   present: 'הווה', past: 'עבר', perfect: 'מושלם', future: 'עתיד',
-  question: 'שאלה', command: 'ציווי', commas: 'פסיקים'
+  question: 'שאלה', command: 'ציווי', commas: 'פסיקים',
+  prefer: 'העדפה', than: 'במקום', others: 'לאחרים', advice: 'עצה', negative: 'שלילה',
+  clause: 'משפט', noun: 'שם עצם', general: 'כללי', specific: 'מסוים', unique: 'יחיד במינו', places: 'מקומות'
 };
 
 const isHe = () => Store.lang === 'he';
