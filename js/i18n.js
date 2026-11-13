@@ -2,7 +2,7 @@
 // To change a text, edit it here; {name} marks a value filled in by the app.
 const STR = {
   en: {
-    'grev.title': 'Rule review', 'grev.aria': 'Rule review: {n} rules had mistakes', 'grev.again': 'Another review round',
+    'cheat.title': 'Quick reminder', 'grev.title': 'Rule review', 'grev.aria': 'Rule review: {n} rules had mistakes', 'grev.again': 'Another review round',
     'grev.left': '{n} rules still need practice', 'grev.left.one': 'One rule still needs practice', 'grev.clear': 'All rules are clear. Well done!',
     'gate.title': 'New level: {level}', 'gate.prev': '{level}: {a} of {b} rules done', 'gate.mine': 'Your level', 'gate.jump': 'Jump here',
     'gate.ask.title': 'Move to {level}?', 'gate.ask.text': "Rules you haven't finished in easier levels stay open, so you can go back to them any time.",
@@ -137,7 +137,7 @@ const STR = {
   },
 
   he: {
-    'grev.title': 'חזרה על כללים', 'grev.aria': 'חזרה על כללים: ב-{n} כללים היו טעויות', 'grev.again': 'עוד סבב חזרה',
+    'cheat.title': 'תזכורת מהירה', 'grev.title': 'חזרה על כללים', 'grev.aria': 'חזרה על כללים: ב-{n} כללים היו טעויות', 'grev.again': 'עוד סבב חזרה',
     'grev.left': 'עוד {n} כללים צריכים תרגול', 'grev.left.one': 'עוד כלל אחד צריך תרגול', 'grev.clear': 'כל הכללים ברורים. כל הכבוד!',
     'gate.title': 'רמה חדשה: {level}', 'gate.prev': '{level}: {a} מתוך {b} כללים הושלמו', 'gate.mine': 'הרמה שלך', 'gate.jump': 'לקפוץ לכאן',
     'gate.ask.title': 'לעבור לרמה: {level}?', 'gate.ask.text': 'כללים שלא הושלמו ברמות הקלות יותר יישארו פתוחים, ואפשר לחזור אליהם בכל רגע.',

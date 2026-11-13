@@ -464,7 +464,7 @@
       items = LEVELS.flatMap(l => GRAMMAR.filter(g => g.level === l.id)).map((g, n) => {
         const done = Store.isGrammarDone(g.id);
         return { href: `#/grammar/${g.id}`, review: `#/grammar/${g.id}/quiz`, face: `<b class="pnum">${n + 1}</b>`, label: ruleTitle(g),
-          plain: (isHe() ? g.he : g.title), done, started: done, pct: done ? 100 : 0, example: g.ex[0], lvl: g.level,
+          plain: (isHe() ? g.he : g.title), done, started: done, pct: done ? 100 : 0, example: g.ex[0], lvl: g.level, rule: g,
           progress: `${t('lv.' + g.level)} · ${t(done ? 'path.g.done' : 'path.g.sub')}` };
       });
     } else {
@@ -577,6 +577,14 @@
   // What is inside a lesson, shown in its card: the first words (a check on the ones already
   // mastered), the first sentences of a sentence lesson, or a rule's first example
   function lessonPreview(x) {
+    if (x.rule && x.state === 'done') {
+      const g = x.rule;
+      return `<div class="pc-cheat">
+          <span class="pc-cheat-h">👑 ${t('cheat.title')}</span>
+          ${g.forms.map(([tag, text]) => `<div class="pc-form"><span class="pc-tag">${formTag(tag)}</span><span class="en" dir="ltr">${text}</span></div>`).join('')}
+          <p class="pc-tip">⚠️ ${heMix(g.tip)}</p>
+        </div>`;
+    }
     if (x.example) return `<div class="pc-ex"><b class="en" dir="ltr">${x.example[0]}</b><span>${x.example[1]}</span></div>`;
     if (!x.words) return '';
     if (x.words[0].phrase) {
@@ -640,7 +648,8 @@
             <button class="pnode ${x.state}" data-i="${i}" style="--pct:${x.pct}"
               aria-label="${x.plain.replace(/"/g, '')} · ${t('path.state.' + x.state)}">
               <span class="pnode-face">${x.face}</span>
-              ${x.state === 'locked' ? `<span class="pbadge lock">${ICON.lock}</span>` : x.state === 'done' ? `<span class="pbadge ok">${ICON.check}</span>` : ''}
+              ${x.state === 'locked' ? `<span class="pbadge lock">${ICON.lock}</span>`
+                : x.state === 'done' ? (x.rule ? `<span class="pbadge crown" aria-hidden="true">👑</span>` : `<span class="pbadge ok">${ICON.check}</span>`) : ''}
             </button>
             <span class="plabel">${x.label}</span>
           </div>`).join('')}
@@ -790,6 +799,9 @@
       card.innerHTML = html;
       path.appendChild(card);
       open = key;
+      // a tall card near the end of the road (a rule's cheat sheet) still has room to scroll into view
+      const need = card.offsetTop + card.offsetHeight + 24;
+      if (need > path.offsetHeight) path.style.height = need + 'px';
       // Focus first, then scroll so the whole card is above the tab bar (focus would cancel a smooth scroll)
       setTimeout(() => {
         const f = card.querySelector('.btn, .pcard-link');

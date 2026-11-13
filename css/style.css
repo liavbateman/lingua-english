@@ -1104,3 +1104,12 @@ button.path-head:active span { background: rgba(142, 125, 255, .22); }
 
 /* Rule review: which rule this question comes from */
 .grev-rule { margin: -4px 0 8px; color: #b9b0ff; font-weight: 700; }
+
+/* Grammar road: a crown on finished rules, and their card becomes a cheat sheet */
+.pbadge.crown { background: #fff3c4; font-size: .9rem; line-height: 1; }
+.pc-cheat { display: grid; gap: 6px; position: relative; text-align: start; }
+.pc-cheat-h { font-weight: 900; font-size: .85rem; }
+.pc-form { display: flex; align-items: baseline; gap: 6px; padding: 6px 8px; border-radius: 10px; background: rgba(255, 255, 255, .45); }
+.pc-form .en { flex: 1; min-width: 0; font-size: .82rem; font-weight: 700; text-align: left; overflow-wrap: anywhere; }
+.pc-tag { flex: none; padding: 1px 8px; border-radius: 999px; background: rgba(74, 50, 0, .14); font-size: .72rem; font-weight: 800; }
+.pc-tip { margin: 2px 0 0; font-size: .8rem; line-height: 1.45; }
