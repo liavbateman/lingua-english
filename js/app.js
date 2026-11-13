@@ -2313,6 +2313,18 @@
       </div>`;
   }
   function countUp() {
+    // The result's emoji sits inside a ring that fills to the round's accuracy: green, gold or coral
+    const big = view.querySelector('.result .big'), accEl = view.querySelector('.st.acc b');
+    if (big && accEl && !big.closest('.res-ring')) {
+      const p = +accEl.dataset.count;
+      const ring = document.createElement('div');
+      ring.className = 'res-ring ' + (p >= 80 ? 'hi' : p >= 50 ? 'mid' : 'lo');
+      ring.style.setProperty('--p', p);
+      ring.setAttribute('role', 'img');
+      ring.setAttribute('aria-label', `${t('st.acc')}: ${p}%`);
+      big.replaceWith(ring);
+      ring.appendChild(big);
+    }
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     view.querySelectorAll('[data-count]').forEach(el => {
       const to = +el.dataset.count, pre = el.dataset.prefix || '', suf = el.dataset.suffix || '';

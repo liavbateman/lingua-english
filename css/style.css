@@ -1719,3 +1719,27 @@ body[data-lv="advanced"] .lb-track i { background: linear-gradient(90deg, #8e7cf
 .pc-words span.seen::before, .pc-key .seen::before { background: #ffd66b; box-shadow: 0 0 0 2px rgba(0, 0, 0, .15); }
 .pc-words span.new::before, .pc-key .new::before { background: transparent; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .7); }
 .pcard.locked .pc-uring::before { background: conic-gradient(rgba(255, 255, 255, .5) calc(var(--p) * 1%), rgba(255, 255, 255, .15) 0); }
+
+/* ---------- Round results: the emoji inside an accuracy ring (design round D26) ---------- */
+@property --rp { syntax: '<number>'; inherits: false; initial-value: 0; }
+.res-ring {
+  --c: #2fd093; position: relative; width: 124px; height: 124px; margin: 0 auto 8px; border-radius: 50%; display: grid; place-items: center;
+}
+.res-ring.mid { --c: #ffc53d; }
+.res-ring.lo { --c: #ff8a6b; }
+.res-ring::before {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  --rp: var(--p); animation: res-fill 1s cubic-bezier(.3, .9, .3, 1) .15s both;
+  background: conic-gradient(var(--c) calc(var(--rp) * 1%), rgba(255, 255, 255, .12) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 8px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 8px));
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--c) 45%, transparent));
+}
+.res-ring .big { margin: 0; width: 96px; height: 96px; background: radial-gradient(circle, color-mix(in srgb, var(--c) 30%, transparent), transparent 70%); }
+@keyframes res-fill { from { --rp: 0; } }
+/* the stat tiles: a darker edge in each tile's own colour, like the path cards */
+.st.acc { box-shadow: 0 4px 0 #17795a; }
+.st.xp { box-shadow: 0 4px 0 #9a5f12; }
+.st.time { box-shadow: 0 4px 0 #2a5a9a; }
+.st span { display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+@media (prefers-reduced-motion: reduce) { .res-ring::before { animation: none; } }
