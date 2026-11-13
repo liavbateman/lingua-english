@@ -576,6 +576,26 @@
 
   // What is inside a lesson, shown in its card: the first words (a check on the ones already
   // mastered), the first sentences of a sentence lesson, or a rule's first example
+  // Rules that are easy to mix up: each card links to its partners, so the difference is one tap away
+  const RULE_PAIRS = [
+    ['present-simple', 'present-continuous'], ['past-simple', 'past-continuous'], ['past-simple', 'present-perfect'],
+    ['present-perfect', 'present-perfect-continuous'], ['present-perfect', 'i-for-since-ago'], ['past-simple', 'used-to'],
+    ['past-simple', 'past-perfect'], ['future', 'i-present-continuous-future'], ['i-too-enough', 'i-so-such'],
+    ['conditionals-1', 'conditionals-2'], ['conditionals-2', 'a-mixed-conditionals'], ['conditionals-1', 'a-conditions'],
+    ['a-wish', 'a-should-have'], ['to-be', 'b-was-were'], ['b-have', 'there-is'], ['articles', 'a-articles-general'],
+    ['b-would-like', 'b-want-need'], ['b-would-like', 'a-would-rather'], ['can', 'modals'], ['modals', 'a-deduction'],
+    ['b-adjective-position', 'i-adjectives-adverbs'], ['gerund-infinitive', 'b-want-need'], ['b-connectors', 'a-concession'],
+    ['passive', 'a-causative'], ['reported-speech', 'past-perfect'], ['i-so-neither', 'i-question-tags'], ['plurals', 'quantity']
+  ];
+  const rulePartners = id => RULE_PAIRS.filter(p => p.includes(id)).map(p => p[0] === id ? p[1] : p[0]);
+  function relatedRules(x) {
+    if (!x.rule || !pathItems.length) return '';
+    const links = rulePartners(x.rule.id)
+      .map(id => pathItems.findIndex(p => p.rule && p.rule.id === id)).filter(i => i >= 0).slice(0, 2);
+    if (!links.length) return '';
+    return `<div class="pc-rel"><span>↔ ${t('rel.title')}</span>
+      ${links.map(i => `<button class="pc-rel-go" data-i="${i}">${pathItems[i].label} ${fwd()}</button>`).join('')}</div>`;
+  }
   const sayBtn = text => `<button class="speak sm pc-say" data-say="${text.replace(/"/g, '&quot;')}" aria-label="${t('aria.listen')}">${ICON.speaker}</button>`;
   const exampleRow = ex => `<div class="pc-ex">${sayBtn(ex[0])}<div class="grow"><b class="en" dir="ltr">${ex[0]}</b><span>${ex[1]}</span></div></div>`;
   function lessonPreview(x) {
@@ -586,9 +606,10 @@
           ${g.forms.map(([tag, text]) => `<div class="pc-form"><span class="pc-tag">${formTag(tag)}</span><span class="en" dir="ltr">${text}</span></div>`).join('')}
           ${exampleRow(g.ex[0])}
           <p class="pc-tip">⚠️ ${heMix(g.tip)}</p>
+          ${relatedRules(x)}
         </div>`;
     }
-    if (x.example) return exampleRow(x.example);
+    if (x.example) return exampleRow(x.example) + relatedRules(x);
     if (!x.words) return '';
     if (x.words[0].phrase) {
       return `<div class="pc-lines">${x.words.slice(0, 2).map(w => `<span class="en" dir="ltr">${w.en}</span>`).join('')}
@@ -845,6 +866,16 @@
           <a class="btn" href="${x.state === 'done' ? x.review : x.href}">${t(x.state === 'done' ? 'path.review' : x.started ? 'path.continue' : 'path.start')}</a>
           ${x.state === 'done' ? `<a class="pcard-link" href="${x.href}">${t('path.again')}</a>` : ''}`, i);
       card.querySelectorAll('.pc-say').forEach(b => { b.onclick = e => { e.stopPropagation(); speak(b.dataset.say.replace(/"/g, "")); }; });
+      // a confused-with link goes to that rule on the road and opens its card
+      card.querySelectorAll('.pc-rel-go').forEach(b => {
+        b.onclick = e => {
+          e.stopPropagation();
+          closeCard();
+          const node = path.querySelector(`.pnode[data-i="${b.dataset.i}"]`);
+          node.scrollIntoView({ block: 'center' });
+          setTimeout(() => node.click(), 0);
+        };
+      });
       path.querySelector(`.pnode[data-i="${i}"]`).setAttribute('aria-expanded', 'true');
     };
     // Chests: locked explains what is left, ready opens with a celebration and points, opened says so

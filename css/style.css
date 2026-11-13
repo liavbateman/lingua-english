@@ -1153,3 +1153,12 @@ button.path-head:active span { background: rgba(142, 125, 255, .22); }
 .pc-say svg { width: 20px; height: 20px; }
 .pcard.done .pc-say { color: #8a5a00; }
 .pcard.locked .pc-say { background: rgba(255, 255, 255, .14); color: #fff; }
+
+/* Rule cards: links to rules that are easy to mix up */
+.pc-rel { display: grid; gap: 6px; position: relative; }
+.pc-rel > span { font-size: .8rem; font-weight: 800; opacity: .9; }
+.pc-rel-go {
+  min-height: 44px; padding: 8px 12px; border-radius: 12px; border: 1px dashed currentColor; cursor: pointer;
+  background: rgba(255, 255, 255, .16); color: inherit; font: inherit; font-weight: 800; font-size: .88rem; text-align: start;
+}
+.pc-rel-go:active { transform: translateY(1px); }
