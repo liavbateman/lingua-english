@@ -1403,18 +1403,27 @@
     function question() {
       const [q, answer, wrong] = qs[i].q;
       const rule = qs[i].r;
+      // The quiz wears the level's colour, like the road and the rule page (the progress track too)
+      const lvl = test || final || rule.level;
+      document.body.dataset.lv = lvl;
       view.innerHTML = `
-        <p class="sub">${review ? `🏋️ ${t('grev.title')}` : saved ? `⭐ ${t('saved.chip')}` : final ? `🎓 ${t('final.title', { level: t('lv.' + final) })}` : test ? `🚪 ${t('gtest.title', { level: t('lv.' + test) })}` : ruleTitle(g)} · ${t('quiz.count', { a: i + 1, b: qs.length })}</p>
+        <div class="gq lv-${lvl}">
+        <div class="gq-head">
+          <span class="gq-title">${review ? `🏋️ ${t('grev.title')}` : saved ? `⭐ ${t('saved.chip')}` : final ? `🎓 ${t('final.title', { level: t('lv.' + final) })}` : test ? `🚪 ${t('gtest.title', { level: t('lv.' + test) })}` : ruleTitle(g)}</span>
+          <span class="gq-count">${t('quiz.count', { a: i + 1, b: qs.length })}</span>
+        </div>
         ${lessonBar(i / qs.length)}
         ${review || saved ? `<p class="small grev-rule">${ruleTitle(rule)}</p>` : ''}
-        <div class="card question">
+        <div class="card question gq-card">
+          <span class="gq-lvl">${t('lv.' + rule.level)} · <span class="en">${t('lvl.cefr.' + rule.level)}</span></span>
           <div class="small">${t('grammar.choose')}</div>
-          <div class="prompt sentence en" id="sentence">${q.replace('___', '_____')}</div>
+          <div class="prompt sentence en" id="sentence" dir="ltr">${q.replace('___', '<span class="gq-blank">_____</span>')}</div>
         </div>
-        <div class="options">
-          ${shuffle([answer, ...wrong]).map(o => `<button class="opt en">${o}</button>`).join('')}
+        <div class="options gq-opts">
+          ${shuffle([answer, ...wrong]).map(o => `<button class="opt en" dir="ltr">${o}</button>`).join('')}
         </div>
-        <button class="btn" id="next" hidden>${t(i === qs.length - 1 ? 'btn.finish' : 'btn.next')}</button>`;
+        <button class="btn" id="next" hidden>${t(i === qs.length - 1 ? 'btn.finish' : 'btn.next')}</button>
+        </div>`;
 
       speak(q.replace('___', '…').replace(/"/g, ''));   // every new question starts with its sentence, the blank as a pause
       selectThenCheck(btn => {
@@ -2357,6 +2366,7 @@
     if ('speechSynthesis' in window) speechSynthesis.cancel();
     if (recognition) recognition.abort();
     view.scrollTop = 0;
+    delete document.body.dataset.lv;   // a grammar quiz sets its level colour again
     document.querySelectorAll('.sheet-back').forEach(s => s.remove());
     view.onkeydown = null;
     view.onscroll = null;

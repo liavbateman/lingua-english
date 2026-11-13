@@ -1570,3 +1570,35 @@ button.pc-form[aria-expanded="true"] .pc-more { transform: rotate(180deg); }
 .asp-simple { --c: #3f7df0; } .asp-prog { --c: #2cb98d; } .asp-perf { --c: #f2a43c; } .asp-pp { --c: #8e6cf5; }
 .rule-tn { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; min-height: 36px; padding: 0 12px; border-radius: 999px;
   background: rgba(255, 255, 255, .1); color: var(--ink); text-decoration: none; font-weight: 700; font-size: .85rem; }
+
+/* ---------- Grammar quiz in its level's colour (design round D19) ---------- */
+.gq-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 4px 0 2px; }
+.gq-title { font-weight: 800; font-size: .95rem; color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+.gq-count { flex: none; padding: 2px 10px; border-radius: 999px; font-size: .8rem; font-weight: 800;
+  background: color-mix(in srgb, var(--lv) 22%, transparent); color: var(--lv); }
+.gq-card {
+  position: relative; background: linear-gradient(160deg, var(--lv-bg-a), var(--lv-bg-b));
+  box-shadow: 0 5px 0 var(--lv-edge); border-top: 3px solid var(--lv);
+}
+.gq-lvl { display: inline-block; margin-bottom: 8px; padding: 2px 10px; border-radius: 999px; font-size: .75rem; font-weight: 800;
+  background: rgba(0, 0, 0, .25); color: var(--lv); }
+.gq-card .small { color: #d5d9f2; }
+.gq-card .prompt.sentence { line-height: 1.4; }
+.gq-blank { display: inline-block; min-width: 3.5em; color: var(--lv); letter-spacing: .05em; }
+/* answer tiles: raised, with a letter badge in the level colour (decorative, hidden from screen readers) */
+.gq-opts { counter-reset: gq; }
+.gq-opts .opt { display: flex; align-items: center; gap: 12px; text-align: left; counter-increment: gq; }
+.gq-opts .opt::before {
+  content: counter(gq, upper-alpha); content: counter(gq, upper-alpha) / "";
+  flex: none; width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
+  font-size: .85rem; font-weight: 900; background: color-mix(in srgb, var(--lv) 24%, transparent); color: var(--lv);
+}
+.gq-opts .opt.sel:not(:disabled) { border-color: var(--lv); background: color-mix(in srgb, var(--lv) 22%, #1b2152); color: var(--ink);
+  box-shadow: 0 4px 0 var(--lv-edge); }
+.gq-opts .opt.sel::before { background: var(--lv); color: #0b1430; }
+.gq-opts .opt.right::before { background: var(--good); color: #08311f; }
+.gq-opts .opt.wrong::before { background: var(--bad); color: #3d0a10; }
+.gq-opts .opt::after { margin-inline-start: auto; }
+body[data-lv="beginner"] .lb-track i { background: linear-gradient(90deg, #2fb88a, #4fd8a8); }
+body[data-lv="intermediate"] .lb-track i { background: linear-gradient(90deg, #3f8be8, #6fb4ff); }
+body[data-lv="advanced"] .lb-track i { background: linear-gradient(90deg, #8e7cf0, #b9a8ff); }
