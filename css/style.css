@@ -1980,3 +1980,18 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
 }
 .learn-tabs.has-pill a.on { background: transparent; box-shadow: none; }
 @media (prefers-reduced-motion: reduce) { .lt-pill { transition: none; } }
+
+/* ---------- Celebration: a short confetti burst in the level's colours (design round D46) ---------- */
+.confetti { position: fixed; inset: 0; z-index: 60; pointer-events: none; overflow: hidden; }
+.confetti i {
+  position: absolute; top: -14px; width: 8px; height: 13px; border-radius: 2px; opacity: 0;
+  animation: confetti-fall 1.6s cubic-bezier(.25, .6, .45, 1) both;
+}
+.confetti i:nth-child(3n) { width: 10px; height: 10px; border-radius: 50%; }
+.confetti i:nth-child(4n) { width: 6px; height: 16px; }
+@keyframes confetti-fall {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0); }
+  85% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), 70vh) rotate(var(--r)); }
+}
+@media (prefers-reduced-motion: reduce) { .confetti { display: none; } }

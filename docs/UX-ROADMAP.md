@@ -102,7 +102,11 @@ in the visual language of the paths (level colours, chunky 3D cards with a botto
 | D43 | Answer tiles feedback | After checking, the wrong tile shakes once and the right tile gets a soft green pulse; both settle (no motion under Reduce Motion) | Done (round 120): the wrong tile already shook (Feel.wrong); now the right tile pops once with a green ring that fades out, and the options that were neither picked nor right step back to half opacity, so the eye goes straight to the pair that matters; no motion under Reduce Motion |
 | D44 | Tenses map | The 12-tense table: each cell with a tiny timeline icon (past / now / future dot), done tenses crowned | Done (round 121): every cell starts with a small timeline (past · now · future, left to right as in English) in the aspect's colour: a dot for simple, a thick stretch for progressive, an arrow up to the point for perfect, a stretch ending at the point for perfect progressive; a finished tense wears a crown in the cell's corner (moved there from the bottom line) |
 | D45 | Learn tabs | The words / sentences / practice tabs as a segmented control with a sliding pill | Done (round 122): the three tabs share one raised pill that slides with a soft spring from the tab you came from to the one you opened (its first position appears without animation; it follows its tab when the phone turns; no motion under Reduce Motion) |
-| D46 | Celebration | The end-of-lesson celebration: a confetti burst in the level's colours, gentle and short | |
+| D46 | Celebration | The end-of-lesson celebration: a confetti burst in the level's colours, gentle and short | Done (round 123): a round of 80%+ (green accuracy ring) or the day's goal sets off 26 pieces of confetti in the level's colours with gold and white (squares, dots and strips), falling and fading within about two seconds; nothing under Reduce Motion |
+| D47 | Word of the moment | A small "word to know" card on the Learn screen: the word, its sound and an example, in the level colour | |
+| D48 | Grammar rule hero | The rule page header with a soft illustration ring (the rule's number in the level ring, done crown) | |
+| D49 | Review stop | The path's review stop as a round raised node with a repeat icon and a count of words waiting | |
+| D50 | Dark polish pass | One pass over every screen: same corner radii, same edge shadows, same chip sizes | |
 
 ## Home: what it was for (until round 51)
 

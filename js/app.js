@@ -2533,6 +2533,25 @@
         <div class="st time"><span><i aria-hidden="true">⏱️</i> ${t('st.time')}</span><b>${time}</b></div>
       </div>`;
   }
+  const CONFETTI = {
+    beginner: ['#4fd8a8', '#2fb88a', '#ffd66b', '#ffffff'],
+    intermediate: ['#6fb4ff', '#3f8be8', '#ffd66b', '#ffffff'],
+    advanced: ['#b9a8ff', '#8e7cf0', '#ffd66b', '#ffffff']
+  };
+  function confetti(lvl) {
+    const colors = CONFETTI[lvl] || CONFETTI.beginner;
+    const box = document.createElement('div');
+    box.className = 'confetti';
+    box.setAttribute('aria-hidden', 'true');
+    box.innerHTML = Array.from({ length: 26 }, (_, k) => {
+      const x = Math.round(Math.random() * 100), d = (Math.random() * .35).toFixed(2), r = Math.round(Math.random() * 360);
+      const dx = Math.round((Math.random() - .5) * 120), dur = (1.3 + Math.random() * .6).toFixed(2);
+      return `<i style="left:${x}%;background:${colors[k % colors.length]};--r:${r}deg;--dx:${dx}px;animation-delay:${d}s;animation-duration:${dur}s"></i>`;
+    }).join('');
+    document.body.appendChild(box);
+    setTimeout(() => box.remove(), 2600);
+  }
+
   function countUp() {
     // The result's emoji sits inside a ring that fills to the round's accuracy: green, gold or coral
     const big = view.querySelector('.result .big'), accEl = view.querySelector('.st.acc b');
@@ -2547,6 +2566,8 @@
       ring.appendChild(big);
     }
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // a short, gentle burst of confetti in the level's colours for a strong round or the day's goal
+    if (view.querySelector('.res-ring.hi, .celebrate')) confetti(document.body.dataset.lv || Store.level);
     view.querySelectorAll('[data-count]').forEach(el => {
       const to = +el.dataset.count, pre = el.dataset.prefix || '', suf = el.dataset.suffix || '';
       const t0 = performance.now();
