@@ -530,5 +530,47 @@ GRAMMAR.push(
     ex: [['I will send you the file as soon as I get to the office.', 'אשלח לך את הקובץ ברגע שאגיע למשרד.'], ['We will not start until everyone is here.', 'לא נתחיל עד שכולם יהיו כאן.'], ['Call me before you leave.', 'תתקשר אליי לפני שתצא.']],
     tip: 'בעברית אומרים "כשאגיע" בעתיד, אבל באנגלית אחרי מילת הזמן לא בא will: "I will call you when I arrive", לא "I will call you when I will arrive".',
     quiz: [['I will call you when I ___ home.', 'get', ['will get', 'got', 'getting']], ['We will wait here until the rain ___.', 'stops', ['will stop', 'stop', 'stopping']], ['As soon as she arrives, we ___ dinner.', 'will start', ['started', 'starting', 'would started']]]
+  },
+
+  // ---------- Added in round 43 ----------
+  {
+    id: 'i-make-do', level: 'intermediate', title: 'Make or do', he: 'make או do: שתי דרכים "לעשות"',
+    when: 'בעברית שניהם "לעשות", ובאנגלית צריך לבחור. do משמש לפעולות, משימות ועבודה (homework, the dishes, a favor). make משמש כשיוצרים או מייצרים משהו (a cake, a plan, coffee), וגם בהרבה צירופים קבועים (a mistake, a decision, money).',
+    forms: [
+      ['do', 'do + tasks and work: do homework, do the dishes, do your best'],
+      ['make', 'make + creating: make a cake, make a plan, make coffee'],
+      ['fixed', 'make a mistake, make a decision, make money, make a phone call'],
+      ['question', 'What do you do? = What is your job?']
+    ],
+    ex: [['I have to do my homework before dinner.', 'צריך להכין שיעורי בית לפני ארוחת הערב.'], ['She made a big mistake at work.', 'היא עשתה טעות גדולה בעבודה.'], ['Could you do me a favor?', 'אפשר לבקש ממך טובה?']],
+    tip: 'הטעות הנפוצה: "I did a mistake" או "do a decision". נכון: "I made a mistake", "make a decision". ובכיוון ההפוך: "make homework" שגוי, אומרים "do homework".',
+    quiz: [['I ___ a terrible mistake yesterday.', 'made', ['did', 'done', 'make']], ['Can you ___ the dishes tonight?', 'do', ['make', 'doing', 'made']], ['We need to ___ a decision by Friday.', 'make', ['do', 'doing', 'done']]]
+  },
+  {
+    id: 'i-verb-prepositions', level: 'intermediate', title: 'Verbs with prepositions', he: 'פעלים עם מילות יחס',
+    when: 'הרבה פעלים באנגלית באים עם מילת יחס קבועה, ולא תמיד אותה מילת יחס כמו בעברית. כדאי ללמוד אותם כצמד: depend on, listen to, wait for.',
+    forms: [
+      ['on', 'depend on, rely on, focus on, insist on'],
+      ['to', 'listen to, belong to, apologize to, reply to'],
+      ['for', 'wait for, look for, pay for, apply for'],
+      ['about', 'think about, worry about, talk about, dream about'],
+      ['none', 'no preposition: discuss the plan, enter the room, call someone']
+    ],
+    ex: [['It depends on the weather.', 'זה תלוי במזג האוויר.'], ['We waited for the bus for twenty minutes.', 'חיכינו לאוטובוס עשרים דקות.'], ["Don't worry about the test.", 'אין מה לדאוג בקשר למבחן.']],
+    tip: 'בעברית אומרים "תלוי ב", ולכן נוטים לכתוב "depend in". נכון: "depend on". ובכיוון ההפוך: בעברית "לדון על התוכנית", אבל באנגלית "discuss the plan" בלי about, ו"להיכנס לחדר" הוא "enter the room" בלי to.',
+    quiz: [['Everything depends ___ the budget.', 'on', ['in', 'of', 'from']], ['I was listening ___ music when you called.', 'to', ['at', 'on', 'for']], ['We need to ___ the plan before the meeting.', 'discuss', ['discuss about', 'talk', 'speak']]]
+  },
+  {
+    id: 'i-for-since-ago', level: 'intermediate', title: 'For, since & ago', he: 'for, since ו-ago: כמה זמן ומתי',
+    when: 'for אומר כמה זמן משהו נמשך (for three years). since אומר מאיזו נקודה בזמן זה התחיל (since 2020). ago אומר לפני כמה זמן משהו קרה, ובא אחרי פרק הזמן (two days ago).',
+    forms: [
+      ['for', 'for + length of time: for ten minutes, for a long time'],
+      ['since', 'since + starting point: since Monday, since I was a child'],
+      ['ago', 'time + ago, with past simple: I met her two years ago.'],
+      ['perfect', 'for / since often go with present perfect: I have lived here for five years.']
+    ],
+    ex: [['We have lived in Haifa since 2019.', 'אנחנו גרים בחיפה מאז 2019.'], ['She called about an hour ago.', 'היא התקשרה לפני בערך שעה.'], ['They have been friends for many years.', 'הם חברים כבר הרבה שנים.']],
+    tip: 'בעברית אומרים "אני גר כאן מ-2019" בהווה, ולכן כותבים בטעות "I live here since 2019". נכון: "I have lived here since 2019". ו-ago בא אחרי הזמן: "three days ago", לא "before three days".',
+    quiz: [['I have known her ___ ten years.', 'for', ['since', 'ago', 'during']], ["We've been here ___ eight o'clock.", 'since', ['for', 'ago', 'from']], ['They moved to Eilat three years ___.', 'ago', ['before', 'since', 'for']]]
   }
 );
