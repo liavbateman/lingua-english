@@ -600,6 +600,42 @@ UNITS.push(
       { en: 'tattoo', he: 'קעקוע', ex: 'He has a small tattoo on his arm.' },
       { en: 'glasses', he: 'משקפיים', ex: 'I wear glasses for reading.' }
     ]
+  },
+
+  // ---------- Added in round 74 ----------
+  {
+    id: 'i-phr-neighbours', level: 'intermediate', kind: 'phrases', title: 'Neighbours & the building', he: 'שכנים ובניין', emoji: '🏢',
+    words: [
+      { en: "Hi, I've just moved in next door.", he: 'היי, עברתי עכשיו לגור בדירה הסמוכה.' },
+      { en: 'Could you keep the noise down after ten?', he: 'אפשר להנמיך את הרעש אחרי עשר?' },
+      { en: "Would you mind watering my plants while I'm away?", he: 'אכפת לך להשקות את העציצים שלי כשאני לא בבית?' },
+      { en: 'Your parcel was delivered to my flat.', he: 'החבילה שלך נמסרה לדירה שלי.' },
+      { en: 'The lift is out of order again.', he: 'המעלית שוב לא עובדת.' },
+      { en: 'Is there a building meeting this week?', he: 'יש אסיפת דיירים השבוע?' },
+      { en: 'Someone parked in my space.', he: 'מישהו חנה בחניה שלי.' },
+      { en: 'Let me know if you ever need anything.', he: 'תגידו לי אם תצטרכו משהו פעם.' },
+      { en: 'Sorry about the noise last night.', he: 'סליחה על הרעש אתמול בלילה.' },
+      { en: "We're having a small party on Saturday.", he: 'אנחנו עורכים מסיבה קטנה בשבת.' },
+      { en: "Could you sign for a delivery if I'm out?", he: 'תוכלו לחתום על משלוח אם אני לא בבית?' },
+      { en: "It's nice to finally meet you.", he: 'נעים סוף סוף להכיר.' }
+    ]
+  },
+  {
+    id: 'i-phr-repairs', level: 'intermediate', kind: 'phrases', title: 'Repairs at home', he: 'תיקונים בבית', emoji: '🔧',
+    words: [
+      { en: 'When can the technician come?', he: 'מתי הטכנאי יכול להגיע?' },
+      { en: 'The washing machine is making a strange noise.', he: 'מכונת הכביסה משמיעה רעש מוזר.' },
+      { en: "The tap won't stop dripping.", he: 'הברז לא מפסיק לטפטף.' },
+      { en: "There's no hot water in the shower.", he: 'אין מים חמים במקלחת.' },
+      { en: 'The light in the kitchen keeps flickering.', he: 'האור במטבח כל הזמן מהבהב.' },
+      { en: 'How much will the repair cost?', he: 'כמה יעלה התיקון?' },
+      { en: 'Is it covered by the warranty?', he: 'זה מכוסה באחריות?' },
+      { en: 'Do you need to replace the whole part?', he: 'צריך להחליף את כל החלק?' },
+      { en: 'How long will it take to fix?', he: 'כמה זמן ייקח לתקן?' },
+      { en: 'Please call me before you come.', he: 'בבקשה להתקשר אליי לפני שמגיעים.' },
+      { en: 'The door lock is stuck.', he: 'המנעול של הדלת תקוע.' },
+      { en: 'Everything works perfectly now, thank you.', he: 'הכול עובד מצוין עכשיו, תודה.' }
+    ]
   }
 );
 
