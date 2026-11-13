@@ -537,21 +537,26 @@
   function levelGates(items) {
     if (items.part !== 'gall') return '';
     const at = LEVELS.findIndex(l => l.id === Store.level);
-    return LEVELS.slice(1).map((l, n) => {
-      const prev = LEVELS[n];
+    // one gate before each level after the first, and a finish line after the last;
+    // once the level before is complete the gate becomes a certificate with a level review
+    return LEVELS.map((prev, n) => {
+      const next = LEVELS[n + 1];
       const list = items.filter(x => x.lvl === prev.id);
       const done = list.filter(x => x.done).length;
-      const reached = at >= n + 1;
+      const complete = list.length > 0 && done === list.length;
+      const reached = next ? at >= n + 1 : complete;
+      const icon = complete ? '🎓' : next ? (reached ? '🚪' : '🔒') : '🏁';
       return `
-        <div class="pgate${reached ? ' open' : ''}" data-lvl="${l.id}" role="heading" aria-level="2">
-          <span class="pgate-icon" aria-hidden="true">${reached ? '🚪' : '🔒'}</span>
+        <div class="pgate${reached ? ' open' : ''}${complete ? ' complete' : ''}" data-lvl="${next ? next.id : 'end'}" role="heading" aria-level="2">
+          <span class="pgate-icon" aria-hidden="true">${icon}</span>
           <div class="grow">
-            <b>${t('gate.title', { level: t('lv.' + l.id) })} <small class="en">${t('lvl.cefr.' + l.id)}</small></b>
-            <span class="pgate-prev">${t('gate.prev', { level: t('lv.' + prev.id), a: done, b: list.length })}</span>
+            <b>${next ? `${t('gate.title', { level: t('lv.' + next.id) })} <small class="en">${t('lvl.cefr.' + next.id)}</small>` : t('gate.end')}</b>
+            <span class="pgate-prev">${complete ? t('gate.done', { level: t('lv.' + prev.id) }) : t('gate.prev', { level: t('lv.' + prev.id), a: done, b: list.length })}</span>
             <span class="pgate-bar" aria-hidden="true"><i style="width:${list.length ? Math.round(done / list.length * 100) : 0}%"></i></span>
+            ${complete ? `<a class="pgate-final" href="#/grammar/final-${prev.id}/quiz">🔁 ${t('gate.final')}</a>` : ''}
           </div>
-          ${at === n + 1 ? `<span class="pgate-tag">${t('gate.mine')}</span>`
-            : !reached ? `<button class="pgate-go" data-lvl="${l.id}">${t('gate.jump')}</button>` : ''}
+          ${!next ? '' : at === n + 1 ? `<span class="pgate-tag">${t('gate.mine')}</span>`
+            : !reached ? `<button class="pgate-go" data-lvl="${next.id}">${t('gate.jump')}</button>` : ''}
         </div>`;
     }).join('');
   }
@@ -720,7 +725,7 @@
         if (gate) {                                       // and a level gate before a new level
           y += 12;
           gate.style.top = y + 'px';
-          y += PATH_GATE;
+          y += Math.max(PATH_GATE, gate.offsetHeight + 24);
         }
         banners[s].style.top = y + 'px';
         y += PATH_BANNER;
@@ -740,6 +745,11 @@
         y += PATH_CHEST;
       }
     });
+    const finish = path.querySelector('.pgate[data-lvl="end"]');   // the finish line after the last chest
+    if (finish) {
+      finish.style.top = (y + 12) + 'px';
+      y += finish.offsetHeight + 36;
+    }
     path.style.height = y + 'px';
     const curve = list => list.map(([x, y], i) => {
       if (!i) return `M${x} ${y}`;
@@ -1238,16 +1248,20 @@
     // "test-<level>": a level check at a gate, one question from each of 6 rules of the level before
     const review = id === 'review';
     const saved = id === 'saved';                   // practice of the learner's saved rules
+    const final = id.startsWith('final-') ? id.slice(6) : null;   // review of a whole finished level
+    if (final && !LEVELS.some(l => l.id === final)) return notFound();
     const test = id.startsWith('test-') ? id.slice(5) : null;
     const ti = test ? LEVELS.findIndex(l => l.id === test) : -1;
     if (test && ti < 1) return notFound();
-    const g = review || saved || test ? null : GRAMMAR.find(x => x.id === id);
-    if (!review && !saved && !test && !g) return notFound();
+    const g = review || saved || test || final ? null : GRAMMAR.find(x => x.id === id);
+    if (!review && !saved && !test && !final && !g) return notFound();
     const weak = review ? GRAMMAR.filter(x => Store.weakRules().includes(x.id))
       : saved ? GRAMMAR.filter(x => Store.isRuleSaved(x.id)) : [];
     if ((review || saved) && !weak.length) { location.hash = '#/grammar'; return; }
     const qs = review || saved
       ? shuffle(weak.flatMap(r => r.quiz.map(q => ({ q, r })))).slice(0, 8)
+      : final
+        ? shuffle(GRAMMAR.filter(x => x.level === final)).slice(0, 10).map(r => ({ q: r.quiz[Math.floor(Math.random() * r.quiz.length)], r }))
       : test
         ? shuffle(GRAMMAR.filter(x => x.level === LEVELS[ti - 1].id)).slice(0, 6).map(r => ({ q: r.quiz[Math.floor(Math.random() * r.quiz.length)], r }))
         : g.quiz.map(q => ({ q, r: g }));
@@ -1258,7 +1272,7 @@
       const [q, answer, wrong] = qs[i].q;
       const rule = qs[i].r;
       view.innerHTML = `
-        <p class="sub">${review ? `🏋️ ${t('grev.title')}` : saved ? `⭐ ${t('saved.chip')}` : test ? `🚪 ${t('gtest.title', { level: t('lv.' + test) })}` : ruleTitle(g)} · ${t('quiz.count', { a: i + 1, b: qs.length })}</p>
+        <p class="sub">${review ? `🏋️ ${t('grev.title')}` : saved ? `⭐ ${t('saved.chip')}` : final ? `🎓 ${t('final.title', { level: t('lv.' + final) })}` : test ? `🚪 ${t('gtest.title', { level: t('lv.' + test) })}` : ruleTitle(g)} · ${t('quiz.count', { a: i + 1, b: qs.length })}</p>
         ${lessonBar(i / qs.length)}
         ${review || saved ? `<p class="small grev-rule">${ruleTitle(rule)}</p>` : ''}
         <div class="card question">
@@ -1286,7 +1300,23 @@
           speak(full.replace(/"/g, ''));
           showFeedback({ ok, answer: ok ? '' : full, say: full.replace(/"/g, ''), combo: streak });
       });
-      $('#next').onclick = () => { i++; i < qs.length ? question() : (review ? reviewSummary() : saved ? savedSummary() : test ? testSummary() : summary()); };
+      $('#next').onclick = () => { i++; i < qs.length ? question() : (review ? reviewSummary() : saved ? savedSummary() : final ? finalSummary() : test ? testSummary() : summary()); };
+    }
+
+    function finalSummary() {
+      const good = correct >= Math.ceil(qs.length * 0.8);
+      refreshChrome('grammar');
+      endLesson(1);
+      view.innerHTML = `
+        <div class="card center" style="margin-top:14px">
+          <div class="big">${good ? '🎓' : '💪'}</div>
+          <h1>${t('quiz.score', { a: correct, b: qs.length })}</h1>
+          <p class="sub">${t(good ? 'final.pass' : 'final.fail')}</p>
+          ${roundStats({ correct, total: qs.length, ms: Date.now() - started })}
+          <a class="btn" href="#/grammar">${t('gtest.go')}</a>
+          ${!good && Store.weakRules().length ? `<a class="btn ghost" href="#/grammar/review/quiz">${t('gtest.review')}</a>` : ''}
+        </div>`;
+      countUp();
     }
 
     function savedSummary() {

@@ -1179,3 +1179,12 @@ button.path-head:active span { background: rgba(142, 125, 255, .22); }
 .pc-save.on { background: rgba(255, 255, 255, .85); color: #8a5a00; }
 
 .gpractice { display: block; margin: 0 0 12px; text-align: center; text-decoration: none; }
+
+/* Level gates grow to fit; a completed level turns its gate into a certificate */
+.pgate { height: auto; min-height: 104px; }
+.pgate.complete { border: 2px solid #ffc53d; background: linear-gradient(140deg, #4a3a10, #2a2250); }
+.pgate.complete .pgate-prev { color: #ffd66b; font-weight: 800; }
+.pgate-final {
+  display: inline-flex; align-items: center; min-height: 40px; margin-top: 8px; padding: 0 12px; border-radius: 12px;
+  background: #ffc53d; color: #4a3200; font-weight: 800; font-size: .85rem; text-decoration: none;
+}
