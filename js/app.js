@@ -1981,21 +1981,30 @@
       const w = words.filter(x => Store.isMastered(x.id)).length;
       const s = sentences.filter(x => Store.isMastered(x.id)).length;
       const r = rules.filter(g => Store.isGrammarDone(g.id)).length;
-      return `
-        <div class="card">
-          <b>${t('lv.' + l.id)}</b>
-          <div class="meter"><span class="small">${t('progress.words', { a: w, b: words.length })}</span>${bar((w / words.length) * 100)}</div>
-          ${sentences.length ? `<div class="meter"><span class="small">${t('progress.phrases', { a: s, b: sentences.length })}</span>${bar((s / sentences.length) * 100)}</div>` : ''}
-          <div class="meter"><span class="small">${t('progress.rules', { a: r, b: rules.length })}</span>${bar((r / rules.length) * 100)}</div>
+      const parts = [[w, words.length], [s, sentences.length], [r, rules.length]].filter(p => p[1]);
+      const pct = Math.round(parts.reduce((n, [a, b]) => n + a / b, 0) / parts.length * 100);
+      const row = (icon, label, a, b) => `
+        <div class="lv-row"><span class="lv-ico" aria-hidden="true">${icon}</span>
+          <span class="grow"><span class="lv-label">${label}</span><span class="lv-bar"><i style="width:${b ? Math.round(a / b * 100) : 0}%"></i></span></span>
         </div>`;
+      return `
+        <section class="lvcard lv-${l.id}">
+          <div class="lv-head">
+            <div class="lv-ring" style="--p:${pct}" role="img" aria-label="${pct}%"><b class="en">${pct}%</b></div>
+            <div class="grow"><b>${t('lv.' + l.id)}</b><small class="en">${t('lvl.cefr.' + l.id)}</small></div>
+          </div>
+          ${row('📖', t('progress.words', { a: w, b: words.length }), w, words.length)}
+          ${sentences.length ? row('💬', t('progress.phrases', { a: s, b: sentences.length }), s, sentences.length) : ''}
+          ${row('✏️', t('progress.rules', { a: r, b: rules.length }), r, rules.length)}
+        </section>`;
     };
     view.innerHTML = `
       <h1>${t('progress.title')}</h1>
       <p class="sub">${t('progress.sub', { x: Store.xp })}</p>
       <div class="stats">
-        <div class="card stat"><b>${mastered}</b><span class="small">${t('home.learned')}</span></div>
-        <div class="card stat"><b>${Store.streak}</b><span class="small">${t('progress.streak')}</span></div>
-        <div class="card stat"><b>${Store.best}</b><span class="small">${t('progress.best')}</span></div>
+        <div class="card stat st-words"><span class="st-ico" aria-hidden="true">📚</span><b>${mastered}</b><span class="small">${t('home.learned')}</span></div>
+        <div class="card stat st-streak"><span class="st-ico" aria-hidden="true">🔥</span><b>${Store.streak}</b><span class="small">${t('progress.streak')}</span></div>
+        <div class="card stat st-best"><span class="st-ico" aria-hidden="true">🏆</span><b>${Store.best}</b><span class="small">${t('progress.best')}</span></div>
       </div>
       ${weekCard()}
       ${LEVELS.map(levelCard).join('')}
@@ -2070,7 +2079,7 @@
         </div>
         <div class="week-bars" role="list">
           ${days.map(d => `
-            <div class="wb${d.today ? ' today' : ''}" role="listitem" title="${longName.format(d.date)}: ${said(d)}"
+            <div class="wb${d.today ? ' is-today' : ''}" role="listitem" title="${longName.format(d.date)}: ${said(d)}"
               aria-label="${d.today ? t('week.today') : longName.format(d.date)}: ${said(d)}">
               <span class="wv" aria-hidden="true">${d.count && (d.today || d.count === max) ? d.count : ''}</span>
               <span class="wcol"><i style="height:${d.count ? Math.max(4, Math.round((d.count / max) * 100)) : 0}%"></i></span>

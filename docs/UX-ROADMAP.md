@@ -50,6 +50,20 @@ Home's screen (H1, H2 below) is no longer shown; its code stays, in case the dai
 | G13 | Structure rows open an example | In a finished rule's cheat sheet, a structure row opens the rule example that matches it (same kind of sentence: statement / negative / question, most shared words), with a speaker; rows with no true match stay plain (182 of 282 rows open) | Babbel grammar tips | Done (round 75) |
 | G14 | One quick question | A finished rule's card offers "One quick question": a choice question answered inside the card, feedback in text and color, "Another one"; a miss goes to the review stop | Duolingo practice, Anki | Done (round 77) |
 
+## Design rounds (from round 78)
+
+At the user's request the loop now works on visual design only: one screen or element per round,
+in the visual language of the paths (level colours, chunky 3D cards with a bottom edge, rings, emoji icons).
+
+| # | Round | What | Status |
+|---|---|---|---|
+| D1 | Progress screen | Stat tiles with icons and tinted backgrounds; level cards in their own colour with a ring for the whole level and one row per part (icon, label, bar); thicker week bars, today in coral; fixed a class clash that boxed the "today" column | Done (round 78) |
+| D2 | Grammar rule page | The rule screen in its level's colour: header card, structure as a clean table, examples as speaker rows, mistake card with a clear warning style | |
+| D3 | Quiz and lesson screens | Answer tiles, progress bar and feedback sheet polished to match the path cards | |
+| D4 | Tab bar and header | Active tab as a pill, softer bar with blur, consistent icon weights | |
+| D5 | Flashcards | Card faces with the unit's colour and emoji, nicer back side | |
+| D6 | Type and spacing audit | One scale for headings, labels and small text; consistent card gaps | |
+
 ## Home: what it was for (until round 51)
 
 Since the lesson path (round 29), the course map lives in the Learn tab. Home now has one job: **today**.
