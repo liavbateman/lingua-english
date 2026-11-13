@@ -74,7 +74,11 @@ in the visual language of the paths (level colours, chunky 3D cards with a botto
 | D15 | Path nodes | Done lessons with a soft gold shine, the current node with a stronger ring, locked nodes calmer | Done (round 92): a gloss highlight on done, current and open nodes plus a soft gold glow on done ones; the current node has a thicker ring and a coral glow; locked nodes darker and quieter |
 | D16 | Chest opening | The chest card and the moment it opens: a burst of confetti-coloured sparks and a bigger reward badge | Done (round 93): 14 coloured sparks burst from the chest (removed after the animation); the points as a big pill badge with a star, one line even at 320px |
 | D17 | Streak calendar | The week chart grows into a month view of practised days on the Progress screen (roadmap item 9) | Done (round 94): a 5-week calendar under the week chart, laid out by weekday; days tinted in four steps by answers, today ringed, active days and longest run in the header, a less/more key |
-| D18 | Launch screen | The PWA splash and app icon background match the app's navy and owl | |
+| D18 | Launch screen | The PWA splash and app icon background match the app's navy and owl | Done (round 95): navy painted inline before the stylesheet and font load (no white flash), the owl icon and LINGUA on a soft navy glow until the first screen is drawn, then a short fade (none under Reduce Motion); manifest and theme colour already #080d26 |
+| D19 | Grammar quiz screen | The grammar quiz in its level's colour: question card, answer buttons as raised tiles, a level-coloured progress track | |
+| D20 | Answer feedback | The right / wrong sheet after an answer: a raised card in green or coral with an icon, the correct sentence spoken and shown | |
+| D21 | Saved rules | The saved-rules list as level-coloured cards with a bookmark ribbon, an empty state with the owl | |
+| D22 | Certificate | The level certificate: a framed card in the level colour with the ring, the date and a share-friendly layout | |
 
 ## Home: what it was for (until round 51)
 
