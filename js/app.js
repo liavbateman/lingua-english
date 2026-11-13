@@ -1261,6 +1261,43 @@
     </section>`;
   }
 
+  // First launch: who the app is for, what is in it, and where to start (the level can change any time)
+  function welcome() {
+    const back = document.createElement('div');
+    back.className = 'sheet-back welcome-back';
+    back.innerHTML = `
+      <div class="sheet welcome" role="dialog" aria-modal="true" aria-labelledby="wl-title">
+        <img class="wl-owl" src="icons/owl-192.png" alt="" width="84" height="84">
+        <b id="wl-title">${t('wl.title')}</b>
+        <p>${t('wl.text')}</p>
+        <ul class="wl-points">
+          <li><span aria-hidden="true">✏️</span>${t('wl.p1')}</li>
+          <li><span aria-hidden="true">📖</span>${t('wl.p2')}</li>
+          <li><span aria-hidden="true">🔊</span>${t('wl.p3')}</li>
+        </ul>
+        <b class="wl-ask">${t('wl.ask')}</b>
+        ${LEVELS.map(l => `
+          <button class="lvl-opt wl-lvl lv-${l.id}" data-level="${l.id}">
+            <span class="grow">
+              <span class="lvl-top"><b>${t('lv.' + l.id)}</b><small>${t('lvl.cefr.' + l.id)}</small></span>
+              <span class="lvl-desc">${t('lvl.desc.' + l.id)}</span>
+            </span>
+          </button>`).join('')}
+        <p class="wl-note">${t('wl.note')}</p>
+      </div>`;
+    back.querySelectorAll('.wl-lvl').forEach(b => {
+      b.onclick = () => {
+        Store.level = b.dataset.level;
+        Store.markWelcomed();
+        back.classList.add('out');
+        setTimeout(() => back.remove(), 200);
+        route();
+      };
+    });
+    document.body.appendChild(back);
+    back.querySelector('.wl-lvl').focus({ preventScroll: true });
+  }
+
   function learn() {
     const items = pathFor('vocab');
     view.innerHTML = `
@@ -2805,4 +2842,5 @@
   window.addEventListener('hashchange', route);
   applyLang();
   route();
+  if (!Store.welcomed) welcome();
 })();

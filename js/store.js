@@ -61,6 +61,12 @@ const Store = (() => {
     // The "goal done" celebration is shown once a day
     get celebrated() { return state.daily.date === dayKey() && !!state.daily.celebrated; },
     markCelebrated() { touchDay(); state.daily.celebrated = true; save(); },
+    // First launch: a short welcome with a level choice, shown once. Anyone who already has
+    // progress (words, rules or points from before this screen existed) counts as welcomed.
+    get welcomed() {
+      return !!state.welcomed || state.xp > 0 || Object.keys(state.words || {}).length > 0 || Object.keys(state.grammar || {}).length > 0;
+    },
+    markWelcomed() { state.welcomed = true; save(); },
 
     // Grammar rules whose practice was passed
     isGrammarDone: id => !!(state.grammar && state.grammar[id]),

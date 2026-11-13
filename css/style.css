@@ -2028,3 +2028,22 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
 .prev-ico { display: grid; place-items: center; color: #fff; filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .2)); }
 .prev-ico svg { width: 28px; height: 28px; }
 .prev-count { z-index: 1; }
+
+/* ---------- First launch: a short welcome with a level choice ---------- */
+.welcome { max-height: calc(100% - 12px); overflow-y: auto; text-align: center; justify-items: stretch; gap: 8px; }
+.wl-owl { justify-self: center; width: 84px; height: 84px; border-radius: 22px; box-shadow: 0 6px 0 #10306b; margin-top: -4px; }
+.welcome > b#wl-title { font-size: 1.35rem; }
+.welcome > p { margin: 0; color: #d5d9f2; }
+.wl-points { list-style: none; margin: 4px 0; padding: 10px 12px; display: grid; gap: 6px; border-radius: 14px; background: rgba(255, 255, 255, .05); text-align: start; }
+.wl-points li { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--ink); }
+.wl-ask { margin-top: 4px; font-size: 1.05rem; }
+.wl-lvl { text-align: start; }
+.welcome .wl-note { font-size: .8rem; color: var(--muted); }
+@media (max-height: 700px) {
+  .wl-owl { width: 60px; height: 60px; border-radius: 16px; }
+  .welcome { gap: 6px; padding-top: 16px; }
+  .wl-points { padding: 8px 10px; gap: 4px; }
+  .wl-points li { font-size: .82rem; }
+  .welcome .wl-lvl { padding-block: 10px; }
+  .welcome .wl-lvl .lvl-desc { font-size: .8rem; }
+}
