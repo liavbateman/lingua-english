@@ -926,3 +926,20 @@ body:has(.pcard) .path-jump { display: none; }
 }
 .ph-go:active { transform: translateY(4px); box-shadow: 0 0 0 #2c7fd1; }
 @media (max-width: 360px) { .ph-owl { width: 84px; height: 84px; border-radius: 20px; } }
+
+/* Path: a review stop beside the current lesson, joined to the road by a dotted side path */
+.pl-side { stroke: #2e3670; stroke-width: 6; stroke-dasharray: 2 12; fill: none; }
+.prev-wrap { position: absolute; width: 100px; display: flex; flex-direction: column; align-items: center; z-index: 1; }
+.prev-node {
+  position: relative; width: 60px; height: 58px; border-radius: 50%; display: grid; place-items: center;
+  font-size: 1.6rem; text-decoration: none; background: #2fb8a0; box-shadow: 0 6px 0 #1d7f6e;
+  animation: nodepulse 2.4s ease-in-out infinite;
+}
+.prev-node:active { transform: translateY(4px); box-shadow: 0 2px 0 #1d7f6e; }
+.prev-count {
+  position: absolute; top: -6px; inset-inline-end: -8px; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 999px;
+  display: grid; place-items: center; background: #ff6b7a; color: #fff; font-size: .78rem; font-weight: 900; border: 2px solid var(--bg);
+}
+.prev-wrap .plabel { margin-top: 10px; color: #6fe6c0; }
+@media (prefers-reduced-motion: reduce) { .prev-node { animation: none; } }
+.prev-wrap .plabel { width: auto; padding: 0 4px; }   /* only as wide as "Review", so it never meets the lesson's label */

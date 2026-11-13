@@ -17,7 +17,7 @@ borrowing proven patterns from leading language apps, and adapts them to a Hebre
 | P3 | Path: milestone chests | A treasure node after each section that opens with a small celebration once the section is done | Duolingo chests | Done (round 34): locked / ready (wiggles) / opened, +20 points once |
 | P4 | Path: progress you can see happen | Coming back from a finished lesson, the node turns gold and the road fills up to the next one | Duolingo | Done (round 36): node turns gold, road grows, bubble drops onto the next lesson, once per change |
 | P5 | Path: mascot header | A header with the owl, streak and the next step above the path, like the reference app | User's reference app | Done (round 38): owl, speech bubble that counts lessons to the next chest, streak and level chips, one button into the current lesson |
-| P6 | Path: review stops | A "review" node that appears on the road when words from earlier lessons are due | Duolingo practice nodes | |
+| P6 | Path: review stops | A "review" node that appears on the road when words from earlier lessons are due | Duolingo practice nodes | Done (round 40): beside the current lesson, dotted side path, count badge, 3+ due words learned once |
 | 7 | Owl reactions | The owl mascot reacts in feedback, empty states and celebrations | Duolingo | |
 | 8 | First-run setup | Three short screens: level, daily goal, reminder time | Babbel, Busuu | |
 | 9 | Streak calendar | A month view of practiced days on the Progress screen | Duolingo | |

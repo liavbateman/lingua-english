@@ -435,6 +435,13 @@
     });
     items.cur = cur;
     items.part = part;
+    // Review stop: words from this path's earlier lessons that were learned once and are due again
+    if (part !== 'grammar' && cur >= 0) {
+      const curUnit = items[cur].href.split('/').pop();
+      const units = new Set(levelUnits().filter(u => (u.kind === 'phrases') === (part === 'phrases') && u.id !== curUnit).map(u => u.id));
+      const due = Store.dueWords().filter(w => units.has(w.unit) && Store.box(w.id) >= 2);
+      if (due.length >= 3) items.review = due;
+    }
     return items;
   }
 
@@ -475,6 +482,13 @@
       <div class="path" id="path">
         <svg class="path-line" id="pathline" aria-hidden="true"></svg>
         ${Array.from({ length: sections }, (_, s) => sectionBanner(items, s)).join('')}
+        ${items.review ? `
+          <div class="prev-wrap" id="prevwrap">
+            <a class="prev-node" href="#/quiz/choice/pathreview" aria-label="${t('rstop.aria', { n: items.review.length })}">
+              <span aria-hidden="true">🏋️</span><b class="prev-count" aria-hidden="true">${items.review.length}</b>
+            </a>
+            <span class="plabel">${t('rstop.label')}</span>
+          </div>` : ''}
         ${Array.from({ length: sections }, (_, s) => {
           const st = chestState(items, s);
           return `<div class="pchest-wrap" data-s="${s}">
@@ -551,6 +565,15 @@
     const svg = document.getElementById('pathline');
     svg.setAttribute('viewBox', `0 0 ${W} ${y}`);
     svg.innerHTML = `<path class="pl-base" d="${d}"/>` + (done ? `<path class="pl-done" d="${done}"/>` : '');
+    const rw = document.getElementById('prevwrap');
+    if (rw && pathItems.cur >= 0) {
+      const [cx, cy] = pts[pathItems.cur];
+      const side = cx >= W / 2 ? -1 : 1;
+      const rx = Math.max(46, Math.min(W - 46, cx + side * 116));
+      rw.style.left = (rx - 50) + 'px';
+      rw.style.top = (cy - 30) + 'px';
+      svg.insertAdjacentHTML('afterbegin', `<path class="pl-side" d="M${cx} ${cy} L${rx} ${cy}"/>`);
+    }
 
     // Back from a finished lesson: the gold road grows from where it was to where it is now
     const from = pathItems.growFrom;
@@ -1072,6 +1095,7 @@
     if (source === 'review') return { pool: Store.dueWords(), title: t('quiz.review') };
     if (source === 'missed') return { pool: lastMissed, title: t('quiz.missedTitle') };
     if (source === 'tricky') return { pool: Store.trickyWords(), title: t('tricky.title') };
+    if (source === 'pathreview') return { pool: (pathItems && pathItems.review) || [], title: t('rstop.label') };
     const unit = UNITS.find(u => u.id === source);
     if (unit) return { pool: unit.words, title: `${unit.emoji} ${unitTitle(unit)}` };
     if (source === 'level') {
