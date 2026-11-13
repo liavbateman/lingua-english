@@ -230,6 +230,28 @@
   }
 
   // ---------- Home ----------
+  // The single best next step, shown as one big card at the top of Home (as Babbel's "Continue"
+  // and Duolingo's "Start"): words about to be forgotten first, then new words, then grammar,
+  // then the rest of today's plan, then free practice.
+  function nextStep() {
+    const done = Store.tasks;
+    const due = Store.dueWords().length;
+    if (due && !done.review) return { href: '#/quiz/choice/review', icon: 'repeat', color: 'coral',
+      title: t('cont.review', { n: due }), sub: t('cont.review.sub') };
+    const u = levelUnits().find(x => x.kind !== 'phrases' && Store.unitProgress(x).seen < x.words.length);
+    if (u && !done.vocab) {
+      const fresh = u.words.length - Store.unitProgress(u).seen;
+      return { href: `#/unit/${u.id}`, icon: 'book', color: 'blue', emoji: u.emoji,
+        title: t('cont.lesson', { title: unitTitle(u) }), sub: t('cont.lesson.sub', { n: fresh }) };
+    }
+    const g = levelGrammar().find(x => !Store.isGrammarDone(x.id));
+    if (g && !done.grammar) return { href: `#/grammar/${g.id}`, icon: 'pencil', color: 'gold',
+      title: t('cont.grammar', { title: ruleTitle(g) }), sub: t('cont.grammar.sub') };
+    const left = planTasks().find(x => !done[x.id]);
+    if (left) return { href: left.href, icon: left.icon, color: left.color, title: left.title, sub: left.sub };
+    return { href: '#/practice', icon: 'levels', color: 'purple', title: t('cont.free'), sub: t('cont.free.sub') };
+  }
+
   function home() {
     const lw = wordsOf(Store.level);
     const pct = Math.round((lw.filter(w => Store.isMastered(w.id)).length / lw.length) * 100);
@@ -243,7 +265,17 @@
     const wotd = single[localDay % single.length];
     const tricky = Store.trickyWords();
 
+    const step = nextStep();
     view.innerHTML = `
+      <a class="continue" href="${step.href}">
+        <span class="cont-kicker">${t('cont.kicker')}</span>
+        <span class="cont-row">
+          <span class="tile ${step.color}">${step.emoji ? `<span class="cont-emoji">${step.emoji}</span>` : ICON[step.icon]}</span>
+          <span class="grow"><b>${step.title}</b><span class="small">${step.sub}</span></span>
+        </span>
+        <span class="cont-go">${t('cont.go')} ${fwd()}</span>
+      </a>
+
       <section class="hero">
         ${TOWER}
         <span class="pill">⭐ ${t('home.journey')}</span>
