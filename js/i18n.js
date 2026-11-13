@@ -25,6 +25,8 @@ const STR = {
     'home.challenge': 'Ready for a challenge?', 'home.challenge.sub': 'Test your English with a quick exercise.',
     'home.start': 'Start now',
 
+    'search.ph': 'Search a word in English or Hebrew', 'search.none': 'No words match “{q}”',
+    'search.count': '{n} results', 'search.one': '1 result',
     'learn.title': 'Learn', 'learn.sub': '{level} lessons. Change the level on the Home screen.',
     'learn.vocab': 'Words', 'learn.phrases': 'Phrases', 'learn.grammar': 'Grammar', 'learn.practice': 'Practice',
     'learn.words': '{a} of {b} words learned', 'learn.sentences': '{a} of {b} sentences learned',
@@ -111,6 +113,8 @@ const STR = {
     'home.challenge': 'זמן לאתגר?', 'home.challenge.sub': 'תרגיל קצר שבודק את האנגלית שלך.',
     'home.start': 'מתחילים',
 
+    'search.ph': 'חיפוש מילה באנגלית או בעברית', 'search.none': 'לא נמצאו מילים עבור „{q}”',
+    'search.count': '{n} תוצאות', 'search.one': 'תוצאה אחת',
     'learn.title': 'לימוד', 'learn.sub': 'שיעורים ברמת {level}. את הרמה מחליפים במסך הבית.',
     'learn.vocab': 'מילים', 'learn.phrases': 'משפטים', 'learn.grammar': 'דקדוק', 'learn.practice': 'תרגול',
     'learn.words': '{a} מתוך {b} מילים נלמדו', 'learn.sentences': '{a} מתוך {b} משפטים נלמדו',

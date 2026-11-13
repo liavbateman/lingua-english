@@ -28,6 +28,7 @@
     levels: svg('<rect x="3.500" y="13" width="4.500" height="8" rx="1.200"/><rect x="9.800" y="8" width="4.500" height="13" rx="1.200"/><rect x="16" y="3" width="4.500" height="18" rx="1.200"/>', true),
     keyboard: svg('<rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6.5 10h.01M10 10h.01M14 10h.01M17.5 10h.01M8 14.5h8"/>'),
     target: svg('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>'),
+    search: svg('<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20"/>'),
     calendar: svg('<rect x="3.500" y="5" width="17" height="15.500" rx="3"/><path d="M3.500 10h17M8 3v4M16 3v4"/>')
   };
 
@@ -326,12 +327,72 @@
         `<a href="${href}" class="${on === id ? 'on' : ''}"${on === id ? ' aria-current="page"' : ''}>${t('learn.' + id)}</a>`).join('')}
     </div>`;
 
+  // ---------- Search: every word and sentence of every level, in English or Hebrew ----------
+  const searchKey = s => s.toLowerCase()
+    .replace(/[\u0591-\u05C7]/g, '')            // Hebrew vowel marks
+    .replace(/[׳״'"’`.,!?()\-]/g, ' ').replace(/\s+/g, ' ').trim();
+  const SEARCH = () => ALL_WORDS.map(w => ({ w, en: searchKey(w.en), he: searchKey(w.he) }));
+  let searchIndex = null;
+
+  function searchWords(query) {
+    const q = searchKey(query);
+    if (!q) return [];
+    searchIndex = searchIndex || SEARCH();
+    const score = x => {
+      for (const f of [x.en, x.he]) {
+        if (f === q) return 0;                             // exact
+        if (f.startsWith(q)) return 1;                     // starts with it
+        if (f.split(' ').some(part => part.startsWith(q))) return 2;   // a word in it starts with it
+      }
+      return x.en.includes(q) || x.he.includes(q) ? 3 : -1;
+    };
+    return searchIndex.map(x => ({ w: x.w, s: score(x) })).filter(x => x.s >= 0)
+      .sort((a, b) => a.s - b.s || (a.w.phrase - b.w.phrase) || a.w.en.length - b.w.en.length)
+      .slice(0, 30).map(x => x.w);
+  }
+
+  function searchResults(query) {
+    const found = searchWords(query);
+    if (!found.length) return `<p class="sub center search-empty">${t('search.none', { q: query.replace(/[<>&"]/g, '') })}</p>`;
+    return `<p class="small search-count" role="status">${t(found.length === 1 ? 'search.one' : 'search.count', { n: found.length })}</p>` +
+      found.map((w, n) => {
+        const unit = UNITS.find(u => u.id === w.unit);
+        return `
+        <div class="search-row">
+          <button class="speak sm" data-say="${n}" aria-label="${t('aria.listen')}">${ICON.speaker}</button>
+          <a class="grow" href="#/unit/${unit.id}">
+            <b class="en">${w.en}</b>
+            <span class="he">${w.he}</span>
+            <span class="small">${unit.emoji} ${unitTitle(unit)} · ${t('lv.' + unit.level)}</span>
+          </a>
+        </div>`;
+      }).join('');
+  }
+
   function learn() {
     view.innerHTML = `
       <h1>${t('learn.title')}</h1>
       <p class="sub">${t('learn.sub', { level: levelLabel() })}</p>
       ${learnTabs('vocab')}
-      ${levelUnits().filter(u => u.kind !== 'phrases').map(unitCard).join('')}`;
+      <div class="search">
+        ${ICON.search}
+        <input id="search" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+          placeholder="${t('search.ph')}" aria-label="${t('search.ph')}">
+      </div>
+      <div id="units">${levelUnits().filter(u => u.kind !== 'phrases').map(unitCard).join('')}</div>
+      <div id="results" hidden></div>`;
+    const input = $('#search'), units = $('#units'), results = $('#results');
+    // Only the results area is redrawn while typing, so the keyboard stays open
+    input.oninput = () => {
+      const q = input.value.trim();
+      units.hidden = !!q;
+      results.hidden = !q;
+      if (!q) { results.innerHTML = ''; return; }
+      results.innerHTML = searchResults(q);
+      const found = searchWords(q);
+      results.querySelectorAll('[data-say]').forEach(b => { b.onclick = () => speak(found[b.dataset.say].en); });
+    };
+    input.onkeydown = e => { if (e.key === 'Enter') input.blur(); };   // "Search" on the keyboard closes it
   }
 
   // Useful full sentences, grouped by situation
