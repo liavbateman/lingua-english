@@ -6,7 +6,7 @@ const FILES = [
   './', 'index.html', 'css/style.css',
   'js/data.js', 'js/grammar.js', 'js/content-beginner.js', 'js/content-intermediate.js', 'js/content-advanced.js', 'js/content-index.js',
   'js/store.js', 'js/i18n.js', 'js/app.js',
-  'manifest.webmanifest', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/logo.png', 'icons/favicon.png'
+  'manifest.webmanifest', 'icons/owl-180.png', 'icons/owl-192.png', 'icons/owl-512.png', 'icons/logo.png', 'icons/favicon.png'
 ];
 const FONTS = ['https://fonts.googleapis.com', 'https://fonts.gstatic.com'];
 
