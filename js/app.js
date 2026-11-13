@@ -1910,10 +1910,14 @@
         ${lessonBar(i / queue.length)}
         <div class="card question">${retry ? `<div class="again">${ICON.repeat}${t('quiz.again')}</div>` : ''}${prompt}</div>
         ${kind === 'type' ? `
-        <form class="typed" id="typed" autocomplete="off">
+        <form class="typed lv-${w.level}" id="typed" autocomplete="off">
+          <div class="ty-slots" id="slots" dir="ltr" aria-hidden="true">${[...w.en].map(c => c === ' ' ? '<i class="gap"></i>' : '<i></i>').join('')}</div>
           <input id="answer" class="en" dir="ltr" lang="en" type="text" enterkeyhint="go"
             autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="${t('quiz.type')}" placeholder="${t('quiz.type.ph')}">
-          <button class="btn" id="check" type="submit">${t('quiz.check')}</button>
+          <div class="ty-row">
+            <button class="ty-hint" id="hint" type="button">💡 ${t('type.hint')}</button>
+            <button class="btn" id="check" type="submit">${t('quiz.check')}</button>
+          </div>
         </form>` : `
         <div class="options">
           ${options.map(o => `<button class="opt ${toHebrew ? 'he' : 'en'} ${long}" data-id="${o.id}">${o[key]}</button>`).join('')}
@@ -2007,6 +2011,27 @@
       if (kind === 'type') {
         const input = $('#answer');
         input.focus();   // runs inside the tap on "Next", so iPhone opens the keyboard
+        // One slot per letter (the word's length is the first hint); typed letters fill the slots in order
+        const slots = [...$('#slots').children].filter(s => !s.classList.contains('gap'));
+        const fill = () => {
+          const typedL = input.value.replace(/ /g, '');
+          slots.forEach((s, k) => { s.textContent = typedL[k] || ''; s.classList.toggle('on', !!typedL[k]); });
+        };
+        input.addEventListener('input', fill);
+        // A hint writes the next correct letter (after the part typed correctly so far)
+        $('#hint').onclick = () => {
+          if (input.readOnly) return;
+          const v = input.value.toLowerCase(), target = w.en.toLowerCase();
+          let k = 0;
+          while (k < v.length && v[k] === target[k]) k++;
+          if (k >= target.length - 1) return input.focus();
+          let next = k + 1;
+          if (target[next - 1] === ' ') next++;
+          input.value = w.en.slice(0, next);
+          fill();
+          input.focus();
+          if (next >= w.en.length - 1) $('#hint').disabled = true;   // the last letter is never given away
+        };
         $('#typed').onsubmit = e => {
           e.preventDefault();
           if (input.readOnly) return;
@@ -2016,6 +2041,7 @@
           input.classList.add(grade === 'wrong' ? 'wrong' : 'right');
           grade === 'wrong' ? Feel.wrong(input) : Feel.right();
           $('#check').hidden = true;
+          $('#hint').hidden = true;
           settle(grade !== 'wrong', grade === 'close',
             grade === 'right' ? wordWhy(true) : wordWhy(grade !== 'wrong', null, input.value.trim()));   // Enter again goes on to the next word
         };

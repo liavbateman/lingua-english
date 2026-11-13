@@ -1796,3 +1796,23 @@ body.in-lesson .view.has-fb { padding-bottom: calc(var(--fb-h, 230px) + 24px + e
   content: ""; position: absolute; top: 6px; left: calc(50% + 14px); width: 9px; height: 9px; border-radius: 50%;
   background: #ff6b7a; box-shadow: 0 0 0 2px var(--bg-2); pointer-events: none;
 }
+
+/* ---------- Typing: letter slots, a hint, a big field and a check button in the level colour (design round D30) ---------- */
+.ty-slots { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; }
+.ty-slots i {
+  width: 22px; height: 30px; border-radius: 7px; display: grid; place-items: center; font-style: normal;
+  font-weight: 800; font-size: .95rem; text-transform: lowercase; color: var(--ink);
+  background: rgba(255, 255, 255, .06); box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--lv, #8e7dff) 45%, transparent);
+}
+.ty-slots i.on { background: color-mix(in srgb, var(--lv, #8e7dff) 26%, transparent); box-shadow: inset 0 -3px 0 var(--lv, #8e7dff); }
+.ty-slots i.gap { width: 10px; background: none; box-shadow: none; }
+.typed[class*="lv-"] input { min-height: 64px; border-radius: 20px; font-size: 1.45rem; background: #161c48; box-shadow: inset 0 3px 0 rgba(0, 0, 0, .25); }
+.typed[class*="lv-"] input:focus { border-color: var(--lv); }
+.ty-row { display: flex; gap: 8px; }
+.ty-row .btn { flex: 1; }
+.typed[class*="lv-"] .btn { background: var(--lv); color: #0b1430; box-shadow: 0 4px 0 var(--lv-edge); }
+.typed[class*="lv-"] .btn:not(:disabled):active { box-shadow: 0 0 0 var(--lv-edge); }
+.ty-hint { flex: none; min-height: 52px; padding: 0 12px; border-radius: 16px; border: 0; cursor: pointer; font: inherit; font-weight: 800; font-size: .85rem;
+  background: rgba(255, 214, 107, .14); color: #ffd66b; box-shadow: 0 4px 0 rgba(0, 0, 0, .3); }
+.ty-hint:disabled { opacity: .45; cursor: default; }
+@media (max-width: 340px) { .ty-slots i { width: 19px; height: 27px; font-size: .85rem; } .ty-hint { padding: 0 9px; font-size: .78rem; } }

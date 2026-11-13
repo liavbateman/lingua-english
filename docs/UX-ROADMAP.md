@@ -86,7 +86,11 @@ in the visual language of the paths (level colours, chunky 3D cards with a botto
 | D27 | Learn tab header | The Learn screen's top: the level chip, the level ring and today's goal in one raised card in the level colour | Done (round 104): on the words and sentences paths the owl card takes the learner's level gradient and edge; its chips are the streak, a mini ring with the level name and how much of this part is done, and today's plan (🎯 done / total, green when complete, read out as "Daily goal"); the grammar road's card is unchanged |
 | D28 | Practice grid | The practice tiles (choice, listen, cloze, type, speak) as raised tiles with their own colour, icon and a short "what you'll do" line | Done (round 105): the tiles already had their colour, icon and line (D11); now each has a skill tag in its colour (memory, pronunciation, ear training, words in context, spelling), a darker edge in its own colour, and the review tile a red badge with the number of words due |
 | D29 | Tab bar | A softer tab bar: the active tab's icon in a pill with the screen's colour, a small dot when something waits (review due) | Done (round 106): each tab has its own colour (Grammar coral, Learn blue, Progress green) on the active pill, icon and label; a red dot on Grammar when rules wait at the review stop and on Learn when words are due, also read out by screen readers |
-| D30 | Typing exercise | The typing screen: the input as a big rounded field, letter hints as chips, a level-coloured check button | |
+| D30 | Typing exercise | The typing screen: the input as a big rounded field, letter hints as chips, a level-coloured check button | Done (round 107): a row of letter slots (the word's length, spaces as gaps) that fill as you type, a bigger rounded field, a "Hint: next letter" button that writes the next correct letter (never the last one), and the check button in the word's level colour |
+| D31 | Explanation sheet polish | The "Why?" block: a collapsible block when long, the rule's name as a link to its page, a small owl beside it | |
+| D32 | Level sheet transitions | The level picker sheet slides up with a soft spring, the chosen level's card pops, the rest dim | |
+| D33 | Rule page examples | The examples on a rule page as speech-bubble cards in the level colour, the key word highlighted | |
+| D34 | Empty and offline states | A friendly offline banner and consistent owl empty states across search, saved, review | |
 
 ## Home: what it was for (until round 51)
 
