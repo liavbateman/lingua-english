@@ -1963,3 +1963,9 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
 }
 .opt:disabled:not(.right):not(.wrong) { opacity: .5; transition: opacity var(--dur-ui); }
 @media (prefers-reduced-motion: reduce) { .opt.right { animation: none; } }
+
+/* ---------- Tenses map: a mini timeline in every cell, finished tenses crowned (design round D44) ---------- */
+.tn-cell { position: relative; }
+.tn-line { color: var(--c); justify-self: start; }
+[dir="rtl"] .tn-line { justify-self: end; }
+.tn-cell.done::after { content: "👑"; position: absolute; top: -9px; inset-inline-end: 8px; font-size: 1rem; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .4)); }

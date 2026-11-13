@@ -1271,6 +1271,21 @@
       ['perf', 'a-future-perfect-continuous', 'I will have worked'], ['pp', 'a-future-perfect-progressive', 'I will have been working']]]
   ];
   const TENSE_EN = { past: 'Past', present: 'Present', future: 'Future', simple: 'Simple', prog: 'Progressive', perf: 'Perfect', pp: 'Perfect Progressive' };
+  // A tiny timeline for a tense cell: past · now · future on one line (time runs left to right, as in English),
+  // and the shape tells the aspect: a dot (simple), a thick stretch (progressive), an arrow up to the point
+  // (perfect), a stretch that runs up to the point (perfect progressive)
+  function tenseLine(time, asp) {
+    const x = { past: 22, present: 42, future: 62 }[time];
+    const shape = {
+      simple: `<circle cx="${x}" cy="8" r="3.6" fill="currentColor"/>`,
+      prog: `<rect x="${x - 7}" y="5" width="14" height="6" rx="3" fill="currentColor"/>`,
+      perf: `<path d="M${x - 15} 8H${x - 2}" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M${x - 5} 4.5L${x - 1} 8L${x - 5} 11.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`,
+      pp: `<rect x="${x - 15}" y="5" width="15" height="6" rx="3" fill="currentColor"/><path d="M${x} 3V13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`
+    }[asp];
+    return `<svg class="tn-line" viewBox="0 0 76 16" width="76" height="16" aria-hidden="true">
+      <path d="M3 8H73" stroke="currentColor" stroke-opacity=".3" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M42 4V12" stroke="currentColor" stroke-opacity=".45" stroke-width="1.5"/>${shape}</svg>`;
+  }
   const isTenseRule = id => TENSES.some(([, cells]) => cells.some(c => c[1] === id));
 
   function tenses() {
@@ -1285,11 +1300,12 @@
           <div class="tn-grid">
             ${cells.map(([asp, id, ex]) => {
               const g = GRAMMAR.find(x => x.id === id);
-              return `<a class="tn-cell asp-${asp}" href="#/grammar/${id}">
+              return `<a class="tn-cell asp-${asp}${Store.isGrammarDone(id) ? ' done' : ''}" href="#/grammar/${id}">
+                ${tenseLine(time, asp)}
                 <b>${t('tn.' + time)} ${t('tn.' + asp)}</b>
                 <small class="en">${TENSE_EN[time]} ${TENSE_EN[asp]}</small>
                 <span class="tn-ex en" dir="ltr">${ex}</span>
-                <span class="tn-meta">${t('lv.' + g.level)}${Store.isGrammarDone(id) ? ' · 👑' : ''}</span>
+                <span class="tn-meta">${t('lv.' + g.level)}</span>
               </a>`;
             }).join('')}
           </div>
