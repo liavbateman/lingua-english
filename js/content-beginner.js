@@ -584,7 +584,7 @@ GRAMMAR.push(
       ['?', 'Do you have…? · Does he have…?'],
       ['have got', "I have got (I've got) · She has got (She's got) · I haven't got · Have you got…?"]
     ],
-    ex: [['I have two children.', 'יש לי שני ילדים.'], ['She has a new car.', 'יש לה מכונית חדשה.'], ["We don't have time.", 'אין לנו זמן.']],
+    ex: [['I have two children.', 'יש לי שני ילדים.'], ['She has a new car.', 'יש לה מכונית חדשה.'], ["We don't have time.", 'אין לנו זמן.'], ["Do you have a pen?", "יש לך עט?"]],
     tip: 'טעות נפוצה: לתרגם "יש לי" מילה במילה. לא "There is to me a car" אלא "I have a car". ובגוף שלישי יחיד אומרים has: "He has a dog", לא "He have a dog".',
     quiz: [['My sister ___ three children.', 'has', ['have', 'is', 'having']], ['___ you have a pen?', 'Do', ['Does', 'Are', 'Have']], ["He doesn't ___ a car.", 'have', ['has', 'got', 'having']]]
   },
@@ -610,7 +610,7 @@ GRAMMAR.push(
       ['to be', 'after am / is / are: He is always late. · They are usually at home.'],
       ['?', 'Do you often cook? · How often do you travel?']
     ],
-    ex: [['I usually get up at seven.', 'אני בדרך כלל קם בשבע.'], ['She is never late.', 'היא אף פעם לא מאחרת.'], ['We sometimes eat out on Friday.', 'אנחנו לפעמים אוכלים בחוץ ביום שישי.']],
+    ex: [['I usually get up at seven.', 'אני בדרך כלל קם בשבע.'], ['She is never late.', 'היא אף פעם לא מאחרת.'], ['We sometimes eat out on Friday.', 'אנחנו לפעמים אוכלים בחוץ ביום שישי.'], ["How often do you go to the gym?", "כל כמה זמן יוצא לך ללכת לחדר כושר?"]],
     tip: `בעברית אומרים "אף פעם לא", אבל באנגלית never כבר שלילי ולא מוסיפים לו שלילה: "I never smoke", לא "I don't never smoke". ושים לב למקום במשפט: "I always drink coffee", לא "I drink always coffee".`,
     quiz: [['I ___ coffee in the morning.', 'always drink', ['drink always', 'always drinks', 'am always drink']], ['She ___ late. She comes on time every day.', 'is never', ["never doesn't", "doesn't never", 'never be']], ['How ___ do you go to the gym?', 'often', ['always', 'usually', 'never']]]
   },
@@ -624,7 +624,7 @@ GRAMMAR.push(
       ['things', 'usually "of": the end of the street · the name of the hotel'],
       ['?', "Whose phone is this? It is Maya's."]
     ],
-    ex: [["This is my brother's car.", 'זאת המכונית של אח שלי.'], ["Dana's office is on the second floor.", 'המשרד של דנה בקומה השנייה.'], ["My parents' house is in Haifa.", 'הבית של ההורים שלי בחיפה.']],
+    ex: [["This is my brother's car.", 'זאת המכונית של אח שלי.'], ["Dana's office is on the second floor.", 'המשרד של דנה בקומה השנייה.'], ["My parents' house is in Haifa.", 'הבית של ההורים שלי בחיפה.'], ["Whose bag is this?", "של מי התיק הזה?"]],
     tip: `טעות נפוצה: לשמור על סדר המילים של העברית. לא "the car Dani" אלא "Dani's car" (גם "the car of Dani" נשמע לא טבעי). ואל תתבלבל עם הקיצור של is: במשפט "Dani's tired" ה-'s הוא is.`,
     quiz: [['This is ___ phone.', "David's", ['David', "Davids'", 'of David']], ['The ___ toys are on the floor.', "children's", ["childrens'", 'childrens', 'children']], ["___ bag is this? It is Maya's.", 'Whose', ['Who', "Who's", 'Which is']]]
   },
@@ -637,7 +637,7 @@ GRAMMAR.push(
       ['?', 'Was he…? · Were you…? · Where were you?'],
       ['there', 'There was a problem. · There were many people.']
     ],
-    ex: [['I was at home yesterday.', 'הייתי בבית אתמול.'], ['The children were tired.', 'הילדים היו עייפים.'], ["She wasn't at work last week.", 'היא לא הייתה בעבודה בשבוע שעבר.']],
+    ex: [['I was at home yesterday.', 'הייתי בבית אתמול.'], ['The children were tired.', 'הילדים היו עייפים.'], ["She wasn't at work last week.", 'היא לא הייתה בעבודה בשבוע שעבר.'], ["Where were you yesterday?", "איפה היית אתמול?"]],
     tip: `טעות נפוצה: להשתמש ב-was לכל הגופים, או להוסיף did. לא "We was" אלא "We were", ולא "Did you were…?" אלא "Were you…?". ועוד דבר: "נולדתי" הוא "I was born", לא "I born".`,
     quiz: [['We ___ in Eilat last summer.', 'were', ['was', 'did', 'be']], ['___ you at the party yesterday?', 'Were', ['Was', 'Did', 'Are']], ['The film ___ very good. I did not like it.', "wasn't", ["weren't", "didn't", 'not was']]]
   },
@@ -650,7 +650,7 @@ GRAMMAR.push(
       ['–', "I don't like fish. · I wouldn't like to live there."],
       ['?', 'Do you like coffee? · Would you like a coffee?']
     ],
-    ex: [['I like Italian food.', 'אני אוהב אוכל איטלקי.'], ["I'd like a glass of water, please.", 'אני רוצה כוס מים, בבקשה.'], ['Would you like to sit here?', 'תרצה לשבת כאן?']],
+    ex: [['I like Italian food.', 'אני אוהב אוכל איטלקי.'], ["I'd like a glass of water, please.", 'אני רוצה כוס מים, בבקשה.'], ['Would you like to sit here?', 'תרצה לשבת כאן?'], ["She doesn't like cold weather.", "היא לא אוהבת מזג אוויר קר."]],
     tip: `לא להתבלבל: "Do you like coffee?" שואל אם אוהבים קפה בכלל, ו-"Would you like a coffee?" מציע קפה עכשיו. ואחרי would like בא to: "I'd like to order", לא "I'd like order".`,
     quiz: [["I'd like ___ a table for two.", 'to book', ['book', 'booking', 'books']], ['___ you like a cup of tea now?', 'Would', ['Are', 'Does', 'Is']], ['She ___ dogs. She has three.', 'likes', ['like', 'liking', 'is like']]]
   },
@@ -664,7 +664,7 @@ GRAMMAR.push(
       ['because', 'I am tired because I slept badly. (סיבה)'],
       ['so', 'I was tired, so I went to bed. (תוצאה)']
     ],
-    ex: [['I like coffee, but I do not like tea.', 'אני אוהב קפה, אבל אני לא אוהב תה.'], ['She stayed at home because she was sick.', 'היא נשארה בבית כי היא הייתה חולה.'], ['It was late, so we took a taxi.', 'היה מאוחר, אז לקחנו מונית.']],
+    ex: [['I like coffee, but I do not like tea.', 'אני אוהב קפה, אבל אני לא אוהב תה.'], ['She stayed at home because she was sick.', 'היא נשארה בבית כי היא הייתה חולה.'], ['It was late, so we took a taxi.', 'היה מאוחר, אז לקחנו מונית.'], ["Do you want tea or coffee?", "רוצה תה או קפה?"]],
     tip: 'טעות נפוצה: להוסיף that אחרי because, כמו "בגלל ש" בעברית. לא "because that I was tired" אלא "because I was tired". וגם לא משתמשים ב-because וב-so יחד: לא "Because it rained, so we stayed home" אלא "It rained, so we stayed home".',
     quiz: [['I am hungry ___ I did not eat breakfast.', 'because', ['so', 'but', 'or']], ['It was raining, ___ we stayed at home.', 'so', ['because', 'but', 'or']], ['He is rich, ___ he is not happy.', 'but', ['because', 'so', 'or']]]
   },
@@ -709,7 +709,7 @@ GRAMMAR.push(
       ['person', 'want + person + to: I want you to stay.'],
       ['negative', "don't want to · doesn't need to: She doesn't need to wait."]
     ],
-    ex: [['I want to learn English.', 'אני רוצה ללמוד אנגלית.'], ['We need to leave at eight.', 'עלינו לצאת בשמונה.'], ['My boss wants me to work late.', 'הבוס רוצה שאעבוד עד מאוחר.']],
+    ex: [['I want to learn English.', 'אני רוצה ללמוד אנגלית.'], ['We need to leave at eight.', 'עלינו לצאת בשמונה.'], ['My boss wants me to work late.', 'הבוס רוצה שאעבוד עד מאוחר.'], ["He doesn't want to go to bed.", "הוא לא רוצה ללכת לישון."]],
     tip: 'טעות נפוצה: לתרגם "אני רוצה שתבוא" מילה במילה: "I want that you come". באנגלית אומרים "I want you to come". ולא שוכחים את to: "I need to go", לא "I need go".',
     quiz: [['I want ___ a new phone.', 'to buy', ['buy', 'buying', 'that I buy']], ['She wants ___ to help her.', 'me', ['that I', 'I', 'my']], ["You don't ___ to bring anything.", 'need', ['needs', 'needing', 'to need']]]
   },

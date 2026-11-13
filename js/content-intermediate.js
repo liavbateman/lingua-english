@@ -664,7 +664,7 @@ GRAMMAR.push(
       ['will', 'no plan yet: I think I will stay home. (החלטה ברגע הדיבור)'],
       ['timetable', 'present simple: The train leaves at 8:15. (לוח זמנים קבוע)']
     ],
-    ex: [['We are flying to Greece next week.', 'אנחנו טסים ליוון בשבוע הבא.'], ['I am seeing the dentist on Tuesday morning.', 'יש לי תור לרופא שיניים ביום שלישי בבוקר.'], ['What are you doing this weekend?', 'מה אתה עושה בסוף השבוע?']],
+    ex: [['We are flying to Greece next week.', 'אנחנו טסים ליוון בשבוע הבא.'], ['I am seeing the dentist on Tuesday morning.', 'יש לי תור לרופא שיניים ביום שלישי בבוקר.'], ['What are you doing this weekend?', 'מה אתה עושה בסוף השבוע?'], ["We aren't going out tonight.", "אנחנו לא יוצאים הערב."]],
     tip: 'בעברית אומרים "מחר אני נפגש עם דנה" בהווה רגיל, אבל באנגלית זה לא present simple: אומרים "Tomorrow I am meeting Dana", לא "Tomorrow I meet Dana".',
     quiz: [['I ___ the dentist at four tomorrow.', 'am seeing', ['am see', 'seeing', 'sees']], ['We ___ flying to Rome on Friday.', 'are', ['will', 'do', 'is']], ['What ___ you doing tonight?', 'are', ['do', 'will', 'is']]]
   },

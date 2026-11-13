@@ -87,8 +87,8 @@ for (const g of GRAMMAR) {
   if (!Array.isArray(g.forms) || g.forms.length < 2 || g.forms.some(r => !Array.isArray(r) || r.length !== 2 || !str(r[0]) || !str(r[1])))
     errors.push(`${at}: "forms" must be at least 2 rows of [label, text]`);
   else if (g.forms.some(r => r[0].length > 12)) errors.push(`${at}: form labels must be 12 characters or shorter`);
-  if (!Array.isArray(g.ex) || g.ex.length !== 3 || g.ex.some(r => !Array.isArray(r) || !hasEn(r[0]) || hasHe(r[0]) || !hasHe(r[1])))
-    errors.push(`${at}: "ex" must be exactly 3 rows of [English, Hebrew]`);
+  if (!Array.isArray(g.ex) || g.ex.length < 3 || g.ex.length > 5 || g.ex.some(r => !Array.isArray(r) || !hasEn(r[0]) || hasHe(r[0]) || !hasHe(r[1])))
+    errors.push(`${at}: "ex" must be 3 to 5 rows of [English, Hebrew]`);
   if (!Array.isArray(g.quiz) || g.quiz.length !== 3) { errors.push(`${at}: "quiz" must have exactly 3 questions`); continue; }
   for (const q of g.quiz) {
     const qat = `${at} › quiz "${q[0]}"`;

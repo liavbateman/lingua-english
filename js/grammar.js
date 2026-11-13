@@ -15,7 +15,7 @@ const GRAMMAR = [
       ['–', "I am not · He is not (isn't) · They are not (aren't)"],
       ['?', 'Am I…? · Is she…? · Are they…?']
     ],
-    ex: [['I am from Israel.', 'אני מישראל.'], ['She is a doctor.', 'היא רופאה.'], ['They are not at home.', 'הם לא בבית.']],
+    ex: [['I am from Israel.', 'אני מישראל.'], ['She is a doctor.', 'היא רופאה.'], ['They are not at home.', 'הם לא בבית.'], ["Are they at work today?", "הם בעבודה היום?"]],
     tip: 'טעות נפוצה: להשמיט את הפועל. לא "He tired" אלא "He is tired".',
     quiz: [['She ___ a teacher.', 'is', ['am', 'are', 'be']], ['We ___ happy today.', 'are', ['is', 'am', 'be']], ['I ___ not hungry.', 'am', ['is', 'are', 'be']]]
   },
@@ -40,7 +40,7 @@ const GRAMMAR = [
       ['–', "I do not (don't) work · She does not (doesn't) work"],
       ['?', 'Do you work? · Does she work?']
     ],
-    ex: [['I work in Tel Aviv.', 'אני עובד בתל אביב.'], ['She drinks coffee every morning.', 'היא שותה קפה כל בוקר.'], ["We don't eat meat.", 'אנחנו לא אוכלים בשר.']],
+    ex: [['I work in Tel Aviv.', 'אני עובד בתל אביב.'], ['She drinks coffee every morning.', 'היא שותה קפה כל בוקר.'], ["We don't eat meat.", 'אנחנו לא אוכלים בשר.'], ["Does she work on Fridays?", "היא עובדת בימי שישי?"]],
     tip: 'בגוף שלישי יחיד (he / she / it) מוסיפים s לפועל: "He works". אחרי does ו-doesn\'t הפועל חוזר לצורת הבסיס: "She doesn\'t work".',
     quiz: [['He ___ football every Sunday.', 'plays', ['play', 'playing', 'is play']], ['They ___ like fish.', "don't", ["doesn't", "isn't", "aren't"]], ['___ she live here?', 'Does', ['Do', 'Is', 'Are']]]
   },
@@ -52,7 +52,7 @@ const GRAMMAR = [
       ['–', "I am not working · She isn't working"],
       ['?', 'Are you working? · Is she working?']
     ],
-    ex: [['I am reading now.', 'אני קורא עכשיו.'], ['He is talking on the phone.', 'הוא מדבר בטלפון.'], ['We are not sleeping.', 'אנחנו לא ישנים.']],
+    ex: [['I am reading now.', 'אני קורא עכשיו.'], ['He is talking on the phone.', 'הוא מדבר בטלפון.'], ['We are not sleeping.', 'אנחנו לא ישנים.'], ["Is he cooking dinner now?", "הוא מבשל ארוחת ערב עכשיו?"]],
     tip: 'פעלים של רגש ושל ידיעה (know, like, want, need) לא באים עם ing: אומרים "I know", לא "I am knowing".',
     quiz: [['Look! It ___ raining.', 'is', ['are', 'does', 'do']], ['They are ___ dinner now.', 'eating', ['eat', 'eats', 'ate']], ['I ___ working today.', 'am not', ["don't", "doesn't", 'not']]]
   },
@@ -90,7 +90,7 @@ const GRAMMAR = [
       ['–', "There isn't a bank · There aren't any banks"],
       ['?', 'Is there a bank? · Are there any banks?']
     ],
-    ex: [['There is a problem.', 'יש בעיה.'], ['There are many people here.', 'יש כאן הרבה אנשים.'], ['Is there a bank near here?', 'יש בנק קרוב לכאן?']],
+    ex: [['There is a problem.', 'יש בעיה.'], ['There are many people here.', 'יש כאן הרבה אנשים.'], ['Is there a bank near here?', 'יש בנק קרוב לכאן?'], ["There isn't a pharmacy near here.", "אין בית מרקחת קרוב לכאן."]],
     tip: 'לא משתמשים ב-have בשביל "יש" כללי: אומרים "There is a car outside", לא "It has a car outside".',
     quiz: [['___ a supermarket on this street.', 'There is', ['There are', 'It has', 'They are']], ['There ___ three chairs.', 'are', ['is', 'has', 'have']], ['___ there any milk?', 'Is', ['Are', 'Has', 'Does']]]
   },
@@ -144,7 +144,7 @@ const GRAMMAR = [
       ['–', "I did not (didn't) work"],
       ['?', 'Did you work?']
     ],
-    ex: [['I visited London last year.', 'ביקרתי בלונדון בשנה שעברה.'], ['She went home early.', 'היא הלכה הביתה מוקדם.'], ["We didn't see the film.", 'לא ראינו את הסרט.']],
+    ex: [['I visited London last year.', 'ביקרתי בלונדון בשנה שעברה.'], ['She went home early.', 'היא הלכה הביתה מוקדם.'], ["We didn't see the film.", 'לא ראינו את הסרט.'], ["Did you see the match last night?", "ראית את המשחק אתמול בלילה?"]],
     tip: 'אחרי did ו-didn\'t הפועל חוזר לצורת הבסיס: "I didn\'t go", לא "I didn\'t went".',
     quiz: [['Yesterday I ___ to the gym.', 'went', ['go', 'gone', 'going']], ["She didn't ___ me.", 'call', ['called', 'calls', 'calling']], ['___ you finish the report?', 'Did', ['Do', 'Were', 'Have']]]
   },
@@ -156,7 +156,7 @@ const GRAMMAR = [
       ['–', "I wasn't working · They weren't working"],
       ['?', 'Were you working? · Was she working?']
     ],
-    ex: [['I was sleeping when you called.', 'ישנתי כשהתקשרת.'], ['They were watching TV at eight.', 'הם צפו בטלוויזיה בשמונה.'], ['What were you doing?', 'מה עשית באותו זמן?']],
+    ex: [['I was sleeping when you called.', 'ישנתי כשהתקשרת.'], ['They were watching TV at eight.', 'הם צפו בטלוויזיה בשמונה.'], ['What were you doing?', 'מה עשית באותו זמן?'], ["We weren't watching TV when you called.", "לא צפינו בטלוויזיה כשהתקשרת."]],
     tip: 'הפעולה הארוכה באה ב-past continuous, והפעולה הקצרה שקטעה אותה ב-past simple: "I was cooking when he arrived".',
     quiz: [['I ___ dinner when the phone rang.', 'was cooking', ['cooked', 'am cooking', 'cook']], ['They ___ sleeping at midnight.', 'were', ['was', 'did', 'are']], ['What ___ you doing yesterday at five?', 'were', ['did', 'was', 'do']]]
   },
@@ -167,7 +167,7 @@ const GRAMMAR = [
       ['will', "I will (I'll) call you · I will not (won't) call · Will you call?"],
       ['going to', "I am going to travel · She isn't going to come · Are you going to stay?"]
     ],
-    ex: [["I'll help you with that.", 'אני אעזור לך עם זה.'], ['We are going to buy a new car.', 'אנחנו הולכים לקנות רכב חדש.'], ["It won't rain tomorrow.", 'לא ירד גשם מחר.']],
+    ex: [["I'll help you with that.", 'אני אעזור לך עם זה.'], ['We are going to buy a new car.', 'אנחנו הולכים לקנות רכב חדש.'], ["It won't rain tomorrow.", 'לא ירד גשם מחר.'], ["Will you call me tomorrow?", "תתקשרו אליי מחר?"]],
     tip: 'אחרי will בא פועל בסיס בלי to: "I will go", לא "I will to go".',
     quiz: [['I think it ___ rain tomorrow.', 'will', ['is', 'going', 'does']], ['We are going ___ a house next year.', 'to buy', ['buy', 'buying', 'bought']], ["Don't worry, I ___ tell anyone.", "won't", ["don't", 'am not', "didn't"]]]
   },
@@ -180,7 +180,7 @@ const GRAMMAR = [
       ['?', 'Have you finished? · Has she finished?'],
       ['for / since', 'for two years (משך זמן) · since 2020 (נקודת התחלה)']
     ],
-    ex: [['I have been to Paris twice.', 'הייתי בפריז פעמיים.'], ['She has just arrived.', 'היא בדיוק הגיעה.'], ['We have lived here for ten years.', 'אנחנו גרים כאן עשר שנים.']],
+    ex: [['I have been to Paris twice.', 'הייתי בפריז פעמיים.'], ['She has just arrived.', 'היא בדיוק הגיעה.'], ['We have lived here for ten years.', 'אנחנו גרים כאן עשר שנים.'], ["She hasn't finished her homework yet.", "היא עוד לא סיימה את שיעורי הבית."], ["Have you ever been to Paris?", "היית פעם בפריז?"]],
     tip: 'עם זמן מדויק בעבר (yesterday, last week, in 2020) משתמשים ב-past simple: "I saw him yesterday", לא "I have seen him yesterday".',
     quiz: [['I have ___ this film before.', 'seen', ['saw', 'see', 'seeing']], ['She ___ lived here since 2019.', 'has', ['have', 'is', 'did']], ['We have known him ___ five years.', 'for', ['since', 'from', 'ago']]]
   },
@@ -207,7 +207,7 @@ const GRAMMAR = [
       ['might', 'It might rain. (אולי)'],
       ['could', 'Could you help me? (בקשה מנומסת)']
     ],
-    ex: [['You should see a doctor.', 'כדאי שתלך לרופא.'], ['I have to finish this today.', 'אני חייב לסיים את זה היום.'], ['She might be late.', 'היא אולי תאחר.']],
+    ex: [['You should see a doctor.', 'כדאי שתלך לרופא.'], ['I have to finish this today.', 'אני חייב לסיים את זה היום.'], ['She might be late.', 'היא אולי תאחר.'], ["You don't have to pay for the tickets.", "לא צריך לשלם על הכרטיסים."], ["Could you open the window, please?", "אפשר לפתוח את החלון, בבקשה?"]],
     tip: 'must not פירושו "אסור". don\'t have to פירושו "לא חייב". אלה שני דברים שונים לגמרי.',
     quiz: [['You ___ smoke here. It is forbidden.', 'must not', ["don't have to", 'might', 'should']], ['It is Saturday. You ___ get up early.', "don't have to", ['must not', 'should', 'must']], ['You look tired. You ___ go to bed.', 'should', ['might not', 'must not', "don't have to"]]]
   },
@@ -259,7 +259,7 @@ const GRAMMAR = [
       ['–', "I haven't been working"],
       ['?', 'Have you been working? · How long have you been working?']
     ],
-    ex: [['I have been waiting for an hour.', 'אני מחכה כבר שעה.'], ['She has been learning English since January.', 'היא לומדת אנגלית מינואר.'], ['It has been raining all day.', 'יורד גשם כל היום.']],
+    ex: [['I have been waiting for an hour.', 'אני מחכה כבר שעה.'], ['She has been learning English since January.', 'היא לומדת אנגלית מינואר.'], ['It has been raining all day.', 'יורד גשם כל היום.'], ["I haven't been sleeping well lately.", "לא ישנתי טוב בזמן האחרון."], ["How long have you been waiting?", "כמה זמן חיכית?"]],
     tip: 'בעברית זה הווה ("אני מחכה כבר שעה"), אבל באנגלית לא אומרים "I am waiting for an hour" אלא "I have been waiting for an hour".',
     quiz: [["I ___ here since nine o'clock.", 'have been waiting', ['am waiting', 'wait', 'was wait']], ['She has been ___ all morning.', 'working', ['work', 'worked', 'works']], ['How long ___ you been learning English?', 'have', ['are', 'do', 'did']]]
   },
@@ -271,7 +271,7 @@ const GRAMMAR = [
       ['–', "I had not (hadn't) finished"],
       ['?', 'Had you finished?']
     ],
-    ex: [['When I arrived, the train had left.', 'כשהגעתי, הרכבת כבר יצאה.'], ['She had never flown before that trip.', 'היא מעולם לא טסה לפני הטיול ההוא.'], ["I was tired because I hadn't slept.", 'הייתי עייף כי לא ישנתי.']],
+    ex: [['When I arrived, the train had left.', 'כשהגעתי, הרכבת כבר יצאה.'], ['She had never flown before that trip.', 'היא מעולם לא טסה לפני הטיול ההוא.'], ["I was tired because I hadn't slept.", 'הייתי עייף כי לא ישנתי.'], ["Had they already left when you arrived?", "הם כבר יצאו כשהגעת?"]],
     tip: 'כשמספרים את האירועים לפי הסדר, מספיק past simple. past perfect נחוץ רק כשחוזרים אחורה בזמן.',
     quiz: [['When we got there, the film ___ already started.', 'had', ['has', 'was', 'did']], ['He was hungry because he ___ eaten.', "hadn't", ["hasn't", "didn't", "wasn't"]], ['I had never ___ sushi before that day.', 'tried', ['try', 'trying', 'tries']]]
   },
@@ -311,7 +311,7 @@ const GRAMMAR = [
       ['question', '"Where do you live?" → He asked where I lived.'],
       ['command', '"Sit down" → She told me to sit down.']
     ],
-    ex: [['She said she was busy.', 'היא אמרה שהיא עסוקה.'], ['He told me he had finished the work.', 'הוא אמר לי שסיים את העבודה.'], ['They asked if I could come.', 'הם שאלו אם אני יכול לבוא.']],
+    ex: [['She said she was busy.', 'היא אמרה שהיא עסוקה.'], ['He told me he had finished the work.', 'הוא אמר לי שסיים את העבודה.'], ['They asked if I could come.', 'הם שאלו אם אני יכול לבוא.'], ["\"Is the shop open?\" She asked whether the shop was open.", "\"החנות פתוחה?\" היא שאלה אם החנות פתוחה."]],
     tip: 'say בא בלי מושא, tell בא עם מושא: "He said that…" אבל "He told me that…". לא אומרים "He said me".',
     quiz: [['"I am tired." He said he ___ tired.', 'was', ['is', 'were', 'be']], ['She ___ me that she was late.', 'told', ['said', 'says', 'tell']], ['"I will help." He said he ___ help.', 'would', ['will', 'can', 'did']]]
   },
@@ -339,7 +339,7 @@ const GRAMMAR = [
       ['?', 'Did you use to smoke?'],
       ['be used to', 'be used to + verb-ing: I am used to working late. (רגיל ל)']
     ],
-    ex: [['I used to live in Haifa.', 'פעם גרתי בחיפה.'], ["She didn't use to like coffee.", 'פעם היא לא אהבה קפה.'], ['We used to play football every Friday.', 'פעם שיחקנו כדורגל כל יום שישי.']],
+    ex: [['I used to live in Haifa.', 'פעם גרתי בחיפה.'], ["She didn't use to like coffee.", 'פעם היא לא אהבה קפה.'], ['We used to play football every Friday.', 'פעם שיחקנו כדורגל כל יום שישי.'], ["Did you use to play the piano?", "ניגנת פעם בפסנתר?"]],
     tip: '"I used to work" פירושו "פעם עבדתי". "I am used to working" פירושו "אני רגיל לעבוד". המשמעות שונה לגמרי.',
     quiz: [['I ___ to smoke, but I stopped.', 'used', ['use', 'was used', 'am used']], ['Did you ___ to live here?', 'use', ['used', 'using', 'uses']], ['She is used to ___ early.', 'waking up', ['wake up', 'woke up', 'wakes up']]]
   }

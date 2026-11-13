@@ -667,7 +667,7 @@ GRAMMAR.push(
       ['who', 'have someone do · get someone to do: I had the plumber fix the tap.'],
       ['bad event', 'She had her bag stolen on the bus.']
     ],
-    ex: [['I had my car repaired last week.', 'תיקנתי את האוטו בשבוע שעבר (במוסך).'], ['We are having the kitchen renovated.', 'אנחנו משפצים את המטבח (קבלן עושה את העבודה).'], ['You should get your eyes tested.', 'כדאי שתעשה בדיקת ראייה.']],
+    ex: [['I had my car repaired last week.', 'תיקנתי את האוטו בשבוע שעבר (במוסך).'], ['We are having the kitchen renovated.', 'אנחנו משפצים את המטבח (קבלן עושה את העבודה).'], ['You should get your eyes tested.', 'כדאי שתעשה בדיקת ראייה.'], ["Where does she have her car serviced?", "איפה היא עושה טיפול לרכב?"]],
     tip: 'בעברית אומרים "הסתפרתי" או "תיקנתי את האוטו" גם כשמישהו אחר עשה את העבודה. באנגלית "I cut my hair" אומר שהסתפרתי לבד. אם הספר עשה זאת, אומרים "I had my hair cut". חשוב הסדר: "I had my car repaired", לא "I had repaired my car".',
     quiz: [['I ___ my car serviced at the same garage every year.', 'have', ['am', 'do', 'make']], ['We are having the office ___ next week.', 'painted', ['paint', 'painting', 'to paint']], ['He ___ his wallet stolen on the train yesterday.', 'had', ['was', 'has been', 'did']]]
   },
@@ -709,7 +709,7 @@ GRAMMAR.push(
       ['?', 'Will you be using the car tonight? · Will they have arrived by six?'],
       ['by / in', "by next year · by the time you arrive · in two years' time"]
     ],
-    ex: [['This time next week I will be lying on the beach.', 'בשבוע הבא בשעה הזאת אני אשכב על החוף.'], ['By the end of the year, we will have opened three new branches.', 'עד סוף השנה כבר נפתח שלושה סניפים חדשים.'], ["Don't call at nine. I will be putting the kids to bed.", 'אל תתקשר בתשע. אני אהיה באמצע להשכיב את הילדים.']],
+    ex: [['This time next week I will be lying on the beach.', 'בשבוע הבא בשעה הזאת אני אשכב על החוף.'], ['By the end of the year, we will have opened three new branches.', 'עד סוף השנה כבר נפתח שלושה סניפים חדשים.'], ["Don't call at nine. I will be putting the kids to bed.", 'אל תתקשר בתשע. אני אהיה באמצע להשכיב את הילדים.'], ["Will you be working late tonight?", "תעבדו עד מאוחר הערב?"]],
     tip: 'בעברית יש רק זמן עתיד אחד, ולכן קל לשכוח את ההבדל. ועוד מלכודת: אחרי by the time ו-when בא הווה ולא will, אף שבעברית אומרים "עד שתגיע": "By the time you arrive, I will have left", לא "By the time you will arrive, I will have left".',
     quiz: [['By next June, she ___ her degree.', 'will have finished', ['will finishing', 'will have finish', 'has finished']], ['This time next week, we ___ on a beach in Greece.', 'will be lying', ['will lying', 'will be lie', 'lying']], ["Don't call at eight. I ___ dinner with a client then.", 'will be having', ['will having', 'will be have', 'have been having']]]
   },
@@ -740,7 +740,7 @@ GRAMMAR.push(
       ['advice', "had better + verb: You'd better leave now or you'll miss the train."],
       ['negative', "had better not + verb: We'd better not be late."]
     ],
-    ex: [["I'd rather have tea, thanks.", 'עדיף לי תה, תודה.'], ["You'd better call her before it gets too late.", 'כדאי מאוד להתקשר אליה לפני שיהיה מאוחר מדי.'], ["I'd rather hear the truth from you.", 'עדיף לי לשמוע ממך את האמת.']],
+    ex: [["I'd rather have tea, thanks.", 'עדיף לי תה, תודה.'], ["You'd better call her before it gets too late.", 'כדאי מאוד להתקשר אליה לפני שיהיה מאוחר מדי.'], ["I'd rather hear the truth from you.", 'עדיף לי לשמוע ממך את האמת.'], ["You'd better not tell her yet.", "כדאי שלא תספרו לה עדיין."]],
     tip: 'אחרי would rather ו-had better לא בא to: "I\'d rather go", לא "I\'d rather to go". ולמרות ה-had, had better מדבר על עכשיו או על העתיד: "You\'d better hurry", לא "You had better hurried".',
     quiz: [["I'd rather ___ at home tonight.", 'stay', ['to stay', 'staying', 'stayed']], ["You'd better ___ late again, or the manager will be angry.", 'not be', ["don't be", 'not to be', "won't be"]], ["I'd rather you ___ my phone without asking.", "didn't use", ["don't use", "won't use", 'not use']]]
   },
@@ -807,7 +807,7 @@ GRAMMAR.push(
       ['unless', "unless = if not: I won't go unless you come too."],
       ['tense', "present after these words, even about the future: as long as it doesn't rain"]
     ],
-    ex: [["You can stay as long as you're quiet.", 'אפשר להישאר בתנאי ששומרים על שקט.'], ["We'll start at nine unless the train is late.", 'נתחיל בתשע, אלא אם כן הרכבת תאחר.'], ['Provided that everyone agrees, the change will start in May.', 'בתנאי שכולם מסכימים, השינוי יתחיל במאי.']],
+    ex: [["You can stay as long as you're quiet.", 'אפשר להישאר בתנאי ששומרים על שקט.'], ["We'll start at nine unless the train is late.", 'נתחיל בתשע, אלא אם כן הרכבת תאחר.'], ['Provided that everyone agrees, the change will start in May.', 'בתנאי שכולם מסכימים, השינוי יתחיל במאי.'], ["You can borrow it as long as you don't lose it.", "אפשר לשאול את זה, בתנאי שלא תאבדו את זה."]],
     tip: 'unless כבר מכיל את השלילה, ולכן לא מוסיפים not: "unless you hurry", לא "unless you don\'t hurry". ואחרי as long as לא בא will: "as long as it doesn\'t rain", לא "as long as it won\'t rain".',
     quiz: [["You'll miss the bus ___ you leave right now.", 'unless', ['unless not', 'except', 'without']], ['You can use my laptop as long as you ___ careful with it.', 'are', ['will be', 'would be', 'be']], ['We will sign the contract, ___ the price is right.', 'provided that', ['provide that', 'despite', 'in case of']]]
   },
@@ -822,7 +822,7 @@ GRAMMAR.push(
       ['result', 'would have + V3: I would have helped.'],
       ['negative', "shouldn't have + V3: I shouldn't have said that."]
     ],
-    ex: [['I should have studied harder.', 'היה עליי ללמוד יותר.'], ['You could have hurt yourself!', 'יכולת להיפגע!'], ['We would have come if we had known.', 'היינו באים אילו ידענו.']],
+    ex: [['I should have studied harder.', 'היה עליי ללמוד יותר.'], ['You could have hurt yourself!', 'יכולת להיפגע!'], ['We would have come if we had known.', 'היינו באים אילו ידענו.'], ["We shouldn't have left so late.", "לא היינו צריכים לצאת כל כך מאוחר."]],
     tip: 'טעות נפוצה: לכתוב "should of", כי כך זה נשמע בדיבור (should\'ve). הצורה הנכונה היא should have. ואחרי have תמיד V3: "should have gone", לא "should have went".',
     quiz: [['You ___ told me earlier. Now it is too late.', 'should have', ['should', 'should of', 'must']], ['We could have ___ the train if we had left earlier.', 'caught', ['catch', 'catching', 'to catch']], ["I ___ said that. I'm sorry.", "shouldn't have", ["shouldn't", 'should have not', "didn't should"]]]
   },
