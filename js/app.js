@@ -760,7 +760,8 @@
           </div>` : ''}
         ${Array.from({ length: sections }, (_, s) => {
           const st = chestState(items, s);
-          return `<div class="pchest-wrap" data-s="${s}">
+          return `<div class="pchest-wrap${st === 'ready' ? ' is-ready' : ''}" data-s="${s}">
+            ${st === 'ready' ? `<span class="pbubble chest-bubble" aria-hidden="true">${t('chest.openme')}</span>` : ''}
             <button class="pchest ${st}" data-s="${s}" aria-label="${t('chest.aria', { n: s + 1 })} · ${t('chest.state.' + st)}">
               <span aria-hidden="true">${st === 'opened' ? '✨' : '🎁'}</span>
             </button>
