@@ -1172,11 +1172,12 @@
       back.className = 'sheet-back';
       back.innerHTML = `
         <div class="sheet level-sheet" role="dialog" aria-modal="true" aria-labelledby="lvl-title">
+          <span class="sheet-grip" aria-hidden="true"></span>
           <b id="lvl-title">${t('lvl.title')}</b>
-          ${LEVELS.map(l => {
+          ${LEVELS.map((l, n) => {
             const pct = Math.round(partDone(l.id, part) * 100);
             const on = l.id === Store.level;
-            return `<button class="lvl-opt lv-${l.id}${on ? ' on' : ''}" data-level="${l.id}" aria-pressed="${on}" aria-label="${t('lv.' + l.id)} · ${t('lvl.pct', { n: pct })}">
+            return `<button class="lvl-opt lv-${l.id}${on ? ' on' : ''}" style="--i:${n}" data-level="${l.id}" aria-pressed="${on}" aria-label="${t('lv.' + l.id)} · ${t('lvl.pct', { n: pct })}">
               <span class="lv-ring" style="--p:${pct}" aria-hidden="true"><b class="en">${pct}%</b></span>
               <span class="grow">
                 <span class="lvl-top"><b>${t('lv.' + l.id)}</b><small>${t('lvl.cefr.' + l.id)}</small>${on ? `<span class="lvl-check">${ICON.check}</span>` : ''}</span>
@@ -1191,8 +1192,12 @@
       back.querySelectorAll('.lvl-opt').forEach(o => {
         o.onclick = () => {
           document.removeEventListener('keydown', key);
-          back.remove();
-          if (o.dataset.level !== Store.level) { Store.level = o.dataset.level; redraw(); }
+          // the chosen level pops, the others dim, then the sheet slides away and the path redraws
+          const apply = () => { back.remove(); if (o.dataset.level !== Store.level) { Store.level = o.dataset.level; redraw(); } };
+          if (matchMedia('(prefers-reduced-motion: reduce)').matches) return apply();
+          back.classList.add('picked');
+          o.classList.add('chosen');
+          setTimeout(() => { back.classList.add('out'); setTimeout(apply, 190); }, 260);
         };
       });
       document.addEventListener('keydown', key);
