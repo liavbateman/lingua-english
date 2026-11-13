@@ -89,6 +89,23 @@ const Store = (() => {
       return { seen, mastered, total: unit.words.length, pct: Math.round((mastered / unit.words.length) * 100) };
     },
 
-    reset() { const lang = state.lang; state = fresh(); state.lang = lang; save(); }
+    reset() { const lang = state.lang; state = fresh(); state.lang = lang; save(); },
+
+    // Backup: everything in one JSON text, tagged so a wrong file is recognised
+    exportData() {
+      return JSON.stringify({ app: 'lingua', version: 1, savedAt: new Date().toISOString(), state }, null, 1);
+    },
+    // Reads a backup made by exportData. Throws on anything else and leaves the progress untouched.
+    // The interface language stays as it is now.
+    importData(text) {
+      const d = JSON.parse(text);
+      const s = d && d.state;
+      if (!d || d.app !== 'lingua' || !s || typeof s.words !== 'object' || Array.isArray(s.words)) throw new Error('not a Lingua backup');
+      const lang = state.lang;
+      state = Object.assign(fresh(), s);
+      state.lang = lang;
+      save();
+      return { words: Object.keys(state.words).length, savedAt: d.savedAt };
+    }
   };
 })();

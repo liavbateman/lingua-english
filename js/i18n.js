@@ -33,7 +33,8 @@ const STR = {
     'grammar.done': 'Rule completed.', 'grammar.retry': 'Read the rule again and give it another try.',
     'grammar.next': 'Next rule: {title}', 'grammar.again': 'Read the rule again', 'grammar.all': 'All grammar rules',
 
-    'card.count': '{a} of {b}', 'card.hint': 'Tap the card to see the translation',
+    'card.count': '{a} of {b}', 'card.hint': 'Tap the card to see the translation', 'card.hide': 'Hide the translation',
+    'sr.right': 'Correct', 'sr.wrong': 'Not quite. The answer is {answer}',
     'card.practice': 'Practice these words',
     'btn.next': 'Next', 'btn.back': 'Back', 'btn.finish': 'Finish',
     'btn.home': 'Back to Home', 'btn.more': 'More practice', 'btn.lessons': 'Go to lessons',
@@ -63,6 +64,12 @@ const STR = {
     'progress.title': 'My progress', 'progress.sub': '{x} points so far',
     'progress.streak': 'Day streak', 'progress.best': 'Best streak',
     'progress.words': '{a} of {b} words', 'progress.phrases': '{a} of {b} sentences', 'progress.rules': '{a} of {b} grammar rules',
+    'update.ready': 'A new version is ready', 'update.reload': 'Update',
+    'backup.title': 'Backup', 'backup.sub': 'Keep a copy of your progress, to restore it on a new phone or after clearing Safari.',
+    'backup.save': 'Save backup', 'backup.restore': 'Restore',
+    'backup.saved': 'Backup ready. Keep the file somewhere safe.', 'backup.saveFailed': 'Could not create the backup.',
+    'backup.confirm': 'Replace your current progress with the backup?', 'backup.bad': 'This file is not a Lingua backup. Nothing was changed.',
+    'backup.restored': 'Progress restored: {n} words.',
     'progress.reset': 'Reset all progress', 'progress.confirm': 'Delete all progress? This cannot be undone.',
     'notfound': 'Page not found'
   },
@@ -99,7 +106,8 @@ const STR = {
     'grammar.done': 'הכלל הושלם.', 'grammar.retry': 'קרא שוב את הכלל ונסה פעם נוספת.',
     'grammar.next': 'הכלל הבא: {title}', 'grammar.again': 'לקרוא שוב את הכלל', 'grammar.all': 'כל כללי הדקדוק',
 
-    'card.count': '{a} מתוך {b}', 'card.hint': 'הקש על הכרטיס כדי לראות את התרגום',
+    'card.count': '{a} מתוך {b}', 'card.hint': 'הקש על הכרטיס כדי לראות את התרגום', 'card.hide': 'הסתרת התרגום',
+    'sr.right': 'נכון', 'sr.wrong': 'לא בדיוק. התשובה היא {answer}',
     'card.practice': 'לתרגל את המילים',
     'btn.next': 'הבא', 'btn.back': 'הקודם', 'btn.finish': 'סיום',
     'btn.home': 'חזרה לבית', 'btn.more': 'עוד תרגול', 'btn.lessons': 'לשיעורים',
@@ -129,6 +137,12 @@ const STR = {
     'progress.title': 'ההתקדמות שלי', 'progress.sub': '{x} נקודות עד עכשיו',
     'progress.streak': 'ימים ברצף', 'progress.best': 'שיא רצף',
     'progress.words': '{a} מתוך {b} מילים', 'progress.phrases': '{a} מתוך {b} משפטים', 'progress.rules': '{a} מתוך {b} כללי דקדוק',
+    'update.ready': 'גרסה חדשה מוכנה', 'update.reload': 'עדכון',
+    'backup.title': 'גיבוי', 'backup.sub': 'שמרו עותק של ההתקדמות, כדי לשחזר אותה בטלפון חדש או אחרי ניקוי של Safari.',
+    'backup.save': 'שמירת גיבוי', 'backup.restore': 'שחזור',
+    'backup.saved': 'הגיבוי מוכן. שמרו את הקובץ במקום בטוח.', 'backup.saveFailed': 'לא הצלחנו ליצור את הגיבוי.',
+    'backup.confirm': 'להחליף את ההתקדמות הנוכחית בגיבוי?', 'backup.bad': 'הקובץ הזה אינו גיבוי של Lingua. לא שונה דבר.',
+    'backup.restored': 'ההתקדמות שוחזרה: {n} מילים.',
     'progress.reset': 'איפוס כל ההתקדמות', 'progress.confirm': 'למחוק את כל ההתקדמות? אי אפשר לבטל את הפעולה.',
     'notfound': 'הדף לא נמצא'
   }

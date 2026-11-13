@@ -29,18 +29,20 @@
     </div>
   </header>
 
-  <main id="view" class="view" aria-live="polite"></main>
+  <main id="view" class="view"></main>
+  <!-- Short spoken messages for screen readers (right / wrong answer) -->
+  <div id="sr-live" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
 
   <!-- Three screens only: Home = today, Learn = everything to study, Progress = the numbers -->
   <nav class="tabbar">
     <a href="#/" data-tab="home">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 2.500 11.200V21h6.500v-6h6v6h6.500v-9.800z"/></svg><span data-t="nav.home"></span>
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 2.500 11.200V21h6.500v-6h6v6h6.500v-9.800z"/></svg><span data-t="nav.home"></span>
     </a>
     <a href="#/learn" data-tab="learn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 6.500C10 5 7 4.500 3.500 5v13.500c3.500-.5 6.500 0 8.500 1.500 2-1.500 5-2 8.500-1.500V5C17 4.500 14 5 12 6.500zM12 6.500V20"/></svg><span data-t="nav.learn"></span>
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 6.500C10 5 7 4.500 3.500 5v13.500c3.500-.5 6.500 0 8.500 1.500 2-1.500 5-2 8.500-1.500V5C17 4.500 14 5 12 6.500zM12 6.500V20"/></svg><span data-t="nav.learn"></span>
     </a>
     <a href="#/progress" data-tab="progress">
-      <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3.500" y="13" width="4.500" height="8" rx="1.200"/><rect x="9.800" y="8" width="4.500" height="13" rx="1.200"/><rect x="16" y="3" width="4.500" height="18" rx="1.200"/></svg><span data-t="nav.progress"></span>
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><rect x="3.500" y="13" width="4.500" height="8" rx="1.200"/><rect x="9.800" y="8" width="4.500" height="13" rx="1.200"/><rect x="16" y="3" width="4.500" height="18" rx="1.200"/></svg><span data-t="nav.progress"></span>
     </a>
   </nav>
 
@@ -64,7 +66,14 @@
       document.addEventListener('contextmenu', e => { if (!typing(e.target)) e.preventDefault(); });
       document.addEventListener('selectstart', e => { if (!typing(e.target)) e.preventDefault(); });
     })();
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+    if ('serviceWorker' in navigator) {
+      // Already running from the offline copy? Then a controller change means a new version took over.
+      const hadCopy = !!navigator.serviceWorker.controller;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (hadCopy) window.dispatchEvent(new Event('app-updated'));
+      });
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
   </script>
 </body>
 </html>
