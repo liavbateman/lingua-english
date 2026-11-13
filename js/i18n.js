@@ -58,6 +58,11 @@ const STR = {
 
     'speak.count': 'Speaking Practice · {a} of {b}', 'speak.do': 'Listen, then say it out loud',
     'speak.hard': 'Still hard', 'speak.said': 'I said it',
+    'speak.do.mic': 'Listen, then tap the microphone and say it', 'speak.mic': 'Say it into the microphone',
+    'speak.listening': 'Listening…', 'speak.great': 'Excellent! That was clear ✓',
+    'speak.heard': 'What I heard:', 'speak.again': 'Listen again and try once more.',
+    'speak.nothing': "I didn't catch that. Tap the microphone and try again.",
+    'speak.blocked': 'The microphone is blocked. You can still practise and rate yourself.',
     'speak.score': '{a} of {b} said with confidence',
     'speak.sub': 'Saying words out loud is the fastest way to remember them.',
 
@@ -131,6 +136,11 @@ const STR = {
 
     'speak.count': 'תרגול דיבור · {a} מתוך {b}', 'speak.do': 'הקשב, ואז אמור בקול',
     'speak.hard': 'עדיין קשה', 'speak.said': 'אמרתי',
+    'speak.do.mic': 'הקשב, ואז הקש על המיקרופון ואמור בקול', 'speak.mic': 'אמירה למיקרופון',
+    'speak.listening': 'מקשיב…', 'speak.great': 'מצוין! זה נשמע ברור ✓',
+    'speak.heard': 'מה ששמעתי:', 'speak.again': 'הקשב שוב ונסה עוד פעם.',
+    'speak.nothing': 'לא שמעתי. הקש על המיקרופון ונסה שוב.',
+    'speak.blocked': 'המיקרופון חסום. אפשר להמשיך לתרגל ולדרג את עצמך.',
     'speak.score': '{a} מתוך {b} נאמרו בביטחון',
     'speak.sub': 'לומר מילים בקול זו הדרך המהירה ביותר לזכור אותן.',
 

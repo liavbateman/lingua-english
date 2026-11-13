@@ -451,3 +451,19 @@ a.card:active, .task:active { transform: scale(.985); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Speaking practice: listen and microphone side by side, then what was heard */
+.speak-row { display: flex; justify-content: center; gap: 18px; }
+.speak-row .speak.xl { margin: 6px 0 0; }
+.speak.mic { background: linear-gradient(140deg, #b09bff, #7a5cf5); color: #fff; }
+.speak.mic.on { animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(142, 125, 255, .55); }
+  50% { box-shadow: 0 0 0 14px rgba(142, 125, 255, 0); }
+}
+.heard { margin-top: 12px; min-height: 1.4em; line-height: 1.5; }
+.heard:empty { display: none; }
+.heard.wait { color: var(--muted); }
+.heard.ok { color: var(--good); }
+.heard.bad { color: var(--bad); }
+.heard .en { color: var(--ink); }

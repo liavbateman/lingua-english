@@ -627,19 +627,43 @@
 
   // ---------- Speaking ----------
   // Listen, repeat out loud, then rate yourself.
+  // How much of the target the recogniser heard: share of its words found, 0..1.
+  // Digits count as words ("10" = "ten"), so the recogniser's number style doesn't matter.
+  const NUMBERS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+    'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+  const spokenWords = s => normalize(s).replace(/-/g, ' ').split(' ').filter(Boolean)
+    .map(x => (/^\d+$/.test(x) && NUMBERS[+x]) || (x === '100' ? 'hundred' : x));
+  function heardScore(target, heard) {
+    const want = spokenWords(target);
+    const got = spokenWords(heard);
+    const found = want.filter(x => got.some(y => y === x || (x.length >= 5 && editDistance(x, y) <= 1)));
+    return found.length / want.length;
+  }
+
+  let recognition = null;   // the one that is listening now, stopped when the screen changes
+  const Recognition = () => window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  // ---------- Speaking ----------
+  // Listen, say it into the microphone and get feedback. Where the browser can't listen,
+  // the learner rates themselves ("I said it" / "Still hard").
   function speaking() {
     const queue = shuffle(poolFor('level').pool).slice(0, 6);
     let i = 0, good = 0;
 
     function draw() {
       const w = queue[i];
+      let heardOk = false;
       view.innerHTML = `
         <p class="sub">${t('speak.count', { a: i + 1, b: queue.length })}</p>
         ${bar((i / queue.length) * 100)}
         <div class="card flash" style="cursor:default">
-          <div class="small">${t('speak.do')}</div>
+          <div class="small">${t(Recognition() ? 'speak.do.mic' : 'speak.do')}</div>
           <div class="word en ${w.phrase ? 'long' : ''}" style="margin-top:8px">${w.en}</div>
-          <button class="speak xl" id="speak" aria-label="${t('aria.listen')}">${ICON.speaker}</button>
+          <div class="speak-row">
+            <button class="speak xl" id="speak" aria-label="${t('aria.listen')}">${ICON.speaker}</button>
+            ${Recognition() ? `<button class="speak xl mic" id="mic" aria-label="${t('speak.mic')}" aria-pressed="false">${ICON.mic}</button>` : ''}
+          </div>
+          <div class="heard" id="heard" aria-live="polite"></div>
           <div class="he ${w.phrase ? 'long' : ''}">${w.he}</div>
           ${w.ex ? `<div class="example en">${w.ex}</div>` : ''}
         </div>
@@ -649,6 +673,7 @@
         </div>`;
       $('#speak').onclick = () => speak(w.en);
       const step = ok => () => {
+        if (recognition) recognition.abort();
         if (ok) good++;
         Store.answer(w.id, ok);
         i++;
@@ -658,6 +683,52 @@
       };
       $('#said').onclick = step(true);
       $('#hard').onclick = step(false);
+
+      const mic = $('#mic');
+      if (!mic) return;
+      const show = (html, cls) => { const h = $('#heard'); if (h) { h.className = 'heard ' + (cls || ''); h.innerHTML = html; } };
+      const listening = on => { mic.classList.toggle('on', on); mic.setAttribute('aria-pressed', String(on)); };
+      mic.onclick = () => {
+        if (recognition) { recognition.abort(); return; }   // second tap stops listening
+        if ('speechSynthesis' in window) speechSynthesis.cancel();
+        const Rec = Recognition();
+        const rec = new Rec();
+        rec.lang = 'en-US';
+        rec.interimResults = false;
+        rec.maxAlternatives = 5;
+        recognition = rec;
+        let answered = false;
+        listening(true);
+        show(t('speak.listening'), 'wait');
+        rec.onresult = e => {
+          answered = true;
+          const alts = Array.from(e.results[0]).map(a => a.transcript);
+          const best = alts.reduce((b, a) => (heardScore(w.en, a) > heardScore(w.en, b) ? a : b), alts[0] || '');
+          if (heardScore(w.en, best) >= 0.8) {
+            heardOk = true;
+            show(`<b>${t('speak.great')}</b>`, 'ok');
+            $('#said').textContent = t('btn.next');
+            $('#said').focus();
+          } else {
+            show(`${t('speak.heard')} <b class="en" dir="ltr">“${best.replace(/[<>&"]/g, '')}”</b><br>${t('speak.again')}`, 'bad');
+          }
+        };
+        rec.onerror = e => {
+          answered = true;
+          if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+            show(t('speak.blocked'), 'bad');
+            mic.remove();                       // no microphone: self-rating only
+          } else if (e.error !== 'aborted') {
+            show(t('speak.nothing'), 'bad');
+          }
+        };
+        rec.onend = () => {
+          if (recognition === rec) recognition = null;
+          listening(false);
+          if (!answered && !heardOk) show(t('speak.nothing'), 'bad');
+        };
+        try { rec.start(); } catch (err) { recognition = null; listening(false); show(t('speak.nothing'), 'bad'); }
+      };
     }
     draw();
   }
@@ -767,6 +838,7 @@
   function route() {
     const [name, a, b] = location.hash.replace(/^#\/?/, '').split('/');
     if ('speechSynthesis' in window) speechSynthesis.cancel();
+    if (recognition) recognition.abort();
     view.scrollTop = 0;
     switch (name || 'home') {
       case 'home': refreshChrome('home'); home(); break;
