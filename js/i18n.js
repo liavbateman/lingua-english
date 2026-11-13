@@ -267,7 +267,9 @@ const FORM_HE = {
   present: 'הווה', past: 'עבר', perfect: 'מושלם', future: 'עתיד',
   question: 'שאלה', command: 'ציווי', commas: 'פסיקים',
   prefer: 'העדפה', than: 'במקום', others: 'לאחרים', advice: 'עצה', negative: 'שלילה',
-  clause: 'משפט', noun: 'שם עצם', general: 'כללי', specific: 'מסוים', unique: 'יחיד במינו', places: 'מקומות', fixed: 'צירופים קבועים'
+  clause: 'משפט', noun: 'שם עצם', general: 'כללי', specific: 'מסוים', unique: 'יחיד במינו', places: 'מקומות', fixed: 'צירופים קבועים', contrast: 'ניגוד', tense: 'זמן הפועל', passive: 'סביל',
+  compare: 'השוואה', details: 'פרטים', timetable: 'לוח זמנים', adjective: 'שם תואר', singular: 'יחיד',
+  complaint: 'תלונה', ability: 'יכולת', continuous: 'מתמשך', 'bad event': 'אירוע רע', possible: 'אפשרי'
 };
 
 const isHe = () => Store.lang === 'he';

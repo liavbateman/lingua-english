@@ -527,5 +527,46 @@ GRAMMAR.push(
     ex: [["Coffee doesn't let me fall asleep.", 'קפה לא נותן לי להירדם.'], ['The coffee in this café is excellent.', 'הקפה בבית הקפה הזה מצוין.'], ['People say that history repeats itself.', 'אומרים שההיסטוריה חוזרת על עצמה.']],
     tip: 'הטעות הנפוצה היא להעתיק את ה׳ הידיעה מעברית: "The life is beautiful", או "I love the music" כשמתכוונים למוזיקה באופן כללי. נכון: "Life is beautiful", "I love music". the בא רק כשאפשר לשאול "איזה?" ולענות: "the music in this film".',
     quiz: [['___ is the most important thing in my life.', 'Family', ['The family', 'A family', 'The families']], ["I can't stand ___ music they play at this gym.", 'the', ['a', 'an', 'these']], ['Most ___ want to live a long and healthy life.', 'people', ['the people', 'of people', 'peoples']]]
+  },
+
+  // ---------- Added in round 45 ----------
+  {
+    id: 'a-participle-clauses', level: 'advanced', title: 'Participle clauses', he: 'קיצור משפטים: Having finished... / Feeling tired...',
+    when: 'בכתיבה ובדיבור רשמי אפשר לקצר שני משפטים עם אותו נושא. במקום "After she finished the report, she left" אומרים "Having finished the report, she left". זה נשמע מקצועי ותמציתי.',
+    forms: [
+      ['-ing', 'same time or reason: Feeling tired, I went to bed early.'],
+      ['having', 'having + past participle = first this, then that: Having read the email, he called the client.'],
+      ['passive', 'past participle: Built in 1920, the house needs repairs.'],
+      ['subject', 'both parts of the sentence must have the same subject']
+    ],
+    ex: [['Having finished the report, she went home.', 'אחרי שסיימה את הדוח, היא הלכה הביתה.'], ['Not knowing the answer, I stayed quiet.', 'לא ידעתי את התשובה, אז שתקתי.'], ['Written in simple English, the book is easy to read.', 'הספר כתוב באנגלית פשוטה, ולכן קל לקרוא אותו.']],
+    tip: 'הטעות הנפוצה היא נושא שלא מתאים: "Walking to work, the rain started" אומר שהגשם הלך לעבודה. נכון: "Walking to work, I got caught in the rain". ואחרי having בא הפועל בצורה השלישית: "Having finished", לא "Having finish".',
+    quiz: [['___ the email, she replied immediately.', 'Having read', ['Have read', 'Had read', 'Having reading']], ['___ tired, I decided to stay at home.', 'Feeling', ['Felt', 'To feel', 'Feel']], ['___ in 1920, the bridge is still in use today.', 'Built', ['Building', 'Having built', 'Build']]]
+  },
+  {
+    id: 'a-emphatic-do', level: 'advanced', title: 'Emphatic do', he: 'הדגשה עם do / does / did',
+    when: 'כדי להדגיש שמשהו באמת נכון, במיוחד כשמישהו חושב אחרת, מוסיפים do, does או did לפני הפועל במשפט חיובי. בעברית עושים את זה עם "באמת" או "כן".',
+    forms: [
+      ['present', 'do / does + verb: I do like your idea.'],
+      ['past', 'did + verb: She did call you yesterday.'],
+      ['command', 'do + verb, warm and polite: Do come in! Do sit down.'],
+      ['contrast', "I don't speak French, but I do speak Spanish."]
+    ],
+    ex: [['I do understand how you feel.', 'ברור לי איך זה מרגיש.'], ['He did send the file, but it never arrived.', 'הוא כן שלח את הקובץ, אבל הוא לא הגיע.'], ['Do take a seat.', 'בבקשה, אפשר לשבת.']],
+    tip: 'אחרי do, does או did בא הפועל בצורת הבסיס: "She does work hard", לא "She does works hard". ובעבר: "I did tell you", לא "I did told you".',
+    quiz: [["I know you don't believe me, but I ___ lock the door last night.", 'did', ['do', 'was', 'have']], ['She ___ want to help; she just has no time.', 'does', ['do', 'is', 'doing']], ['He did ___ me the truth.', 'tell', ['told', 'tells', 'telling']]]
+  },
+  {
+    id: 'a-conditions', level: 'advanced', title: 'As long as, provided that, unless', he: 'תנאים: as long as / provided that / unless',
+    when: 'כדי לשים תנאי בצורה מדויקת יותר מ-if. as long as ו-provided (that) אומרים "בתנאי ש". unless אומר "אלא אם כן", כלומר if not. כמו אחרי if, גם אחריהן בא הווה כשמדברים על העתיד.',
+    forms: [
+      ['as long as', "You can borrow the car as long as you're careful."],
+      ['provided', 'provided (that) + present: We will sign, provided that the price is right.'],
+      ['unless', "unless = if not: I won't go unless you come too."],
+      ['tense', "present after these words, even about the future: as long as it doesn't rain"]
+    ],
+    ex: [["You can stay as long as you're quiet.", 'אפשר להישאר בתנאי ששומרים על שקט.'], ["We'll start at nine unless the train is late.", 'נתחיל בתשע, אלא אם כן הרכבת תאחר.'], ['Provided that everyone agrees, the change will start in May.', 'בתנאי שכולם מסכימים, השינוי יתחיל במאי.']],
+    tip: 'unless כבר מכיל את השלילה, ולכן לא מוסיפים not: "unless you hurry", לא "unless you don\'t hurry". ואחרי as long as לא בא will: "as long as it doesn\'t rain", לא "as long as it won\'t rain".',
+    quiz: [["You'll miss the bus ___ you leave right now.", 'unless', ['unless not', 'except', 'without']], ['You can use my laptop as long as you ___ careful with it.', 'are', ['will be', 'would be', 'be']], ['We will sign the contract, ___ the price is right.', 'provided that', ['provide that', 'despite', 'in case of']]]
   }
 );
