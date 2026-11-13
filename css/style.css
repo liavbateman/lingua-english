@@ -1131,3 +1131,17 @@ button.path-head:active span { background: rgba(142, 125, 255, .22); }
 .gres-num.done { background: #ffc53d; color: #4a3200; }
 .gres-num.current { background: #ff7a59; color: #fff; }
 .gres-num.open { background: #7a6bff; color: #fff; }
+
+/* Grammar road mini-map: stages grouped by level, with the level's name above its group */
+.minimap.grouped { gap: 10px; align-items: flex-end; }
+.mm-group { display: grid; gap: 0; min-width: 0; }
+.mm-segs { display: flex; gap: 3px; }
+.mm-lvl {
+  min-height: 28px; padding: 0 2px; border: 0; background: none; cursor: pointer; color: var(--muted);
+  font: inherit; font-size: .72rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mm-lvl small { font-size: .68rem; opacity: .85; }
+.mm-group.cur .mm-lvl { color: #ffb199; }
+.minimap.grouped .mm-seg { height: 30px; }
+.minimap.grouped .mm-bar { height: 16px; }
+.minimap.grouped .mm-seg span { display: none; }

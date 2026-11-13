@@ -601,15 +601,31 @@
   // which one is current, which one is on screen; a tap jumps to that stage
   function miniMap(items, sections) {
     const curS = items.cur >= 0 ? stageAt(items, items.cur) : -1;
+    const seg = s => {
+      const part = stageItems(items, s);
+      const done = part.filter(x => x.done).length;
+      return `<button class="mm-seg ${SECTION_COLORS[s % SECTION_COLORS.length]}${s === curS ? ' cur' : ''}${done === part.length ? ' full' : ''}"
+          data-s="${s}" aria-label="${t('mm.seg', { n: s + 1, a: done, b: part.length })}">
+        <b class="mm-bar"><i style="width:${Math.round((done / part.length) * 100)}%"></i><span>${s + 1}</span></b>
+      </button>`;
+    };
+    if (items.part !== 'gall') {
+      return `<nav class="minimap" id="minimap" aria-label="${t('mm.aria')}">${Array.from({ length: sections }, (_, s) => seg(s)).join('')}</nav>`;
+    }
+    // The grammar road: stages grouped by level, each group with its name and how much of it is done;
+    // the name jumps to that level's gate
+    const stages = stagesOf(items);
+    const curLvl = items.cur >= 0 ? items[items.cur].lvl : null;
     return `
-      <nav class="minimap" id="minimap" aria-label="${t('mm.aria')}">
-        ${Array.from({ length: sections }, (_, s) => {
-          const part = stageItems(items, s);
-          const done = part.filter(x => x.done).length;
-          return `<button class="mm-seg ${SECTION_COLORS[s % SECTION_COLORS.length]}${s === curS ? ' cur' : ''}${done === part.length ? ' full' : ''}"
-              data-s="${s}" aria-label="${t('mm.seg', { n: s + 1, a: done, b: part.length })}">
-            <b class="mm-bar"><i style="width:${Math.round((done / part.length) * 100)}%"></i><span>${s + 1}</span></b>
-          </button>`;
+      <nav class="minimap grouped" id="minimap" aria-label="${t('mm.aria')}">
+        ${LEVELS.map(l => {
+          const ss = stages.map((r, s) => s).filter(s => items[stages[s][0]].lvl === l.id);
+          if (!ss.length) return '';
+          const list = items.filter(x => x.lvl === l.id);
+          return `<div class="mm-group${l.id === curLvl ? ' cur' : ''}" style="flex:${ss.length}">
+            <button class="mm-lvl" data-lvl="${l.id}" data-s="${ss[0]}">${t('lv.' + l.id)} <small class="en">${list.filter(x => x.done).length}/${list.length}</small></button>
+            <div class="mm-segs">${ss.map(seg).join('')}</div>
+          </div>`;
         }).join('')}
       </nav>`;
   }
@@ -881,9 +897,9 @@
     const mm = document.getElementById('minimap');
     if (mm) {
       const banners = [...path.querySelectorAll('.psec')];
-      mm.querySelectorAll('.mm-seg').forEach(b => {
+      mm.querySelectorAll('.mm-seg, .mm-lvl').forEach(b => {
         b.onclick = () => {
-          const target = banners[+b.dataset.s];
+          const target = (b.dataset.lvl && path.querySelector(`.pgate[data-lvl="${b.dataset.lvl}"]`)) || banners[+b.dataset.s];
           const top = target.getBoundingClientRect().top - view.getBoundingClientRect().top + view.scrollTop - mm.offsetHeight - 12;
           view.scrollTo({ top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
         };
