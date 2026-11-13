@@ -2255,6 +2255,13 @@
     draw();
   }
 
+  // When the last backup file was made (kept on this phone only), for the backup card
+  function lastBackupText() {
+    let at = 0;
+    try { at = +localStorage.getItem('lingua-last-backup') || 0; } catch (e) {}
+    return at ? t('backup.last', { d: new Intl.DateTimeFormat(Store.lang, { day: 'numeric', month: 'long' }).format(at) }) : t('backup.never');
+  }
+
   // ---------- Progress ----------
   // Numbers only. The lessons themselves live on the Learn screen and nowhere else.
   function progress() {
@@ -2295,11 +2302,12 @@
       ${monthCard()}
       ${LEVELS.map(levelCard).join('')}
       <div class="card backup">
-        <b>💾 ${t('backup.title')}</b>
+        <div class="bk-head"><span class="bk-ico" aria-hidden="true">💾</span>
+          <div class="grow"><b>${t('backup.title')}</b><span class="bk-last" id="bk-last">${lastBackupText()}</span></div></div>
         <p class="small">${t('backup.sub')}</p>
         <div class="pager">
-          <button class="btn ghost" id="restore">${t('backup.restore')}</button>
-          <button class="btn" id="save">${t('backup.save')}</button>
+          <button class="btn ghost" id="restore"><span aria-hidden="true">📂</span> ${t('backup.restore')}</button>
+          <button class="btn" id="save"><span aria-hidden="true">⬇️</span> ${t('backup.save')}</button>
         </div>
         <input type="file" id="backup-file" accept=".json,application/json,text/plain" hidden>
         <p class="small backup-msg" id="backup-msg" role="status"></p>
@@ -2322,6 +2330,8 @@
           setTimeout(() => URL.revokeObjectURL(a.href), 1000);
         }
         msg(t('backup.saved'), true);
+        try { localStorage.setItem('lingua-last-backup', String(Date.now())); } catch (e) {}
+        $('#bk-last').textContent = lastBackupText();
       } catch (e) {
         if (e.name !== 'AbortError') msg(t('backup.saveFailed'), false);   // closing the share sheet is not an error
       }
