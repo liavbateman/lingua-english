@@ -256,8 +256,6 @@
 
   function home() {
     const lw = wordsOf(Store.level);
-    const pct = Math.round((lw.filter(w => Store.isMastered(w.id)).length / lw.length) * 100);
-    const learned = ALL_WORDS.filter(w => Store.isMastered(w.id)).length;
     const tasks = planTasks();
     const done = Store.tasks;
     const doneCount = tasks.filter(x => done[x.id]).length;
@@ -269,6 +267,7 @@
 
     const step = nextStep();
     view.innerHTML = `
+      ${todayCard(tasks, doneCount)}
       <a class="continue" href="${step.href}">
         <span class="cont-kicker">${t('cont.kicker')}</span>
         <span class="cont-row">
@@ -278,23 +277,6 @@
         <span class="cont-go">${t('cont.go')} ${fwd()}</span>
       </a>
 
-      <section class="hero">
-        ${TOWER}
-        <span class="pill">⭐ ${t('home.journey')}</span>
-        <h2>${t('home.title')}</h2>
-        <p>${t('home.sub')}</p>
-        <div class="hero-stats">
-          <div><b>${pct}<small>%</small></b><span>${t('home.overall')}</span></div>
-          <div><b>${Store.best}</b><span>${t('home.record')}</span></div>
-          <div><b>${learned}</b><span>${t('home.learned')}</span></div>
-        </div>
-        ${bar(pct)}
-      </section>
-
-      <div class="section">${ICON.levels} ${t('home.level')} <span class="end">${levelLabel()}</span></div>
-      <div class="seg" role="group" aria-label="${t('home.level')}">
-        ${LEVELS.map(l => `<button data-level="${l.id}" class="${l.id === Store.level ? 'on' : ''}" aria-pressed="${l.id === Store.level}">${t('lv.' + l.id)}</button>`).join('')}
-      </div>
 
       <div class="section">${ICON.calendar} ${t('home.plan')} <span class="end"><b class="en">${doneCount} / ${tasks.length}</b> ${t('home.completed')}</span></div>
       ${doneCount === tasks.length ? `<div class="plan-done">${ICON.check}<span><b>${t('goal.home')}</b> ${t('goal.home.sub')}</span></div>` : ''}
@@ -331,13 +313,50 @@
       </a>`;
 
     $('#wotd-speak').onclick = () => speak(wotd.en);
-    view.querySelectorAll('.seg button').forEach(b => {
-      b.onclick = () => {
-        Store.level = b.dataset.level;
-        home();
-        view.querySelector(`.seg [data-level="${b.dataset.level}"]`).focus();   // keep the keyboard where it was
-      };
-    });
+    bindLevelSeg(home);
+  }
+
+  // The top of Home is about today (as Duolingo's daily goal and Babbel's "Today"):
+  // a greeting, the level (opens the level sheet), the streak, a ring for today's plan
+  // and the last seven days, so one look says "have I done enough today?"
+  function todayCard(tasks, doneCount) {
+    const h = new Date().getHours();
+    const hi = t(h >= 5 && h < 12 ? 'today.morning' : h >= 12 && h < 17 ? 'today.noon' : h >= 17 && h < 22 ? 'today.evening' : 'today.night');
+    const week = Store.week();
+    const activeToday = week[6].count > 0 || Object.keys(Store.tasks).length > 0;
+    const left = tasks.length - doneCount;
+    const streak = Store.streak;
+    const msg = !left ? t('today.done')
+      : !activeToday && streak ? t('today.risk', { n: streak })
+      : !activeToday ? t('today.start')
+      : left === 1 ? t('today.left1') : t('today.left', { n: left });
+    const C = 2 * Math.PI * 26;
+    const frac = tasks.length ? doneCount / tasks.length : 0;
+    const DAYS = isHe() ? ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'] : ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    return `
+      <section class="today${!left ? ' all' : ''}">
+        <div class="td-top">
+          <h1 class="td-hi">${hi}</h1>
+          <button class="td-level" id="levelbtn" data-part="vocab" aria-haspopup="dialog" aria-label="${t('lvl.change', { level: levelLabel() })}">${levelLabel()} ▾</button>
+        </div>
+        <div class="td-main">
+          <div class="td-ring" role="img" aria-label="${t('today.ring', { a: doneCount, b: tasks.length })}">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <circle cx="32" cy="32" r="26" class="td-track"/>
+              ${frac ? `<circle cx="32" cy="32" r="26" class="td-fill" stroke-dasharray="${(C * frac).toFixed(1)} ${C.toFixed(1)}"/>` : ''}
+            </svg>
+            <b class="en">${!left ? ICON.check : `${doneCount}/${tasks.length}`}</b>
+          </div>
+          <div class="grow">
+            <small class="td-label">${t('today.goal')}</small>
+            <p class="td-msg">${msg}</p>
+            <div class="td-week" aria-label="${t('today.week')}">
+              ${week.map(d => `<span class="td-day${d.count ? ' on' : ''}${d.today ? ' now' : ''}" title="${d.count}">
+                <i aria-hidden="true">${d.count ? '✓' : ''}</i><small>${DAYS[d.date.getDay()]}</small></span>`).join('')}
+            </div>
+          </div>
+        </div>
+      </section>`;
   }
 
   // ---------- Learn ----------
@@ -838,7 +857,7 @@
     const btn = document.getElementById('levelbtn');
     if (!btn) return;
     btn.onclick = () => {
-      const part = pathItems.part;
+      const part = btn.dataset.part || pathItems.part;
       const back = document.createElement('div');
       back.className = 'sheet-back';
       back.innerHTML = `

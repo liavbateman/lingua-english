@@ -25,5 +25,21 @@ borrowing proven patterns from leading language apps, and adapts them to a Hebre
 | 8 | First-run setup | Three short screens: level, daily goal, reminder time | Babbel, Busuu | |
 | 9 | Streak calendar | A month view of practiced days on the Progress screen | Duolingo | |
 
+## Home: what it is for
+
+Since the lesson path (round 29), the course map lives in the Learn tab. Home now has one job: **today**.
+In one look it answers "have I done enough today, and what is the single next thing?" It doesn't
+repeat the map, the stats (those belong to Progress) or the level buttons (the level sheet does that).
+Order on screen: today's goal → the next step → today's plan → one place for extra practice.
+
+| # | Round | Pattern | Inspired by | Status |
+|---|---|---|---|---|
+| H1 | Today header | Greeting by time of day, level chip (opens the level sheet), a ring for today's plan, a message (tasks left / keep the streak / done) and the last 7 days. Replaces the welcome card with duplicate stats and the level buttons | Duolingo daily goal, Babbel "Today" | Done (round 48) |
+| H2 | Continue = the path | The next-step card shows where it sits on the path (stage, lesson N of M, progress ring like the path node) and links to the path | Duolingo, Babbel | |
+| H3 | Plan as daily quests | Each task shows its own progress bar (e.g. "6 / 15 words"); finishing all of them opens a small daily chest | Duolingo daily quests | |
+| H4 | Word of the day you practise | The Hebrew is hidden until tapped (active recall), with "add to my review" | Drops, Memrise | |
+| H5 | Evening streak nudge | After 18:00 with nothing done, the owl asks for one short lesson, with a 3-minute review button | Duolingo | |
+| H6 | One "extra practice" row | Tricky words, the challenge and free practice merge into one row, so Home stays short | Busuu, Babbel | |
+
 Rules for every round: Hebrew first and right to left, neutral (non-gendered) Hebrew, works on a 320px-wide iPhone,
 nothing important hidden by the home indicator, motion respects "Reduce Motion", and feedback never relies on color alone.
