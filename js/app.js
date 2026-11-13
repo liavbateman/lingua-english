@@ -1245,12 +1245,29 @@
     };
   }
 
+  // One word to know today, from the learner's level (the same word all day, a new one at midnight)
+  function wordOfDay() {
+    const single = wordsOf(Store.level).filter(w => !w.phrase);
+    if (!single.length) return '';
+    const localDay = Math.floor((Date.now() - new Date().getTimezoneOffset() * 6e4) / 864e5);
+    const w = single[localDay % single.length];
+    return `<section class="wday lv-${Store.level}">
+      <div class="wday-top">
+        <span class="wday-kicker">✨ ${t('home.wotd')}</span>
+        <button class="speak sm" id="wd-say" data-en="${w.en.replace(/"/g, '&quot;')}" aria-label="${t('aria.listen')}">${ICON.speaker}</button>
+      </div>
+      <div class="wday-word"><b class="en" dir="ltr">${w.en}</b><span>${w.he}</span></div>
+      ${w.ex ? `<p class="wday-ex en" dir="ltr">${w.ex}</p>` : ''}
+    </section>`;
+  }
+
   function learn() {
     const items = pathFor('vocab');
     view.innerHTML = `
       <h1 class="sr-only">${t('learn.title')}</h1>
       ${pathHero(items)}
       ${learnTabs('vocab')}
+      ${wordOfDay()}
       ${levelSeg()}
       <div class="search">
         ${ICON.search}
@@ -1261,6 +1278,8 @@
       <div id="results" hidden></div>`;
     bindPath(items);
     bindLevelSeg(learn);
+    const ws = $('#wd-say');
+    if (ws) ws.onclick = () => speak(ws.dataset.en);
     const input = $('#search'), units = $('#units'), results = $('#results');
     // Only the results area is redrawn while typing, so the keyboard stays open
     input.oninput = () => {
