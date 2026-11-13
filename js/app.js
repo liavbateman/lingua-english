@@ -583,7 +583,7 @@
               ${navigator.share ? `<button class="cert-share" data-lvl="${prev.id}" data-n="${list.length}">${t('cert.share')}</button>` : ''}
             </div>
             ${next ? `<div class="cert-next">${t('gate.title', { level: t('lv.' + next.id) })} <small class="en">${t('lvl.cefr.' + next.id)}</small>
-              ${at === n + 1 ? `<span class="pgate-tag">${t('gate.mine')}</span>` : !reached ? `<button class="pgate-go" data-lvl="${next.id}">${t('gate.jump')}</button>` : ''}</div>` : ''}
+              ${at === n + 1 ? `<span class="pgate-tag">${t('gate.mine')}</span>` : !reached ? `<button class="pgate-go" data-lvl="${next.id}"${freshHide()}>${t('gate.jump')}</button>` : ''}</div>` : ''}
           </div>
         </div>`;
       }
@@ -597,7 +597,7 @@
             ${complete ? `<a class="pgate-final" href="#/grammar/final-${prev.id}/quiz">🔁 ${t('gate.final')}</a>` : ''}
           </div>
           ${!next ? '' : at === n + 1 ? `<span class="pgate-tag">${t('gate.mine')}</span>`
-            : !reached ? `<button class="pgate-go" data-lvl="${next.id}">${t('gate.jump')}</button>` : ''}
+            : !reached ? `<button class="pgate-go" data-lvl="${next.id}"${freshHide()}>${t('gate.jump')}</button>` : ''}
         </div>`;
     }).join('');
   }
@@ -705,6 +705,13 @@
 
   // A slim map of all stages that stays at the top while the path scrolls: how full each stage is,
   // which one is current, which one is on screen; a tap jumps to that stage
+  // Gradual reveal: until a learner has started a few lessons, the extras (search, saved rules, the tenses
+  // map, the stage mini-map, level jumps, chests of stages not begun) stay out of sight. They stay in the page
+  // with the hidden attribute, so nothing that binds to them breaks.
+  const startedCount = () => GRAMMAR.filter(g => Store.isGrammarDone(g.id)).length + UNITS.filter(u => Store.unitProgress(u).seen > 0).length;
+  const isFresh = () => startedCount() < 3;
+  const freshHide = (extraShow = false) => (isFresh() && !extraShow ? ' hidden' : '');
+
   function miniMap(items, sections) {
     const curS = items.cur >= 0 ? stageAt(items, items.cur) : -1;
     const seg = s => {
@@ -716,14 +723,14 @@
       </button>`;
     };
     if (items.part !== 'gall') {
-      return `<nav class="minimap" id="minimap" aria-label="${t('mm.aria')}">${Array.from({ length: sections }, (_, s) => seg(s)).join('')}</nav>`;
+      return `<nav class="minimap" id="minimap" aria-label="${t('mm.aria')}"${freshHide()}>${Array.from({ length: sections }, (_, s) => seg(s)).join('')}</nav>`;
     }
     // The grammar road: stages grouped by level, each group with its name and how much of it is done;
     // the name jumps to that level's gate
     const stages = stagesOf(items);
     const curLvl = items.cur >= 0 ? items[items.cur].lvl : null;
     return `
-      <nav class="minimap grouped" id="minimap" aria-label="${t('mm.aria')}">
+      <nav class="minimap grouped" id="minimap" aria-label="${t('mm.aria')}"${freshHide()}>
         ${LEVELS.map(l => {
           const ss = stages.map((r, s) => s).filter(s => items[stages[s][0]].lvl === l.id);
           if (!ss.length) return '';
@@ -758,7 +765,8 @@
           </div>` : ''}
         ${Array.from({ length: sections }, (_, s) => {
           const st = chestState(items, s);
-          return `<div class="pchest-wrap${st === 'ready' ? ' is-ready' : ''}" data-s="${s}">
+          const begun = stageItems(items, s).some(x => x.done || x.started);
+          return `<div class="pchest-wrap${st === 'ready' ? ' is-ready' : ''}${st === 'locked' && !begun && isFresh() ? ' is-quiet' : ''}" data-s="${s}">
             ${st === 'ready' ? `<span class="pbubble chest-bubble" aria-hidden="true">${t('chest.openme')}</span>` : ''}
             <button class="pchest ${st}" data-s="${s}" aria-label="${t('chest.aria', { n: s + 1 })} · ${t('chest.state.' + st)}">
               <span aria-hidden="true">${st === 'opened' ? '✨' : '🎁'}</span>
@@ -1274,7 +1282,7 @@
       ${learnTabs('vocab')}
       ${wordOfDay()}
       ${levelSeg()}
-      <div class="search">
+      <div class="search"${freshHide()}>
         ${ICON.search}
         <input id="search" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
           placeholder="${t('search.ph')}" aria-label="${t('search.ph')}">
@@ -1424,9 +1432,9 @@
     view.innerHTML = `
       <h1 class="sr-only">${t('gr.title')}</h1>
       ${pathHero(items)}
-      <a class="tn-entry" href="#/tenses"><span class="tn-entry-ico" aria-hidden="true">⏱️</span>
+      <a class="tn-entry" href="#/tenses"${freshHide()}><span class="tn-entry-ico" aria-hidden="true">⏱️</span>
         <span class="grow"><b>${t('tn.title')}</b><small>${t('tn.card')}</small></span><span class="go-chev" aria-hidden="true">${fwd()}</span></a>
-      <div class="gsearch-row">
+      <div class="gsearch-row"${freshHide(Store.savedRules().length > 0)}>
         <div class="search">
           ${ICON.search}
           <input id="gsearch" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
