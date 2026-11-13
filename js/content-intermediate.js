@@ -542,6 +542,42 @@ UNITS.push(
       { en: "I'd like to give a month's notice.", he: 'רציתי להודיע על עזיבה חודש מראש.' },
       { en: 'When will I get my deposit back?', he: 'מתי אקבל בחזרה את הפיקדון?' }
     ]
+  },
+
+  // ---------- Added in round 60 ----------
+  {
+    id: 'i-phr-plans', level: 'intermediate', kind: 'phrases', title: 'Plans & invitations', he: 'תוכניות והזמנות', emoji: '🎉',
+    words: [
+      { en: 'Are you free on Saturday evening?', he: 'יש לך זמן פנוי בשבת בערב?' },
+      { en: 'Would you like to come to my birthday party?', he: 'רוצה לבוא למסיבת יום ההולדת שלי?' },
+      { en: "I'd love to, thanks for inviting me.", he: 'בשמחה, תודה על ההזמנה.' },
+      { en: "I'm afraid I can't make it this time.", he: 'לצערי הפעם זה לא יסתדר לי.' },
+      { en: 'How about next weekend instead?', he: 'מה דעתך על סוף השבוע הבא במקום?' },
+      { en: 'What time should we meet?', he: 'באיזו שעה ניפגש?' },
+      { en: "Let's meet outside the cinema at seven.", he: 'בואו ניפגש מחוץ לקולנוע בשבע.' },
+      { en: 'Should I bring anything?', he: 'להביא משהו?' },
+      { en: 'Can I bring a friend along?', he: 'אפשר להביא חבר או חברה?' },
+      { en: "I'll let you know by tomorrow.", he: 'אעדכן עד מחר.' },
+      { en: 'Sorry, something came up and I have to cancel.', he: 'סליחה, צץ משהו ונאלצתי לבטל.' },
+      { en: 'Thanks for having me, I had a great time!', he: 'תודה על האירוח, היה לי ממש כיף!' }
+    ]
+  },
+  {
+    id: 'i-phr-tech', level: 'intermediate', kind: 'phrases', title: 'Tech problems', he: 'תקלות טכניות', emoji: '💻',
+    words: [
+      { en: "My laptop won't turn on.", he: 'המחשב הנייד שלי לא נדלק.' },
+      { en: 'The screen keeps freezing.', he: 'המסך כל הזמן נתקע.' },
+      { en: "I can't connect to the internet.", he: 'אין לי חיבור לאינטרנט.' },
+      { en: 'I forgot my password.', he: 'שכחתי את הסיסמה.' },
+      { en: 'Have you tried restarting it?', he: 'ניסית להפעיל מחדש?' },
+      { en: 'The app crashes every time I open it.', he: 'האפליקציה קורסת בכל פעם שפותחים אותה.' },
+      { en: 'My phone battery dies really quickly.', he: 'הסוללה בטלפון שלי נגמרת ממש מהר.' },
+      { en: 'I accidentally deleted an important file.', he: 'מחקתי בטעות קובץ חשוב.' },
+      { en: 'Is there a way to get it back?', he: 'יש דרך לשחזר אותו?' },
+      { en: 'Could you send me a screenshot of the error?', he: 'אפשר לשלוח לי צילום מסך של השגיאה?' },
+      { en: 'You need to update the software first.', he: 'קודם צריך לעדכן את התוכנה.' },
+      { en: "It's working now, thanks for your help!", he: 'עכשיו זה עובד, תודה על העזרה!' }
+    ]
   }
 );
 
