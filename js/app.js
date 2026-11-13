@@ -521,38 +521,137 @@
   }
 
   // ---------- Flashcards ----------
+  // Flashcards: a tap turns the card over in 3D; then swipe right for "knew it", left for "again"
+  // (as in Drops, Memrise and Anki). Buttons do the same for anyone who prefers tapping.
   function lesson(unitId) {
     const unit = UNITS.find(u => u.id === unitId);
     if (!unit) return notFound();
-    let i = 0, flipped = false;
+    const words = unit.words;
+    let i = 0, known = 0;
 
-    function draw(focusId) {
-      const w = unit.words[i];
-      Store.markSeen(w.id);
-      const last = i === unit.words.length - 1;
+    function finish() {
+      endLesson(1);
       view.innerHTML = `
-        <h1>${unit.emoji} ${unitTitle(unit)}</h1>
-        <p class="sub">${t('card.count', { a: i + 1, b: unit.words.length })}</p>
-        ${lessonBar((i + 1) / unit.words.length)}
-        <div class="card flash" id="flash">
-          <div class="word en ${w.phrase ? 'long' : ''}">${w.en}</div>
-          <button class="speak" id="speak" aria-label="${t('aria.listen')}">${ICON.speaker}</button>
-          <div aria-live="polite">${flipped
-            ? `<div class="he ${w.phrase ? 'long' : ''}">${w.he}</div>${w.ex ? `<div class="example en">${w.ex}</div>` : ''}`
-            : ''}</div>
-          <button class="hint" id="flip" aria-expanded="${flipped}">${t(flipped ? 'card.hide' : 'card.hint')}</button>
-        </div>
-        <div class="pager">
-          <button class="btn ghost" id="prev" ${i === 0 ? 'disabled' : ''}>${t('btn.back')}</button>
-          ${last
-            ? `<a class="btn" href="#/quiz/choice/${unit.id}">${t('card.practice')}</a>`
-            : `<button class="btn" id="next">${t('btn.next')}</button>`}
+        <div class="card center" style="margin-top:14px">
+          <div class="big">🃏</div>
+          <h1>${t('cards.done.title')}</h1>
+          <p class="sub">${t('cards.done', { a: known, b: words.length })}</p>
+          <a class="btn" href="#/quiz/choice/${unit.id}">${t('card.practice')}</a>
+          <button class="btn ghost" id="restart">${t('cards.restart')}</button>
         </div>`;
-      $('#flash').onclick = () => { flipped = !flipped; draw('flip'); };
-      $('#speak').onclick = e => { e.stopPropagation(); speak(w.en); };
-      $('#prev').onclick = () => { i--; flipped = false; draw(i === 0 ? 'next' : 'prev'); };
-      if (!last) $('#next').onclick = () => { i++; flipped = false; draw(i === unit.words.length - 1 ? 'prev' : 'next'); };
-      if (focusId && $('#' + focusId)) $('#' + focusId).focus();
+      $('#restart').onclick = () => { i = 0; known = 0; document.body.classList.add('in-lesson'); draw(); };
+    }
+
+    function draw() {
+      const w = words[i];
+      Store.markSeen(w.id);
+      const long = w.phrase ? 'long' : '';
+      let flipped = false, busy = false;
+      view.innerHTML = `
+        <p class="sub">${unit.emoji} ${unitTitle(unit)} · ${t('card.count', { a: i + 1, b: words.length })}</p>
+        ${lessonBar(i / words.length)}
+        <div class="fc-wrap" id="fcwrap">
+          <span class="fc-tag know" aria-hidden="true">${t('cards.know')} ✓</span>
+          <span class="fc-tag again" aria-hidden="true">↺ ${t('cards.again')}</span>
+          <div class="fc" id="fc">
+            <div class="fc-face front card flash">
+              <div class="word en ${long}">${w.en}</div>
+              <button class="speak" data-speak aria-label="${t('aria.listen')}">${ICON.speaker}</button>
+              <button class="hint" id="flip" aria-expanded="false">${t('card.hint')}</button>
+            </div>
+            <div class="fc-face back card flash" aria-hidden="true">
+              <div class="fc-en en">${w.en}</div>
+              <div class="he ${long}">${w.he}</div>
+              ${w.ex ? `<div class="example en">${w.ex}</div>` : ''}
+              <button class="speak sm" data-speak aria-label="${t('aria.listen')}" tabindex="-1">${ICON.speaker}</button>
+            </div>
+          </div>
+        </div>
+        <p class="fc-help small" id="fchelp" aria-live="polite"></p>
+        <div class="pager" id="fcbtns"></div>
+        ${i > 0 ? `<button class="btn plain" id="prev">${bwd()} ${t('cards.prev')}</button>` : ''}`;
+
+      const wrap = $('#fcwrap'), fc = $('#fc'), btns = $('#fcbtns');
+      const front = fc.querySelector('.front'), back = fc.querySelector('.back');
+
+      function buttons() {
+        btns.innerHTML = flipped
+          // "Knew it" sits on the right in both languages, the side a "knew it" swipe goes to
+          ? (isHe()
+            ? `<button class="btn" id="know">${t('cards.know')} ✓</button><button class="btn ghost" id="again">↺ ${t('cards.again')}</button>`
+            : `<button class="btn ghost" id="again">↺ ${t('cards.again')}</button><button class="btn" id="know">${t('cards.know')} ✓</button>`)
+          : `<button class="btn" id="show">${t('cards.show')}</button>`;
+        if (flipped) {
+          $('#again').onclick = () => fly(false);
+          $('#know').onclick = () => fly(true);
+        } else $('#show').onclick = () => flip();
+      }
+      function flip() {
+        if (busy) return;
+        flipped = !flipped;
+        fc.classList.toggle('is-flipped', flipped);
+        front.setAttribute('aria-hidden', String(flipped));
+        back.setAttribute('aria-hidden', String(!flipped));
+        back.querySelector('[data-speak]').tabIndex = flipped ? 0 : -1;
+        $('#flip').setAttribute('aria-expanded', String(flipped));
+        $('#fchelp').textContent = flipped ? t('cards.swipe') : '';
+        buttons();
+        if (flipped) setTimeout(() => $('#know') && $('#know').focus({ preventScroll: true }), 50);
+      }
+      // The card flies off to the side it was sent, then the next one comes in
+      function fly(knowIt) {
+        if (busy) return;
+        busy = true;
+        if (knowIt) { known++; Store.answer(w.id, true); Feel.right(); } else Store.again(w.id);
+        wrap.style.transition = 'transform .3s ease-in, opacity .3s ease-in';
+        wrap.style.transform = `translateX(${knowIt ? 130 : -130}vw) rotate(${knowIt ? 22 : -22}deg)`;
+        wrap.style.opacity = '0';
+        setTimeout(() => { i++; i < words.length ? draw() : finish(); },
+          matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 260);
+      }
+
+      // Drag: follows the finger, tilts, and shows "knew it" / "again" as it goes
+      let x0 = null, dx = 0, moved = false, suppress = false;
+      wrap.onpointerdown = e => { if (busy) return; x0 = e.clientX; dx = 0; moved = false; wrap.style.transition = 'none'; };
+      wrap.onpointermove = e => {
+        if (x0 === null) return;
+        dx = e.clientX - x0;
+        if (Math.abs(dx) > 8) moved = true;
+        if (!moved || !flipped) return;
+        if (!wrap.hasPointerCapture(e.pointerId)) wrap.setPointerCapture(e.pointerId);
+        wrap.style.transform = `translateX(${dx}px) rotate(${dx / 18}deg)`;
+        wrap.style.setProperty('--know', Math.max(0, Math.min(1, dx / 100)));
+        wrap.style.setProperty('--again', Math.max(0, Math.min(1, -dx / 100)));
+      };
+      const release = () => {
+        if (x0 === null) return;
+        x0 = null;
+        if (!moved) return;
+        suppress = true;
+        if (!flipped) return;
+        if (Math.abs(dx) > 90) return fly(dx > 0);
+        wrap.style.transition = 'transform .25s cubic-bezier(.3, 1.4, .5, 1)';
+        wrap.style.transform = '';
+        wrap.style.setProperty('--know', 0);
+        wrap.style.setProperty('--again', 0);
+      };
+      wrap.onpointerup = release;
+      wrap.onpointercancel = release;
+      // A tap (not a drag) turns the card; the speaker buttons only speak
+      wrap.onclick = e => {
+        if (suppress) { suppress = false; return; }
+        if (e.target.closest('[data-speak]')) return speak(w.en);
+        flip();
+      };
+      // Keyboard: Space/Enter turn the card (the hint button), arrows decide once it's turned
+      view.onkeydown = e => {
+        if (!flipped || busy) return;
+        if (e.key === 'ArrowRight') fly(true);
+        if (e.key === 'ArrowLeft') fly(false);
+      };
+      const prev = $('#prev');
+      if (prev) prev.onclick = () => { i--; draw(); };
+      buttons();
     }
     draw();
   }
@@ -1202,6 +1301,7 @@
     if (recognition) recognition.abort();
     view.scrollTop = 0;
     document.querySelectorAll('.sheet-back').forEach(s => s.remove());
+    view.onkeydown = null;
     const inLesson = ['unit', 'quiz', 'speak'].includes(name) || (name === 'grammar' && b === 'quiz');
     document.body.classList.toggle('in-lesson', inLesson);
     if (inLesson) lessonBar(0);

@@ -696,3 +696,21 @@ body.in-lesson .view.has-check { padding-bottom: calc(132px + env(safe-area-inse
 .st.time { border-color: #6fb4ff; background: rgba(111, 180, 255, .14); }
 .st.time span { color: #6fb4ff; }
 @media (prefers-reduced-motion: reduce) { .combo, .st { animation: none; } }
+
+/* ---------- Flashcards: 3D flip and swipe ---------- */
+.fc-wrap { position: relative; perspective: 1200px; margin-top: 14px; touch-action: pan-y; }
+.fc { position: relative; height: 300px; transform-style: preserve-3d; transition: transform .55s cubic-bezier(.3, 1.15, .4, 1); }
+.fc.is-flipped { transform: rotateY(180deg); }
+.fc-face { position: absolute; inset: 0; margin: 0 !important; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.fc-face.back { transform: rotateY(180deg); }
+.fc-face.back .speak { margin: 12px auto 0; }
+.fc-en { font-size: 1.05rem; font-weight: 700; color: var(--muted); }
+.fc-tag {
+  position: absolute; top: 18px; z-index: 3; padding: 6px 12px; border: 3px solid; border-radius: 12px;
+  font-weight: 900; font-size: 1rem; background: rgba(8, 13, 38, .75); pointer-events: none;
+}
+.fc-tag.know { left: 16px; color: var(--good); border-color: var(--good); transform: rotate(-10deg); opacity: var(--know, 0); }
+.fc-tag.again { right: 16px; color: #ffb34a; border-color: #ffb34a; transform: rotate(10deg); opacity: var(--again, 0); }
+.fc-help { text-align: center; min-height: 1.3em; margin: 12px 0; }
+@media (prefers-reduced-motion: reduce) { .fc { transition: none; } }

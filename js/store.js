@@ -70,6 +70,14 @@ const Store = (() => {
     isSeen: id => box(id) >= 1,
     isMastered: id => box(id) >= MASTERED_BOX,
 
+    // Flashcard "again": back to the first box and due now, without counting as a mistake
+    again(id) {
+      const s = state.words[id] || {};
+      state.words[id] = Object.assign(s, { box: 1, due: Date.now() });
+      touchDay();
+      save();
+    },
+
     markSeen(id) {
       if (!state.words[id]) { state.words[id] = { box: 1, due: Date.now() }; save(); }
     },

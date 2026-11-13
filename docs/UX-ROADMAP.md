@@ -9,7 +9,7 @@ borrowing proven patterns from leading language apps, and adapts them to a Hebre
 | 2 | Answer feedback sheet | After answering, a green or red sheet slides up from the bottom with the correct answer, a speaker and a large Continue button in the thumb zone, so the button never jumps around | Duolingo | Done (round 24) |
 | 3 | Tactile buttons | Thick 3D buttons and answer tiles that visibly press down; select an answer, then Check, to avoid mis-taps | Duolingo | Done (round 25) |
 | 4 | Combo and lesson-end stats | "3 in a row!" while answering; the end screen shows accuracy, points and time as tiles that count up | Duolingo, Busuu | Done (round 26) |
-| 5 | Flashcards that flip and swipe | 3D flip animation; swipe right for "I know it" and left for "Again" | Drops, Memrise, Anki | |
+| 5 | Flashcards that flip and swipe | 3D flip animation; swipe right for "I know it" and left for "Again" | Drops, Memrise, Anki | Done (round 27) |
 | 6 | One "Continue" on Home | The Home screen leads with one big card for the next best step; secondary items move down | Babbel, Duolingo | |
 | 7 | Owl reactions | The owl mascot reacts in feedback, empty states and celebrations | Duolingo | |
 | 8 | First-run setup | Three short screens: level, daily goal, reminder time | Babbel, Busuu | |

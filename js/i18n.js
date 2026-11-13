@@ -47,6 +47,10 @@ const STR = {
     'card.count': '{a} of {b}', 'card.hint': 'Tap the card to see the translation', 'card.hide': 'Hide the translation',
     'sr.right': 'Correct', 'sr.wrong': 'Not quite. The answer is {answer}',
     'card.practice': 'Practice these words',
+    'cards.show': 'Show the translation', 'cards.know': 'Knew it', 'cards.again': 'Again',
+    'cards.swipe': 'Swipe right if you knew it, left to see it again',
+    'cards.prev': 'Previous card', 'cards.done.title': 'All cards done!',
+    'cards.done': 'You knew {a} of {b}', 'cards.restart': 'Go through the cards again',
     'btn.next': 'Next', 'btn.back': 'Back', 'btn.finish': 'Finish',
     'btn.home': 'Back to Home', 'btn.more': 'More practice', 'btn.lessons': 'Go to lessons',
 
@@ -141,6 +145,10 @@ const STR = {
     'card.count': '{a} מתוך {b}', 'card.hint': 'הקשה על הכרטיס מציגה את התרגום', 'card.hide': 'הסתרת התרגום',
     'sr.right': 'נכון', 'sr.wrong': 'לא בדיוק. התשובה היא {answer}',
     'card.practice': 'לתרגל את המילים',
+    'cards.show': 'הצגת התרגום', 'cards.know': 'ידעתי', 'cards.again': 'עוד פעם',
+    'cards.swipe': 'החלקה ימינה: ידעתי · שמאלה: עוד פעם',
+    'cards.prev': 'לכרטיס הקודם', 'cards.done.title': 'עברת על כל הכרטיסים!',
+    'cards.done': 'ידעת {a} מתוך {b}', 'cards.restart': 'לעבור שוב על הכרטיסים',
     'btn.next': 'הבא', 'btn.back': 'הקודם', 'btn.finish': 'סיום',
     'btn.home': 'חזרה לבית', 'btn.more': 'עוד תרגול', 'btn.lessons': 'לשיעורים',
 
