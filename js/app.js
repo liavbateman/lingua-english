@@ -766,7 +766,7 @@
           </div>`;
         }).join('')}
         ${items.map((x, i) => `
-          <div class="pnode-wrap" data-i="${i}">
+          <div class="pnode-wrap${x.lvl ? ' lv-' + x.lvl : ''}" data-i="${i}">
             ${x.state === 'current' ? `<span class="pbubble">${t(x.started ? 'path.continue' : 'path.start')}</span>` : ''}
             <button class="pnode ${x.state}" data-i="${i}" style="--pct:${x.pct}"
               aria-label="${x.plain.replace(/"/g, '')} · ${t('path.state.' + x.state)}">

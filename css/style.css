@@ -1879,3 +1879,9 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
 .lang:active { transform: translateY(2px); box-shadow: 0 1px 0 #0d1232; }
 .logo { box-shadow: 0 3px 0 #10306b, 0 6px 18px rgba(30, 90, 200, .35); }
 @media (prefers-reduced-motion: reduce) { .streak.bump, .streak.bump .streak-fire { animation: none; } }
+
+/* ---------- Grammar road nodes in their level's colour (design round D36) ---------- */
+.pnode-wrap[class*="lv-"] .pnode.open { --face: color-mix(in srgb, var(--lv) 52%, #1b2046); --edge: var(--lv-edge); }
+.pnode-wrap[class*="lv-"] .pnode.open::before { --ring: var(--lv); }
+.pnode-wrap[class*="lv-"] .pnode.locked { --face: color-mix(in srgb, var(--lv) 14%, #262b58); --edge: color-mix(in srgb, var(--lv-edge) 70%, #11163a); }
+.pnode-wrap[class*="lv-"] .pnode.locked .pnum { color: color-mix(in srgb, var(--lv) 60%, #8f96bd); opacity: 1; }
