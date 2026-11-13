@@ -578,6 +578,28 @@ UNITS.push(
       { en: 'You need to update the software first.', he: 'קודם צריך לעדכן את התוכנה.' },
       { en: "It's working now, thanks for your help!", he: 'עכשיו זה עובד, תודה על העזרה!' }
     ]
+  },
+
+  // ---------- Added in round 68 ----------
+  {
+    id: 'i-appearance', level: 'intermediate', title: 'Describing appearance', he: 'תיאור מראה חיצוני', emoji: '🧑‍🦱',
+    words: [
+      { en: 'curly', he: 'מתולתל', ex: 'She has long, curly hair.' },
+      { en: 'straight', he: 'חלק (שיער)', ex: 'His hair is short and straight.' },
+      { en: 'bald', he: 'קירח', ex: 'My uncle went bald in his thirties.' },
+      { en: 'beard', he: 'זקן', ex: 'He grew a beard during the holiday.' },
+      { en: 'moustache', he: 'שפם', ex: 'The man with the moustache is our new neighbour.' },
+      { en: 'freckles', he: 'נמשים', ex: 'The girl has red hair and freckles.' },
+      { en: 'wrinkles', he: 'קמטים', ex: 'My grandmother gets lovely wrinkles when she smiles.' },
+      { en: 'slim', he: 'רזה', ex: 'She is tall and slim.' },
+      { en: 'overweight', he: 'במשקל עודף', ex: 'The doctor said he was a little overweight.' },
+      { en: 'pale', he: 'חיוור', ex: 'You look pale. Are you OK?' },
+      { en: 'handsome', he: 'נאה', ex: 'Her brother is very handsome.' },
+      { en: 'middle-aged', he: 'בגיל העמידה', ex: 'A middle-aged woman asked us for directions.' },
+      { en: 'ponytail', he: 'קוקו', ex: 'She usually wears her hair in a ponytail.' },
+      { en: 'tattoo', he: 'קעקוע', ex: 'He has a small tattoo on his arm.' },
+      { en: 'glasses', he: 'משקפיים', ex: 'I wear glasses for reading.' }
+    ]
   }
 );
 
