@@ -417,3 +417,18 @@ a.card:active, .task:active { transform: scale(.985); }
 .backup-msg:empty { display: none; }
 .backup-msg.ok { color: var(--good); }
 .backup-msg.bad { color: var(--bad); }
+
+/* "New version ready" bar, just above the bottom tab bar */
+.update {
+  position: fixed; z-index: 30; left: 16px; right: 16px;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 10px 10px 16px; border-radius: 16px;
+  background: var(--card-2); border: 1px solid var(--brand); box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+  font-weight: 600;
+}
+[dir="rtl"] .update { padding: 10px 16px 10px 10px; }
+.update button {
+  border: 0; border-radius: 12px; padding: 10px 16px; min-height: 44px;
+  background: var(--brand); color: #fff; font: inherit; font-weight: 700; cursor: pointer;
+}

@@ -54,7 +54,14 @@
   <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
   <script>
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+    if ('serviceWorker' in navigator) {
+      // Already running from the offline copy? Then a controller change means a new version took over.
+      const hadCopy = !!navigator.serviceWorker.controller;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (hadCopy) window.dispatchEvent(new Event('app-updated'));
+      });
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
   </script>
 </body>
 </html>

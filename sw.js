@@ -1,14 +1,20 @@
-// עבודה לא מקוונת: קודם מנסים רשת (כדי לקבל עדכונים), ואם אין - מהמטמון.
-const CACHE = 'english-app-v12';
+// Offline and instant start: answer from the copy on the phone right away, and fetch a fresh
+// copy in the background for the next launch. Changing CACHE replaces every file at once
+// (the app then shows "New version ready").
+const CACHE = 'english-app-v15';
 const FILES = [
   './', 'index.html', 'css/style.css',
   'js/data.js', 'js/grammar.js', 'js/content-beginner.js', 'js/content-intermediate.js', 'js/content-advanced.js', 'js/content-index.js',
   'js/store.js', 'js/i18n.js', 'js/app.js',
   'manifest.webmanifest', 'icons/icon-180.png', 'icons/icon-512.png'
 ];
+const FONTS = ['https://fonts.googleapis.com', 'https://fonts.gstatic.com'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
+  // cache: 'reload' skips the browser's HTTP cache, so a new version really gets new files
+  e.waitUntil(caches.open(CACHE)
+    .then(c => c.addAll(FILES.map(f => new Request(f, { cache: 'reload' }))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
@@ -20,20 +26,31 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(
-    fetch(e.request)
-      .then(res => {
-        // Keep our own files and the web font, so the app also works offline
-        const origin = new URL(e.request.url).origin;
-        const keep = origin === location.origin
-          || origin === 'https://fonts.googleapis.com' || origin === 'https://fonts.gstatic.com';
-        if (res.ok && keep) {
-          const copy = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, copy));
-        }
-        return res;
-      })
-      .catch(() => caches.match(e.request, { ignoreSearch: true }).then(r => r || caches.match('index.html')))
-  );
+  const req = e.request;
+  if (req.method !== 'GET') return;
+  const origin = new URL(req.url).origin;
+  const own = origin === location.origin;
+  if (!own && !FONTS.includes(origin)) return;   // anything else goes straight to the network
+
+  e.respondWith((async () => {
+    const cache = await caches.open(CACHE);
+    const cached = await cache.match(req, { ignoreSearch: true })
+      || (req.mode === 'navigate' ? await cache.match('index.html') : undefined);
+
+    const fresh = fetch(req).then(res => {
+      // The font stylesheet comes back "opaque" (no CORS); it is still the right file to keep
+      if (res.ok || (!own && res.type === 'opaque')) cache.put(req, res.clone());
+      return res;
+    });
+
+    if (cached) {
+      e.waitUntil(fresh.catch(() => {}));   // refresh quietly for next time
+      return cached;
+    }
+    try {
+      return await fresh;
+    } catch (err) {
+      return req.mode === 'navigate' ? cache.match('index.html') : Response.error();
+    }
+  })());
 });

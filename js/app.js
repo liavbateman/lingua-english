@@ -769,6 +769,18 @@
     route();
   };
 
+  // A new version was installed in the background: offer it, never reload in the middle of a lesson
+  window.addEventListener('app-updated', () => {
+    if (document.getElementById('update')) return;
+    const bar = document.createElement('div');
+    bar.id = 'update';
+    bar.className = 'update';
+    bar.setAttribute('role', 'status');
+    bar.innerHTML = `<span>✨ ${t('update.ready')}</span><button>${t('update.reload')}</button>`;
+    bar.querySelector('button').onclick = () => location.reload();
+    document.body.appendChild(bar);
+  });
+
   window.addEventListener('hashchange', route);
   applyLang();
   route();
