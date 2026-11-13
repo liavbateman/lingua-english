@@ -2599,7 +2599,8 @@
   const CONFETTI = {
     beginner: ['#4fd8a8', '#2fb88a', '#ffd66b', '#ffffff'],
     intermediate: ['#6fb4ff', '#3f8be8', '#ffd66b', '#ffffff'],
-    advanced: ['#b9a8ff', '#8e7cf0', '#ffd66b', '#ffffff']
+    advanced: ['#b9a8ff', '#8e7cf0', '#ffd66b', '#ffffff'],
+    kids: ['#ff5d8f', '#ffc93c', '#3fa7ff', '#2fd093', '#ff9f43', '#b98cff']
   };
   function confetti(lvl) {
     const colors = CONFETTI[lvl] || CONFETTI.beginner;
@@ -2746,12 +2747,14 @@
     document.querySelectorAll('.sheet-back').forEach(s => s.remove());
     view.onkeydown = null;
     view.onscroll = null;
-    const inLesson = ['unit', 'quiz', 'speak'].includes(name) || (name === 'grammar' && b === 'quiz');
+    const inLesson = ['unit', 'quiz', 'speak'].includes(name) || (name === 'grammar' && b === 'quiz') || (name === 'kids' && a === 'play');
+    if (name !== 'kids' && name !== 'home' && name) Kids.leave();
     document.body.classList.toggle('in-lesson', inLesson);
     if (inLesson) lessonBar(0);
     else if (name !== 'x') lessonExit = location.hash || '#/';
     switch (name || 'home') {
-      case 'home': refreshChrome('grammar'); grammarRoad(); break;
+      case 'home':
+      case 'kids': refreshChrome('kids'); Kids.show(name === 'kids' ? a : '', b); break;
       case 'learn': refreshChrome('learn'); learn(); break;
       case 'phrases': refreshChrome('learn'); phrases(); break;
       case 'unit': refreshChrome('learn'); lesson(a); break;
@@ -2838,6 +2841,9 @@
   window.addEventListener('online', net);
   window.addEventListener('offline', net);
   net();
+
+  // The kids world lives in kids.js and borrows these helpers
+  Kids.init({ view, shuffle, Feel, confetti, announce, lessonBar, endLesson });
 
   window.addEventListener('hashchange', route);
   applyLang();

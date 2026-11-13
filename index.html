@@ -44,8 +44,9 @@
       addEventListener('orientationchange', fit);
     })();
   </script>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Varela+Round&display=swap">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/kids.css">
 </head>
 <body>
   <div id="splash" aria-hidden="true"><img src="icons/owl-192.png" alt="" width="96" height="96"><b>LINGUA</b></div>
@@ -70,8 +71,11 @@
   <!-- Short spoken messages for screen readers (right / wrong answer) -->
   <div id="sr-live" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
 
-  <!-- Three screens: Grammar = one road through every rule, Learn = words and sentences, Progress = the numbers -->
+  <!-- Four screens: Kids = the picture-word islands for young children, Grammar = one road through every rule, Learn = words and sentences, Progress = the numbers -->
   <nav class="tabbar">
+    <a href="#/kids" data-tab="kids">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="9" rx="5.500" ry="6.500"/><path d="M12 15.500l-1.200 1.800h2.400zM12 17.300c0 1.500-1.500 2.200-1.500 3.700"/></svg><span data-t="nav.kids"></span>
+    </a>
     <a href="#/grammar" data-tab="grammar">
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.500 6.500l4 4"/></svg><span data-t="nav.grammar"></span>
     </a>
@@ -94,6 +98,8 @@
   <script src="js/explain-beginner.js"></script>
   <script src="js/explain-intermediate.js"></script>
   <script src="js/explain-advanced.js"></script>
+  <script src="js/kids-data.js"></script>
+  <script src="js/kids.js"></script>
   <script src="js/store.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>

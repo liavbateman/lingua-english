@@ -104,6 +104,36 @@ const Store = (() => {
       return true;
     },
 
+    // ---------- Kids world ----------
+    // Stars per island (best of 3), stickers earned, and how often each picture word was heard right
+    kidsStars: id => (state.kids && state.kids.stars[id]) || 0,
+    kidsHasSticker: id => !!(state.kids && state.kids.stickers[id]),
+    get kidsStickerCount() { return state.kids ? Object.keys(state.kids.stickers).length : 0; },
+    get kidsTotalStars() { return state.kids ? Object.values(state.kids.stars).reduce((a, b) => a + b, 0) : 0; },
+    // A finished island: keeps the best stars, gives its sticker once. Returns what is new.
+    kidsFinish(id, stars, xp) {
+      state.kids = state.kids || { stars: {}, stickers: {}, words: {} };
+      const k = state.kids;
+      const firstSticker = !k.stickers[id];
+      const better = stars > (k.stars[id] || 0);
+      k.stickers[id] = true;
+      if (better) k.stars[id] = stars;
+      state.xp += xp;
+      touchDay();
+      state.daily.count++;
+      const today = dayKey();
+      state.history = state.history || {};
+      state.history[today] = (state.history[today] || 0) + 1;
+      save();
+      return { firstSticker, better };
+    },
+    kidsWordRight(id) {
+      state.kids = state.kids || { stars: {}, stickers: {}, words: {} };
+      state.kids.words[id] = (state.kids.words[id] || 0) + 1;
+      save();
+    },
+    kidsWordCount: id => (state.kids && state.kids.words[id]) || 0,
+
     box,
     isSeen: id => box(id) >= 1,
     isMastered: id => box(id) >= MASTERED_BOX,

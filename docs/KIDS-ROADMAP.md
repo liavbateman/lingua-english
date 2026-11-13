@@ -1,0 +1,38 @@
+# Lingua Kids roadmap
+
+Goal (user, 2026-11-14): make Lingua the number one English-learning app for kids on the App Store,
+with elements and learning flows built for how children learn. Work happens on the branch
+`claude/english-learning-kids-app-078a51`, in an endless improvement loop until the user says stop.
+Each round takes the next open item, builds it, checks it in the preview at phone size, and commits.
+
+## How young children learn (the rules every round follows)
+
+1. **Sound and picture first.** Most 4–7 year olds can't read English (or much Hebrew). Every word is
+   heard and seen as a picture; text is a helper, never required.
+2. **Short and bouncy.** A session is 2–4 minutes. Lots of variety, every step one tap.
+3. **No failure.** A wrong tap wiggles and greys out; the child tries again. Stars are always 1–3, never 0.
+4. **Many repetitions, different games.** The same word comes back in meet, find, match, and later games.
+5. **Collecting and a buddy.** Stickers, stars and the owl buddy who talks and cheers.
+6. **Hebrew instructions out loud** (when the device has a Hebrew voice), English words spoken slowly.
+7. **Big targets.** Pictures at least 88px; nothing important in tiny text.
+8. **Parents in control.** Anything that leaves the kids world sits behind a parent gate.
+
+## Rounds
+
+| # | Round | What | Status |
+|---|---|---|---|
+| K1 | Kids world | A new first tab and home: a sky-blue island map (10 picture-word themes, 75 words); each island a session of meet the words → find the picture you hear (3 then 4 pictures, errorless) → memory game (4 pairs); 1–3 stars, a sticker per island, a sticker album; the owl buddy; Hebrew spoken instructions; rounded font | Done (round 1) |
+| K2 | Welcome for kids | First launch asks "Who is learning?" (a child / a grown-up); a child goes straight to the kids world with the owl saying hello | |
+| K3 | Pop the balloons | A game: balloons with pictures float up, pop the one you hear | |
+| K4 | ABC & phonics island | Letters A–Z with a sound, a word and a picture each (A is for apple); trace or tap the letter | |
+| K5 | Say it! | Speak the word into the mic; the owl cheers any close try (speech recognition, lenient) | |
+| K6 | Daily treasure | One small gift a day for playing (a streak for kids: suns in a row, no loss shown) | |
+| K7 | Parent gate & parent corner | A grown-up check (hold two dots / a sum) before leaving the kids world; a parent page with words learned, time played, and a daily time limit | |
+| K8 | Owl dress-up | Stars buy hats and colours for the owl buddy | |
+| K9 | Picture stories | Short 4-page stories with tap-to-hear sentences built from learned words | |
+| K10 | Review garden | Words learned earlier grow as plants that need "watering" (spaced review as a game) | |
+| K11 | Drag & drop game | Drag the word onto its picture | |
+| K12 | Songs & chants | A sung chant for numbers and colours with words lighting up | |
+| K13 | More islands | Feelings, home, weather, actions (verbs with animated emoji), shapes, school | |
+| K14 | Sound design | Pops, whooshes and a happy jingle for kids (Web Audio, quiet, can be muted) | |
+| K15 | Kids accessibility pass | Contrast, VoiceOver labels, Reduce Motion, landscape on iPad | |
