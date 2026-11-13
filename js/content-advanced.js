@@ -227,6 +227,53 @@ UNITS.push(
     ]
   },
 
+  // ---------- Added in round 37 ----------
+  {
+    id: 'a-workplace', level: 'advanced', title: 'Workplace & HR', he: 'מקום העבודה ומשאבי אנוש', emoji: '🗂️',
+    words: [
+      { en: 'burnout', he: 'שחיקה', ex: 'After months of long hours, she suffered from burnout.' },
+      { en: 'onboarding', he: 'קליטת עובדים חדשים', ex: 'The onboarding process takes about two weeks.' },
+      { en: 'performance review', he: 'הערכת ביצועים', ex: 'My annual performance review is next Monday.' },
+      { en: 'remote work', he: 'עבודה מרחוק', ex: 'Remote work saves me two hours of driving a day.' },
+      { en: 'workload', he: 'עומס עבודה', ex: 'The workload doubled after two colleagues left.' },
+      { en: 'raise', he: 'העלאה במשכורת', ex: 'She asked her manager for a raise.' },
+      { en: 'notice period', he: 'תקופת הודעה מוקדמת', ex: 'My notice period is thirty days.' },
+      { en: 'benefits', he: 'הטבות', ex: 'The company offers good benefits, like a gym membership.' },
+      { en: 'overtime', he: 'שעות נוספות', ex: 'We worked overtime to finish the project on time.' },
+      { en: 'work-life balance', he: 'איזון בין עבודה לחיים', ex: 'A four-day week could improve work-life balance.' }
+    ]
+  },
+  {
+    id: 'a-travel-pro', level: 'advanced', title: 'Travel like a pro', he: 'לטייל כמו מקצוענים', emoji: '🧳',
+    words: [
+      { en: 'layover', he: 'עצירת ביניים', ex: 'We have a six-hour layover in Istanbul.' },
+      { en: 'itinerary', he: 'מסלול הנסיעה', ex: 'I sent you the full itinerary by email.' },
+      { en: 'off the beaten track', he: 'הרחק מהמסלולים המוכרים', ex: 'We found a quiet village off the beaten track.' },
+      { en: 'upgrade', he: 'שדרוג', ex: 'They gave us a free upgrade to business class.' },
+      { en: 'accommodation', he: 'מקום לינה', ex: 'Accommodation in the city center is very expensive.' },
+      { en: 'sightseeing', he: 'סיור באתרים', ex: 'We spent the whole day sightseeing in Rome.' },
+      { en: 'currency exchange', he: 'המרת מטבע', ex: 'The currency exchange at the airport has terrible rates.' },
+      { en: 'travel insurance', he: 'ביטוח נסיעות', ex: 'Never go abroad without travel insurance.' },
+      { en: 'peak season', he: 'עונת שיא', ex: 'Flights are much more expensive in peak season.' },
+      { en: 'souvenir', he: 'מזכרת', ex: 'I bought a small souvenir for my sister.' }
+    ]
+  },
+  {
+    id: 'a-nuanced-feelings', level: 'advanced', title: 'Nuanced feelings', he: 'רגשות מורכבים', emoji: '🎭',
+    words: [
+      { en: 'bittersweet', he: 'מתוק-מריר', ex: 'Leaving my old school was a bittersweet moment.' },
+      { en: 'nostalgic', he: 'נוסטלגי', ex: 'Old songs always make me feel nostalgic.' },
+      { en: 'relief', he: 'הקלה', ex: 'It was a relief to hear that everyone was safe.' },
+      { en: 'anxious', he: 'מודאג, חרד', ex: 'I always feel anxious before a job interview.' },
+      { en: 'resentful', he: 'ממורמר', ex: 'He felt resentful after being ignored at the meeting.' },
+      { en: 'ambivalent', he: 'אמביוולנטי, בעל רגשות מעורבים', ex: "I'm ambivalent about moving to another city." },
+      { en: 'humbling', he: 'מלמד ענווה', ex: 'Meeting such talented people was a humbling experience.' },
+      { en: 'homesick', he: 'מתגעגע הביתה', ex: 'During my first month abroad, I was very homesick.' },
+      { en: 'awkward', he: 'מביך', ex: 'There was an awkward silence after the joke.' },
+      { en: 'overjoyed', he: 'מאושר עד הגג', ex: 'They were overjoyed when their first child was born.' }
+    ]
+  },
+
   // ---------- Phrases ----------
   {
     id: 'a-phr-negotiation', level: 'advanced', kind: 'phrases', title: 'Negotiating', he: 'משא ומתן', emoji: '🤝',
