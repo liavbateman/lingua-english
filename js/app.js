@@ -2356,6 +2356,8 @@
     const dayName = new Intl.DateTimeFormat(Store.lang, { weekday: 'narrow' });
     const longName = new Intl.DateTimeFormat(Store.lang, { weekday: 'long' });
     const said = d => t(d.count === 1 ? 'week.answer.one' : 'week.answers', { n: d.count });
+    // a dashed line at the week's daily average: days above it stand out
+    const avg = Math.round(total / days.length);
     return `
       <div class="card week">
         <div class="week-head">
@@ -2363,8 +2365,9 @@
           <span class="small">${t('week.sub', { a: active, n: total })}</span>
         </div>
         <div class="week-bars" role="list">
+          ${avg && max ? `<span class="week-avg" style="--a:${avg / max}" aria-hidden="true"><small>${t('week.avg', { n: avg })}</small></span>` : ''}
           ${days.map(d => `
-            <div class="wb${d.today ? ' is-today' : ''}" role="listitem" title="${longName.format(d.date)}: ${said(d)}"
+            <div class="wb${d.today ? ' is-today' : ''}${avg && d.count >= avg ? ' above' : ''}" role="listitem" title="${longName.format(d.date)}: ${said(d)}"
               aria-label="${d.today ? t('week.today') : longName.format(d.date)}: ${said(d)}">
               <span class="wv" aria-hidden="true">${d.count && (d.today || d.count === max) ? d.count : ''}</span>
               <span class="wcol"><i style="height:${d.count ? Math.max(4, Math.round((d.count / max) * 100)) : 0}%"></i></span>

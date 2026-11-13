@@ -1885,3 +1885,18 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
 .pnode-wrap[class*="lv-"] .pnode.open::before { --ring: var(--lv); }
 .pnode-wrap[class*="lv-"] .pnode.locked { --face: color-mix(in srgb, var(--lv) 14%, #262b58); --edge: color-mix(in srgb, var(--lv-edge) 70%, #11163a); }
 .pnode-wrap[class*="lv-"] .pnode.locked .pnum { color: color-mix(in srgb, var(--lv) 60%, #8f96bd); opacity: 1; }
+
+/* ---------- Week chart: rounded bars with a gloss, today glowing, a dashed average line (design round D37) ---------- */
+.week-bars { position: relative; }
+.wv { height: 18px; line-height: 18px; }
+.wd { height: 16px; line-height: 16px; }
+.week-avg {
+  position: absolute; left: 0; right: 0; height: 0; pointer-events: none; z-index: 1;
+  bottom: calc(22px + (100% - 40px) * var(--a)); border-top: 2px dashed rgba(255, 214, 107, .55);
+}
+.week-avg small { position: absolute; inset-inline-start: 0; bottom: 2px; padding: 0 6px; border-radius: 6px; font-size: .68rem; font-weight: 800;
+  color: #ffd66b; background: var(--card, #1a2052); }
+.wcol i { position: relative; width: 20px; border-radius: 999px 999px 6px 6px; opacity: .65; }
+.wcol i::after { content: ""; position: absolute; inset: 3px 4px auto; height: 35%; border-radius: 999px; background: linear-gradient(rgba(255, 255, 255, .35), transparent); }
+.wb.above .wcol i { opacity: 1; }
+.wb.is-today .wcol i { opacity: 1; box-shadow: 0 0 12px rgba(255, 122, 89, .55); }
