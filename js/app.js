@@ -189,9 +189,16 @@
     document.getElementById('stat-streak').textContent = s;
     document.getElementById('stat-streak-label').textContent = t(s === 1 ? 'streak.one' : 'streak.many');
     document.querySelector('.streak').classList.toggle('lit', s > 0);   // a live streak glows, 0 stays quiet
+    // A small dot on a tab when something waits there: rules to review (Grammar), words due (Learn)
+    const waiting = { grammar: Store.weakRules().length ? t('tab.grev') : '', learn: Store.dueWords().length ? t('tab.review') : '' };
     document.querySelectorAll('.tabbar a').forEach(a => {
       a.classList.toggle('active', a.dataset.tab === tab);
       if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+      let sr = a.querySelector('.tb-sr');
+      if (!sr) { sr = document.createElement('span'); sr.className = 'sr-only tb-sr'; a.appendChild(sr); }
+      const w = waiting[a.dataset.tab] || '';
+      a.classList.toggle('has-dot', !!w);
+      sr.textContent = w ? ', ' + w : '';
     });
   }
 

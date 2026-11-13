@@ -1784,3 +1784,15 @@ body.in-lesson .view.has-fb { padding-bottom: calc(var(--fb-h, 230px) + 24px + e
 .ptile .tile { position: relative; }
 .pt-badge { position: absolute; top: -7px; inset-inline-end: -9px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px;
   display: grid; place-items: center; font-size: .75rem; font-weight: 900; background: #ff6b7a; color: #fff; box-shadow: 0 0 0 2px #1a2052; }
+
+/* ---------- Tab bar: each screen's own colour on its active pill, a dot when something waits (design round D29) ---------- */
+.tabbar a[data-tab="grammar"] { --tc: #ff9a6b; }
+.tabbar a[data-tab="learn"] { --tc: #6fb4ff; }
+.tabbar a[data-tab="progress"] { --tc: #4fd8a8; }
+.tabbar a { position: relative; }
+.tabbar a.active svg { background: color-mix(in srgb, var(--tc) 26%, transparent); color: var(--tc); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc) 35%, transparent); }
+.tabbar a.active span { color: color-mix(in srgb, var(--tc) 55%, #fff); }
+.tabbar a.has-dot::after {
+  content: ""; position: absolute; top: 6px; left: calc(50% + 14px); width: 9px; height: 9px; border-radius: 50%;
+  background: #ff6b7a; box-shadow: 0 0 0 2px var(--bg-2); pointer-events: none;
+}
