@@ -17,6 +17,23 @@
   <!-- One font for Hebrew and English, so text looks the same on every device -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <script>
+    // iPhone home-screen app: with the see-through status bar, iOS reports a page height that is
+    // shorter than the screen, leaving an empty strip under the tab bar. Use the real screen height.
+    (function () {
+      if (navigator.standalone !== true) return;   // iPhone/iPad home-screen app only
+      var root = document.documentElement;
+      function fit() {
+        var land = matchMedia('(orientation: landscape)').matches;
+        var h = land ? Math.min(screen.width, screen.height) : Math.max(screen.width, screen.height);
+        root.style.setProperty('--app-h', h + 'px');
+      }
+      root.classList.add('ios-app');
+      fit();
+      addEventListener('resize', fit);
+      addEventListener('orientationchange', fit);
+    })();
+  </script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="css/style.css">
 </head>

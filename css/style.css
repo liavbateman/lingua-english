@@ -61,6 +61,12 @@ body {
 }
 
 
+/* iPhone home-screen app: the page is sized to the real screen (set in index.html), because iOS
+   reports a shorter height there. Any strip that still shows matches the tab bar. */
+html.ios-app, html.ios-app body { height: var(--app-h, 100%); }
+html.ios-app body { bottom: auto; }
+html.ios-app { background: linear-gradient(var(--bg) 50%, var(--bg-2) 50%); }
+
 /* ---------- shell ---------- */
 .topbar {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
