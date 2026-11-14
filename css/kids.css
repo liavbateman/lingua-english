@@ -1167,3 +1167,29 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-rh-end { color: #e0457b; }
 .k-rh-main.rhymed { box-shadow: 0 8px 0 #2fd093; }
 .k-rh-main .k-word { direction: ltr; }
+
+/* dress for the weather */
+.k-wear-scene {
+  position: relative; height: 230px; margin-bottom: 12px; border-radius: 26px; overflow: hidden; box-shadow: 0 6px 0 var(--k-edge);
+}
+.k-wear-scene.wx-sunny { background: linear-gradient(#7fd3ff, #d8f3ff 70%, #9be38c 70%); }
+.k-wear-scene.wx-rainy { background: linear-gradient(#8a9bb8, #c6d2e4 70%, #6fae74 70%); }
+.k-wear-scene.wx-cold { background: linear-gradient(#bcd8f5, #eef6ff 70%, #ffffff 70%); }
+.k-wear-scene.wx-rainy::after, .k-wear-scene.wx-cold::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .55;
+  background-image: radial-gradient(circle, #fff 1.5px, transparent 2px); background-size: 26px 26px; animation: k-wear-fall 1.6s linear infinite;
+}
+.k-wear-scene.wx-rainy::after { background-image: linear-gradient(transparent 40%, #3f7bff 40% 60%, transparent 60%); background-size: 18px 22px; opacity: .35; }
+@keyframes k-wear-fall { to { background-position: 0 26px; } }
+.k-wear-sky { position: absolute; top: 10px; inset-inline-end: 16px; font-size: 3rem; }
+.k-wear-owl { position: absolute; left: 50%; bottom: 10px; width: 150px; height: 170px; transform: translateX(-50%); }
+.k-wear-me { position: absolute; inset: 0; display: grid; place-items: center; font-size: 8.4rem; line-height: 1; }
+.k-wear-on { position: absolute; line-height: 1; z-index: 1; }
+.k-wear-on.new { animation: k-pop .5s var(--ease-pop) both; }
+.s-head { top: -6px; left: 50%; translate: -50% 0; font-size: 3.6rem; }
+.s-eyes { top: 46px; left: 50%; translate: -50% 0; font-size: 3.2rem; }
+.s-neck { top: 92px; left: 50%; translate: -50% 0; font-size: 3rem; }
+.s-hand { top: 98px; right: -14px; font-size: 2.6rem; }
+.s-feet { bottom: -6px; left: 50%; translate: -50% 0; font-size: 2.6rem; }
+.s-up { top: -18px; left: -34px; font-size: 4rem; }
+@media (prefers-reduced-motion: reduce) { .k-wear-scene::after { animation: none; } }

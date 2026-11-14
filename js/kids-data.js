@@ -523,3 +523,13 @@ const KIDS_RHYMES = [
   [['sock', 'גרב', '🧦'], ['clock', 'שעון', '🕰️']], [['king', 'מלך', '🤴'], ['ring', 'טבעת', '💍']],
   [['bed', 'מיטה', '🛏️'], ['sled', 'מזחלת', '🛷']], [['snail', 'חילזון', '🐌'], ['whale', 'לווייתן', '🐋']]
 ].map(p => p.map(([en, he, pic]) => ({ en, he, pic })));
+
+// Dress for the weather: each weather and the two things the owl needs (slot = where it sits on the owl)
+const KIDS_WEAR = [
+  { id: 'sunny', en: 'It is sunny!', he: 'שמשי!', sky: '☀️', items: [
+    { en: 'sunglasses', he: 'משקפי שמש', pic: '🕶️', slot: 'eyes', verb: 'Put on your' }, { en: 'sun hat', he: 'כובע שמש', pic: '👒', slot: 'head', verb: 'Put on your' }] },
+  { id: 'rainy', en: 'It is rainy!', he: 'גשום!', sky: '🌧️', items: [
+    { en: 'umbrella', he: 'מטרייה', pic: '☂️', slot: 'up', verb: 'Take your' }, { en: 'boots', he: 'מגפיים', pic: '👢', slot: 'feet', verb: 'Put on your' }] },
+  { id: 'cold', en: 'It is cold!', he: 'קר!', sky: '❄️', items: [
+    { en: 'scarf', he: 'צעיף', pic: '🧣', slot: 'neck', verb: 'Put on your' }, { en: 'gloves', he: 'כפפות', pic: '🧤', slot: 'hand', verb: 'Put on your' }] }
+];

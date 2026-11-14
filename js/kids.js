@@ -114,6 +114,7 @@ const Kids = (() => {
       twin: 'כמעט כמו בעברית!', twinSay: 'כמעט כמו בעברית!', twinsTitle: 'מילים תאומות', twinsSub: 'מילים באנגלית שנשמעות כמו בעברית · פגשתם {n} מתוך {all}',
       mon: 'מאכילים את המפלצת', monSub: 'המפלצת רעבה! מה היא רוצה לאכול?', monTip: 'הקשיבו מה המפלצת רוצה, וגררו את האוכל לפה שלה (או לחצו עליו)',
       rhyme: 'מילים מתחרזות', rhymeSub: 'cat - hat! מוצאים מילים שנגמרות באותו צליל', rhymeTip: 'הקשיבו לסוף של המילה. איזו תמונה נשמעת אותו דבר בסוף?',
+      wear: 'מלבישים לפי מזג האוויר', wearSub: 'קר? שמש? גשם? מלבישים את הינשוף', wearTip: 'הקשיבו למזג האוויר ולחצו על מה שהינשוף צריך',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -221,6 +222,7 @@ const Kids = (() => {
       twin: 'Almost like in Hebrew!', twinSay: 'Almost like in Hebrew!', twinsTitle: 'Twin words', twinsSub: 'English words that sound like Hebrew · you met {n} of {all}',
       mon: 'Feed the monster', monSub: 'The monster is hungry! What does it want?', monTip: 'Listen to what the monster wants, then drag the food to its mouth (or tap it)',
       rhyme: 'Rhyme time', rhymeSub: 'cat - hat! Find words that end with the same sound', rhymeTip: 'Listen to the end of the word. Which picture sounds the same at the end?',
+      wear: 'Dress for the weather', wearSub: 'Cold? Sunny? Rainy? Dress the owl', wearTip: 'Listen to the weather and tap what the owl needs',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -590,6 +592,11 @@ const Kids = (() => {
           <span class="grow"><b>${kt('rhyme')}</b><small>${bidiEn(kt('rhymeSub'))}</small></span>
           ${Store.kidsHasSticker('rhyme') ? starsHtml(Store.kidsStars('rhyme'), 'sm') : ''}
         </a>`}
+        <a class="k-abc-card k-wear-card" href="#/kids/wear">
+          <span class="k-story-books" aria-hidden="true">🧣</span>
+          <span class="grow"><b>${kt('wear')}</b><small>${kt('wearSub')}</small></span>
+          ${Store.kidsHasSticker('wear') ? starsHtml(Store.kidsStars('wear'), 'sm') : ''}
+        </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
           <span class="grow"><b>${kt('songs')}</b><small>${kt('songsSub')}</small></span>
@@ -1963,6 +1970,82 @@ const Kids = (() => {
       celebrate();
       sayEn('Rhyme time is fun time!', 0.9);
       $('#k-again').onclick = rhymeGame;
+    }
+    round();
+  }
+
+  // ---------- dress for the weather: clothes words in context ----------
+  // Three weathers, two things each. "It is cold! Put on your scarf!" - tap the scarf and it lands on the owl.
+  // Sunglasses in the rain just make the owl giggle: a wrong pick is funny, never a fail.
+  function wearGame() {
+    document.body.classList.add('in-lesson');
+    const all = KIDS_WEAR.flatMap(wx => wx.items);
+    const steps = K.shuffle(KIDS_WEAR).flatMap(wx => wx.items.map(it => ({ wx, it })));
+    let at = 0, firstTry = 0, wearing = [];
+    function round() {
+      K.lessonBar(at / steps.length);
+      const { wx, it } = steps[at];
+      if (at > 0 && steps[at - 1].wx !== wx) wearing = [];   // a new weather: start dressed fresh
+      const line = `${wx.en} ${it.verb} ${it.en}!`;
+      const opts = K.shuffle([it, ...K.shuffle(all.filter(x => !wx.items.includes(x))).slice(0, little() ? 1 : 2)]);
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🧣</span> ${kt('wear')} · ${at + 1}/${steps.length}</p>
+          <div class="k-wear-scene wx-${wx.id}" aria-hidden="true">
+            <span class="k-wear-sky">${wx.sky}</span>
+            <div class="k-wear-owl"><span class="k-wear-me">🦉</span>${wearing.map(x => `<span class="k-wear-on s-${x.slot}">${x.pic}</span>`).join('')}</div>
+          </div>
+          <div class="k-prompt">
+            <button class="k-speaker" id="k-say" aria-label="${kt('listen')}: ${line}"><span aria-hidden="true">🔊</span></button>
+            <span class="k-target en" lang="en">${line}</span>
+          </div>
+          <div class="k-opts">${opts.map((o, i) => `<button class="k-opt k-rh-opt" data-i="${i}" aria-label="${o.en}"><span aria-hidden="true">${o.pic}</span><small class="en" dir="ltr">${o.en}</small></button>`).join('')}</div>
+          ${owl(`${wx.sky} ${wx.he}`, 'small')}
+        </div>`;
+      const ask = () => say([['en', wx.en], ['en', `${it.verb} ${it.en}!`]], 0.85);
+      $('#k-say').onclick = ask;
+      setTimeout(ask, 300);
+      K.view.querySelectorAll('.k-opt').forEach(btn => {
+        btn.onclick = () => {
+          const o = opts[+btn.dataset.i];
+          if (o === it) {
+            K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; });
+            btn.classList.add('right');
+            K.Feel.right();
+            if (!missed) firstTry++;
+            wearing.push(it);
+            $('.k-wear-owl').insertAdjacentHTML('beforeend', `<span class="k-wear-on s-${it.slot} new">${it.pic}</span>`);
+            owlMood('cheer');
+            $('.k-bubble').textContent = `${it.en} · ${it.he} ✓`;
+            say([['en', `Yes! ${it.en}! Thank you!`]], 0.9);
+            setTimeout(() => { at++; at < steps.length ? round() : end(); }, 2000);
+          } else {
+            missed = true;
+            K.Feel.wrong(btn);
+            owlMood('giggle');
+            $('.k-bubble').textContent = `${o.pic} ${o.en}? 😂 ${wx.sky}`;
+            say([['en', `${o.en}? Silly! ${wx.en}`]], 0.9);
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = firstTry >= 6 ? 3 : firstTry >= 4 ? 2 : 1;
+      Store.kidsFinish('wear', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🧣 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('Ready for any weather!', 0.9);
+      $('#k-again').onclick = wearGame;
     }
     round();
   }
@@ -3966,6 +4049,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'wear') wearGame();
       else if (a === 'rhyme') rhymeGame();
       else if (a === 'monster') monsterGame();
       else if (a === 'fam') famGame();
