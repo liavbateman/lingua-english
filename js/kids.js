@@ -4764,7 +4764,7 @@ const Kids = (() => {
     K.endLesson();
     const fam = Store.kidsFamily, me = Store.kidsProfiles.find(p => p.active) || {};
     const slot = m => `<button class="k-ft-slot ${fam[m.role] ? 'on' : ''}" data-role="${m.role}" aria-label="${m.role}">
-        <span class="k-ft-face" aria-hidden="true">${fam[m.role] || '➕'}</span><small class="en">${m.role}</small></button>`;
+        <span class="k-ft-face" aria-hidden="true">${fam[m.role] || '➕'}</span><small class="en">${m.role === 'pet' && PET[fam.pet] ? PET[fam.pet] : m.role}</small></button>`;
     K.view.innerHTML = `
       <div class="k-wrap">
         <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
@@ -4804,8 +4804,12 @@ const Kids = (() => {
       const f = Store.kidsFamily;
       const lines = FAMILY.filter(m => f[m.role]).map(m => says(m, f[m.role]));
       if (!lines.length) { $('.k-bubble').textContent = kt('ftreeTip'); return; }
-      say([['en', 'This is my family!'], ...lines.map(l => ['en', l]), ['en', 'I love my family!']], 0.85);
-      K.view.querySelectorAll('.k-ft-slot.on').forEach((s, i) => setTimeout(() => { s.classList.add('lit'); setTimeout(() => s.classList.remove('lit'), 900); }, 1200 + i * 1300));
+      // each person glows exactly while their line is said; the child glows at "I love my family!"
+      const who = [null, ...FAMILY.filter(m => f[m.role]).map(m => K.view.querySelector(`.k-ft-slot[data-role="${m.role}"]`)), K.view.querySelector('.k-ft-slot.me')];
+      speakSeq(['This is my family!', ...lines, 'I love my family!'], 0.85, i => {
+        K.view.querySelectorAll('.k-ft-slot.lit').forEach(x => x.classList.remove('lit'));
+        if (who[i] && who[i].isConnected) who[i].classList.add('lit');
+      }, () => K.view.querySelectorAll('.k-ft-slot.lit').forEach(x => x.classList.remove('lit')));
     };
   }
 
@@ -7002,6 +7006,7 @@ const Kids = (() => {
     hello() { say([['he', 'היי! אני הינשוף. בואו נלמד אנגלית ביחד!'], ['en', "Hello! Let's play!"]]); },
     show(a, b) {
       clearScreenTimers();
+      document.querySelectorAll('.k-reveal').forEach(x => x.remove());   // an open picker / card never outlives its screen
       clearInterval(peekTimer);
       clearInterval(speedTimer);
       clearInterval(callTimer);
