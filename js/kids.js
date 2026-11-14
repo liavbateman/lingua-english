@@ -6545,11 +6545,16 @@ const Kids = (() => {
     function round() {
       K.lessonBar(at / rounds.length);
       const x = rounds[at];
-      const opts = K.shuffle([x, ...K.shuffle(KIDS_ABC.filter(y => y !== x)).slice(0, 2)]);
+      // letter names that rhyme ("dee", "vee", "see") are hard to tell apart by ear: never offer them together
+      const SOUNDALIKE = ['BCDEGPTVZ', 'AHJK', 'FLMNSX', 'IY', 'QUW'];
+      const group = L => SOUNDALIKE.find(g => g.includes(L)) || L;
+      const others = K.shuffle(KIDS_ABC.filter(y => y !== x && !group(x.L).includes(y.L)));
+      const second = others[0], third = others.find(y => y !== second && !group(second.L).includes(y.L));
+      const opts = K.shuffle([x, second, third]);
       let missed = false;
       K.view.innerHTML = `
         <div class="k-wrap k-play">
-          <p class="k-step"><span aria-hidden="true">🔤</span> ${kt('abcFind')}</p>
+          <p class="k-step"><span aria-hidden="true">🔤</span> ${kt('abcFind')} · ${at + 1}/${rounds.length}</p>
           <div class="k-prompt">
             <button class="k-speaker" id="k-say" aria-label="${kt('listen')}"><span aria-hidden="true">🔊</span></button>
           </div>

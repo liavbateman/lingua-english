@@ -11,7 +11,7 @@ A new session starts one minute after the previous one ends. The loop runs until
 | # | Game | Route | Play 1 findings | Fixes | Verdict |
 |---|---|---|---|---|---|
 | 1 | Island lesson | `#/kids/play/animals` | All 23 steps + memory work, bar fills steadily, 3 stars. (a) the "Try at home" tip broke a quoted English phrase across two lines ("What is / it?"); (b) memory: a wrong pair got no reaction at all; (c) lesson is long for 3-5 (little mode already drops drag and animal sounds - left as is) | Quoted English inside Hebrew never wraps (bdi.k-q nowrap, app-wide); memory: wrong pair -> owl thinks + "try again", right pair -> "blue · כחול ✓" | **Good** (replayed on Colors: 19 steps + memory, both fixes seen) |
-| 2 | ABC letter game | `#/kids/abcgame` | | | |
+| 2 | ABC letter game | `#/kids/abcgame` | Plays fine (8 rounds, letter said as "D.", right answer adds "D is for dog"). (a) choices often had rhyming letter names that are near-impossible to tell apart by ear for a 3-5 year old (D/V/C, V/W/D, E/U/G); (b) no round counter, unlike the other games | Choices never mix letters from the same sound-alike group (ee: BCDEGPTVZ, ay: AHJK, eh: FLMNSX, I/Y, Q/U/W); "Find the letter · 3/8" counter | **Good** (15 more rounds: no sound-alike sets, counter shown, 3 stars) |
 | 3 | Letter tracing | `#/kids/trace/A` | | | |
 | 4 | Picture story | `#/kids/story/goodnight` | | | |
 | 5 | Story you choose | `#/kids/path` | | | |
