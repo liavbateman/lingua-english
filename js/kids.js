@@ -2402,9 +2402,11 @@ const Kids = (() => {
             setTimeout(() => { at++; at < steps.length ? round() : end(); }, 2000);
           } else {
             missed = true;
+            btn.disabled = true;
+            btn.classList.add('nope');
             K.Feel.wrong(btn);
             owlMood('giggle');
-            $('.k-bubble').textContent = `${o.pic} ${o.en}? 😂 ${wx.sky}`;
+            $('.k-bubble').innerHTML = `${o.pic} <bdi class="k-q" dir="ltr" lang="en">${o.en}?</bdi> 🤭 ${wx.sky}`;
             say([['en', `${o.en}? Silly! ${wx.en}`]], 0.9);
           }
         };
