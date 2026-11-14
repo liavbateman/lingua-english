@@ -86,6 +86,8 @@ const Kids = (() => {
       pcBig: 'אותיות גדולות ומרווחות', pcBigText: 'גופן קריא במיוחד (Lexend), גדול יותר ועם רווחים בין האותיות. עוזר לילדים שקשה להם לקרוא, כולל דיסלקציה',
       mute: 'האפליקציה לא מצליחה לדבר כרגע', muteOffline: 'אין חיבור לאינטרנט, ובמכשיר אין קול אנגלי שמור. התחברו פעם אחת לאינטרנט או התקינו קול אנגלי.',
       muteNoVoice: 'במכשיר לא נמצא קול באנגלית. בקשו מהורה לבדוק בפינת ההורים ← קולות.', muteOk: 'הבנתי',
+      blend: 'מחברים צלילים', blendSub: 'שומעים צליל, ועוד צליל, ועוד אחד… איזו מילה יצאה?', blendTip: 'לחצו על כל אות לשמוע אותה, ואז בחרו את התמונה',
+      blendGo: 'לחבר!',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -165,6 +167,8 @@ const Kids = (() => {
       pcBig: 'Big, spaced letters', pcBigText: 'An extra-readable font (Lexend), larger and with more space between letters. Helps children who find reading hard, including dyslexia',
       mute: "The app can't speak right now", muteOffline: "There's no internet and no English voice saved on this device. Connect once, or install an English voice.",
       muteNoVoice: 'No English voice was found on this device. Ask a grown-up to check Parent corner → Voices.', muteOk: 'Got it',
+      blend: 'Blend it!', blendSub: 'A sound, another sound, one more… which word is it?', blendTip: 'Tap each letter to hear it, then pick the picture',
+      blendGo: 'Blend!',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -1119,6 +1123,81 @@ const Kids = (() => {
       celebrate();
       sayEn(best ? 'New record! Super fast!' : 'Great speed!', 1);
       $('#k-again').onclick = speedGame;
+    }
+    round();
+  }
+
+  // ---------- Blend it! first reading with letter sounds ----------
+  // A word as three letter tiles: each says its sound ("kuh", "ah", "tuh"), then the tiles slide
+  // together and the owl blends them into the word. The child picks its picture among 3.
+  function blendGame() {
+    document.body.classList.add('in-lesson');
+    const rounds = K.shuffle(KIDS_CVC).slice(0, 6);
+    let at = 0, firstTry = 0;
+    const soundOf = ch => (KIDS_ABC.find(x => x.L === ch.toUpperCase()) || {}).sound || ch;
+    function round() {
+      K.lessonBar(at / rounds.length);
+      const w = rounds[at];
+      const opts = K.shuffle([w, ...K.shuffle(KIDS_CVC.filter(x => x !== w)).slice(0, 2)]);
+      let missed = false, blended = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🧩</span> ${kt('blend')} · ${at + 1}/${rounds.length}</p>
+          <div class="k-blend" dir="ltr">${w.en.split('').map((ch, i) => `<button class="k-blend-tile" data-i="${i}" aria-label="${ch}">${ch}</button>`).join('')}</div>
+          <button class="k-btn ghost k-blend-go" id="k-blend-go">🔗 ${kt('blendGo')}</button>
+          <div class="k-opts">${opts.map((o, i) => `<button class="k-opt" data-i="${i}" aria-label="${o.en}"><span aria-hidden="true">${o.pic}</span></button>`).join('')}</div>
+          ${owl(kt('blendTip'), 'small')}
+        </div>`;
+      const tiles = [...K.view.querySelectorAll('.k-blend-tile')];
+      const sayTile = i => { sayEn(soundOf(w.en[i]), 0.7); tiles[i].classList.remove('lit'); void tiles[i].offsetWidth; tiles[i].classList.add('lit'); };
+      tiles.forEach((t, i) => { t.onclick = () => sayTile(i); });
+      // sound by sound, then together
+      const blend = () => {
+        tiles.forEach((t, i) => setTimeout(() => sayTile(i), i * 900));
+        setTimeout(() => { $('.k-blend').classList.add('joined'); sayEn(w.en, 0.7); blended = true; }, tiles.length * 900 + 200);
+      };
+      $('#k-blend-go').onclick = blend;
+      setTimeout(blend, 400);
+      K.view.querySelectorAll('.k-opt').forEach(b => {
+        b.onclick = () => {
+          if (opts[+b.dataset.i] === w) {
+            K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; });
+            b.classList.add('right');
+            K.Feel.right();
+            if (!missed) firstTry++;
+            $('.k-blend').classList.add('joined');
+            owlMood('cheer');
+            $('.k-bubble').textContent = `${w.en.split('').join(' – ')} → ${w.en}!`;
+            sayEn(w.en, 0.8);
+            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 1600);
+          } else {
+            missed = true;
+            b.disabled = true;
+            b.classList.add('nope');
+            K.Feel.wrong(b);
+            owlMood('think');
+            $('.k-bubble').textContent = kt('tryAgain');
+            if (blended) setTimeout(() => sayEn(w.en, 0.7), 300); else blend();
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = firstTry >= 6 ? 3 : firstTry >= 4 ? 2 : 1;
+      Store.kidsFinish('blend', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <a class="k-btn" href="#/kids/abc">ABC</a>
+          <button class="k-btn ghost" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+        </div>`;
+      celebrate();
+      sayEn('You can read! Hooray!', 0.9);
+      $('#k-again').onclick = blendGame;
     }
     round();
   }
@@ -2357,6 +2436,7 @@ const Kids = (() => {
         <h1 class="k-title">🔤 ${kt('abc')}</h1>
         <p class="k-sub">${kt('abcTip')}</p>
         <a class="k-btn" href="#/kids/abcgame"><span aria-hidden="true">🎮</span> ${kt('abcGame')}</a>
+        <a class="k-btn ghost" href="#/kids/blend"><span aria-hidden="true">🧩</span> ${kt('blend')}</a>
         <div class="k-letters">
           ${KIDS_ABC.map((x, i) => `<a class="k-letter" href="#/kids/abc/${x.L}" style="--c:${BALLOONS[i % BALLOONS.length]}" aria-label="${x.L}"><b>${x.L}</b><small>${x.L.toLowerCase()}</small>${Store.kidsHasTraced(x.L) ? '<i class="k-traced" aria-hidden="true">✍️</i>' : ''}</a>`).join('')}
         </div>
@@ -2673,6 +2753,7 @@ const Kids = (() => {
       else if (a === 'owl') wardrobe();
       else if (a === 'stories') stories();
       else if (a === 'riddles') riddles();
+      else if (a === 'blend') blendGame();
       else if (a === 'speed') speedGame();
       else if (a === 'peek') peekGame();
       else if (a === 'pairs') pairsGame();

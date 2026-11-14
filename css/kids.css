@@ -912,3 +912,15 @@ body.kids-big .k-mem-face.word.long { font-size: 1rem; }
 .k-mute-note .grow { display: flex; flex-direction: column; flex: 1; }
 .k-mute-note small { font-size: .88rem; }
 .k-mute-note .k-skip { margin: 0; flex: none; background: #fff; color: #5a430c; }
+
+/* blend it */
+.k-blend { display: flex; justify-content: center; gap: 14px; margin: 6px 0 12px; transition: gap .5s var(--ease-pop); }
+.k-blend.joined { gap: 2px; }
+.k-blend-tile {
+  width: 82px; height: 96px; border: 0; border-radius: 22px; background: #fff; color: var(--k-ink); cursor: pointer;
+  font: 700 3.4rem/1 var(--k-font); box-shadow: 0 6px 0 var(--k-edge); transition: transform var(--dur-quick), background var(--dur-quick);
+}
+.k-blend.joined .k-blend-tile { background: #fff1c2; }
+.k-blend-tile.lit { animation: k-boing .5s var(--ease-pop); background: #d8fbe9; }
+.k-blend-go { width: auto; margin: 0 auto 14px; padding: 10px 22px; font-size: 1.1rem; }
+body.kids-big .k-blend-tile { font-family: "Lexend", var(--k-font); }

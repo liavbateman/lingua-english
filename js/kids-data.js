@@ -469,3 +469,9 @@ const KIDS_TIPS = {
   opposites: ['הדגימו בגוף: big/small עם הידיים, up/down עם קפיצה, fast/slow בהליכה.', 'Act them out: big/small with your arms, up/down with a jump, fast/slow while walking.'],
   school: ['כשמכינים את התיק, אמרו יחד: pencil, ruler, book, backpack.', 'When packing the school bag, say together: pencil, ruler, book, backpack.']
 };
+
+// Blend it! (first reading): short words of three letter sounds, each with a picture
+const KIDS_CVC = [
+  ['cat', '🐱'], ['dog', '🐶'], ['sun', '☀️'], ['bus', '🚌'], ['hat', '🧢'], ['pig', '🐷'],
+  ['bed', '🛏️'], ['cup', '🥤'], ['fox', '🦊'], ['hen', '🐔'], ['pen', '🖊️'], ['bug', '🐛'], ['net', '🥅'], ['map', '🗺️']
+].map(([en, pic]) => ({ en, pic }));
