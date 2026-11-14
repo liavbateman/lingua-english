@@ -81,6 +81,8 @@ const Kids = (() => {
       peek: 'מציצים!', peekSub: 'מה מסתתר מאחורי העננים?', peekTip: 'מה מסתתר שם? בחרו מילה. ככל שמוקדם יותר, יותר כוכבים!',
       tryHome: 'לנסות בבית', tryHomeAny: 'השתמשו במילים של היום בבית: הצביעו, שאלו "What is it?" ושבחו כל ניסיון.',
       surprise: 'הפתעה!', surpriseTip: 'לחצו על הקובייה (או נערו את הטלפון) למשחק הפתעה',
+      speed: 'סיבוב מהיר', speedSub: '10 מילים, כמה שיותר מהר!', speedBest: 'השיא שלך: {n}', speedScore: '{n} נקודות', speedNew: 'שיא חדש!',
+      speedTip: 'הקשיבו ולחצו מהר! לא נורא אם הזמן נגמר',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -155,6 +157,8 @@ const Kids = (() => {
       peek: 'Peek-a-boo!', peekSub: "What's hiding behind the clouds?", peekTip: "What's hiding there? Pick a word. The earlier, the more stars!",
       tryHome: 'Try at home', tryHomeAny: 'Use today\'s words at home: point, ask "What is it?" and praise every try.',
       surprise: 'Surprise!', surpriseTip: 'Tap the dice (or shake the phone) for a surprise game',
+      speed: 'Speed round', speedSub: '10 words, as fast as you can!', speedBest: 'Your best: {n}', speedScore: '{n} points', speedNew: 'New best!',
+      speedTip: "Listen and tap fast! It's fine if time runs out",
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -484,6 +488,10 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">☁️</span>
           <span class="grow"><b>${kt('peek')}</b><small>${kt('peekSub')}</small></span>
           ${Store.kidsHasSticker('peek') ? starsHtml(Store.kidsStars('peek'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-speed-card" href="#/kids/speed">
+          <span class="k-story-books" aria-hidden="true">⚡</span>
+          <span class="grow"><b>${kt('speed')}</b><small>${Store.kidsSpeedBest ? kt('speedBest', { n: Store.kidsSpeedBest }) : kt('speedSub')}</small></span>
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -1013,6 +1021,97 @@ const Kids = (() => {
       celebrate();
       sayEn('Peek-a-boo! Great guessing!', 0.9);
       $('#k-again').onclick = peekGame;
+    }
+    round();
+  }
+
+  // ---------- speed round (for older kids) ----------
+  // 10 known words: hear one, tap its picture among 4 before a gentle 8-second bar runs out.
+  // A right answer scores 1 point plus up to 1 for speed; when time runs out the answer is shown, no fuss.
+  let speedTimer = null;
+  function speedGame() {
+    document.body.classList.add('in-lesson');
+    const known = KIDS_WORDS.filter(w => Store.kidsWordCount(w.id) > 0);
+    const pool = known.length >= 12 ? known : KIDS_WORDS.filter(w => isOpen(KIDS_THEMES.findIndex(th => th.id === w.theme)));
+    const rounds = K.shuffle(pool).slice(0, 10);
+    const LIMIT = 8000;
+    let at = 0, score = 0;
+    function round() {
+      clearInterval(speedTimer);
+      K.lessonBar(at / rounds.length);
+      const w = rounds[at];
+      const opts = K.shuffle([w, ...K.shuffle(pool.filter(x => x !== w && x.pic !== w.pic)).slice(0, 3)]);
+      let done = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">⚡</span> ${kt('speed')} · ${at + 1}/10 · <b>${kt('speedScore', { n: score.toFixed(1).replace('.0', '') })}</b></p>
+          <div class="k-speed-bar" aria-hidden="true"><i id="k-speed-fill"></i></div>
+          <div class="k-prompt">
+            <button class="k-speaker" id="k-say" aria-label="${kt('listen')}: ${w.en}"><span aria-hidden="true">🔊</span></button>
+            <span class="k-target en" lang="en">${w.en}</span>
+          </div>
+          <div class="k-opts four">${opts.map((o, i) => `<button class="k-opt" data-i="${i}" aria-label="${o.en}"><span aria-hidden="true">${o.pic}</span></button>`).join('')}</div>
+          ${owl(kt('speedTip'), 'small')}
+        </div>`;
+      $('#k-say').onclick = () => sayEn(w.en, 1);
+      sayEn(w.en, 1);
+      const start = Date.now(), fill = $('#k-speed-fill');
+      speedTimer = setInterval(() => {
+        const left = Math.max(0, 1 - (Date.now() - start) / LIMIT);
+        if (fill) fill.style.width = (left * 100) + '%';
+        if (left <= 0) timeUp();
+      }, 100);
+      const next = () => { at++; at < rounds.length ? round() : end(); };
+      function timeUp() {
+        if (done) return;
+        done = true;
+        clearInterval(speedTimer);
+        K.view.querySelectorAll('.k-opt').forEach(b => { b.disabled = true; if (opts[+b.dataset.i] === w) b.classList.add('right'); });
+        $('.k-bubble').textContent = `${w.pic} ${w.en}`;
+        sayEn(w.en, 1);
+        setTimeout(next, 1100);
+      }
+      K.view.querySelectorAll('.k-opt').forEach(b => {
+        b.onclick = () => {
+          if (done) return;
+          if (opts[+b.dataset.i] === w) {
+            done = true;
+            clearInterval(speedTimer);
+            const left = Math.max(0, 1 - (Date.now() - start) / LIMIT);
+            score += 1 + Math.round(left * 10) / 10;
+            K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; });
+            b.classList.add('right');
+            Sfx.star(Math.min(3, Math.floor(left * 4)));
+            Store.kidsWordRight(w.id);
+            owlMood('cheer');
+            setTimeout(next, 500);
+          } else {
+            b.disabled = true;
+            b.classList.add('nope');
+            K.Feel.wrong(b);
+          }
+        };
+      });
+    }
+    function end() {
+      clearInterval(speedTimer);
+      K.endLesson(1);
+      const pts = Math.round(score * 10) / 10, best = Store.kidsSpeedScore(pts);
+      const stars = pts >= 16 ? 3 : pts >= 11 ? 2 : 1;
+      Store.kidsFinish('speed', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>⚡ ${kt('speedScore', { n: pts })}</h1>
+            ${starsHtml(stars, 'big pop')}
+            ${best ? `<b class="k-best">🏆 ${kt('speedNew')}</b>` : `<p class="k-unlock">${kt('speedBest', { n: Store.kidsSpeedBest })}</p>`}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn(best ? 'New record! Super fast!' : 'Great speed!', 1);
+      $('#k-again').onclick = speedGame;
     }
     round();
   }
@@ -2522,6 +2621,7 @@ const Kids = (() => {
     hello() { say([['he', 'היי! אני הינשוף. בואו נלמד אנגלית ביחד!'], ['en', "Hello! Let's play!"]]); },
     show(a, b) {
       clearInterval(peekTimer);
+      clearInterval(speedTimer);
       stopRec();
       stopRecording();
       clearHands();
@@ -2538,6 +2638,7 @@ const Kids = (() => {
       else if (a === 'owl') wardrobe();
       else if (a === 'stories') stories();
       else if (a === 'riddles') riddles();
+      else if (a === 'speed') speedGame();
       else if (a === 'peek') peekGame();
       else if (a === 'pairs') pairsGame();
       else if (a === 'practice') practice(b);

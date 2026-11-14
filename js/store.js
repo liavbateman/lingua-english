@@ -198,6 +198,15 @@ const Store = (() => {
       const words = KIDS_WORDS.filter(w => first[w.id] && first[w.id] >= from);
       return { days, words };
     },
+    // Speed round: the best score (points out of 10 words, with a bonus for quick answers)
+    get kidsSpeedBest() { return (state.kids && state.kids.speedBest) || 0; },
+    kidsSpeedScore(n) {
+      state.kids = state.kids || { stars: {}, stickers: {}, words: {} };
+      const best = n > (state.kids.speedBest || 0);
+      if (best) state.kids.speedBest = n;
+      save();
+      return best;
+    },
     // The owl buddy's look: a colour and an accessory, chosen in the wardrobe
     get kidsOwl() { const o = state.kids && state.kids.owl; return { color: (o && o.color) || 'blue', acc: (o && o.acc) || '' }; },
     setKidsOwl(part, id) {

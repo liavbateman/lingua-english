@@ -888,3 +888,7 @@ body.kids.night .k-trophy:not(.got) { background: rgba(255, 255, 255, .85); }
 .k-roll-pic { font-size: 5rem; line-height: 1; animation: k-wiggle .3s linear infinite; }
 .k-roll-pic.k-roll-done { animation: k-boing .5s var(--ease-pop); }
 @media (prefers-reduced-motion: reduce) { .k-roll-pic { animation: none !important; } }
+
+/* speed round */
+.k-speed-bar { height: 12px; margin: 0 4px 14px; border-radius: 999px; background: rgba(255, 255, 255, .55); overflow: hidden; }
+.k-speed-bar i { display: block; width: 100%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #2fd093, #ffc93c); transition: width .1s linear; }
