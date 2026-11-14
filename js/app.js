@@ -1835,10 +1835,10 @@
           <h1>${t('cards.done.title')}</h1>
           <p class="sub">${t('cards.done', { a: known, b: words.length })}</p>
           <ol class="steps2" aria-label="${t('steps.aria')}">
-            <li class="done"><span aria-hidden="true">✓</span>${t('steps.met', { n: words.length })}</li>
+            <li class="done"><span aria-hidden="true">✓</span>${t(unit.kind === 'phrases' ? 'steps.met.phr' : 'steps.met', { n: words.length })}</li>
             <li class="now"><span aria-hidden="true">2</span>${t('steps.practice')}</li>
           </ol>
-          <a class="btn" href="#/quiz/choice/${unit.id}">${t('card.practice')}</a>
+          <a class="btn" href="#/quiz/choice/${unit.id}">${t(unit.kind === 'phrases' ? 'card.practice.phr' : 'card.practice')}</a>
           <a class="btn ghost" href="#/">${t('btn.home')}</a>
           <button class="btn plain" id="restart">${t('cards.restart')}</button>
         </div>`;
