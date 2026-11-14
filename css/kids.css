@@ -591,3 +591,19 @@ body.kids :focus-visible { outline: 4px solid #1d2a5b; outline-offset: 3px; bord
 .k-end-owl .k-av { width: 76px; height: 76px; border-radius: 24px; }
 .k-end-card { margin-top: 40px; }
 @media (prefers-reduced-motion: reduce) { .k-mood-pop { animation: none !important; opacity: 0; } }
+
+/* picture of the day */
+.k-wotd {
+  display: flex; align-items: center; gap: 12px; width: 100%; margin: 12px 0 0; padding: 12px 14px; border: 0; border-radius: 24px;
+  background: #fff; color: var(--k-ink); font: inherit; text-align: start; cursor: pointer; box-shadow: 0 6px 0 var(--k-edge);
+  transition: transform var(--dur-press), box-shadow var(--dur-press);
+}
+.k-wotd:active { transform: translateY(5px); box-shadow: 0 1px 0 var(--k-edge); }
+.k-wotd-pic { font-size: 3rem; line-height: 1; flex: none; }
+.k-wotd .grow { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.k-wotd-k { font-size: .85rem; color: var(--k-muted); }
+.k-wotd b { font-size: 1.5rem; line-height: 1.2; }
+.k-wotd small { font-size: .9rem; color: var(--k-ink); }
+.k-wotd-he { flex: none; padding: 4px 10px; border-radius: 12px; background: #f3f6ff; color: var(--k-ink); font-size: 1rem; }
+.k-wotd.planted small { color: #157a54; }
+.k-wotd.boing .k-wotd-pic { animation: k-boing .5s var(--ease-pop); }

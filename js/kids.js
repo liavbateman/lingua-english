@@ -52,6 +52,7 @@ const Kids = (() => {
       who: 'מי משחק עכשיו?', addKid: 'ילד נוסף', kidName: 'שם (לא חובה)', pickFace: 'בחרו פרצוף', save: 'שמירה',
       addGate: 'הוספת ילד היא להורים', player: 'שחקן',
       owlHi: 'הינשוף',
+      wotd: 'התמונה של היום', wotdTap: 'לחצו לשמוע', wotdPlanted: 'נשתלה בגינה שלכם 🌱',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -97,6 +98,7 @@ const Kids = (() => {
       who: "Who's playing?", addKid: 'Add a child', kidName: 'Name (optional)', pickFace: 'Pick a face', save: 'Save',
       addGate: 'Adding a child is for grown-ups', player: 'Player',
       owlHi: 'The owl',
+      wotd: 'Picture of the day', wotdTap: 'Tap to hear it', wotdPlanted: 'Planted in your garden 🌱',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -292,6 +294,7 @@ const Kids = (() => {
           </a>`;
         })()}
         ${chestCard()}
+        ${wotdCard()}
         <div class="k-tiles">
         ${(() => {
           const g = Store.kidsGarden(), dry = g.filter(p => p.thirsty).length;
@@ -341,6 +344,19 @@ const Kids = (() => {
       $('#k-sfx').textContent = Store.kidsSfx ? '🔊' : '🔇';
       $('#k-sfx').setAttribute('aria-pressed', String(Store.kidsSfx));
       Sfx.tap();
+    };
+    const wotdBtn = $('#k-wotd');
+    if (wotdBtn) wotdBtn.onclick = () => {
+      const w = KIDS_WORDS.find(x => x.id === wotdBtn.dataset.id);
+      sayEn(w.en);
+      wotdBtn.classList.remove('boing'); void wotdBtn.offsetWidth; wotdBtn.classList.add('boing');
+      if (!Store.kidsWordCount(w.id)) {
+        Store.kidsWordRight(w.id);   // heard and seen: it becomes a plant in the garden
+        wotdBtn.querySelector('small').textContent = kt('wotdPlanted');
+        wotdBtn.classList.add('planted');
+        owlMood('love');
+        Sfx.star(2);
+      }
     };
     const chest = $('#k-chest');
     if (chest) chest.onclick = () => openChest(chest);
@@ -886,6 +902,31 @@ const Kids = (() => {
       </div>`;
     say([['he', kt('restTitle')], ['en', 'Good night!']]);
     $('#k-more').onclick = () => gate(() => { Store.kidsAddExtra(10); map(); });
+  }
+
+  // ---------- picture of the day ----------
+  // One word a day from the open islands, a new one (not yet known) while there are any;
+  // the same word all day long, so a parent can ask about it at dinner.
+  function wotdWord() {
+    const kept = Store.kidsWotd && KIDS_WORDS.find(w => w.id === Store.kidsWotd);
+    if (kept) return kept;
+    const open = KIDS_THEMES.filter((th, i) => isOpen(i)).flatMap(th => th.words);
+    const fresh = open.filter(w => !Store.kidsWordCount(w.id));
+    const pool = fresh.length ? fresh : open;
+    const day = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
+    const w = pool[(day * 7) % pool.length];
+    Store.kidsWotd = w.id;
+    return w;
+  }
+  function wotdCard() {
+    const w = wotdWord();
+    const known = Store.kidsWordCount(w.id) > 0;
+    return `
+      <button class="k-wotd ${known ? 'planted' : ''}" id="k-wotd" data-id="${w.id}" aria-label="${kt('wotd')}: ${w.en}">
+        <span class="k-wotd-pic" aria-hidden="true">${w.pic}</span>
+        <span class="grow"><span class="k-wotd-k">☀️ ${kt('wotd')}</span><b class="en">${w.en}</b><small>${known ? kt('wotdPlanted') : kt('wotdTap')}</small></span>
+        <span class="k-wotd-he he">${w.he}</span>
+      </button>`;
   }
 
   // ---------- today's adventure ----------
