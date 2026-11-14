@@ -1119,14 +1119,23 @@
     const toCurrent = smooth => curEl.scrollIntoView({ block: 'center', behavior: smooth ? 'smooth' : 'auto' });
     if (items.cur > 1) toCurrent(false);
     jump.onclick = () => toCurrent(true);
-    // The "back to my lesson" button shows only while the current lesson is off screen, pointing to it
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(([e]) => {
-        jump.hidden = e.isIntersecting;
-        jump.classList.toggle('down', !e.isIntersecting && e.boundingClientRect.top > 0);
-      }, { root: view }).observe(curEl.querySelector('.pnode'));
-    }
+    // The "back to my lesson" button shows only while the current lesson is off screen, pointing to it,
+    // and not while the learner is still above the path (the header's own button covers that)
+    jumpState = { jump, node: curEl.querySelector('.pnode'), path: document.getElementById('path') };
+    jumpEval();
   }
+  let jumpState = null;
+  function jumpEval() {
+    const st = jumpState;
+    if (!st || !document.contains(st.jump)) return;
+    const vr = view.getBoundingClientRect(), r = st.node.getBoundingClientRect();
+    const onScreen = r.bottom > vr.top && r.top < vr.bottom;
+    const below = r.top >= vr.bottom;
+    const abovePath = st.path.getBoundingClientRect().top > vr.top + vr.height * 0.55;
+    st.jump.hidden = onScreen || (below && abovePath);
+    st.jump.classList.toggle('down', below);
+  }
+  view.addEventListener('scroll', jumpEval, { passive: true });
   window.addEventListener('resize', () => layoutPath());
 
   // A header above the path (as in the reference app): the owl says what is next, with the streak,
@@ -1155,9 +1164,7 @@
         <img class="ph-owl" src="icons/owl-512.png" alt="" width="112" height="112">
         <div class="ph-side">
           <div class="ph-chips">
-            <span class="ph-chip">🔥 ${Store.streak}</span>
-            ${lv ? `<span class="ph-chip ph-lvchip"><span class="ph-ring" style="--p:${pct}" aria-hidden="true"></span>${levelLabel()} · <span class="en">${pct}%</span></span>
-              ${plan.length ? `<span class="ph-chip${planDone === plan.length ? ' ph-goal-done' : ''}"><span aria-hidden="true">🎯</span> <span class="sr-only">${t('today.goal')}:</span> <span class="en">${planDone}/${plan.length}</span></span>` : ''}`
+            ${lv ? `<span class="ph-chip ph-lvchip"><span class="ph-ring" style="--p:${pct}" aria-hidden="true"></span>${levelLabel()} · <span class="en">${pct}%</span></span>`
               : `<span class="ph-chip">${cur ? t('lv.' + cur.lvl) : '✓'}</span>`}
           </div>
           <p class="ph-say">${say}</p>
