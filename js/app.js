@@ -329,7 +329,7 @@
     const left = tasks.length - doneCount;
     const streak = Store.streak;
     const msg = !left ? t('today.done')
-      : !activeToday && streak ? t('today.risk', { n: streak })
+      : !activeToday && streak ? t(streak === 1 ? 'today.risk.one' : 'today.risk', { n: streak })
       : !activeToday ? t('today.start')
       : left === 1 ? t('today.left1') : t('today.left', { n: left });
     const C = 2 * Math.PI * 26;
@@ -2424,6 +2424,8 @@
   // Numbers only. The lessons themselves live on the Learn screen and nowhere else.
   function progress() {
     const mastered = ALL_WORDS.filter(w => Store.isMastered(w.id)).length;
+    // the top tile counts every word met so far, so the first days show real progress (mastery is in the level cards)
+    const met = ALL_WORDS.filter(w => Store.isSeen(w.id)).length;
     const levelCard = l => {
       const words = wordsOf(l.id).filter(x => !x.phrase);
       const sentences = wordsOf(l.id).filter(x => x.phrase);
@@ -2452,7 +2454,7 @@
       <h1>${t('progress.title')}</h1>
       <p class="sub">${t('progress.sub', { x: Store.xp })}</p>
       <div class="stats">
-        <div class="card stat st-words"><span class="st-ico" aria-hidden="true">📚</span><b>${mastered}</b><span class="small">${t('home.learned')}</span></div>
+        <div class="card stat st-words"><span class="st-ico" aria-hidden="true">📚</span><b>${met}</b><span class="small">${t('progress.met')}</span></div>
         <div class="card stat st-streak"><span class="st-ico" aria-hidden="true">🔥</span><b>${Store.streak}</b><span class="small">${t('progress.streak')}</span></div>
         <div class="card stat st-best"><span class="st-ico" aria-hidden="true">🏆</span><b>${Store.best}</b><span class="small">${t('progress.best')}</span></div>
       </div>
@@ -2533,7 +2535,7 @@
       <div class="card month">
         <div class="week-head">
           <b>${t('month.title')}</b>
-          <span class="small">${t('month.sub', { a: active, b: best })}</span>
+          <span class="small">${t(active === 1 ? 'month.sub.one' : 'month.sub', { a: active, b: best })}</span>
         </div>
         <div class="cal" role="list">
           ${Array.from({ length: 7 }, (_, k) => `<span class="cal-wd" aria-hidden="true">${narrow.format(new Date(sun.getTime() + k * 864e5))}</span>`).join('')}
