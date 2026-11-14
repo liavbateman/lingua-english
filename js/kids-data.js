@@ -482,3 +482,20 @@ const KIDS_CVC = [
   ['cat', '🐱'], ['dog', '🐶'], ['sun', '☀️'], ['bus', '🚌'], ['hat', '🧢'], ['pig', '🐷'],
   ['bed', '🛏️'], ['cup', '🥤'], ['fox', '🦊'], ['hen', '🐔'], ['pen', '🖊️'], ['bug', '🐛'], ['net', '🥅'], ['map', '🗺️']
 ].map(([en, pic]) => ({ en, pic }));
+
+// A story you choose: each page offers two picture choices that lead to different pages and endings
+const KIDS_PATH = {
+  title: 'The magic forest', he: 'היער הקסום', pic: '🌲',
+  pages: {
+    start: { scene: '🌲🦉🌲', en: 'The owl is in the magic forest. Where do we go?', he: 'הינשוף ביער הקסום. לאן הולכים?',
+      choices: [{ en: 'the red door', pic: '🚪', to: 'door' }, { en: 'the bridge', pic: '🌉', to: 'bridge' }] },
+    door: { scene: '🚪🐱', en: 'We open the red door. There is a little cat!', he: 'פותחים את הדלת האדומה. יש שם חתולה קטנה!',
+      choices: [{ en: 'give milk', pic: '🥛', to: 'milk' }, { en: 'play ball', pic: '⚽', to: 'ball' }] },
+    bridge: { scene: '🌉🐟', en: 'We walk on the bridge. There is a big fish!', he: 'הולכים על הגשר. יש שם דג גדול!',
+      choices: [{ en: 'say hello', pic: '👋', to: 'hello' }, { en: 'swim', pic: '🏊', to: 'swim' }] },
+    milk: { scene: '🐱🥛💖', en: 'The cat drinks the milk. She is happy!', he: 'החתולה שותה את החלב. היא שמחה!', end: true },
+    ball: { scene: '🐱⚽😄', en: 'The cat plays with the ball. What fun!', he: 'החתולה משחקת בכדור. איזה כיף!', end: true },
+    hello: { scene: '👋🐟😊', en: 'Hello, fish! The fish says hello too!', he: 'שלום, דג! הדג אומר שלום גם!', end: true },
+    swim: { scene: '🏊🐟💦', en: 'We swim with the fish. The water is cold!', he: 'שוחים עם הדג. המים קרים!', end: true }
+  }
+};

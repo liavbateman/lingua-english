@@ -230,6 +230,16 @@ const Store = (() => {
       Object.keys(m).forEach(k => { if (k < oldest) delete m[k]; });
       save();
     },
+    // A story you choose: the endings this child has found
+    kidsPathEnds: () => (state.kids && state.kids.pathEnds) || [],
+    kidsPathEnd(id) {
+      state.kids = state.kids || { stars: {}, stickers: {}, words: {} };
+      const list = state.kids.pathEnds = state.kids.pathEnds || [];
+      if (list.includes(id)) return false;
+      list.push(id);
+      save();
+      return true;
+    },
     // The owl buddy's look: a colour and an accessory, chosen in the wardrobe
     get kidsOwl() { const o = state.kids && state.kids.owl; return { color: (o && o.color) || 'blue', acc: (o && o.acc) || '' }; },
     setKidsOwl(part, id) {

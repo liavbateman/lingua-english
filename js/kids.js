@@ -100,6 +100,8 @@ const Kids = (() => {
       shop: 'החנות', shopSub: 'משחקים בחנות: מה הלקוח רוצה?', shopTip: 'הקשיבו ללקוח, שימו בסל ולחצו "Here you are!"',
       shopGive: 'Here you are!', shopBasket: 'הסל', shopCoins: '{n} מטבעות',
       spell: 'מאייתים', spellTip: 'הקשיבו למילה ולחצו על האותיות לפי הסדר. לחיצה על אות בשורה מחזירה אותה',
+      pathBook: 'בחרו את הדרך', pathChoose: 'מה בוחרים?', pathEnd: 'סוף אחד מתוך ארבעה! אפשר לקרוא שוב ולבחור דרך אחרת',
+      pathAgain: 'דרך אחרת', pathFound: 'מצאתם {n} מתוך 4 סופים',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -193,6 +195,8 @@ const Kids = (() => {
       shop: 'The shop', shopSub: 'Play shop: what does the customer want?', shopTip: 'Listen to the customer, fill the basket and tap "Here you are!"',
       shopGive: 'Here you are!', shopBasket: 'Basket', shopCoins: '{n} coins',
       spell: 'Spell it!', spellTip: 'Listen to the word and tap the letters in order. Tap a letter in the row to take it back',
+      pathBook: 'Choose your way', pathChoose: 'What do you choose?', pathEnd: 'One of four endings! Read again and choose another way',
+      pathAgain: 'Another way', pathFound: 'You found {n} of 4 endings',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -1629,6 +1633,11 @@ const Kids = (() => {
         <h1 class="k-title">📚 ${kt('stories')}</h1>
         <p class="k-sub">${kt('storiesSub')}</p>
         <div class="k-books">
+          <a class="k-book k-path-book" href="#/kids/path" style="--c:#16a34a">
+            <span class="k-book-pic" aria-hidden="true">${KIDS_PATH.pic}</span>
+            <span class="k-book-title en">${KIDS_PATH.title}</span>
+            <span class="k-book-he">✨ ${kt('pathBook')}</span>
+          </a>
           ${KIDS_STORIES.map(st => {
             const open = storyOpen(st), read = Store.kidsHasSticker('st-' + st.id);
             const isle = st.island && theme(st.island);
@@ -1755,6 +1764,50 @@ const Kids = (() => {
       $('#k-again').onclick = () => story(id);
     }
     page();
+  }
+
+  // ---------- a story you choose ----------
+  function pathStory(id = 'start') {
+    const pg = KIDS_PATH.pages[id];
+    if (!pg) { location.hash = '#/kids/stories'; return; }
+    document.body.classList.add('in-lesson');
+    K.lessonBar(id === 'start' ? 0 : pg.end ? 1 : .5);
+    const isNew = pg.end ? Store.kidsPathEnd(id) : false;   // count this ending before showing how many were found
+    const found = Store.kidsPathEnds();
+    K.view.innerHTML = `
+      <div class="k-wrap k-play">
+        <p class="k-step en">${KIDS_PATH.pic} ${KIDS_PATH.title}</p>
+        <div class="k-card k-page">
+          <div class="k-scene" aria-hidden="true">${pg.scene}</div>
+          <p class="k-sentence en" lang="en">${pg.en.split(' ').map(w => `<button class="k-w">${w}</button>`).join(' ')}</p>
+          <p class="k-he he" lang="he">${pg.he}</p>
+        </div>
+        ${pg.end ? `
+          <p class="k-tip">🏁 ${kt('pathEnd')} · ${kt('pathFound', { n: found.length })}</p>
+          <button class="k-btn" id="k-path-again">🔀 ${kt('pathAgain')}</button>
+          <a class="k-btn ghost" href="#/kids/stories">📚 ${kt('stories')}</a>`
+        : `
+          <p class="k-tip">${kt('pathChoose')}</p>
+          <div class="k-path-choices">${pg.choices.map((c, i) => `<button class="k-path-choice" data-i="${i}"><span aria-hidden="true">${c.pic}</span><b class="en">${c.en}</b></button>`).join('')}</div>`}
+      </div>`;
+    const words = [...K.view.querySelectorAll('.k-w')];
+    words.forEach(w => { w.onclick = () => sayEn(w.textContent.replace(/[^A-Za-z']/g, '')); });
+    setTimeout(() => readAlong(pg.en, words), 250);
+    if (pg.end) {
+      celebrate();
+      if (isNew) Store.kidsFinish('path', Math.min(3, Store.kidsPathEnds().length), 10);
+      $('#k-path-again').onclick = () => pathStory('start');
+      return;
+    }
+    K.view.querySelectorAll('.k-path-choice').forEach(b => {
+      b.onclick = () => {
+        const c = pg.choices[+b.dataset.i];
+        Sfx.tap();
+        b.classList.add('picked');
+        sayEn(c.en);
+        setTimeout(() => pathStory(c.to), 900);
+      };
+    });
   }
 
   // ---------- the owl's wardrobe ----------
@@ -3245,6 +3298,7 @@ const Kids = (() => {
       else if (a === 'trace') trace(b);
       else if (a === 'owl') wardrobe();
       else if (a === 'stories') stories();
+      else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
       else if (a === 'spell') spellGame();
       else if (a === 'shop') shopGame();

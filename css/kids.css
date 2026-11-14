@@ -1027,3 +1027,14 @@ body.kids-big .k-customer-says { font-family: "Lexend", var(--k-font); letter-sp
 .k-spell-tile.used { opacity: .25; }
 .k-spell-tile.hint { background: #fff1c2; animation: k-wiggle 1s ease-in-out infinite; }
 body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", var(--k-font); }
+
+/* a story you choose */
+.k-path-book { border-inline-start-style: dashed; }
+.k-path-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.k-path-choice {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px 8px; border: 0; border-radius: 26px; background: #fff;
+  color: var(--k-ink); cursor: pointer; box-shadow: 0 6px 0 var(--k-edge); font-size: 3.4rem; transition: transform var(--dur-press);
+}
+.k-path-choice b { font: 700 1.1rem var(--k-font); }
+.k-path-choice:active { transform: translateY(4px); }
+.k-path-choice.picked { background: #d8fbe9; box-shadow: 0 6px 0 #2fd093; animation: k-boing .5s var(--ease-pop); }
