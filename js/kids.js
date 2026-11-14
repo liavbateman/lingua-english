@@ -1367,10 +1367,18 @@ const Kids = (() => {
           ${owl(kt('peekTip'), 'small')}
         </div>`;
       const clouds = [...K.view.querySelectorAll('.k-peek-clouds i')];
+      const words = [...K.view.querySelectorAll('.k-peek-word')];
+      // the owl reads the three words, each one glowing as it is said (for children who can't read yet)
+      const readWords = () => speakSeq(opts.map(o => o.en + (o === opts[opts.length - 1] ? '?' : ',')), 0.85, i => {
+        words.forEach(b => b.classList.remove('say'));
+        if (words[i].isConnected && !done) words[i].classList.add('say');
+      }, () => words.forEach(b => b.classList.remove('say')));
       const blow = () => {
-        if (shown >= 9) return clearInterval(peekTimer);
+        if (!clouds[0].isConnected) return clearInterval(peekTimer);
+        if (shown >= 9) { clearInterval(peekTimer); if (!done) readWords(); return; }
         clouds[order[shown++]].classList.add('gone');
       };
+      if (at === 0) sayEn("What's hiding?", 0.9);
       blow();
       peekTimer = setInterval(blow, 900);
       K.view.querySelectorAll('.k-peek-word').forEach(b => {
@@ -1395,6 +1403,7 @@ const Kids = (() => {
             b.classList.add('nope');
             K.Feel.wrong(b);
             owlMood('think');
+            $('.k-bubble').textContent = kt('tryAgain');
             sayEn(opts[+b.dataset.i].en);
           }
         };

@@ -868,7 +868,13 @@ body.kids.night .k-trophy:not(.got) { background: rgba(255, 255, 255, .85); }
 .k-peek-pic { font-size: 9rem; line-height: 1; }
 .k-peek-clouds { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }
 .k-peek-clouds i {
-  background: radial-gradient(circle at 35% 40%, #fff 0 30%, #eef3ff 31% 60%, #dfe7fb 61%); border: 1px solid #d5def5;
+  /* puffy overlapping clouds: three white puffs on each, slightly bigger than its cell */
+  background:
+    radial-gradient(circle at 28% 62%, #fff 0 30%, transparent 31%),
+    radial-gradient(circle at 58% 42%, #fff 0 36%, transparent 37%),
+    radial-gradient(circle at 78% 66%, #fff 0 26%, transparent 27%),
+    radial-gradient(circle at 50% 75%, #f3f6ff 0 40%, transparent 41%), #e8eefc;
+  transform: scale(1.25); border-radius: 40%;
   transition: opacity .45s ease, transform .45s var(--ease-pop);
 }
 .k-peek-clouds i.gone { opacity: 0; transform: scale(1.4) translateY(-20px); }
@@ -876,6 +882,7 @@ body.kids.night .k-trophy:not(.got) { background: rgba(255, 255, 255, .85); }
 .k-peek-word { cursor: pointer; }
 .k-peek-word.right { background: #2fd093; box-shadow: 0 5px 0 #1d9a6b; }
 .k-peek-word.nope { opacity: .35; filter: grayscale(1); }
+.k-peek-word.say { box-shadow: 0 5px 0 var(--k-edge, #1e6fd0), 0 0 0 5px #fde68a; transform: scale(1.08); transition: transform .2s; }
 @media (prefers-reduced-motion: reduce) { .k-peek-clouds i { transition: opacity .2s; } }
 
 /* try at home tip for grown-ups on the island end screen */
