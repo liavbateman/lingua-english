@@ -103,6 +103,7 @@ const Kids = (() => {
       pathBook: 'בחרו את הדרך', pathChoose: 'מה בוחרים?', pathEnd: 'סוף אחד מתוך ארבעה! אפשר לקרוא שוב ולבחור דרך אחרת',
       pathAgain: 'דרך אחרת', pathFound: 'מצאתם {n} מתוך 4 סופים',
       calTitle: 'לוח המדבקות שלי', calSub: 'כל יום שמשחקים מקבל מדבקה', calCount: '{n} ימי משחק החודש',
+      hide: 'מחבואים', hideSub: 'איפה הינשוף? מתחת, על, בתוך, מאחורי', hideTip: 'הקשיבו איפה הינשוף התחבא ולחצו שם',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -199,6 +200,7 @@ const Kids = (() => {
       pathBook: 'Choose your way', pathChoose: 'What do you choose?', pathEnd: 'One of four endings! Read again and choose another way',
       pathAgain: 'Another way', pathFound: 'You found {n} of 4 endings',
       calTitle: 'My sticker calendar', calSub: 'Every day you play gets a sticker', calCount: '{n} play days this month',
+      hide: 'Hide and seek', hideSub: 'Where is the owl? under, on, in, behind', hideTip: 'Listen where the owl is hiding and tap there',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -543,6 +545,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🏪</span>
           <span class="grow"><b>${kt('shop')}</b><small>${kt('shopSub')}</small></span>
           ${Store.kidsHasSticker('shop') ? starsHtml(Store.kidsStars('shop'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-hide-card" href="#/kids/hide">
+          <span class="k-story-books" aria-hidden="true">🙈</span>
+          <span class="grow"><b>${kt('hide')}</b><small>${kt('hideSub')}</small></span>
+          ${Store.kidsHasSticker('hide') ? starsHtml(Store.kidsStars('hide'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -1508,6 +1515,89 @@ const Kids = (() => {
       celebrate();
       sayEn('Super speller!', 0.9);
       $('#k-again').onclick = spellGame;
+    }
+    round();
+  }
+
+  // ---------- hide and seek: little place words (under, on, in, behind) ----------
+  // A room with a bed, a chair, a box and a door. The owl hides and says where ("The owl is under the bed!");
+  // the child taps that spot and the owl peeks out. A wrong spot just puffs and the sentence is said again.
+  const SPOTS = [
+    { id: 'on the bed', he: 'על המיטה', x: 4, y: 36, w: 40, h: 18 },
+    { id: 'under the bed', he: 'מתחת למיטה', x: 4, y: 76, w: 40, h: 16 },
+    { id: 'on the chair', he: 'על הכיסא', x: 52, y: 42, w: 20, h: 16 },
+    { id: 'under the chair', he: 'מתחת לכיסא', x: 52, y: 78, w: 20, h: 14 },
+    { id: 'in the box', he: 'בתוך הקופסה', x: 77, y: 60, w: 20, h: 24 },
+    { id: 'behind the door', he: 'מאחורי הדלת', x: 76, y: 6, w: 20, h: 40 }
+  ];
+  function hideGame() {
+    document.body.classList.add('in-lesson');
+    const rounds = K.shuffle(SPOTS).slice(0, 5);
+    let at = 0, firstTry = 0;
+    function round() {
+      K.lessonBar(at / rounds.length);
+      const s = rounds[at], line = `The owl is ${s.id}!`;
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🙈</span> ${kt('hide')} · ${at + 1}/${rounds.length}</p>
+          <div class="k-prompt">
+            <button class="k-speaker" id="k-say" aria-label="${kt('listen')}: ${line}"><span aria-hidden="true">🔊</span></button>
+            <span class="k-target en" lang="en">${line}</span>
+          </div>
+          <div class="k-room" aria-label="room">
+            <span class="k-room-obj" style="left:6%;top:44%;font-size:7rem" aria-hidden="true">🛏️</span>
+            <span class="k-room-obj" style="left:54%;top:48%;font-size:4.6rem" aria-hidden="true">🪑</span>
+            <span class="k-room-obj" style="left:78%;top:8%;font-size:6.4rem" aria-hidden="true">🚪</span>
+            <span class="k-room-obj" style="left:79%;top:62%;font-size:4rem" aria-hidden="true">📦</span>
+            ${SPOTS.map((p, i) => `<button class="k-spot" data-i="${i}" style="left:${p.x}%;top:${p.y}%;width:${p.w}%;height:${p.h}%" aria-label="${p.id}"></button>`).join('')}
+          </div>
+          ${owl(kt('hideTip'), 'small')}
+        </div>`;
+      const spots = SPOTS;
+      const ask = () => sayEn(line, 0.8);
+      $('#k-say').onclick = ask;
+      setTimeout(ask, 300);
+      K.view.querySelectorAll('.k-spot').forEach(b => {
+        b.onclick = () => {
+          const p = spots[+b.dataset.i];
+          if (p === s) {
+            K.view.querySelectorAll('.k-spot').forEach(x => { x.disabled = true; });
+            b.classList.add('found');
+            b.innerHTML = '<span class="k-peek-owl" aria-hidden="true">🦉</span>';
+            K.Feel.right();
+            if (!missed) firstTry++;
+            owlMood('cheer');
+            $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${s.id}!</bdi> · ${s.he}`;
+            say([['en', `Yes! ${line}`]]);
+            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 2000);
+          } else {
+            missed = true;
+            b.classList.remove('puff'); void b.offsetWidth; b.classList.add('puff');
+            K.Feel.wrong(b);
+            owlMood('think');
+            $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${p.id}?</bdi> ${kt('tryAgain')}`;
+            setTimeout(ask, 400);
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = firstTry >= 5 ? 3 : firstTry >= 3 ? 2 : 1;
+      Store.kidsFinish('hide', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🙈 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('You found me every time!', 0.9);
+      $('#k-again').onclick = hideGame;
     }
     round();
   }
@@ -3327,6 +3417,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'hide') hideGame();
       else if (a === 'spell') spellGame();
       else if (a === 'shop') shopGame();
       else if (a === 'together') togetherGame();

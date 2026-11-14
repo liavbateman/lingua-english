@@ -1053,3 +1053,19 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-cal-day.future { opacity: .45; }
 .k-cal-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
 .k-cal-day { aspect-ratio: auto; height: 42px; min-width: 0; }
+
+/* hide and seek */
+.k-room {
+  position: relative; height: 300px; border-radius: 26px; overflow: hidden; direction: ltr;
+  background: linear-gradient(#fde8c8 0 68%, #c9935f 68% 100%); box-shadow: 0 8px 0 var(--k-edge), inset 0 -8px 0 #a8743f;
+}
+.k-room-obj { position: absolute; line-height: 1; pointer-events: none; filter: drop-shadow(0 4px 2px rgba(0, 0, 0, .18)); }
+.k-spot {
+  position: absolute; border: 3px dashed transparent; border-radius: 18px; background: transparent; cursor: pointer;
+  transition: border-color var(--dur-quick), background var(--dur-quick);
+}
+.k-spot:hover, .k-spot:focus-visible { border-color: rgba(29, 42, 91, .35); background: rgba(255, 255, 255, .2); }
+.k-spot.found { border-color: #2fd093; background: rgba(47, 208, 147, .18); }
+.k-spot.puff { animation: k-puff .5s ease-out; }
+@keyframes k-puff { 0% { background: rgba(255, 255, 255, .8); } 100% { background: transparent; } }
+.k-peek-owl { display: grid; place-items: center; height: 100%; font-size: 2.6rem; animation: k-pop .5s var(--ease-pop) both; }
