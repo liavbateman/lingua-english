@@ -55,6 +55,8 @@ const Kids = (() => {
       wotd: 'התמונה של היום', wotdTap: 'לחצו לשמוע', wotdPlanted: 'נשתלה בגינה שלכם 🌱',
       riddles: 'מי אני?', riddlesSub: 'חידות קטנות: הקשיבו ונחשו', riddleQ: 'מי אני?', riddleTip: 'הקשיבו לרמזים ובחרו תמונה',
       opp: 'מה ההפך?', oppTip: 'מצאו את ההפך', isOpp: '{a} – {b}!',
+      night: 'לילה טוב! 🌙', nightSub: 'סיפור קטן לפני השינה', nightHi: 'כבר ערב… בוא נקרא סיפור לפני השינה 🌙',
+      pcBed: 'מראה לילה בערב', pcBedText: 'מ-19:00 השמיים נעשים לילה, הצבעים רגועים והקול איטי יותר',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -103,6 +105,8 @@ const Kids = (() => {
       wotd: 'Picture of the day', wotdTap: 'Tap to hear it', wotdPlanted: 'Planted in your garden 🌱',
       riddles: 'Who am I?', riddlesSub: 'Little riddles: listen and guess', riddleQ: 'Who am I?', riddleTip: 'Listen to the clues and pick a picture',
       opp: "What's the opposite?", oppTip: 'Find the opposite', isOpp: '{a} – {b}!',
+      night: 'Good night! 🌙', nightSub: 'A little story before bed', nightHi: "It's evening… let's read a bedtime story 🌙",
+      pcBed: 'Bedtime look in the evening', pcBedText: 'From 7pm the sky turns to night, colours calm down and the voice slows',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -135,11 +139,13 @@ const Kids = (() => {
       u.lang = lang === 'he' ? 'he-IL' : 'en-US';
       const v = lang === 'he' ? heVoice : enVoice;
       if (v) u.voice = v;
-      u.rate = lang === 'he' ? 1 : rate;
+      u.rate = (lang === 'he' ? 1 : rate) * (isNight() ? .85 : 1);
       u.pitch = 1.1;   // a little brighter, friendlier for children
       speechSynthesis.speak(u);
     });
   }
+  // Bedtime: from 7 in the evening until 6 in the morning the sky turns to night
+  const isNight = () => { const h = new Date().getHours(); return Store.kidsBedtime && (h >= 19 || h < 6); };
   const sayEn = (text, rate) => say([['en', text]], rate);
 
   // A soft "pop" for a balloon: a short falling tone and a puff of noise (quiet; silence is fine too)
@@ -305,7 +311,7 @@ const Kids = (() => {
           <div class="k-owl">
             <span class="k-owl-link"><button class="k-owl-tap" id="k-owl-tap" aria-label="${kt('owlHi')}">${owlAv()}</button>
               <a class="k-owl-edit" href="#/kids/owl" aria-label="${kt('wardrobe')}">👕</a></span>
-            <div class="k-bubble" role="status">${Store.kidsStickerCount ? kt('pick') : kt('hi')}</div>
+            <div class="k-bubble" role="status">${isNight() ? kt('nightHi') : Store.kidsStickerCount ? kt('pick') : kt('hi')}</div>
           </div>
           <div class="k-chips">
             <button class="k-chip k-face" id="k-face" aria-label="${kt('who')}">${me.face}${me.name ? ` <b>${esc(me.name)}</b>` : ''}</button>
@@ -315,6 +321,11 @@ const Kids = (() => {
           </div>
         </div>
         <h1 class="sr-only">${kt('title')}</h1>
+        ${isNight() ? `<a class="k-today k-night-card" href="#/kids/story/goodnight">
+            <span class="k-today-go" aria-hidden="true">🌙</span>
+            <span class="grow"><b>${kt('night')}</b><small>${kt('nightSub')}</small></span>
+            <span class="k-today-arrow" aria-hidden="true">${isHe() ? '‹' : '›'}</span>
+          </a>` : ''}
         ${(() => {
           const plan = todayPlan();
           return `<a class="k-today" href="#/kids/today/start">
@@ -702,7 +713,7 @@ const Kids = (() => {
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-US';
     if (enVoice) u.voice = enVoice;
-    u.rate = 0.75;
+    u.rate = isNight() ? 0.65 : 0.75;
     u.pitch = 1.1;
     const starts = [];
     text.replace(/[A-Za-z']+/g, (m, i) => { starts.push(i); return m; });
@@ -972,6 +983,10 @@ const Kids = (() => {
             <span class="grow"><b>${kt('pcMode')}</b><small>${kt('pcModeText')}</small></span>
             <input type="checkbox" id="k-mode" ${Store.kidsMode ? 'checked' : ''}>
           </label>
+          <label class="k-pc-switch k-pc-gap">
+            <span class="grow"><b>🌙 ${kt('pcBed')}</b><small>${kt('pcBedText')}</small></span>
+            <input type="checkbox" id="k-bed" ${Store.kidsBedtime ? 'checked' : ''}>
+          </label>
         </section>
         <section class="k-pc-box">
           <h2>${kt('pcPer')}</h2>
@@ -988,6 +1003,7 @@ const Kids = (() => {
       b.onclick = () => { Store.kidsLimit = +b.dataset.n; parents(); };
     });
     $('#k-mode').onchange = e => { Store.kidsMode = e.target.checked; };
+    $('#k-bed').onchange = e => { Store.kidsBedtime = e.target.checked; document.body.classList.toggle('night', isNight()); };
   }
 
   // ---------- daily time limit ----------
@@ -1846,6 +1862,7 @@ const Kids = (() => {
       clearHands();
       songRun++;   // a song still playing stops
       document.body.classList.add('kids');
+      document.body.classList.toggle('night', isNight());
       if (a === 'parents') return parents();
       if (overLimit()) return rest();   // checked between screens, never in the middle of a game
       if (a === 'play') play(b);
@@ -1865,6 +1882,6 @@ const Kids = (() => {
       else map();
     },
     gate,
-    leave() { stopRec(); document.body.classList.remove('kids'); document.body.style.removeProperty('--kc'); }
+    leave() { stopRec(); document.body.classList.remove('kids', 'night'); document.body.style.removeProperty('--kc'); }
   };
 })();

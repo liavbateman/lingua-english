@@ -259,6 +259,18 @@ KIDS_ABC.forEach(x => { x.sound = KIDS_SOUNDS[x.L]; });
 // page: [scene pictures, English sentence, Hebrew]; ask: [question, Hebrew, [right picture, other, other]]
 const KIDS_STORIES = [
   {
+    // The bedtime story: on the shelf all day, and offered on the map in the evening
+    id: 'goodnight', island: null, title: 'Good night, owl', he: 'לילה טוב, ינשוף', pic: '🌙',
+    pages: [
+      ['🌅', 'The sun goes down.', 'השמש שוקעת.'],
+      ['🌙', 'The moon comes up.', 'הירח עולה.'],
+      ['✨⭐✨', 'The stars say hello.', 'הכוכבים אומרים שלום.'],
+      ['🦉💤', 'The owl says good night.', 'הינשוף אומר לילה טוב.'],
+      ['🛏️😴', 'Good night, little one!', 'לילה טוב, קטנטנים!']
+    ],
+    ask: ['Who says good night?', 'מי אומר לילה טוב?', ['🦉', '🐶', '🚗']]
+  },
+  {
     id: 'catdog', island: null, title: 'The cat and the dog', he: 'החתול והכלב', pic: '🐱',
     pages: [
       ['🐱🏡', 'This is a cat.', 'זה חתול.'],

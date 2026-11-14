@@ -173,6 +173,9 @@ const Store = (() => {
     // Game tutorials already shown (the pointing hand appears once per game type)
     kidsTipSeen: kind => !!(state.kids && state.kids.tips && state.kids.tips[kind]),
     kidsTipDone(kind) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.tips = state.kids.tips || {}; state.kids.tips[kind] = true; save(); },
+    // Bedtime look in the evening (on unless a grown-up turned it off)
+    get kidsBedtime() { return !(state.kids && state.kids.bedtime === false); },
+    set kidsBedtime(v) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.bedtime = !!v; save(); },
     // The owl buddy's look: a colour and an accessory, chosen in the wardrobe
     get kidsOwl() { const o = state.kids && state.kids.owl; return { color: (o && o.color) || 'blue', acc: (o && o.acc) || '' }; },
     setKidsOwl(part, id) {
