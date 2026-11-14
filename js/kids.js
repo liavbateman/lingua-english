@@ -293,7 +293,7 @@ const Kids = (() => {
       };
     });
     const cur = $('.k-isle.cur');
-    if (cur) setTimeout(() => cur.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60);
+    if (cur) setTimeout(() => cur.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }), 60);
   }
 
   // ---------- review garden ----------

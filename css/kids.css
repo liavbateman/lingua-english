@@ -480,3 +480,35 @@ a.k-btn { text-decoration: none; text-align: center; }
 /* game sounds on / off */
 .k-sfx { border: 0; cursor: pointer; font-size: 1.1rem; padding: 8px 12px; }
 .k-sfx[aria-pressed="false"] { opacity: .7; }
+
+/* ---------- accessibility pass (round 15) ----------
+   Text that sat straight on the sky was white with a shadow (about 1.5:1). It now sits in white pills
+   or uses the dark ink (8:1+). Pink and pastel text got darker shades that pass WCAG AA. */
+body.kids { --k-pink: #f2477f; --k-pink-edge: #c42b5e; --k-pink-text: #c2255c; }
+.k-step { display: table; margin: 4px auto 12px; padding: 5px 14px; border-radius: 999px; background: rgba(255, 255, 255, .92); color: var(--k-ink); text-shadow: none; box-shadow: 0 3px 0 var(--k-edge); }
+.k-target { color: var(--k-ink); text-shadow: none; background: rgba(255, 255, 255, .92); padding: 2px 16px; border-radius: 14px; }
+.k-back { color: var(--k-ink); text-shadow: none; background: rgba(255, 255, 255, .85); padding: 6px 14px; border-radius: 999px; }
+.k-title { color: var(--k-ink); text-shadow: 0 2px 0 rgba(255, 255, 255, .6); }
+.k-tip, .k-isle-sub { color: var(--k-ink); }
+.k-chip.star b, .k-best { color: #8a5a00; }
+.k-go, .k-sticker-new, .k-reveal-card b { color: var(--k-pink-text); }
+.k-btn, .k-mic { background: var(--k-pink); box-shadow: 0 6px 0 var(--k-pink-edge); }
+.k-btn:active { box-shadow: 0 1px 0 var(--k-pink-edge); }
+.k-btn.ghost { background: #fff; color: var(--k-ink); box-shadow: 0 6px 0 var(--k-edge); }
+.k-mic { box-shadow: 0 8px 0 var(--k-pink-edge), 0 14px 26px rgba(196, 43, 94, .35); }
+.k-mic.on { background: #1f9e6e; box-shadow: 0 8px 0 #157a54; }
+.k-pc-seg button.on { background: var(--k-pink); border-color: var(--k-pink); }
+/* letters and accents in island colours: mixed with the ink so yellow or sky blue stays readable on white */
+.k-letter b, .k-letter-glyph, .k-letter-big mark { color: color-mix(in srgb, var(--c) 55%, #1d2a5b); }
+.k-chest-card .grow small { color: #6a4d0c; }
+.k-chest-card.locked .grow small, .k-chest-card.opened .grow small { color: var(--k-ink); }
+/* keyboard and switch-control users see where they are */
+body.kids :focus-visible { outline: 4px solid #1d2a5b; outline-offset: 3px; border-radius: 12px; }
+/* Reduce Motion: the endless bobbing, floating, pulsing and wiggling stop completely */
+@media (prefers-reduced-motion: reduce) {
+  .k-av, .k-isle.cur .k-isle-btn, .k-speaker, .k-balloon, .k-chest-card.ready .k-chest, .k-mic.on::before, .k-mic.on::after,
+  .k-drop, .k-rest-owl, .k-garden-card.dry .k-story-books { animation: none !important; }
+}
+.k-abc-letters b:nth-child(1) { background: #d42e66; }
+.k-abc-letters b:nth-child(2) { background: #1f6fd1; }
+.k-abc-letters b:nth-child(3) { color: #1d2a5b; }
