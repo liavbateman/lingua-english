@@ -1112,3 +1112,16 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-twin-chip b { font-size: .72rem; overflow-wrap: anywhere; }
 .k-twin-chip small { font-size: .7rem; color: var(--k-muted); }
 .k-twin-chip.locked { opacity: .45; cursor: default; justify-content: center; }
+
+/* gentle reminder */
+.k-rm-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 4px; }
+.k-rm-row.off { opacity: .45; pointer-events: none; }
+.k-rm-row label { display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--k-ink); }
+.k-rm-row input[type=time] { font: 700 1.1rem var(--k-font); padding: 6px 10px; border: 2px solid var(--k-edge); border-radius: 14px; background: #fff; color: var(--k-ink); }
+.k-remind .k-btn { margin-top: 10px; }
+.k-rm-note { display: block; margin-top: 6px; color: var(--k-muted); text-align: center; }
+.k-rm-toast {
+  position: fixed; inset-inline: 16px; top: calc(env(safe-area-inset-top, 0px) + 14px); z-index: 60; padding: 14px 18px;
+  border-radius: 22px; background: #fff; color: var(--k-ink); font-weight: 700; box-shadow: 0 8px 24px rgba(20, 40, 110, .3);
+  animation: k-pop .5s var(--ease-pop) both;
+}

@@ -187,6 +187,9 @@ const Store = (() => {
     // Bedtime look in the evening (on unless a grown-up turned it off)
     get kidsBedtime() { return !(state.kids && state.kids.bedtime === false); },
     set kidsBedtime(v) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.bedtime = !!v; save(); },
+    // A gentle daily reminder for parents: on/off, the time, and the last day it was shown
+    get kidsRemind() { const r = (state.kids && state.kids.remind) || {}; return { on: !!r.on, time: r.time || '17:00', last: r.last || '' }; },
+    set kidsRemind(v) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.remind = { ...this.kidsRemind, ...v }; save(); },
     // The last 7 days for the weekly note: words first got right, and play time per day (oldest first)
     kidsWeek() {
       const k = state.kids || {}, first = k.first || {}, ds = k.daysec || {};

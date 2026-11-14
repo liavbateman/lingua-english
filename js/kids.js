@@ -56,6 +56,9 @@ const Kids = (() => {
       riddles: 'מי אני?', riddlesSub: 'חידות קטנות: הקשיבו ונחשו', riddleQ: 'מי אני?', riddleTip: 'הקשיבו לרמזים ובחרו תמונה',
       opp: 'מה ההפך?', oppTip: 'מצאו את ההפך', isOpp: '{a} – {b}!',
       night: 'לילה טוב! 🌙', nightSub: 'סיפור קטן לפני השינה', nightHi: 'כבר ערב… בוא נקרא סיפור לפני השינה 🌙',
+      rmTitle: 'תזכורת עדינה', rmText: 'פעם ביום, בשעה שתבחרו: "זמן ל-10 דקות אנגלית עם הינשוף?" (רק אם עוד לא שיחקו היום)',
+      rmTime: 'בשעה', rmCal: 'הוספה ליומן', rmCalText: 'הכי בטוח בטלפון: תזכורת קבועה ביומן, גם כשהאפליקציה סגורה',
+      rmOff: 'ההתראות חסומות בדפדפן. אפשר להשתמש ביומן', rmBody: 'זמן ל-10 דקות אנגלית עם הינשוף?', rmTest: 'ניסיון',
       pcBed: 'מראה לילה בערב', pcBedText: 'מ-19:00 השמיים נעשים לילה, הצבעים רגועים והקול איטי יותר',
       wkTitle: 'השבוע של {name}', wkTitleAnon: 'השבוע', wkWords: '{n} מילים חדשות', wkNone: 'עוד אין מילים חדשות השבוע. אולי משחק קצר היום?',
       wkDays: '{n} ימי משחק · {m} דק׳', wkDay1: 'יום משחק אחד · {m} דק׳', wkShare: 'לשתף', wkCopied: 'הועתק! אפשר להדביק בוואטסאפ',
@@ -158,6 +161,9 @@ const Kids = (() => {
       riddles: 'Who am I?', riddlesSub: 'Little riddles: listen and guess', riddleQ: 'Who am I?', riddleTip: 'Listen to the clues and pick a picture',
       opp: "What's the opposite?", oppTip: 'Find the opposite', isOpp: '{a} – {b}!',
       night: 'Good night! 🌙', nightSub: 'A little story before bed', nightHi: "It's evening… let's read a bedtime story 🌙",
+      rmTitle: 'Gentle reminder', rmText: 'Once a day at the time you choose: "Time for 10 minutes of English with the owl?" (only if they have not played yet)',
+      rmTime: 'At', rmCal: 'Add to calendar', rmCalText: 'Most reliable on a phone: a daily calendar alert, even when the app is closed',
+      rmOff: 'Notifications are blocked in the browser. You can use the calendar', rmBody: 'Time for 10 minutes of English with the owl?', rmTest: 'Try it',
       pcBed: 'Bedtime look in the evening', pcBedText: 'From 7pm the sky turns to night, colours calm down and the voice slows',
       wkTitle: "{name}'s week", wkTitleAnon: 'This week', wkWords: '{n} new words', wkNone: 'No new words this week yet. Maybe a short game today?',
       wkDays: '{n} play days · {m} min', wkDay1: '1 play day · {m} min', wkShare: 'Share', wkCopied: 'Copied! Paste it into WhatsApp',
@@ -2255,6 +2261,7 @@ const Kids = (() => {
               <span class="k-pc-n">${n}/${th.words.length}</span></div>`;
           }).join('')}
         </section>
+        ${remindBox()}
         ${weekBox()}
         <button class="k-btn ghost" id="k-card">🖼️ ${kt('cardBtn')}</button>
         ${voiceBox()}
@@ -2281,7 +2288,94 @@ const Kids = (() => {
     if (vHe) vHe.onclick = () => say([['he', kt('vcSampleHe')]]);
     $('#k-big').onchange = e => { Store.kidsBigPrint = e.target.checked; document.body.classList.toggle('kids-big', Store.kidsBigPrint); };
     $('#k-card').onclick = progressCard;
+    remindWire();
     $('#k-bed').onchange = e => { Store.kidsBedtime = e.target.checked; document.body.classList.toggle('night', isNight()); };
+  }
+
+  // ---------- a gentle daily reminder for parents ----------
+  // Two ways, honestly labelled: a notification while the app is open or in the background (the web can't
+  // wake a closed app without a server), and a daily calendar event with an alert, which always works.
+  function remindBox() {
+    const r = Store.kidsRemind;
+    const blocked = 'Notification' in window && Notification.permission === 'denied';
+    return `
+      <section class="k-pc-box k-remind">
+        <label class="k-pc-switch">
+          <span class="grow"><b>⏰ ${kt('rmTitle')}</b><small>${kt('rmText')}</small></span>
+          <input type="checkbox" id="k-rm" ${r.on ? 'checked' : ''}>
+        </label>
+        <div class="k-rm-row ${r.on ? '' : 'off'}">
+          <label>${kt('rmTime')} <input type="time" id="k-rm-time" value="${r.time}" step="900"></label>
+          <button class="k-chip" id="k-rm-test">🔔 ${kt('rmTest')}</button>
+        </div>
+        ${blocked ? `<p class="k-pc-tip">⚠️ ${kt('rmOff')}</p>` : ''}
+        <button class="k-btn ghost" id="k-rm-cal">📅 ${kt('rmCal')}</button>
+        <small class="k-rm-note">${kt('rmCalText')}</small>
+      </section>`;
+  }
+  function remindWire() {
+    const box = $('#k-rm');
+    if (!box) return;
+    box.onchange = async e => {
+      Store.kidsRemind = { on: e.target.checked };
+      if (e.target.checked && 'Notification' in window && Notification.permission === 'default') {
+        try { await Notification.requestPermission(); } catch (err) { /* old Safari: callback form only */ }
+      }
+      parents();
+    };
+    $('#k-rm-time').onchange = e => { if (e.target.value) Store.kidsRemind = { time: e.target.value }; };
+    $('#k-rm-test').onclick = () => remindNow(true);
+    $('#k-rm-cal').onclick = remindCalendar;
+  }
+  async function remindNow(test) {
+    const title = 'Lingua Kids', body = kt('rmBody');
+    try {
+      if (!('Notification' in window) || Notification.permission !== 'granted') throw new Error('no permission');
+      const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
+      const opts = { body, icon: 'icons/owl-192.png', badge: 'icons/owl-192.png', tag: 'kids-remind', data: { url: './#/kids' } };
+      if (reg) await reg.showNotification(title, opts); else new Notification(title, opts);
+    } catch (err) {
+      if (test) owlToast(body);
+    }
+  }
+  // the owl's little message on screen when notifications are not allowed (or the app is open anyway)
+  function owlToast(text) {
+    const t = document.createElement('div');
+    t.className = 'k-rm-toast';
+    t.setAttribute('role', 'status');
+    t.innerHTML = `<span aria-hidden="true">🦉</span> ${esc(text)}`;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 4500);
+  }
+  function remindTick() {
+    const r = Store.kidsRemind;
+    if (!r.on) return;
+    const now = new Date(), today = Store.kidsDayKey(now);
+    const [h, m] = r.time.split(':').map(Number);
+    if (r.last === today || now.getHours() * 60 + now.getMinutes() < h * 60 + m) return;
+    Store.kidsRemind = { last: today };
+    if (Store.kidsPlayedOn(today)) return;   // already played today: no nagging
+    if (document.visibilityState === 'visible') owlToast(kt('rmBody')); else remindNow(false);
+  }
+  function remindCalendar() {
+    const [h, m] = Store.kidsRemind.time.split(':');
+    const d = new Date(), pad = n => String(n).padStart(2, '0');
+    const end = Math.min(+h * 60 + +m + 10, 23 * 60 + 59);   // a 10-minute event, never past midnight
+    const day = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`;
+    const ics = [
+      'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Lingua Kids//EN', 'BEGIN:VEVENT',
+      `UID:lingua-kids-remind-${day}@lingua`, `DTSTAMP:${day}T000000Z`,
+      `DTSTART:${day}T${pad(h)}${pad(m)}00`, `DTEND:${day}T${pad(Math.floor(end / 60))}${pad(end % 60)}00`,
+      'RRULE:FREQ=DAILY', `SUMMARY:${kt('rmBody')}`,
+      'BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${kt('rmBody')}`, 'TRIGGER:PT0M', 'END:VALARM',
+      'END:VEVENT', 'END:VCALENDAR'
+    ].join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+    a.download = 'lingua-kids-reminder.ics';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
   }
 
   // The week in a box: new words as pictures, play days as dots, and a message to share with family
@@ -3640,6 +3734,9 @@ const Kids = (() => {
         const el = e.target.closest('.k-btn, .k-isle-btn, .k-abc-card, .k-chip:not(.k-sfx), .k-back, .k-letter, .k-book, .k-ward-item, .k-note, .k-plant, .k-parents, .k-skip, .k-chest-card, #k-pic, #k-letter, .k-chip-word, .k-target-pic');
         if (el) Sfx.tap();
       }, true);
+      // the gentle reminder: checked every minute while the app is open or in the background
+      setInterval(remindTick, 60000);
+      setTimeout(remindTick, 5000);
       // a twin word chip in the album says both twins: "banana - בננה"
       document.addEventListener('click', e => {
         const chip = e.target.closest('.k-twin-chip[data-en]');

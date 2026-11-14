@@ -1,7 +1,7 @@
 // Offline and instant start: answer from the copy on the phone right away, and fetch a fresh
 // copy in the background for the next launch. Changing CACHE replaces every file at once
 // (the app then shows "New version ready").
-const CACHE = 'english-app-v223';
+const CACHE = 'english-app-v224';
 const FILES = [
   './', 'index.html', 'css/style.css', 'css/kids.css',
   'js/data.js', 'js/grammar.js', 'js/content-beginner.js', 'js/content-intermediate.js', 'js/content-advanced.js', 'js/content-index.js',
@@ -57,4 +57,15 @@ self.addEventListener('fetch', e => {
       return req.mode === 'navigate' ? cache.match('index.html') : Response.error();
     }
   })());
+});
+
+// The gentle kids reminder: tapping it opens (or brings back) the app on the kids map
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || './';
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+    const open = list.find(c => 'focus' in c);
+    if (open) { open.navigate && open.navigate(url); return open.focus(); }
+    return self.clients.openWindow(url);
+  }));
 });
