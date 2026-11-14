@@ -2468,8 +2468,8 @@
         <div class="card stat st-best"><span class="st-ico" aria-hidden="true">🏆</span><b>${Store.best}</b><span class="small">${t('progress.best')}</span></div>
       </div>
       ${weekCard()}
-      ${monthCard()}
-      ${LEVELS.map(levelCard).join('')}
+      ${Store.days(35).filter(d => d.count > 0).length >= 3 ? monthCard() : ''}
+      ${LEVELS.filter(l => !isFresh() || l.id === Store.level).map(levelCard).join('')}
       <div class="card backup">
         <div class="bk-head"><span class="bk-ico" aria-hidden="true">💾</span>
           <div class="grow"><b>${t('backup.title')}</b><span class="bk-last" id="bk-last">${lastBackupText()}</span></div></div>
