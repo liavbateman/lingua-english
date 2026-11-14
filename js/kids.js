@@ -141,6 +141,7 @@ const Kids = (() => {
       copyRec: 'עכשיו אני', copyOwl: 'הינשוף', copyMe: 'אני', copyNext: 'הבא', copyTip: 'הקשיבו לינשוף, לחצו על המיקרופון ואמרו את המילה באותו קול',
       copyNoRec: 'אמרו את המילה בקול באותו קול מצחיק, ואז לחצו "הבא"',
       seesaw: 'נדנדת ההפכים', seesawSub: 'גדול וקטן, חם וקר: שמים את ההפך בצד השני והנדנדה עפה!', seesawTip: 'מי ההפך? לחצו על התמונה כדי לשים אותה בצד השני של הנדנדה',
+      morning: 'הבוקר שלי', morningSub: 'מתעוררים, מצחצחים, מתלבשים: מה בא אחר כך?', morningTip: 'מה עושים עכשיו? לחצו על התמונה הבאה',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -275,6 +276,7 @@ const Kids = (() => {
       copyRec: 'My turn', copyOwl: 'Owl', copyMe: 'Me', copyNext: 'Next', copyTip: 'Listen to the owl, tap the mic and say the word in the same voice',
       copyNoRec: 'Say the word out loud in the same funny voice, then tap "Next"',
       seesaw: 'Opposite see-saw', seesawSub: 'Big and small, hot and cold: put the opposite on the other side and the see-saw flies!', seesawTip: 'Which one is the opposite? Tap a picture to put it on the other seat',
+      morning: 'My morning', morningSub: 'Wake up, brush, get dressed: what comes next?', morningTip: 'What do we do now? Tap the next picture',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -708,6 +710,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">⚖️</span>
           <span class="grow"><b>${kt('seesaw')}</b><small>${kt('seesawSub')}</small></span>
           ${Store.kidsHasSticker('seesaw') ? starsHtml(Store.kidsStars('seesaw'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-morning-card" href="#/kids/morning">
+          <span class="k-story-books" aria-hidden="true">🌅</span>
+          <span class="grow"><b>${kt('morning')}</b><small>${kt('morningSub')}</small></span>
+          ${Store.kidsHasSticker('morning') ? starsHtml(Store.kidsStars('morning'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -3429,6 +3436,81 @@ const Kids = (() => {
     round();
   }
 
+  // ---------- my morning: daily-life actions in order ----------
+  // "Good morning!" A timeline of the morning fills up step by step: the child picks what comes next
+  // and the owl tells it with order words (First... Then... Next... After that... Finally...).
+  function morningGame() {
+    document.body.classList.add('in-lesson');
+    const steps = KIDS_MORNING, done = [steps[0]];
+    const ORDER = ['First', 'Then', 'Next', 'After that', 'Then', 'Next', 'Finally'];
+    let missesAll = 0;
+    function line(i) { return `${ORDER[i === steps.length - 1 ? 6 : i]}, ${steps[i].en}!`; }
+    function round() {
+      K.lessonBar((done.length - 1) / (steps.length - 1));
+      const want = steps[done.length];
+      // wrong choices are only clearly wrong: things already done, or 3+ steps ahead (families order the middle differently)
+      const later = steps.slice(done.length + 3), before = steps.slice(0, done.length);
+      const others = K.shuffle([...later, ...before]).slice(0, little() ? 1 : 2);
+      const opts = K.shuffle([want, ...others]);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🌅</span> Good morning!</p>
+          <div class="k-morning-line" dir="ltr">${steps.map((s, i) => i < done.length
+            ? `<span class="k-mo-slot done"><span aria-hidden="true">${s.pic}</span><small>${i + 1}</small></span>`
+            : `<span class="k-mo-slot ${i === done.length ? 'now' : ''}"><span aria-hidden="true">${i === done.length ? '❔' : ''}</span><small>${i + 1}</small></span>`).join('')}</div>
+          <p class="k-mo-last en" lang="en">${done.length === 1 ? 'First, wake up! ⏰' : line(done.length - 1)}</p>
+          <p class="k-tip en" lang="en">What comes next?</p>
+          <div class="k-opts">${opts.map((o, i) => `<button class="k-opt k-rh-opt" data-i="${i}" aria-label="${o.en}"><span aria-hidden="true">${o.pic}</span><small class="en">${o.en}</small></button>`).join('')}</div>
+          ${owl(kt('morningTip'), 'small')}
+        </div>`;
+      setTimeout(() => say([['en', done.length === 1 ? 'Good morning! First, wake up!' : line(done.length - 1)], ['en', 'What comes next?']], 0.85), 300);
+      K.view.querySelectorAll('.k-opt').forEach(btn => {
+        btn.onclick = () => {
+          const o = opts[+btn.dataset.i];
+          if (o === want) {
+            K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; });
+            btn.classList.add('right');
+            K.Feel.right();
+            done.push(want);
+            const slot = K.view.querySelectorAll('.k-mo-slot')[done.length - 1];
+            slot.className = 'k-mo-slot done pop';
+            slot.innerHTML = `<span aria-hidden="true">${want.pic}</span><small>${done.length}</small>`;
+            owlMood('cheer');
+            $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${want.en}</bdi> · ${want.he}`;
+            sayEn(line(done.length - 1), 0.85);
+            setTimeout(() => (done.length < steps.length ? round() : end()), 2200);
+          } else {
+            missesAll++;
+            K.Feel.wrong(btn);
+            owlMood('think');
+            const i = steps.indexOf(o);
+            $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${o.en}</bdi>? ${i < done.length ? '✓' : '⏳'} ${kt('tryAgain')}`;
+            sayEn(i < done.length ? `We did that already!` : `${o.en}? Not yet!`, 0.9);
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = missesAll === 0 ? 3 : missesAll <= 2 ? 2 : 1;
+      Store.kidsFinish('morning', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <div class="k-morning-line done" dir="ltr">${steps.map(s => `<span class="k-mo-slot done"><span aria-hidden="true">${s.pic}</span></span>`).join('')}</div>
+            <h1>🌅 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      say(steps.map((s, i) => ['en', line(i)]), 0.95);
+      $('#k-again').onclick = morningGame;
+    }
+    round();
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -5485,6 +5567,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'morning') morningGame();
       else if (a === 'seesaw') seesawGame();
       else if (a === 'copy') copyGame();
       else if (a === 'brush') brushGame(b === 'fast');

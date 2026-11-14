@@ -1483,3 +1483,14 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 @keyframes k-ss-swing { 20% { transform: rotate(-12deg); } 45% { transform: rotate(12deg); } 70% { transform: rotate(-7deg); } 90% { transform: rotate(4deg); } }
 .k-ss-plank.tip { transform: rotate(14deg); }
 @media (prefers-reduced-motion: reduce) { .k-ss-plank { transition: none; } .k-ss-plank.swing { animation: none; } }
+
+/* my morning */
+.k-morning-line { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; padding: 10px 8px; border-radius: 20px;
+  background: linear-gradient(90deg, #ffe0b3, #bfe9ff); box-shadow: 0 5px 0 var(--k-edge); }
+.k-mo-slot { position: relative; display: grid; place-items: center; aspect-ratio: 1; border-radius: 12px; background: rgba(255, 255, 255, .55); font-size: 1.5rem; }
+.k-mo-slot small { position: absolute; bottom: -4px; right: -2px; font: 700 .6rem var(--k-font); color: var(--k-muted); }
+.k-mo-slot.done { background: #fff; }
+.k-mo-slot.now { outline: 3px dashed #e0457b; }
+.k-mo-slot.pop { animation: k-pop .45s var(--ease-pop) both; }
+.k-mo-last { margin: 12px 0 0; text-align: center; font: 700 1.25rem var(--k-font); color: #ffe9a6; }
+.k-morning-line.done { margin: 8px 0; }

@@ -565,3 +565,10 @@ const KIDS_SHAPE_HUNT = {
   square: { he: 'ריבוע', mark: '🟧', things: [['present', '🎁'], ['picture', '🖼️'], ['waffle', '🧇'], ['box', '📦'], ['window', '🪟']] },
   triangle: { he: 'משולש', mark: '🔺', things: [['pizza', '🍕'], ['tent', '⛺'], ['tree', '🎄'], ['cheese', '🧀'], ['ruler', '📐']] }
 };
+
+// Morning routine: daily-life actions in order
+const KIDS_MORNING = [
+  ['wake up', 'מתעוררים', '⏰'], ['wash your face', 'שוטפים פנים', '🧼'], ['brush your teeth', 'מצחצחים שיניים', '🦷'],
+  ['get dressed', 'מתלבשים', '👕'], ['eat breakfast', 'אוכלים ארוחת בוקר', '🥣'], ['put on your shoes', 'נועלים נעליים', '👟'],
+  ['go to school', 'הולכים לגן או לבית הספר', '🎒']
+].map(([en, he, pic]) => ({ en, he, pic }));
