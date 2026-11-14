@@ -2087,21 +2087,31 @@
   // ---------- Practice (third section of the Learn screen) ----------
   function practice() {
     const due = dueHere().length;
+    const tricky = Store.trickyWords().length;
+    const review = { title: t('practice.review'), sub: due === 1 ? t('practice.review.one') : due ? t('practice.review.some', { n: due }) : t('practice.review.none'), href: '#/quiz/choice/review', icon: 'repeat', color: 'blue', skill: 'memory', badge: due };
+    // The wide first tile is the thing to do now: tricky words, or a review that is due. With nothing due,
+    // "nothing to review" would greet the learner as the top choice, so the review tile waits at the bottom
+    const top = tricky ? { title: t('tricky.title'), sub: t('tricky.some', { n: tricky }), href: '#/quiz/choice/tricky', icon: 'target', color: 'rose', skill: 'memory' } : due ? review : null;
     const modes = [
-      ...(Store.trickyWords().length ? [{ title: t('tricky.title'), sub: t('tricky.some', { n: Store.trickyWords().length }), href: '#/quiz/choice/tricky', icon: 'target', color: 'rose', skill: 'memory' }] : []),
-      { title: t('practice.review'), sub: due === 1 ? t('practice.review.one') : due ? t('practice.review.some', { n: due }) : t('practice.review.none'), href: '#/quiz/choice/review', icon: 'repeat', color: 'blue', skill: 'memory', badge: due },
+      ...(top ? [{ ...top, wide: true }] : []),
+      ...(tricky && due ? [review] : []),
       { title: t('task.speak'), sub: t('practice.speak.sub'), href: '#/speak', icon: 'mic', color: 'purple', skill: 'speak' },
       { title: t('task.listen'), sub: t('practice.listen.sub'), href: '#/quiz/listen/level', icon: 'headphones', color: 'green', skill: 'listen' },
       { title: t('practice.cloze'), sub: t('practice.cloze.sub'), href: '#/quiz/cloze/level', icon: 'pencil', color: 'gold', skill: 'context' },
-      { title: t('practice.type'), sub: t('practice.type.sub'), href: '#/quiz/type/level', icon: 'keyboard', color: 'coral', skill: 'spell' }
+      { title: t('practice.type'), sub: t('practice.type.sub'), href: '#/quiz/type/level', icon: 'keyboard', color: 'coral', skill: 'spell' },
+      ...(due ? [] : [{ ...review, wide: true }])
     ];
+    // before any lesson, a line saying where practice words come from
+    const first = startedCount() === 0
+      ? `<p class="lvl-hint">${t('practice.first')} <a href="#/unit/${nextUnit().id}">${t('type.first.go')}</a></p>` : '';
     view.innerHTML = `
       <h1>${t('learn.title')}</h1>
       <p class="sub">${t('practice.sub', { level: levelLabel() })}</p>
       ${learnTabs('practice')}
+      ${first}
       <div class="pgrid">
-        ${modes.map((m, i) => `
-          <a class="ptile c-${m.color}${i === 0 ? ' wide' : ''}" href="${m.href}">
+        ${modes.map(m => `
+          <a class="ptile c-${m.color}${m.wide ? ' wide' : ''}" href="${m.href}">
             <span class="tile ${m.color}">${ICON[m.icon]}${m.badge ? `<span class="pt-badge en" aria-hidden="true">${m.badge > 99 ? '99+' : m.badge}</span>` : ''}</span>
             <span class="grow"><span class="pt-skill">${t('skill.' + m.skill)}</span><b>${m.title}</b><span class="small">${m.sub}</span></span>
           </a>`).join('')}

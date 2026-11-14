@@ -139,7 +139,7 @@ const STR = {
     'btn.next': 'Next', 'btn.back': 'Back', 'btn.finish': 'Finish',
     'btn.home': 'Back to Today', 'btn.more': 'More practice', 'btn.lessons': 'Go to lessons',
 
-    'practice.sub': 'Pick an exercise · {level} level',
+    'practice.sub': 'Pick an exercise · {level} level', 'practice.first': 'The exercises use the words of your lessons.',
     'practice.review': 'Review due words', 'practice.review.some': '{n} words are ready for review', 'practice.review.one': 'One word is ready for review',
     'practice.review.none': 'Nothing to review right now',
     'practice.speak.sub': 'Listen and say it out loud',
@@ -325,7 +325,7 @@ const STR = {
     'btn.next': 'הבא', 'btn.back': 'הקודם', 'btn.finish': 'סיום',
     'btn.home': 'חזרה למסך היום', 'btn.more': 'עוד תרגול', 'btn.lessons': 'לשיעורים',
 
-    'practice.sub': 'בחירת תרגיל · רמת {level}',
+    'practice.sub': 'בחירת תרגיל · רמת {level}', 'practice.first': 'התרגילים משתמשים במילים מהשיעורים שלך.',
     'practice.review': 'חזרה על מילים', 'practice.review.some': '{n} מילים מחכות לחזרה', 'practice.review.one': 'מילה אחת מחכה לחזרה',
     'practice.review.none': 'אין כרגע מילים לחזרה',
     'practice.speak.sub': 'מקשיבים ואומרים בקול',
