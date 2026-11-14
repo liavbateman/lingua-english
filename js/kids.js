@@ -36,6 +36,9 @@ const Kids = (() => {
       needStars: 'צריך {n} ★', owlLooks: 'איזה ינשוף יפה!',
       stories: 'סיפורים', storiesSub: 'סיפורים קצרים עם תמונות, לקרוא ולשמוע', storyLocked: 'סיימו את האי {name} כדי לפתוח',
       readAgain: 'עוד פעם', storyTap: 'לחצו על מילה כדי לשמוע אותה', storyQ: 'שאלה קטנה', theEnd: 'הסוף!',
+      garden: 'הגינה שלי', gardenSub: 'כל מילה שלמדתם היא צמח. השקו אותו כדי שיגדל!', thirsty: '💧 {n} צמאים',
+      gardenEmpty: 'הגינה עוד ריקה. שחקו באי, וכל מילה שתלמדו תהפוך לצמח!', water: 'להשקות את הגינה', allWet: 'כל הצמחים שתו! חזרו מחר',
+      watered: 'הגינה שתתה!', grew: '{n} צמחים גדלו',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -65,6 +68,9 @@ const Kids = (() => {
       needStars: 'Needs {n} ★', owlLooks: 'What a lovely owl!',
       stories: 'Stories', storiesSub: 'Short picture stories to read and hear', storyLocked: 'Finish the {name} island to open',
       readAgain: 'Again', storyTap: 'Tap a word to hear it', storyQ: 'A little question', theEnd: 'The end!',
+      garden: 'My garden', gardenSub: 'Every word you learned is a plant. Water it so it grows!', thirsty: '💧 {n} thirsty',
+      gardenEmpty: 'The garden is empty for now. Play an island and every word you learn becomes a plant!', water: 'Water the garden', allWet: 'Every plant had a drink! Come back tomorrow',
+      watered: 'The garden had a drink!', grew: '{n} plants grew',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -187,6 +193,14 @@ const Kids = (() => {
         </div>
         <h1 class="sr-only">${kt('title')}</h1>
         ${chestCard()}
+        ${(() => {
+          const g = Store.kidsGarden(), dry = g.filter(p => p.thirsty).length;
+          return `<a class="k-abc-card k-garden-card ${dry ? 'dry' : ''}" href="#/kids/garden">
+            <span class="k-story-books" aria-hidden="true">🌻</span>
+            <span class="grow"><b>${kt('garden')}</b><small>${g.length ? kt('gardenSub') : kt('gardenEmpty')}</small></span>
+            ${dry ? `<span class="k-story-count k-drops">${kt('thirsty', { n: dry })}</span>` : ''}
+          </a>`;
+        })()}
         <a class="k-abc-card k-story-card" href="#/kids/stories">
           <span class="k-story-books" aria-hidden="true">📚</span>
           <span class="grow"><b>${kt('stories')}</b><small>${kt('storiesSub')}</small></span>
@@ -227,6 +241,94 @@ const Kids = (() => {
     });
     const cur = $('.k-isle.cur');
     if (cur) setTimeout(() => cur.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60);
+  }
+
+  // ---------- review garden ----------
+  const PLANT = ['', '🌱', '🌿', '🌷', '🌻'];
+  function garden(grown = []) {
+    K.endLesson();
+    const g = Store.kidsGarden(), dry = g.filter(p => p.thirsty);
+    K.view.innerHTML = `
+      <div class="k-wrap">
+        <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
+        <h1 class="k-title">🌻 ${kt('garden')}</h1>
+        <p class="k-sub">${g.length ? kt('gardenSub') : kt('gardenEmpty')}</p>
+        ${g.length ? (dry.length
+          ? `<a class="k-btn" href="#/kids/water">💧 ${kt('water')} (${Math.min(dry.length, 6)})</a>`
+          : `<p class="k-allwet">✨ ${kt('allWet')}</p>`) : ''}
+        <div class="k-garden">
+          ${g.map(p => `
+            <button class="k-plant ${p.thirsty ? 'thirsty' : ''} ${grown.includes(p.w.id) ? 'grew' : ''}" data-en="${p.w.en}" aria-label="${p.w.en}${p.thirsty ? ', 💧' : ''}">
+              <span class="k-plant-grow" aria-hidden="true">${PLANT[p.lvl]}</span>
+              <span class="k-pot" aria-hidden="true">${p.w.pic}</span>
+              ${p.thirsty ? '<i class="k-drop" aria-hidden="true">💧</i>' : ''}
+            </button>`).join('')}
+        </div>
+      </div>`;
+    K.view.querySelectorAll('.k-plant').forEach(b => { b.onclick = () => sayEn(b.dataset.en); });
+  }
+
+  // Watering: up to 6 thirsty words as "find the picture"; a right first tap makes the plant grow
+  function water() {
+    const all = Store.kidsGarden();
+    const due = K.shuffle(all.filter(p => p.thirsty)).slice(0, 6);
+    if (!due.length) { location.hash = '#/kids/garden'; return; }
+    document.body.classList.add('in-lesson');
+    const pool = all.length >= 3 ? all.map(p => p.w) : KIDS_WORDS;
+    const grown = [];
+    let at = 0;
+    function round() {
+      K.lessonBar(at / due.length);
+      const w = due[at].w;
+      const opts = K.shuffle([w, ...K.shuffle(pool.filter(x => x !== w && x.pic !== w.pic)).slice(0, 2)]);
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">💧</span> ${kt('water')} · ${at + 1}/${due.length}</p>
+          <div class="k-prompt">
+            <button class="k-speaker" id="k-say" aria-label="${kt('listen')}: ${w.en}"><span aria-hidden="true">🔊</span></button>
+            <span class="k-target en" lang="en">${w.en}</span>
+          </div>
+          <div class="k-opts">${opts.map((o, i) => `<button class="k-opt" data-i="${i}" aria-label="${o.en}"><span aria-hidden="true">${o.pic}</span></button>`).join('')}</div>
+          ${owl(kt('tapTip'), 'small')}
+        </div>`;
+      $('#k-say').onclick = () => sayEn(w.en);
+      setTimeout(() => sayEn(w.en), 200);
+      K.view.querySelectorAll('.k-opt').forEach(b => {
+        b.onclick = () => {
+          if (opts[+b.dataset.i] === w) {
+            K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; });
+            b.classList.add('right');
+            K.Feel.right();
+            const before = due[at].lvl, after = Store.kidsWater(w.id, !missed);
+            if (after > before) grown.push(w.id);
+            $('.k-bubble').textContent = after > before ? `${PLANT[after]} ${pickOne(kt('great'))}` : pickOne(kt('great'));
+            $('.k-owl').classList.add('happy');
+            sayEn(w.en);
+            setTimeout(() => { at++; at < due.length ? round() : end(); }, 1200);
+          } else {
+            missed = true;
+            b.disabled = true;
+            b.classList.add('nope');
+            K.Feel.wrong(b);
+            $('.k-bubble').textContent = kt('tryAgain');
+            setTimeout(() => sayEn(w.en), 350);
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      location.replace('#/kids/garden');   // back to the garden without a history step, plants that grew bounce
+      setTimeout(() => {
+        garden(grown);
+        const head = $('.k-sub');
+        if (head) head.textContent = `💧 ${kt('watered')}${grown.length ? ' ' + kt('grew', { n: grown.length }) + ' 🌱' : ''}`;
+        K.confetti('kids');
+        sayEn('Your garden is happy!', 0.9);
+      }, 30);
+    }
+    round();
   }
 
   // ---------- picture stories ----------
@@ -1023,6 +1125,8 @@ const Kids = (() => {
       else if (a === 'abcgame') abcGame();
       else if (a === 'owl') wardrobe();
       else if (a === 'stories') stories();
+      else if (a === 'garden') garden();
+      else if (a === 'water') water();
       else if (a === 'story') story(b);
       else map();
     },

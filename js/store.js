@@ -135,6 +135,26 @@ const Store = (() => {
       save();
     },
     kidsWordCount: id => (state.kids && state.kids.words[id]) || 0,
+    // Review garden: every word the child got right is a plant. It gets thirsty when the word is due
+    // for review (1, 2, 4, then 8 days) and grows a stage each time it is watered with a right answer.
+    kidsGarden() {
+      const k = state.kids || { words: {} }, g = k.garden || {}, now = Date.now();
+      return KIDS_WORDS.filter(w => (k.words || {})[w.id]).map(w => {
+        const p = g[w.id] || { lvl: 1, due: 0 };
+        return { w, lvl: p.lvl, thirsty: p.due <= now };
+      });
+    },
+    kidsWater(id, right) {
+      state.kids = state.kids || { stars: {}, stickers: {}, words: {} };
+      const g = state.kids.garden = state.kids.garden || {};
+      const p = g[id] || { lvl: 1, due: 0 };
+      if (right) p.lvl = Math.min(4, p.lvl + 1);
+      p.due = Date.now() + [1, 1, 2, 4, 8][p.lvl] * DAY;
+      g[id] = p;
+      touchDay();
+      save();
+      return p.lvl;
+    },
     // The owl buddy's look: a colour and an accessory, chosen in the wardrobe
     get kidsOwl() { const o = state.kids && state.kids.owl; return { color: (o && o.color) || 'blue', acc: (o && o.acc) || '' }; },
     setKidsOwl(part, id) {
