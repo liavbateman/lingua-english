@@ -207,6 +207,9 @@ const Store = (() => {
       save();
       return best;
     },
+    // Big, spaced English text for children who find reading hard (a grown-up turns it on)
+    get kidsBigPrint() { return !!(state.kids && state.kids.bigPrint); },
+    set kidsBigPrint(v) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.bigPrint = !!v; save(); },
     // The owl buddy's look: a colour and an accessory, chosen in the wardrobe
     get kidsOwl() { const o = state.kids && state.kids.owl; return { color: (o && o.color) || 'blue', acc: (o && o.acc) || '' }; },
     setKidsOwl(part, id) {

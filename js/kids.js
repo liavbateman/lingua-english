@@ -83,6 +83,7 @@ const Kids = (() => {
       surprise: 'הפתעה!', surpriseTip: 'לחצו על הקובייה (או נערו את הטלפון) למשחק הפתעה',
       speed: 'סיבוב מהיר', speedSub: '10 מילים, כמה שיותר מהר!', speedBest: 'השיא שלך: {n}', speedScore: '{n} נקודות', speedNew: 'שיא חדש!',
       speedTip: 'הקשיבו ולחצו מהר! לא נורא אם הזמן נגמר',
+      pcBig: 'אותיות גדולות ומרווחות', pcBigText: 'גופן קריא במיוחד (Lexend), גדול יותר ועם רווחים בין האותיות. עוזר לילדים שקשה להם לקרוא, כולל דיסלקציה',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -159,6 +160,7 @@ const Kids = (() => {
       surprise: 'Surprise!', surpriseTip: 'Tap the dice (or shake the phone) for a surprise game',
       speed: 'Speed round', speedSub: '10 words, as fast as you can!', speedBest: 'Your best: {n}', speedScore: '{n} points', speedNew: 'New best!',
       speedTip: "Listen and tap fast! It's fine if time runs out",
+      pcBig: 'Big, spaced letters', pcBigText: 'An extra-readable font (Lexend), larger and with more space between letters. Helps children who find reading hard, including dyslexia',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -1535,6 +1537,10 @@ const Kids = (() => {
             <input type="checkbox" id="k-mode" ${Store.kidsMode ? 'checked' : ''}>
           </label>
           <label class="k-pc-switch k-pc-gap">
+            <span class="grow"><b>🔠 ${kt('pcBig')}</b><small>${kt('pcBigText')}</small></span>
+            <input type="checkbox" id="k-big" ${Store.kidsBigPrint ? 'checked' : ''}>
+          </label>
+          <label class="k-pc-switch k-pc-gap">
             <span class="grow"><b>🌙 ${kt('pcBed')}</b><small>${kt('pcBedText')}</small></span>
             <input type="checkbox" id="k-bed" ${Store.kidsBedtime ? 'checked' : ''}>
           </label>
@@ -1568,6 +1574,7 @@ const Kids = (() => {
     const vEn = $('#k-vc-en'), vHe = $('#k-vc-he');
     if (vEn) vEn.onclick = () => sayEn('Hello! This is how the English words sound.', 0.9);
     if (vHe) vHe.onclick = () => say([['he', kt('vcSampleHe')]]);
+    $('#k-big').onchange = e => { Store.kidsBigPrint = e.target.checked; document.body.classList.toggle('kids-big', Store.kidsBigPrint); };
     $('#k-bed').onchange = e => { Store.kidsBedtime = e.target.checked; document.body.classList.toggle('night', isNight()); };
   }
 
@@ -2628,6 +2635,7 @@ const Kids = (() => {
       songRun++;   // a song still playing stops
       document.body.classList.add('kids');
       document.body.classList.toggle('night', isNight());
+      document.body.classList.toggle('kids-big', Store.kidsBigPrint);
       if (a === 'parents') return parents();
       if (overLimit()) return rest();   // checked between screens, never in the middle of a game
       if (a === 'play') play(b);
@@ -2652,6 +2660,6 @@ const Kids = (() => {
       else map();
     },
     gate,
-    leave() { stopRec(); document.body.classList.remove('kids', 'night'); document.body.style.removeProperty('--kc'); }
+    leave() { stopRec(); document.body.classList.remove('kids', 'night', 'kids-big'); document.body.style.removeProperty('--kc'); }
   };
 })();
