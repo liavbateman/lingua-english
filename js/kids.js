@@ -95,6 +95,8 @@ const Kids = (() => {
       sceneClear: 'לנקות', sceneEmpty: 'עוד אין תמונות. שחקו באיים כדי לאסוף מילים!',
       checkin: 'הינשוף שואל: איך אתם מרגישים היום?', checkinDone: 'היום הרגשתם:',
       weatherQ: 'ומה מזג האוויר היום? הסתכלו מהחלון!', checkinToday: 'היום:',
+      together: 'משחקים ביחד', togetherSub: 'שני ילדים, טלפון אחד, כל אחד בתורו', turnOf: 'התור של {name}!', teamScore: 'ביחד מצאתם {n} מתוך {m}!',
+      teamTip: 'מעבירים את הטלפון! כל תשובה נכונה עוזרת לשניכם',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -183,6 +185,8 @@ const Kids = (() => {
       sceneClear: 'Clear', sceneEmpty: 'No pictures yet. Play the islands to collect words!',
       checkin: 'The owl asks: how do you feel today?', checkinDone: 'Today you feel:',
       weatherQ: "And what's the weather today? Look out of the window!", checkinToday: 'Today:',
+      together: 'Play together', togetherSub: 'Two children, one phone, taking turns', turnOf: "{name}'s turn!", teamScore: 'Together you found {n} of {m}!',
+      teamTip: 'Pass the phone! Every right answer helps you both',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -519,6 +523,10 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">⚡</span>
           <span class="grow"><b>${kt('speed')}</b><small>${Store.kidsSpeedBest ? kt('speedBest', { n: Store.kidsSpeedBest }) : kt('speedSub')}</small></span>
         </a>`}
+        <a class="k-abc-card k-together-card" href="#/kids/together">
+          <span class="k-story-books" aria-hidden="true">👫</span>
+          <span class="grow"><b>${kt('together')}</b><small>${kt('togetherSub')}</small></span>
+        </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
           <span class="grow"><b>${kt('songs')}</b><small>${kt('songsSub')}</small></span>
@@ -1216,6 +1224,82 @@ const Kids = (() => {
       celebrate();
       sayEn('You can read! Hooray!', 0.9);
       $('#k-again').onclick = blendGame;
+    }
+    round();
+  }
+
+  // ---------- play together: two children take turns on one phone ----------
+  // A team game, not a race: each turn one child hears a word and finds its picture,
+  // every right answer fills the shared jar, and the end screen celebrates them together.
+  function togetherGame() {
+    document.body.classList.add('in-lesson');
+    const profs = Store.kidsProfiles;
+    const players = profs.length >= 2 ? profs.slice(0, 2).map((p, i) => ({ face: p.face, name: p.name || kt('player') + ' ' + (i + 1) }))
+      : [{ face: '🦊', name: kt('player') + ' 1' }, { face: '🐼', name: kt('player') + ' 2' }];
+    const pool = KIDS_WORDS.filter(w => isOpen(KIDS_THEMES.findIndex(th => th.id === w.theme)));
+    const rounds = K.shuffle(pool).slice(0, 10);
+    let at = 0, team = 0;
+    function round() {
+      K.lessonBar(at / rounds.length);
+      const p = players[at % 2], w = rounds[at];
+      const opts = K.shuffle([w, ...K.shuffle(pool.filter(x => x !== w && x.pic !== w.pic)).slice(0, 2)]);
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <div class="k-turn" aria-live="polite">
+            ${players.map((q, i) => `<span class="k-turn-p ${i === at % 2 ? 'on' : ''}"><i aria-hidden="true">${q.face}</i>${esc(q.name)}</span>`).join('')}
+          </div>
+          <p class="k-step"><span aria-hidden="true">${p.face}</span> ${kt('turnOf', { name: esc(p.name) })}</p>
+          <div class="k-jar" aria-label="${team}/${rounds.length}">${rounds.map((_, i) => `<i class="${i < team ? 'on' : ''}"></i>`).join('')}</div>
+          <div class="k-prompt">
+            <button class="k-speaker" id="k-say" aria-label="${kt('listen')}: ${w.en}"><span aria-hidden="true">🔊</span></button>
+            <span class="k-target en" lang="en">${w.en}</span>
+          </div>
+          <div class="k-opts">${opts.map((o, i) => `<button class="k-opt" data-i="${i}" aria-label="${o.en}"><span aria-hidden="true">${o.pic}</span></button>`).join('')}</div>
+          ${owl(kt('teamTip'), 'small')}
+        </div>`;
+      $('#k-say').onclick = () => sayEn(w.en);
+      setTimeout(() => sayEn(w.en), 300);
+      K.view.querySelectorAll('.k-opt').forEach(b => {
+        b.onclick = () => {
+          if (opts[+b.dataset.i] === w) {
+            K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; });
+            b.classList.add('right');
+            K.Feel.right();
+            if (!missed) team++;
+            const jar = K.view.querySelectorAll('.k-jar i');
+            if (!missed && jar[team - 1]) jar[team - 1].classList.add('on', 'k-pop-in');
+            owlMood('cheer');
+            $('.k-bubble').textContent = `${p.face} ${pickOne(kt('great'))}`;
+            sayEn(w.en);
+            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 1400);
+          } else {
+            missed = true;
+            b.disabled = true;
+            b.classList.add('nope');
+            K.Feel.wrong(b);
+            owlMood('think');
+            $('.k-bubble').textContent = kt('tryAgain');
+            setTimeout(() => sayEn(w.en), 350);
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>${players.map(q => q.face).join(' 🤝 ')}</h1>
+            <p class="k-unlock"><b>${kt('teamScore', { n: team, m: rounds.length })}</b></p>
+            <div class="k-jar big">${rounds.map((_, i) => `<i class="${i < team ? 'on' : ''}"></i>`).join('')}</div>
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('Great teamwork!', 0.9);
+      $('#k-again').onclick = togetherGame;
     }
     round();
   }
@@ -2959,6 +3043,7 @@ const Kids = (() => {
       else if (a === 'owl') wardrobe();
       else if (a === 'stories') stories();
       else if (a === 'riddles') riddles();
+      else if (a === 'together') togetherGame();
       else if (a === 'blend') blendGame();
       else if (a === 'speed') speedGame();
       else if (a === 'peek') peekGame();

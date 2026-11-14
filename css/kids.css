@@ -981,3 +981,15 @@ body.kids.wx-windy .k-isle-pic, body.kids.wx-windy .k-owl .k-av { animation: mv-
 @keyframes k-fall { from { background-position: 0 0; } to { background-position: -10px 60px; } }
 body.kids.wx-rainy .view, body.kids.wx-snowy .view { position: relative; z-index: 1; }
 @media (prefers-reduced-motion: reduce) { body.kids.wx-rainy::after, body.kids.wx-snowy::after, body.kids.wx-windy .k-isle-pic { animation: none !important; } }
+
+/* play together */
+.k-turn { display: flex; justify-content: center; gap: 10px; margin-bottom: 8px; }
+.k-turn-p { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; background: rgba(255, 255, 255, .55); color: var(--k-ink); font: 1rem var(--k-font); opacity: .6; transition: transform var(--dur-ui), opacity var(--dur-ui); }
+.k-turn-p i { font-style: normal; font-size: 1.5rem; }
+.k-turn-p.on { background: #fff; opacity: 1; transform: scale(1.12); box-shadow: 0 4px 0 var(--k-edge); }
+.k-jar { display: flex; justify-content: center; gap: 4px; margin: 0 0 12px; }
+.k-jar i { width: 18px; height: 18px; border-radius: 50%; background: rgba(255, 255, 255, .45); }
+.k-jar i.on { background: #ffc22e; box-shadow: 0 2px 0 #d68f00; }
+.k-jar.big { margin-top: 10px; }
+.k-jar.big i { width: 22px; height: 22px; background: #e8eefc; }
+.k-jar.big i.on { background: #ffc22e; }
