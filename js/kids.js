@@ -120,6 +120,7 @@ const Kids = (() => {
       zoo: 'סופרים ביחד', zooSub: 'כמה תפוחים? תן לי שלושה! סופרים באנגלית', zooCount: 'סופרים איתי', zooDone: 'מוכן!',
       zooTipHow: 'לחצו על כל אחד כדי לספור, ואז בחרו את המספר', zooTipGive: 'לחצו על הדברים כדי לשים אותם בסל. לחיצה בסל מחזירה',
       lull: 'שיר ערש של היום', lullSub: 'לילה טוב לכל המילים שלמדנו היום', lullPlay: 'לשיר שוב', lullEnd: 'לילה טוב! חלומות פז',
+      teddy: 'גוגעים בדובי', teddySub: 'איפה האף של הדובי? האוזניים? הרגליים?', teddyTip: 'הקשיבו וגעו בחלק הנכון בדובי',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -233,6 +234,7 @@ const Kids = (() => {
       zoo: 'Count with me', zooSub: 'How many apples? Give me three! Counting in English', zooCount: 'Count with me', zooDone: 'Done!',
       zooTipHow: 'Tap each one to count, then pick the number', zooTipGive: 'Tap things to put them in the basket. Tap in the basket to take one out',
       lull: "Today's lullaby", lullSub: 'Good night to every word we learned today', lullPlay: 'Sing again', lullEnd: 'Good night! Sweet dreams',
+      teddy: "Touch the teddy", teddySub: "Where is the teddy's nose? ears? feet?", teddyTip: 'Listen and touch the right part of the teddy',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -621,6 +623,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🔢</span>
           <span class="grow"><b>${kt('zoo')}</b><small>${kt('zooSub')}</small></span>
           ${Store.kidsHasSticker('zoo') ? starsHtml(Store.kidsStars('zoo'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-teddy-card" href="#/kids/teddy">
+          <span class="k-story-books" aria-hidden="true">🧸</span>
+          <span class="grow"><b>${kt('teddy')}</b><small>${kt('teddySub')}</small></span>
+          ${Store.kidsHasSticker('teddy') ? starsHtml(Store.kidsStars('teddy'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -2421,6 +2428,95 @@ const Kids = (() => {
     }
     $('#k-lull-again').onclick = sing;
     sing();
+  }
+
+  // ---------- touch the teddy: body words on a real body ----------
+  // A big drawn teddy bear; every part is a tap target. "Touch the teddy's nose!" - the right part glows
+  // and the teddy giggles; another part just says its own name ("That is the ears!"), so a miss still teaches.
+  const TEDDY = [
+    { id: 'nose', he: 'אף' }, { id: 'eyes', he: 'עיניים' }, { id: 'ears', he: 'אוזניים' }, { id: 'mouth', he: 'פה' },
+    { id: 'hands', he: 'ידיים' }, { id: 'feet', he: 'רגליים' }, { id: 'tummy', he: 'בטן' }, { id: 'head', he: 'ראש' }
+  ];
+  function teddySvg() {
+    const P = (id, el) => `<g class="k-td-part" data-part="${id}" role="button" tabindex="0" aria-label="${id}">${el}</g>`;
+    return `<svg class="k-teddy" viewBox="0 0 200 270" aria-label="teddy bear">
+      ${P('feet', '<ellipse cx="68" cy="248" rx="26" ry="16"/><ellipse cx="132" cy="248" rx="26" ry="16"/>')}
+      ${P('hands', '<ellipse cx="40" cy="178" rx="18" ry="32" transform="rotate(20 40 178)"/><ellipse cx="160" cy="178" rx="18" ry="32" transform="rotate(-20 160 178)"/>')}
+      ${P('tummy', '<ellipse cx="100" cy="190" rx="52" ry="58"/><ellipse class="k-td-light" cx="100" cy="198" rx="30" ry="34"/>')}
+      ${P('ears', '<circle cx="54" cy="40" r="24"/><circle cx="146" cy="40" r="24"/><circle class="k-td-light" cx="54" cy="40" r="12"/><circle class="k-td-light" cx="146" cy="40" r="12"/>')}
+      ${P('head', '<circle cx="100" cy="84" r="58"/>')}
+      ${P('eyes', '<circle class="k-td-dark" cx="78" cy="72" r="9"/><circle class="k-td-dark" cx="122" cy="72" r="9"/><circle class="k-td-shine" cx="81" cy="69" r="3"/><circle class="k-td-shine" cx="125" cy="69" r="3"/>')}
+      <ellipse class="k-td-light k-td-muzzle" cx="100" cy="104" rx="28" ry="21"/>
+      ${P('mouth', '<rect class="k-td-hitbox" x="80" y="110" width="40" height="18"/><path class="k-td-line" d="M86 114 Q100 128 114 114"/>')}
+      ${P('nose', '<ellipse class="k-td-dark" cx="100" cy="98" rx="11" ry="8"/>')}
+    </svg>`;
+  }
+  function teddyGame() {
+    document.body.classList.add('in-lesson');
+    const rounds = K.shuffle(TEDDY).slice(0, little() ? 5 : 7);
+    let at = 0, firstTry = 0;
+    function round() {
+      K.lessonBar(at / rounds.length);
+      const part = rounds[at], line = `Touch the teddy's ${part.id}!`;
+      let missed = false, done = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🧸</span> ${kt('teddy')} · ${at + 1}/${rounds.length}</p>
+          <div class="k-prompt">
+            <button class="k-speaker" id="k-say" aria-label="${kt('listen')}: ${line}"><span aria-hidden="true">🔊</span></button>
+            <span class="k-target en" lang="en">${line}</span>
+          </div>
+          <div class="k-teddy-box">${teddySvg()}</div>
+          ${owl(kt('teddyTip'), 'small')}
+        </div>`;
+      const ask = () => sayEn(line, 0.85);
+      $('#k-say').onclick = ask;
+      setTimeout(ask, 300);
+      const tap = g => {
+        if (done) return;
+        const id = g.dataset.part, p = TEDDY.find(x => x.id === id);
+        g.classList.remove('hit', 'nope'); void g.getBoundingClientRect();
+        if (id === part.id) {
+          done = true;
+          g.classList.add('hit');
+          $('.k-teddy').classList.add('giggle');
+          K.Feel.right();
+          if (!missed) firstTry++;
+          owlMood('cheer');
+          $('.k-bubble').textContent = `${part.id} · ${part.he} ✓`;
+          say([['en', `Hee hee! My ${part.id}!`]], 0.95);
+          setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 1900);
+        } else {
+          missed = true;
+          g.classList.add('nope');
+          owlMood('think');
+          $('.k-bubble').textContent = `${id} · ${p.he}. ${kt('tryAgain')}`;
+          say([['en', `That is the ${id}.`], ['en', line]], 0.9);
+        }
+      };
+      K.view.querySelectorAll('.k-td-part').forEach(g => {
+        g.addEventListener('click', e => { e.stopPropagation(); tap(g); });
+        g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tap(g); } });
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = firstTry >= rounds.length ? 3 : firstTry >= rounds.length - 2 ? 2 : 1;
+      Store.kidsFinish('teddy', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🧸 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('Teddy says thank you! Big hug!', 0.9);
+      $('#k-again').onclick = teddyGame;
+    }
+    round();
   }
 
   // ---------- songs & chants ----------
@@ -4428,6 +4524,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'teddy') teddyGame();
       else if (a === 'lullaby') lullaby();
       else if (a === 'zoo') zooGame();
       else if (a === 'call') callGame();

@@ -1256,3 +1256,23 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-lull.done .k-lull-w { opacity: .4; }
 .k-lull.done .k-lull-moon { font-size: 4.4rem; }
 @media (prefers-reduced-motion: reduce) { .k-lull-moon, .k-lull-sky i { animation: none; } .k-lull-w { transition: none; } }
+
+/* touch the teddy */
+.k-teddy-box { display: flex; justify-content: center; padding: 10px 0 4px; border-radius: 26px; background: rgba(255, 255, 255, .9); box-shadow: 0 6px 0 var(--k-edge); }
+.k-teddy { width: min(72vw, 280px); height: auto; overflow: visible; }
+.k-teddy.giggle { animation: k-td-giggle .6s ease-in-out; }
+@keyframes k-td-giggle { 25% { transform: rotate(-4deg); } 75% { transform: rotate(4deg); } }
+.k-td-part { cursor: pointer; fill: #c98a4b; stroke: #8a5527; stroke-width: 2; transform-box: fill-box; transform-origin: center; outline: none; }
+.k-td-part:focus-visible { stroke: #3f7bff; stroke-width: 4; }
+.k-td-light { fill: #f2cf9e; stroke: none; }
+.k-td-muzzle { pointer-events: none; }
+.k-td-dark { fill: #2a1a10; stroke: none; }
+.k-td-shine { fill: #fff; stroke: none; pointer-events: none; }
+.k-td-line { fill: none; stroke: #2a1a10; stroke-width: 4; stroke-linecap: round; }
+.k-td-part.hit { animation: k-td-hit .6s var(--ease-pop); }
+.k-td-part.hit, .k-td-part.hit .k-td-light { fill: #ffd84d; }
+@keyframes k-td-hit { 50% { transform: scale(1.18); } }
+.k-td-part.nope { animation: k-td-no .45s ease-in-out; }
+@keyframes k-td-no { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+@media (prefers-reduced-motion: reduce) { .k-teddy.giggle, .k-td-part.hit, .k-td-part.nope { animation: none; } }
+.k-td-part .k-td-hitbox, .k-td-part.hit .k-td-hitbox { fill: transparent; stroke: none; }
