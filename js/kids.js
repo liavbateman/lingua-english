@@ -97,6 +97,8 @@ const Kids = (() => {
       weatherQ: 'ומה מזג האוויר היום? הסתכלו מהחלון!', checkinToday: 'היום:',
       together: 'משחקים ביחד', togetherSub: 'שני ילדים, טלפון אחד, כל אחד בתורו', turnOf: 'התור של {name}!', teamScore: 'ביחד מצאתם {n} מתוך {m}!',
       teamTip: 'מעבירים את הטלפון! כל תשובה נכונה עוזרת לשניכם',
+      shop: 'החנות', shopSub: 'משחקים בחנות: מה הלקוח רוצה?', shopTip: 'הקשיבו ללקוח, שימו בסל ולחצו "Here you are!"',
+      shopGive: 'Here you are!', shopBasket: 'הסל', shopCoins: '{n} מטבעות',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -187,6 +189,8 @@ const Kids = (() => {
       weatherQ: "And what's the weather today? Look out of the window!", checkinToday: 'Today:',
       together: 'Play together', togetherSub: 'Two children, one phone, taking turns', turnOf: "{name}'s turn!", teamScore: 'Together you found {n} of {m}!',
       teamTip: 'Pass the phone! Every right answer helps you both',
+      shop: 'The shop', shopSub: 'Play shop: what does the customer want?', shopTip: 'Listen to the customer, fill the basket and tap "Here you are!"',
+      shopGive: 'Here you are!', shopBasket: 'Basket', shopCoins: '{n} coins',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -526,6 +530,11 @@ const Kids = (() => {
         <a class="k-abc-card k-together-card" href="#/kids/together">
           <span class="k-story-books" aria-hidden="true">👫</span>
           <span class="grow"><b>${kt('together')}</b><small>${kt('togetherSub')}</small></span>
+        </a>
+        <a class="k-abc-card k-shop-card" href="#/kids/shop">
+          <span class="k-story-books" aria-hidden="true">🏪</span>
+          <span class="grow"><b>${kt('shop')}</b><small>${kt('shopSub')}</small></span>
+          ${Store.kidsHasSticker('shop') ? starsHtml(Store.kidsStars('shop'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -1300,6 +1309,101 @@ const Kids = (() => {
       celebrate();
       sayEn('Great teamwork!', 0.9);
       $('#k-again').onclick = togetherGame;
+    }
+    round();
+  }
+
+  // ---------- the shop: role-play with whole phrases ----------
+  // Customers ask "Can I have two apples, please?"; the child puts the right things in the basket and says
+  // "Here you are!" with a button. A wrong basket is just "Hmm, I want…" and the basket empties.
+  function shopGame() {
+    document.body.classList.add('in-lesson');
+    const shelf = ['food/apple', 'food/banana', 'food/grapes', 'food/strawberry', 'food/bread', 'food/milk', 'food/egg', 'food/pizza']
+      .map(id => KIDS_WORDS.find(w => w.id === id)).filter(Boolean);
+    const plural = { apple: 'apples', banana: 'bananas', egg: 'eggs', pizza: 'pizzas', strawberry: 'strawberries' };
+    const customers = K.shuffle(['🐻', '🐰', '🐸', '🐵', '🐼', '🦁']).slice(0, 5);
+    let at = 0, coins = 0, firstTry = 0;
+    function order() {
+      const w = pickOne(shelf), two = plural[w.en] && Math.random() < .45;
+      const one = ['milk', 'bread', 'grapes'].includes(w.en) ? 'some ' + w.en : (/^[aeiou]/.test(w.en) ? 'an ' : 'a ') + w.en;
+      return { w, n: two ? 2 : 1, text: `Can I have ${two ? 'two ' + plural[w.en] : one}, please?` };
+    }
+    function round() {
+      K.lessonBar(at / customers.length);
+      const o = order(), who = customers[at];
+      let basket = [], missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🏪</span> ${kt('shop')} · ${at + 1}/${customers.length} · 🪙 ${coins}</p>
+          <div class="k-customer">
+            <span class="k-customer-face" aria-hidden="true">${who}</span>
+            <button class="k-customer-says en" id="k-say">${o.text}</button>
+          </div>
+          <div class="k-shelf">${shelf.map((w, i) => `<button class="k-shelf-item" data-i="${i}" aria-label="${w.en}"><span aria-hidden="true">${w.pic}</span><small class="en">${w.en}</small></button>`).join('')}</div>
+          <div class="k-basket" aria-live="polite"><span aria-hidden="true">🧺</span><span class="k-basket-items" id="k-basket"></span></div>
+          <button class="k-btn" id="k-give">🛍️ <bdi dir="ltr" lang="en">${kt('shopGive')}</bdi></button>
+          ${owl(bidiEn(kt('shopTip')), 'small')}
+        </div>`;
+      const showBasket = () => {
+        $('#k-basket').innerHTML = basket.map((w, i) => `<button class="k-basket-item" data-i="${i}" aria-label="${w.en}">${w.pic}</button>`).join('');
+        K.view.querySelectorAll('.k-basket-item').forEach(b => { b.onclick = () => { basket.splice(+b.dataset.i, 1); showBasket(); }; });
+      };
+      const ask = () => sayEn(o.text);
+      $('#k-say').onclick = ask;
+      setTimeout(ask, 300);
+      K.view.querySelectorAll('.k-shelf-item').forEach(b => {
+        b.onclick = () => {
+          if (basket.length >= 4) return;
+          const w = shelf[+b.dataset.i];
+          basket.push(w);
+          sayEn(w.en, 1);
+          Sfx.tap();
+          showBasket();
+        };
+      });
+      $('#k-give').onclick = () => {
+        sayEn('Here you are!', 1);
+        const ok = basket.length === o.n && basket.every(w => w === o.w);
+        setTimeout(() => {
+          if (ok) {
+            if (!missed) firstTry++;
+            coins += o.n;
+            Store.kidsWordRight(o.w.id);
+            K.Feel.right();
+            owlMood('cheer');
+            $('.k-customer-says').textContent = 'Thank you! 🪙';
+            $('.k-customer').classList.add('happy');
+            say([['en', 'Thank you! Bye bye!']]);
+            setTimeout(() => { at++; at < customers.length ? round() : end(); }, 1700);
+          } else {
+            missed = true;
+            K.Feel.wrong($('.k-basket'));
+            owlMood('think');
+            $('.k-customer-says').textContent = 'Hmm… ' + o.text;
+            basket = [];
+            showBasket();
+            setTimeout(ask, 300);
+          }
+        }, 700);
+      };
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = firstTry >= 5 ? 3 : firstTry >= 3 ? 2 : 1;
+      Store.kidsFinish('shop', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🏪 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+            <p class="k-unlock">🪙 ${kt('shopCoins', { n: coins })}</p>
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('What a great shopkeeper!', 0.9);
+      $('#k-again').onclick = shopGame;
     }
     round();
   }
@@ -3043,6 +3147,7 @@ const Kids = (() => {
       else if (a === 'owl') wardrobe();
       else if (a === 'stories') stories();
       else if (a === 'riddles') riddles();
+      else if (a === 'shop') shopGame();
       else if (a === 'together') togetherGame();
       else if (a === 'blend') blendGame();
       else if (a === 'speed') speedGame();
