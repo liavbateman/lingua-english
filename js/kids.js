@@ -73,6 +73,8 @@ const Kids = (() => {
       vcEnTip: 'בלי קול אנגלי הילד לא ישמע את המילים. התקינו קול אנגלי באותו מקום בהגדרות.',
       vcSampleHe: 'שלום! ככה נשמעות ההוראות בעברית.',
       count: 'כמה יש?', countTip: 'לחצו על כל אחד כדי לספור, ואז בחרו מספר',
+      colour: 'צובעים!', colourSub: 'בחרו צבע וצבעו את התמונה', colourAsk: 'צבעו את ה{thing} ב{colour}', colourDone: 'איזו תמונה יפה!',
+      colourFree: 'עכשיו צבעו מה שבא לכם!',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -139,6 +141,8 @@ const Kids = (() => {
       vcEnTip: "Without an English voice your child won't hear the words. Install an English voice in the same settings.",
       vcSampleHe: 'שלום! ככה נשמעות ההוראות בעברית.',
       count: 'How many?', countTip: 'Tap each one to count, then pick the number',
+      colour: 'Colour it!', colourSub: 'Pick a colour and colour the picture', colourAsk: 'Colour the {thing} {colour}', colourDone: 'What a lovely picture!',
+      colourFree: 'Now colour anything you like!',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -449,6 +453,11 @@ const Kids = (() => {
           <span class="grow"><b>${kt('riddles')}</b><small>${kt('riddlesSub')}</small></span>
           ${Store.kidsHasSticker('riddles') ? starsHtml(Store.kidsStars('riddles'), 'sm') : ''}
         </a>
+        <a class="k-abc-card k-colour-card" href="#/kids/colour">
+          <span class="k-story-books" aria-hidden="true">🖍️</span>
+          <span class="grow"><b>${kt('colour')}</b><small>${kt('colourSub')}</small></span>
+          ${Store.kidsHasSticker('colour') ? starsHtml(Store.kidsStars('colour'), 'sm') : ''}
+        </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
           <span class="grow"><b>${kt('songs')}</b><small>${kt('songsSub')}</small></span>
@@ -673,6 +682,93 @@ const Kids = (() => {
       $('#k-again').onclick = riddles;
     }
     round();
+  }
+
+  // ---------- colour it ----------
+  // A picture of shapes to fill: tap a colour (hear its name), then a part of the picture.
+  // The owl gives 5 colour instructions ("Colour the sun yellow"); after that, free colouring.
+  const PAINT = { red: '#ef4444', blue: '#3b82f6', green: '#22c55e', yellow: '#facc15', orange: '#fb923c', purple: '#a855f7', black: '#1f2937', white: '#ffffff' };
+  const PAINT_HE = { red: 'אדום', blue: 'כחול', green: 'ירוק', yellow: 'צהוב', orange: 'כתום', purple: 'סגול', black: 'שחור', white: 'לבן' };
+  const PARTS = [
+    ['sky', 'שמיים', '<rect x="0" y="0" width="300" height="258"/>'],
+    ['sun', 'שמש', '<circle cx="248" cy="52" r="30"/>'],
+    ['cloud', 'ענן', '<path d="M38 82a20 20 0 0 1 30-22a26 26 0 0 1 48 4a18 18 0 0 1 4 34H44a17 17 0 0 1-6-16z"/>'],
+    ['house', 'בית', '<rect x="56" y="150" width="128" height="108"/>'],
+    ['roof', 'גג', '<path d="M44 152 120 92l76 60z"/>'],
+    ['door', 'דלת', '<rect x="104" y="200" width="32" height="58" rx="4"/>'],
+    ['window', 'חלון', '<rect x="146" y="168" width="26" height="26" rx="3"/>'],
+    ['tree', 'עץ', '<circle cx="238" cy="178" r="34"/>'],
+    ['grass', 'דשא', '<rect x="0" y="258" width="300" height="42"/>']
+  ];
+  function colourIt() {
+    document.body.classList.add('in-lesson');
+    const asks = K.shuffle([['sun', 'yellow'], ['roof', 'red'], ['house', 'blue'], ['tree', 'green'], ['door', 'purple'], ['grass', 'green'], ['window', 'orange']]).slice(0, 5);
+    let at = 0, missed = 0, brush = null;
+    K.lessonBar(0);
+    K.view.innerHTML = `
+      <div class="k-wrap k-play">
+        <p class="k-step"><span aria-hidden="true">🖍️</span> ${kt('colour')}</p>
+        <div class="k-card k-paint-card">
+          <svg class="k-paint" viewBox="0 0 300 300" role="img" aria-label="${kt('colour')}">
+            ${PARTS.map(([id, he, shape]) => `<g class="k-part" data-part="${id}" tabindex="0" role="button" aria-label="${id}">${shape.replace('/>', ' fill="#ffffff"/>')}</g>`).join('')}
+            <rect x="229" y="210" width="18" height="48" fill="#8b5a2b" pointer-events="none"/>
+            <circle cx="160" cy="232" r="3" fill="#1f2937" pointer-events="none"/>
+          </svg>
+        </div>
+        <div class="k-paints">
+          ${Object.entries(PAINT).map(([name, hex]) => `<button class="k-paint-pot" data-c="${name}" style="--p:${hex}" aria-label="${name}"><i></i><span class="en">${name}</span></button>`).join('')}
+        </div>
+        ${owl('', 'small')}
+      </div>`;
+    const bub = () => $('.k-bubble');
+    function ask() {
+      if (at >= asks.length) return finish();
+      K.lessonBar(at / asks.length);
+      const [part, col] = asks[at];
+      const he = PARTS.find(p => p[0] === part)[1];
+      bub().innerHTML = `${kt('colourAsk', { thing: isHe() ? he : part, colour: isHe() ? PAINT_HE[col] : col })} <b class="en" style="color:${PAINT[col] === '#ffffff' ? '#1d2a5b' : PAINT[col]}">● ${col}</b>`;
+      say([['en', `Colour the ${part} ${col}!`]]);
+      K.view.querySelectorAll('.k-part').forEach(g => g.classList.toggle('hint', g.dataset.part === part));
+    }
+    K.view.querySelectorAll('.k-paint-pot').forEach(b => {
+      b.onclick = () => {
+        brush = b.dataset.c;
+        K.view.querySelectorAll('.k-paint-pot').forEach(x => x.classList.toggle('on', x === b));
+        sayEn(brush, 0.9);
+      };
+    });
+    const paint = g => {
+      if (!brush) { K.Feel.wrong(g); return; }
+      g.firstElementChild.setAttribute('fill', PAINT[brush]);
+      Sfx.tap();
+      if (at >= asks.length) return;   // free colouring after the instructions
+      const [part, col] = asks[at];
+      if (g.dataset.part === part && brush === col) {
+        K.Feel.right();
+        owlMood('cheer');
+        sayEn(`${col} ${part}!`);
+        at++;
+        setTimeout(ask, 1300);
+      } else if (g.dataset.part === part) {
+        missed++;
+        owlMood('think');
+        say([['en', `Hmm, ${col}!`]]);
+      }
+    };
+    K.view.querySelectorAll('.k-part').forEach(g => {
+      g.onclick = () => paint(g);
+      g.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); paint(g); } };
+    });
+    function finish() {
+      K.lessonBar(1);
+      K.view.querySelectorAll('.k-part').forEach(g => g.classList.remove('hint'));
+      const stars = missed === 0 ? 3 : missed <= 2 ? 2 : 1;
+      Store.kidsFinish('colour', stars, 10 + stars * 5);
+      bub().textContent = `${kt('colourDone')} ${'★'.repeat(stars)} · ${kt('colourFree')}`;
+      celebrate();
+      sayEn('What a beautiful picture!', 0.9);
+    }
+    setTimeout(() => { say([['he', kt('colourSub')]]); setTimeout(ask, 400); }, 200);
   }
 
   // ---------- songs & chants ----------
@@ -2120,6 +2216,7 @@ const Kids = (() => {
       else if (a === 'owl') wardrobe();
       else if (a === 'stories') stories();
       else if (a === 'riddles') riddles();
+      else if (a === 'colour') colourIt();
       else if (a === 'today') today(b);
       else if (a === 'songs') songs();
       else if (a === 'song') song(b);

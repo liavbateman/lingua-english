@@ -829,3 +829,23 @@ body.kids.night .k-trophy:not(.got) { background: rgba(255, 255, 255, .85); }
 .k-count-thing:disabled { cursor: default; }
 .k-opt-num { display: flex; flex-direction: column; align-items: center; justify-content: center; font: 700 3rem/1 var(--k-font); color: var(--k-ink); }
 .k-opt-num small { font-size: .95rem; font-weight: 400; color: var(--k-muted); margin-top: 4px; }
+
+/* colour it */
+.k-paint-card { padding: 10px; cursor: default; }
+.k-paint { display: block; width: 100%; max-width: 420px; margin: 0 auto; touch-action: manipulation; }
+.k-part { cursor: pointer; }
+.k-part > * { stroke: #1d2a5b; stroke-width: 3; stroke-linejoin: round; transition: fill var(--dur-ui); }
+.k-part[data-part="sky"] > * { stroke-width: 0; }
+.k-part.hint > * { animation: k-hint 1.2s ease-in-out infinite; }
+@keyframes k-hint { 50% { stroke: #f2477f; stroke-width: 6; } }
+.k-part:focus-visible { outline: none; }
+.k-part:focus-visible > * { stroke: #f2477f; stroke-width: 6; }
+.k-paints { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; direction: ltr; }
+.k-paint-pot {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px; border: 3px solid transparent; border-radius: 18px;
+  background: #fff; color: var(--k-ink); font: .9rem var(--k-font); cursor: pointer; box-shadow: 0 4px 0 var(--k-edge);
+}
+.k-paint-pot i { width: 34px; height: 34px; border-radius: 50%; background: var(--p); box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .15), 0 0 0 2px #dfe6f7; }
+.k-paint-pot.on { border-color: var(--k-ink); transform: translateY(-3px); }
+.k-play .k-bubble b { white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .k-part.hint > * { animation: none; stroke: #f2477f; stroke-width: 6; } }
