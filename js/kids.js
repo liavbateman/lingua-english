@@ -385,6 +385,7 @@ const Kids = (() => {
   if ('speechSynthesis' in window) { voices(); speechSynthesis.addEventListener('voiceschanged', voices); }
   // parts: [['he', 'איפה'], ['en', 'cat']]; Hebrew parts are skipped when there is no Hebrew voice
   function say(parts, rate = 0.8) {
+    seqToken++;
     if (!('speechSynthesis' in window)) return;
     if (!enVoice) voices();
     speechSynthesis.cancel();
@@ -403,6 +404,34 @@ const Kids = (() => {
   const little = () => Store.kidsAge === 'little';
   const isNight = () => { const h = new Date().getHours(); return Store.kidsBedtime && (h >= 19 || h < 6); };
   const sayEn = (text, rate) => say([['en', text]], rate);
+  // Say several English lines strictly one after another (queued, never cutting each other off) and call
+  // onEach(i) the moment line i starts - so a word lights up exactly when it is heard. A new sequence (or
+  // any say()) replaces the old one. Without speech it still walks the steps on a gentle timer.
+  let seqToken = 0;
+  function speakSeq(lines, rate = 0.85, onEach, onDone) {
+    const my = ++seqToken;
+    const step = i => { if (my === seqToken && onEach) onEach(i); };
+    const done = () => { if (my === seqToken) { seqToken++; if (onDone) onDone(); } };
+    if (!('speechSynthesis' in window) || !lines.length) {
+      lines.forEach((_, i) => setTimeout(() => step(i), i * 900));
+      setTimeout(done, lines.length * 900);
+      return;
+    }
+    if (!enVoice) voices();
+    speechSynthesis.cancel();
+    lines.forEach((text, i) => {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';
+      if (enVoice) u.voice = enVoice;
+      u.rate = rate * (isNight() ? .85 : 1);
+      u.pitch = 1.1;
+      u.onstart = () => step(i);
+      if (i === lines.length - 1) { u.onend = done; u.onerror = done; }
+      speechSynthesis.speak(u);
+    });
+    // safety net: some devices never fire onend
+    setTimeout(done, lines.length * 2500 + 2000);
+  }
 
   // A soft "pop" for a balloon: a short falling tone and a puff of noise (quiet; silence is fine too)
   let actx = null;
@@ -1479,12 +1508,17 @@ const Kids = (() => {
           ${owl(kt('blendTip'), 'small')}
         </div>`;
       const tiles = [...K.view.querySelectorAll('.k-blend-tile')];
-      const sayTile = i => { sayEn(soundOf(w.en[i]), 0.7); tiles[i].classList.remove('lit'); void tiles[i].offsetWidth; tiles[i].classList.add('lit'); };
+      const light = i => { tiles[i].classList.remove('lit'); void tiles[i].offsetWidth; tiles[i].classList.add('lit'); };
+      const sayTile = i => { sayEn(soundOf(w.en[i]), 0.7); light(i); };
       tiles.forEach((t, i) => { t.onclick = () => sayTile(i); });
-      // sound by sound, then together
+      // sound by sound, then together - queued so the sounds never cut each other off
       const blend = () => {
-        tiles.forEach((t, i) => setTimeout(() => sayTile(i), i * 900));
-        setTimeout(() => { $('.k-blend').classList.add('joined'); sayEn(w.en, 0.7); blended = true; }, tiles.length * 900 + 200);
+        $('.k-blend').classList.remove('joined');
+        speakSeq([...tiles.map((t, i) => soundOf(w.en[i])), w.en], 0.7, i => {
+          if (!tiles[0].isConnected) return;
+          if (i < tiles.length) light(i);
+          else { $('.k-blend').classList.add('joined'); blended = true; }
+        });
       };
       $('#k-blend-go').onclick = blend;
       setTimeout(blend, 400);
@@ -2469,8 +2503,11 @@ const Kids = (() => {
     let at = 0, firstTry = 0;
     const word = (n, t) => `${NUMS[n - 1]} ${n === 1 ? t[0] : t[1]}`;
     function countAlong(els, then) {
-      els.forEach((el, i) => setTimeout(() => { el.classList.add('lit'); sayEn(NUMS[i], 1); setTimeout(() => el.classList.remove('lit'), 600); }, i * 750));
-      if (then) setTimeout(then, els.length * 750 + 200);
+      if (!els.length) { if (then) then(); return; }
+      speakSeq(NUMS.slice(0, els.length), 1, i => {
+        els.forEach(e => e.classList.remove('lit'));
+        if (els[i] && els[i].isConnected) els[i].classList.add('lit');
+      }, () => { els.forEach(e => e.classList.remove('lit')); if (then && els[0].isConnected) then(); });
     }
     function round() {
       K.lessonBar(at / rounds.length);
@@ -3181,8 +3218,10 @@ const Kids = (() => {
     const p = pages[page - 1], btns = [...K.view.querySelectorAll('.k-mb-w')];
     btns.forEach((b, i) => { b.onclick = () => { sayEn(p.words[i].en, 0.9); b.classList.remove('lit'); void b.offsetWidth; b.classList.add('lit'); }; });
     $('#k-mb-read').onclick = () => {
-      sayEn('I know', 0.85);
-      btns.forEach((b, i) => setTimeout(() => { if (!b.isConnected) return; b.classList.add('lit'); sayEn(p.words[i].en, 0.9); setTimeout(() => b.classList.remove('lit'), 700); }, 900 + i * 1000));
+      speakSeq(['I know', ...p.words.map(w => w.en)], 0.9, i => {
+        btns.forEach(b => b.classList.remove('lit'));
+        if (i > 0 && btns[i - 1] && btns[i - 1].isConnected) btns[i - 1].classList.add('lit');
+      }, () => btns.forEach(b => b.classList.remove('lit')));
     };
   }
 
@@ -4222,9 +4261,14 @@ const Kids = (() => {
     btns.forEach((b, i) => { b.onclick = () => { sayEn(words[i].en, 0.85); b.classList.remove('lit'); void b.offsetWidth; b.classList.add('lit'); }; });
     // the chant: letter name twice, its sound twice, then the words, each lighting up in turn
     $('#k-lotw-chant').onclick = () => {
-      say([['en', `${x.name}! ${x.name}! ${x.sound}, ${x.sound}!`]], 0.85);
-      btns.forEach((b, i) => setTimeout(() => { if (!b.isConnected) return; b.classList.add('lit'); sayEn(words[i].en, 0.9); setTimeout(() => b.classList.remove('lit'), 700); }, 2600 + i * 1100));
-      setTimeout(() => { if ($('#k-lotw-chant')) { Store.kidsFinish('lotw', 3, 10); owlMood('cheer'); } }, 2600 + words.length * 1100);
+      // one queue: the letter twice, its sound twice, then each word - every word lights up as it is said
+      speakSeq([`${x.name}! ${x.name}!`, `${x.sound}, ${x.sound}!`, ...words.map(w => w.en)], 0.85, i => {
+        btns.forEach(b => b.classList.remove('lit'));
+        if (i >= 2 && btns[i - 2] && btns[i - 2].isConnected) btns[i - 2].classList.add('lit');
+      }, () => {
+        btns.forEach(b => b.classList.remove('lit'));
+        if ($('#k-lotw-chant')) { Store.kidsFinish('lotw', 3, 10); owlMood('cheer'); }
+      });
     };
     setTimeout(() => say([['en', `The letter of the week is ${x.name}!`]], 0.85), 300);
   }
