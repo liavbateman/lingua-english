@@ -1038,3 +1038,18 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-path-choice b { font: 700 1.1rem var(--k-font); }
 .k-path-choice:active { transform: translateY(4px); }
 .k-path-choice.picked { background: #d8fbe9; box-shadow: 0 6px 0 #2fd093; animation: k-boing .5s var(--ease-pop); }
+
+/* sticker calendar */
+.k-cal { padding: 12px; border-radius: 24px; background: #fff; box-shadow: 0 6px 0 var(--k-edge); color: var(--k-ink); }
+.k-cal-month { margin: 0 0 8px; text-align: center; font-weight: 700; }
+.k-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+.k-cal-grid > b { font-size: .8rem; color: var(--k-muted); }
+.k-cal-day { position: relative; display: grid; place-items: center; aspect-ratio: 1; border-radius: 12px; background: #f3f6ff; }
+.k-cal-day.empty { background: none; }
+.k-cal-day small { position: absolute; top: 2px; inset-inline-start: 5px; font-size: .62rem; color: var(--k-muted); }
+.k-cal-day i { font-style: normal; font-size: 1.4rem; animation: k-pop .4s var(--ease-pop) both; }
+.k-cal-day.on { background: #fff1c2; }
+.k-cal-day.today { outline: 3px solid var(--k-pink, #f2477f); }
+.k-cal-day.future { opacity: .45; }
+.k-cal-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.k-cal-day { aspect-ratio: auto; height: 42px; min-width: 0; }

@@ -240,6 +240,9 @@ const Store = (() => {
       save();
       return true;
     },
+    // Did the child play on this day? (play time per day, kept 8 weeks)
+    kidsPlayedOn: key => !!(state.kids && state.kids.daysec && state.kids.daysec[key] > 0),
+    kidsDayKey: d => dayKey(d),
     // The owl buddy's look: a colour and an accessory, chosen in the wardrobe
     get kidsOwl() { const o = state.kids && state.kids.owl; return { color: (o && o.color) || 'blue', acc: (o && o.acc) || '' }; },
     setKidsOwl(part, id) {

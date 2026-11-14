@@ -102,6 +102,7 @@ const Kids = (() => {
       spell: 'מאייתים', spellTip: 'הקשיבו למילה ולחצו על האותיות לפי הסדר. לחיצה על אות בשורה מחזירה אותה',
       pathBook: 'בחרו את הדרך', pathChoose: 'מה בוחרים?', pathEnd: 'סוף אחד מתוך ארבעה! אפשר לקרוא שוב ולבחור דרך אחרת',
       pathAgain: 'דרך אחרת', pathFound: 'מצאתם {n} מתוך 4 סופים',
+      calTitle: 'לוח המדבקות שלי', calSub: 'כל יום שמשחקים מקבל מדבקה', calCount: '{n} ימי משחק החודש',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -197,6 +198,7 @@ const Kids = (() => {
       spell: 'Spell it!', spellTip: 'Listen to the word and tap the letters in order. Tap a letter in the row to take it back',
       pathBook: 'Choose your way', pathChoose: 'What do you choose?', pathEnd: 'One of four endings! Read again and choose another way',
       pathAgain: 'Another way', pathFound: 'You found {n} of 4 endings',
+      calTitle: 'My sticker calendar', calSub: 'Every day you play gets a sticker', calCount: '{n} play days this month',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -3113,6 +3115,30 @@ const Kids = (() => {
     round();
   }
 
+  // ---------- sticker calendar: this month, a sticker on every day the child played (never a broken streak) ----------
+  function calendarHtml() {
+    const now = new Date(), y = now.getFullYear(), m = now.getMonth();
+    const first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate();
+    const lead = first.getDay();   // Sunday first, as in Israel
+    const STK = ['⭐', '🌈', '🦄', '🍩', '🐳', '🌻', '🚀', '🎈', '🐼', '🍓', '🦋', '🎨'];
+    let played = 0;
+    const cells = [];
+    for (let i = 0; i < lead; i++) cells.push('<span class="k-cal-day empty"></span>');
+    for (let d = 1; d <= days; d++) {
+      const date = new Date(y, m, d), key = Store.kidsDayKey(date), on = Store.kidsPlayedOn(key), today = d === now.getDate();
+      if (on) played++;
+      cells.push(`<span class="k-cal-day ${on ? 'on' : ''} ${today ? 'today' : ''} ${date > now ? 'future' : ''}"><small>${d}</small>${on ? `<i aria-hidden="true">${STK[(d * 7 + m) % STK.length]}</i>` : ''}</span>`);
+    }
+    const names = Array.from({ length: 7 }, (_, i) => new Date(2023, 0, 1 + i).toLocaleDateString(isHe() ? 'he-IL' : 'en-US', { weekday: 'narrow' }));
+    return `
+      <h2 class="k-title k-h2">📅 ${kt('calTitle')}</h2>
+      <p class="k-sub">${kt('calSub')} · <b>${kt('calCount', { n: played })}</b></p>
+      <div class="k-cal">
+        <p class="k-cal-month">${now.toLocaleDateString(isHe() ? 'he-IL' : 'en-US', { month: 'long', year: 'numeric' })}</p>
+        <div class="k-cal-grid">${names.map(n => `<b>${n}</b>`).join('')}${cells.join('')}</div>
+      </div>`;
+  }
+
   // ---------- trophies: milestones for everything the child does, with progress toward the next ----------
   function trophyList() {
     const learned = KIDS_WORDS.filter(w => Store.kidsWordCount(w.id) > 0).length;
@@ -3231,6 +3257,7 @@ const Kids = (() => {
         <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
         <h1 class="k-title">🎁 ${kt('album')}</h1>
         <a class="k-btn" href="#/kids/scene">🎨 ${kt('scene')}</a>
+        ${calendarHtml()}
         ${trophiesHtml()}
         <h2 class="k-title k-h2">🎁 ${kt('stickers')}</h2>
         <p class="k-sub">${kt('albumSub')} · ${Store.kidsStickerCount}/${KIDS_THEMES.length}</p>
