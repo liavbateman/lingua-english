@@ -268,7 +268,9 @@ const KIDS_ABC = [
   ['S', 'ess', 'sun', 'שמש', '☀️'], ['T', 'tee', 'tree', 'עץ', '🌳'], ['U', 'you', 'umbrella', 'מטרייה', '☂️'],
   ['V', 'vee', 'violin', 'כינור', '🎻'], ['W', 'double you', 'whale', 'לווייתן', '🐳'], ['X', 'ex', 'fox', 'שועל', '🦊'],
   ['Y', 'why', 'yo-yo', 'יו-יו', '🪀'], ['Z', 'zee', 'zebra', 'זברה', '🦓']
-].map(([L, name, word, he, pic]) => ({ L, name, word, he, pic }));
+].map(([L, spelled, word, he, pic]) => ({ L, name: L, spelled, word, he, pic }));
+// (name is what the voice says: the capital letter itself, which every voice reads as the letter's name;
+//  "spelled" keeps how the name sounds, for people)
 
 // Letter sounds (phonics), spelled so a speech voice says something close: "B says buh, buh, ball"
 const KIDS_SOUNDS = { A: 'ah', B: 'buh', C: 'kuh', D: 'duh', E: 'eh', F: 'fuh', G: 'guh', H: 'huh', I: 'ih', J: 'juh', K: 'kuh', L: 'luh', M: 'muh',

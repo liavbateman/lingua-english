@@ -408,7 +408,7 @@ const Kids = (() => {
   // onEach(i) the moment line i starts - so a word lights up exactly when it is heard. A new sequence (or
   // any say()) replaces the old one. Without speech it still walks the steps on a gentle timer.
   let seqToken = 0;
-  function speakSeq(lines, rate = 0.85, onEach, onDone) {
+  function speakSeq(lines, rate = 0.85, onEach, onDone, opts = {}) {
     const my = ++seqToken;
     const step = i => { if (my === seqToken && onEach) onEach(i); };
     const done = () => { if (my === seqToken) { seqToken++; if (onDone) onDone(); } };
@@ -424,7 +424,8 @@ const Kids = (() => {
       u.lang = 'en-US';
       if (enVoice) u.voice = enVoice;
       u.rate = rate * (isNight() ? .85 : 1);
-      u.pitch = 1.1;
+      u.pitch = opts.pitch || 1.1;
+      if (opts.volume != null) u.volume = opts.volume;
       u.onstart = () => step(i);
       if (i === lines.length - 1) { u.onend = done; u.onerror = done; }
       speechSynthesis.speak(u);
@@ -4711,6 +4712,63 @@ const Kids = (() => {
     lines.push([['Hooray!', th.sticker]]);
     return { id: 'isle-' + th.id, title: th.title, he: th.he, pic: th.pic, color: th.color, lines };
   }
+  // A tiny backing band for the songs: a C - F - G - C chord on each bar, a soft bass and a gentle
+  // tick on the beat. Quiet, so the words stay clear; it follows the "sounds" switch for children.
+  const songBand = (() => {
+    let timer = null, beat = 0, master = null;
+    const CHORDS = [[261.63, 329.63, 392], [349.23, 440, 523.25], [392, 493.88, 587.33], [261.63, 329.63, 392]];
+    const BASS = [130.81, 174.61, 196, 130.81];
+    function ctx() {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === 'suspended') actx.resume();
+      return actx;
+    }
+    function tone(freq, when, len, vol, type) {
+      const c = ctx(), o = c.createOscillator(), g = c.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(0, when);
+      g.gain.linearRampToValueAtTime(vol, when + .03);
+      g.gain.exponentialRampToValueAtTime(.0001, when + len);
+      o.connect(g).connect(master);
+      o.start(when); o.stop(when + len + .05);
+    }
+    function tick(when, vol) {
+      const c = ctx(), len = .05, buf = c.createBuffer(1, c.sampleRate * len, c.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+      const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+      src.buffer = buf; f.type = 'highpass'; f.frequency.value = 5000; g.gain.value = vol;
+      src.connect(f).connect(g).connect(master);
+      src.start(when);
+    }
+    return {
+      start(bpm = 104) {
+        this.stop();
+        if (!Store.kidsSfx) return;
+        try {
+          const c = ctx();
+          master = c.createGain(); master.gain.value = 1; master.connect(c.destination);
+          const spb = 60 / bpm;
+          beat = 0;
+          const play = () => {
+            const when = c.currentTime + .05, bar = Math.floor(beat / 4) % 4, inBar = beat % 4;
+            if (inBar === 0) { CHORDS[bar].forEach(f => tone(f, when, spb * 3.6, .025, 'triangle')); tone(BASS[bar], when, spb * 1.6, .07, 'sine'); }
+            if (inBar === 2) tone(BASS[bar] * 1.5, when, spb * 1.2, .05, 'sine');
+            tick(when, inBar % 2 ? .05 : .02);
+            beat++;
+          };
+          play();
+          timer = setInterval(play, spb * 1000);
+        } catch (e) { /* no audio: the song still sings */ }
+      },
+      stop(fade) {
+        clearInterval(timer); timer = null;
+        if (master) {
+          const m = master; master = null;
+          try { m.gain.setTargetAtTime(0, actx.currentTime, fade ? .4 : .05); setTimeout(() => m.disconnect(), 1500); } catch (e) {}
+        }
+      }
+    };
+  })();
   let songRun = 0;   // a newer play (or leaving the screen) stops the one before
   function song(id) {
     const isle = id && id.startsWith('isle-') && theme(id.slice(5));
@@ -4736,32 +4794,72 @@ const Kids = (() => {
     const flat = sg.lines.flatMap(l => l);
     const tune = flat.map((_, k) => SCALE[[0, 1, 2, 3, 4, 3, 2, 1][k % 8] + (k % 16 >= 8 ? 1 : 0)]);
     notes.forEach((b, k) => { b.onclick = () => { note(tune[k]); sayEn(flat[k][2] || flat[k][0]); b.classList.remove('hit'); void b.offsetWidth; b.classList.add('hit'); }; });
+    // Play: each line is sung as ONE phrase (natural rhythm instead of word-by-word beeps), a soft backing
+    // band plays chords and a beat underneath, and each word lights up as the voice reaches it (word
+    // boundary events, with a timed fallback for voices that don't send them).
+    const lineOf = notes.map(n => +n.dataset.r);
+    const lines = sg.lines.map((line, r) => {
+      const ws = line.map(([w, , spoken]) => (spoken || w));
+      const punct = ws.some(w => /[,!?.]/.test(w));
+      const parts = ws.map(w => w.replace(/[.]$/, ''));
+      const text = (punct ? parts.join(' ') : parts.join(', ')).replace(/[,]?$/, '') + (/[!?]$/.test(parts[parts.length - 1]) ? '' : '!');
+      // where each word starts inside the text, to match boundary events to notes
+      let at = 0;
+      const starts = parts.map(w => { const i = text.indexOf(w, at); at = i + w.length; return i; });
+      const first = lineOf.indexOf(r);
+      return { text, starts, first, count: line.length };
+    });
     const play = quiet => {
       const run = ++songRun;
       speechSynthesis.cancel();
       $('.k-bubble').textContent = quiet ? kt('singTip') : '🎶';
-      let k = 0;
-      const next = () => {
+      songBand.start(sg.id === 'abc' ? 96 : 104);
+      const light = k => {
         if (run !== songRun || !document.body.contains(notes[0])) return;
         notes.forEach(n => n.classList.remove('lit'));
-        if (k >= flat.length) { owlMood('cheer'); K.Feel.right(); return; }
-        const b = notes[k], [w, , spoken] = flat[k];
-        b.classList.add('lit');
-        note(tune[k]);
-        const u = new SpeechSynthesisUtterance((spoken || w).replace(/[!?,]/g, ''));
+        if (notes[k]) { notes[k].classList.add('lit'); note(tune[k], .25); }
+      };
+      const finish = () => {
+        if (run !== songRun) return;
+        notes.forEach(n => n.classList.remove('lit'));
+        songBand.stop(true);
+        if (document.body.contains(notes[0])) { owlMood('cheer'); K.Feel.right(); }
+      };
+      let r = 0;
+      const sing = () => {
+        if (run !== songRun || !document.body.contains(notes[0])) return songBand.stop();
+        if (r >= lines.length) return finish();
+        const L = lines[r];
+        let lit = -1, gotBoundary = false, timer = null, ended = false;
+        const show = i => { if (i > lit && i < L.count) { lit = i; light(L.first + i); } };
+        const u = new SpeechSynthesisUtterance(L.text);
         u.lang = 'en-US';
         if (enVoice) u.voice = enVoice;
-        u.rate = 0.9;
-        u.pitch = 1.3;
+        u.rate = sg.id === 'abc' ? 0.85 : 0.8;
+        u.pitch = 1.25;
         u.volume = quiet ? 0.25 : 1;
-        const lineEnd = k + 1 < flat.length && notes[k + 1].dataset.r !== b.dataset.r;
-        let moved = false;
-        const go = () => { if (moved) return; moved = true; k++; setTimeout(next, lineEnd ? 450 : 120); };
-        u.onend = go;
-        setTimeout(go, 1600);   // never wait forever for a voice that doesn't answer
-        if ('speechSynthesis' in window) speechSynthesis.speak(u); else setTimeout(go, 500);
+        u.onboundary = e => {
+          if (e.name && e.name !== 'word') return;
+          gotBoundary = true;
+          let i = 0;
+          while (i + 1 < L.starts.length && L.starts[i + 1] <= e.charIndex) i++;
+          show(i);
+        };
+        u.onstart = () => {
+          show(0);
+          // no word events from this voice? light the words on a steady beat instead
+          const step = (sg.id === 'abc' ? 520 : 620) / u.rate * 0.8;
+          let i = 1;
+          timer = setInterval(() => { if (gotBoundary || ended) return clearInterval(timer); show(i++); if (i >= L.count) clearInterval(timer); }, step);
+        };
+        const next = () => { if (ended) return; ended = true; clearInterval(timer); show(L.count - 1); r++; setTimeout(sing, 380); };
+        u.onend = next;
+        u.onerror = next;
+        // safety net if a voice never answers
+        setTimeout(() => { if (!ended && run === songRun && !speechSynthesis.speaking) next(); }, 6000 + L.count * 900);
+        if ('speechSynthesis' in window) speechSynthesis.speak(u); else setTimeout(next, L.count * 600);
       };
-      next();
+      setTimeout(sing, 450);   // one bar of music first, then the voice comes in
     };
     $('#k-play').onclick = () => play(false);
     $('#k-sing').onclick = () => play(true);
@@ -6732,7 +6830,8 @@ const Kids = (() => {
       stopRec();
       stopRecording();
       clearHands();
-      songRun++;   // a song still playing stops
+      songRun++; songBand.stop();   // a song still playing stops, band too
+      if (K.view.querySelector('.k-song')) speechSynthesis.cancel();   // leaving a song screen: stop its voice
       document.body.classList.add('kids');
       document.body.classList.toggle('night', isNight());
       document.body.classList.toggle('kids-big', Store.kidsBigPrint);
