@@ -2006,8 +2006,10 @@
     if (source === 'level') {
       const all = wordsOf(Store.level);
       const seen = all.filter(w => Store.isSeen(w.id));
-      // Prefer words that were already studied; fall back to the whole level
-      return { pool: seen.length >= 6 ? seen : all, title: levelLabel() };
+      // Words already studied; with only a few, topped up from the next lesson's words (what the learner
+      // is about to meet) rather than from the whole level, so a new learner is never tested on unknown words
+      const upNext = nextUnit().words.filter(w => !Store.isSeen(w.id) && !w.phrase);
+      return { pool: seen.length >= 6 ? seen : [...seen, ...upNext], title: levelLabel() };
     }
     return null;
   }
@@ -2342,9 +2344,7 @@
     // so a new learner says "hello" and "thank you", not a word never seen before
     const lvlPool = poolFor('level').pool;
     const met = shuffle(lvlPool.filter(w => Store.isSeen(w.id)));
-    const upNext = nextUnit().words.filter(w => !Store.isSeen(w.id));
-    const queue = met.length >= 6 ? met.slice(0, 6)
-      : [...met, ...upNext].slice(0, 6).concat(shuffle(lvlPool)).filter((w, k, arr) => arr.indexOf(w) === k).slice(0, 6);
+    const queue = met.length >= 6 ? met.slice(0, 6) : [...met, ...lvlPool.filter(w => !met.includes(w))].slice(0, 6);
     let i = 0, good = 0;
 
     function draw() {
