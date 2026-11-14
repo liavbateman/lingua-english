@@ -1323,7 +1323,12 @@
     document.body.appendChild(layer);
     const spot = layer.querySelector('.tour-spot'), bubble = layer.querySelector('.tour-bubble');
     let k = 0;
-    const end = () => { Store.markToured(); layer.remove(); document.removeEventListener('keydown', key); };
+    // when the tour ends, focus lands on the next-lesson card it introduced, not on <body>
+    const end = () => {
+      Store.markToured(); layer.remove(); document.removeEventListener('keydown', key);
+      const card = document.querySelector('.continue');
+      if (card) { card.scrollIntoView({ block: 'center' }); card.focus({ preventScroll: true }); }
+    };
     const key = e => { if (e.key === 'Escape') end(); };
     const show = () => {
       const el = document.querySelector(steps[k].sel);
