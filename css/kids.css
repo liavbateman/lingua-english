@@ -1080,3 +1080,21 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-simon-ring i { display: block; height: 100%; width: 0; border-radius: inherit; background: #2fd093; animation: k-fill 2.6s linear forwards; }
 @keyframes k-fill { to { width: 100%; } }
 @media (prefers-reduced-motion: reduce) { .k-simon .k-pic { animation: none; } .k-simon-ring i { animation-duration: .01s; } }
+
+/* word families */
+.k-fam-box { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; direction: ltr; }
+.k-fam-pic {
+  aspect-ratio: 1; border: 0; border-radius: 22px; background: #fff; font-size: 2.6rem; cursor: pointer;
+  box-shadow: 0 5px 0 var(--k-edge); transition: transform var(--dur-press), opacity var(--dur-quick);
+}
+.k-fam-pic:active { transform: translateY(3px); }
+.k-fam-pic.in { animation: k-fam-drop .5s ease-in forwards; }
+@keyframes k-fam-drop { 40% { transform: scale(1.2); } 100% { transform: translateY(40px) scale(.3); opacity: 0; } }
+.k-fam-pic.puff { animation: k-puff .5s ease-out; }
+.k-fam-basket {
+  display: flex; align-items: center; gap: 8px; min-height: 64px; margin-top: 14px; padding: 6px 14px; border-radius: 22px;
+  background: #fff4dc; box-shadow: inset 0 -5px 0 #e5c48a; direction: ltr;
+}
+.k-fam-bk { font-size: 2.4rem; }
+#k-fam-in i { font-style: normal; font-size: 2rem; animation: k-pop .4s var(--ease-pop) both; }
+@media (prefers-reduced-motion: reduce) { .k-fam-pic.in { animation: none; opacity: .25; } }

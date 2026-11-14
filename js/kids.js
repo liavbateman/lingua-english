@@ -106,6 +106,8 @@ const Kids = (() => {
       hide: 'מחבואים', hideSub: 'איפה הינשוף? מתחת, על, בתוך, מאחורי', hideTip: 'הקשיבו איפה הינשוף התחבא ולחצו שם',
       cardBtn: 'כרטיס התקדמות לשיתוף', cardTitle: 'כרטיס התקדמות', cardShare: 'שיתוף', cardSave: 'שמירת תמונה', cardClose: 'סגירה',
       simon: 'הינשוף אומר', simonSub: 'עושים מה שהינשוף אומר: לגעת באף, לקפוץ, למחוא כפיים', simonDid: 'עשיתי!', simonTip: 'עשו את התנועה ואז לחצו "עשיתי!"',
+      fam: 'משפחות של מילים', famSub: 'מוצאים את כל החיות, כל האוכל, כל הצעצועים', famTip: 'לחצו על כל התמונות מהמשפחה. כל מילה נכנסת לסל',
+      famLeft: 'עוד {n}',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -205,6 +207,8 @@ const Kids = (() => {
       hide: 'Hide and seek', hideSub: 'Where is the owl? under, on, in, behind', hideTip: 'Listen where the owl is hiding and tap there',
       cardBtn: 'Share a progress card', cardTitle: 'Progress card', cardShare: 'Share', cardSave: 'Save image', cardClose: 'Close',
       simon: 'Owl says', simonSub: 'Do what the owl says: touch your nose, jump, clap', simonDid: 'I did it!', simonTip: 'Do the move, then tap "I did it!"',
+      fam: 'Word families', famSub: 'Find all the animals, all the food, all the toys', famTip: 'Tap every picture in the family. Each word jumps into the basket',
+      famLeft: '{n} more',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -558,6 +562,11 @@ const Kids = (() => {
         <a class="k-abc-card k-simon-card" href="#/kids/simon">
           <span class="k-story-books" aria-hidden="true">🤸</span>
           <span class="grow"><b>${kt('simon')}</b><small>${kt('simonSub')}</small></span>
+        </a>
+        <a class="k-abc-card k-fam-card" href="#/kids/fam">
+          <span class="k-story-books" aria-hidden="true">🧺</span>
+          <span class="grow"><b>${kt('fam')}</b><small>${kt('famSub')}</small></span>
+          ${Store.kidsHasSticker('fam') ? starsHtml(Store.kidsStars('fam'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -1661,6 +1670,93 @@ const Kids = (() => {
       celebrate();
       sayEn('What a great mover!', 0.9);
       $('#k-again').onclick = simonGame;
+    }
+    round();
+  }
+
+  // ---------- word families: sort a mixed picture box into groups ----------
+  // "Find all the animals!" A box of 8 pictures, 3 of them from one family. Each right tap says the word
+  // and drops it in the basket; a picture from another family just says its own name (still learning).
+  const FAMILIES = [
+    { id: 'animals', en: 'animals', he: 'החיות', pic: '🐾' }, { id: 'food', en: 'food', he: 'האוכל', pic: '🍽️' },
+    { id: 'toys', en: 'toys', he: 'הצעצועים', pic: '🧸' }, { id: 'go', en: 'things that go', he: 'כלי התחבורה', pic: '🚦' },
+    { id: 'clothes', en: 'clothes', he: 'הבגדים', pic: '👚' }, { id: 'body', en: 'body parts', he: 'חלקי הגוף', pic: '🧍' }
+  ];
+  function famGame() {
+    document.body.classList.add('in-lesson');
+    const themeOf = id => (KIDS_THEMES.find(t => t.id === id) || { words: [] }).words.filter(w => w.pic && !/\s/.test(w.en));
+    const fams = K.shuffle(FAMILIES.filter(f => themeOf(f.id).length >= 3)).slice(0, 4);
+    let at = 0, misses = 0;
+    function round() {
+      K.lessonBar(at / fams.length);
+      const f = fams[at];
+      const pics = new Set();
+      const take = (list, n) => K.shuffle(list).filter(w => !pics.has(w.pic) && pics.add(w.pic)).slice(0, n);
+      const right = take(themeOf(f.id), 3);
+      const others = take(FAMILIES.filter(o => o !== f).flatMap(o => themeOf(o.id)), 5);
+      const box = K.shuffle([...right.map(w => ({ w, ok: true })), ...others.map(w => ({ w, ok: false }))]);
+      const line = `Find all the ${f.en}!`;
+      let found = 0;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🧺</span> ${kt('fam')} · ${at + 1}/${fams.length}</p>
+          <div class="k-prompt">
+            <button class="k-speaker" id="k-say" aria-label="${kt('listen')}: ${line}"><span aria-hidden="true">🔊</span></button>
+            <span class="k-target en" lang="en">${line}</span>
+          </div>
+          <p class="k-sub he">${f.pic} ${f.he} · <b id="k-fam-left">${kt('famLeft', { n: 3 })}</b></p>
+          <div class="k-fam-box">${box.map((x, i) => `<button class="k-fam-pic" data-i="${i}" aria-label="${x.w.en}"><span aria-hidden="true">${x.w.pic}</span></button>`).join('')}</div>
+          <div class="k-fam-basket" aria-live="polite"><span class="k-fam-bk" aria-hidden="true">🧺</span><span id="k-fam-in"></span></div>
+          ${owl(kt('famTip'), 'small')}
+        </div>`;
+      const ask = () => say([['en', line]], 0.85);
+      $('#k-say').onclick = ask;
+      setTimeout(ask, 300);
+      K.view.querySelectorAll('.k-fam-pic').forEach(b => {
+        b.onclick = () => {
+          const x = box[+b.dataset.i];
+          if (x.ok) {
+            b.disabled = true;
+            b.classList.add('in');
+            found++;
+            K.Feel.right();
+            sayEn(x.w.en, 0.85);
+            $('#k-fam-in').insertAdjacentHTML('beforeend', `<i aria-label="${x.w.en}">${x.w.pic}</i>`);
+            $('#k-fam-left').textContent = kt('famLeft', { n: 3 - found });
+            if (found === 3) {
+              K.view.querySelectorAll('.k-fam-pic').forEach(y => { y.disabled = true; });
+              owlMood('cheer');
+              $('.k-bubble').textContent = `${right.map(w => w.en).join(', ')}: ${f.en}!`;
+              setTimeout(() => say([['en', `Yes! ${right.map(w => w.en).join(', ')}. All ${f.en}!`]], 0.85), 900);
+              setTimeout(() => { at++; at < fams.length ? round() : end(); }, 3600);
+            }
+          } else {
+            misses++;
+            b.classList.remove('puff'); void b.offsetWidth; b.classList.add('puff');
+            K.Feel.wrong(b);
+            owlMood('think');
+            $('.k-bubble').textContent = `${x.w.en}? ${kt('tryAgain')}`;
+            sayEn(x.w.en, 0.85);
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = misses <= 1 ? 3 : misses <= 4 ? 2 : 1;
+      Store.kidsFinish('fam', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🧺 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('You sorted them all!', 0.9);
+      $('#k-again').onclick = famGame;
     }
     round();
   }
@@ -3549,6 +3645,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'fam') famGame();
       else if (a === 'simon') simonGame();
       else if (a === 'hide') hideGame();
       else if (a === 'spell') spellGame();
