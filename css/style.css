@@ -2132,3 +2132,17 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
   .speak-row .speak.xl svg { width: 32px; height: 32px; }
   .sp-rate { margin: 8px 0 6px; }
 }
+
+/* End screens on the smallest phones (568px tall): the next step and "Back to Today" stay above the fold */
+@media (max-height: 620px) {
+  .result { margin-top: 6px; padding: 14px 14px 14px; }
+  .result .big { width: 72px; height: 72px; font-size: 2.4rem; margin-bottom: 2px; }
+  .res-ring { width: 84px; height: 84px; margin-bottom: 4px; }
+  .res-ring .big { width: 66px; height: 66px; }
+  .result h1 { font-size: 1.4rem; margin: 2px 0; }
+  .result .sub { margin-bottom: 8px; }
+  .result .stats-row { margin: 2px 0 10px; }
+  .result .st { padding: 8px 6px; }
+  .result .steps2 { margin: 2px 0 10px; gap: 6px; }
+  .result .steps2 li { padding: 8px 10px; }
+}
