@@ -16,6 +16,8 @@
   --muted: #a6add0;
   --brand: #6a5cff;
   --brand-2: #8e7dff;
+  /* white text on buttons needs 4.5:1 across the whole gradient (#8e7dff gave only 3.2:1) */
+  --btn-grad: linear-gradient(135deg, #6d5df8, #5646f2);
   --brand-soft: rgba(106, 92, 255, .18);
   --good: #2fd093;
   --good-soft: rgba(47, 208, 147, .16);
@@ -150,7 +152,7 @@ a.card:active, .task:active { transform: scale(.985); }
   display: block; width: 100%; min-height: 52px;
   border: 0; border-radius: 16px; padding: 14px 16px;
   font: inherit; font-weight: 700; text-align: center; text-decoration: none;
-  background: linear-gradient(135deg, var(--brand-2), var(--brand)); color: #fff; cursor: pointer;
+  background: var(--btn-grad); color: #fff; cursor: pointer;
   -webkit-appearance: none; appearance: none;
   box-shadow: 0 8px 22px rgba(106, 92, 255, .35);
 }
@@ -740,7 +742,7 @@ body.in-lesson .view.has-check { padding-bottom: calc(132px + env(safe-area-inse
 .cont-emoji { font-size: 1.6rem; line-height: 1; }
 .cont-go {
   display: block; text-align: center; padding: 13px 16px; border-radius: 14px; font-weight: 800;
-  background: linear-gradient(135deg, var(--brand-2), var(--brand)); color: #fff; box-shadow: 0 4px 0 #463bc4;
+  background: var(--btn-grad); color: #fff; box-shadow: 0 4px 0 #463bc4;
 }
 @media (prefers-reduced-motion: reduce) { .continue { transition: none; } }
 
@@ -844,7 +846,7 @@ body.in-lesson .view.has-check { padding-bottom: calc(132px + env(safe-area-inse
 .pcard.open .btn { color: #5546e0; box-shadow: 0 4px 0 #d6d0ff; }
 .pcard.locked { background: #2b3160; color: var(--ink); box-shadow: 0 5px 0 #1b2046, 0 18px 40px rgba(0, 0, 0, .45); }
 .pcard.locked p { color: var(--muted); }
-.pcard.locked .btn { background: linear-gradient(135deg, var(--brand-2), var(--brand)); color: #fff; box-shadow: 0 4px 0 #463bc4; }
+.pcard.locked .btn { background: var(--btn-grad); color: #fff; box-shadow: 0 4px 0 #463bc4; }
 @media (prefers-reduced-motion: reduce) { .pcard { animation: none; } }
 /* while a lesson card is open, the jump button steps aside */
 body:has(.pcard) .path-jump { display: none; }
@@ -1104,7 +1106,7 @@ button.path-head:active span { background: rgba(142, 125, 255, .22); }
 .pgate-tag { flex: none; padding: 4px 10px; border-radius: 999px; background: var(--brand-soft); color: #d8d2ff; font-weight: 800; font-size: .78rem; }
 .pgate-go {
   flex: none; min-height: 44px; padding: 0 12px; border-radius: 14px; border: 0; cursor: pointer;
-  background: linear-gradient(135deg, var(--brand-2), var(--brand)); color: #fff; font-weight: 800; font-size: .85rem;
+  background: var(--btn-grad); color: #fff; font-weight: 800; font-size: .85rem;
   box-shadow: 0 3px 0 #463bc4;
 }
 .pgate-go:active { transform: translateY(3px); box-shadow: none; }
