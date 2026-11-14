@@ -136,7 +136,7 @@ const Kids = (() => {
       shunt: 'ציד צורות', shuntSub: 'איפה יש עיגול? שעון, כדור, עוגייה! מוצאים צורות בכל מקום', shuntTip: 'מצאו את כל הדברים בצורה הזאת', shuntLeft: 'עוד {n}',
       brush: 'מצחצחים שיניים עם הינשוף', brushSub: '2 דקות של צחצוח עם הוראות באנגלית: top, bottom, left, right', brushGo: 'מתחילים לצחצח!',
       brushStop: 'עצירה', brushTip: 'מצחצחים יחד עם הינשוף. החלק שמאיר הוא החלק לצחצח', brushDone: 'שיניים נקיות ונוצצות!',
-      whoPlays: 'מי משחק?', whoPick: 'בחרו 2 או 3 ילדים', whoGo: 'מתחילים!', passTo: 'עכשיו התור של {name}!',
+      whoPlays: 'מי משחק?', whoPick: 'בחרו 2 או 3 ילדים', whoGo: 'מתחילים!', passTo: 'עכשיו התור של {name}!', passReady: 'אני מוכן/ה!',
       copy: 'מחקים את הינשוף', copySub: 'הינשוף מדבר בקול מצחיק: כמו עכבר, כמו דוב, בלחישה. מחקים אותו!',
       copyRec: 'עכשיו אני', copyOwl: 'הינשוף', copyMe: 'אני', copyNext: 'הבא', copyTip: 'הקשיבו לינשוף, לחצו על המיקרופון ואמרו את המילה באותו קול',
       copyNoRec: 'אמרו את המילה בקול באותו קול מצחיק, ואז לחצו "הבא"',
@@ -295,7 +295,7 @@ const Kids = (() => {
       shunt: 'Shape hunt', shuntSub: 'Where is a circle? A clock, a ball, a cookie! Shapes are everywhere', shuntTip: 'Find all the things with this shape', shuntLeft: '{n} more',
       brush: 'Brush your teeth with the owl', brushSub: '2 minutes of brushing with English steps: top, bottom, left, right', brushGo: "Let's brush!",
       brushStop: 'Stop', brushTip: 'Brush along with the owl. Brush the part that lights up', brushDone: 'Clean, shiny teeth!',
-      whoPlays: "Who's playing?", whoPick: 'Pick 2 or 3 children', whoGo: "Let's play!", passTo: 'Pass it to {name}!',
+      whoPlays: "Who's playing?", whoPick: 'Pick 2 or 3 children', whoGo: "Let's play!", passTo: 'Pass it to {name}!', passReady: "I'm ready!",
       copy: "Copy the owl's voice", copySub: 'The owl talks in a funny voice: like a mouse, like a bear, in a whisper. Copy it!',
       copyRec: 'My turn', copyOwl: 'Owl', copyMe: 'Me', copyNext: 'Next', copyTip: 'Listen to the owl, tap the mic and say the word in the same voice',
       copyNoRec: 'Say the word out loud in the same funny voice, then tap "Next"',
@@ -1625,16 +1625,20 @@ const Kids = (() => {
     const pool = KIDS_WORDS.filter(w => isOpen(KIDS_THEMES.findIndex(th => th.id === w.theme)));
     const rounds = K.shuffle(pool).slice(0, N * 4);
     let at = 0, team = 0;
-    // between turns: a big "pass it to ..." card, so the phone really changes hands
+    // between turns: a big "pass it to ..." card that waits until the next child taps "I'm ready" -
+    // so the word is not said before the phone has really changed hands
     function pass(then) {
       const p = players[at % N];
+      K.lessonBar(at / rounds.length);
       K.view.innerHTML = `
         <div class="k-wrap k-play k-pass">
           <div class="k-pass-face" aria-hidden="true">${p.face}</div>
           <p class="k-pass-text">${kt('passTo', { name: esc(p.name) })}</p>
+          <button class="k-btn k-pass-go" id="k-pass-go">${p.face} ${kt('passReady')} ▶️</button>
         </div>`;
       Sfx.whoosh && Sfx.whoosh();
-      setTimeout(then, 1300);
+      say([['he', kt('passTo', { name: p.name })]]);
+      $('#k-pass-go').onclick = () => { Sfx.tap(); then(); };
     }
     function round() {
       K.lessonBar(at / rounds.length);

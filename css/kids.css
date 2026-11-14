@@ -1455,6 +1455,9 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-pass-face { font-size: 7rem; animation: k-pass-in .6s var(--ease-pop) both; }
 @keyframes k-pass-in { from { transform: translateX(-120px) rotate(-20deg); opacity: 0; } }
 .k-pass-text { font: 700 1.8rem var(--k-font); color: #fff; }
+.k-pass-go { margin-top: 18px; min-width: 220px; font-size: 1.3rem; animation: k-pulse 1.6s ease-in-out .8s infinite; }
+@media (prefers-reduced-motion: reduce) { .k-pass-go { animation: none; } }
+body.kids .k-btn:disabled { opacity: .45; filter: grayscale(.6); box-shadow: none; cursor: default; }
 .k-turn-stars { margin-inline-start: 4px; font-size: .85em; }
 .k-who { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
 .k-who-p { display: flex; flex-direction: column; align-items: center; padding: 12px 4px; border: 0; border-radius: 22px; background: #fff; color: var(--k-ink);
