@@ -812,3 +812,20 @@ body.kids.night .k-trophy:not(.got) { background: rgba(255, 255, 255, .85); }
 .k-vc-test { width: auto; margin: 0; padding: 8px 14px; font-size: 1rem; flex: none; }
 .k-vc-tip { margin-top: 10px; padding: 10px 12px; border-radius: 14px; background: #fff6d6; color: #5a430c; font-size: .9rem; }
 .k-vc-tip p { margin: 4px 0; }
+
+/* count with me */
+.k-count-box { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 18px 12px; margin-bottom: 16px; cursor: default; direction: ltr; }
+.k-count-thing {
+  position: relative; width: 64px; height: 64px; border: 0; border-radius: 18px; background: #f3f6ff; font-size: 2.4rem; cursor: pointer;
+  transition: transform var(--dur-quick), background var(--dur-quick);
+}
+.k-count-thing.done { background: #fff1c2; }
+.k-count-thing.lit { transform: scale(1.12); background: #d8fbe9; }
+.k-count-thing b {
+  position: absolute; top: -8px; inset-inline-end: -6px; min-width: 24px; height: 24px; padding: 0 4px; border-radius: 999px;
+  background: var(--kc, #3fa7ff); color: #fff; font: 700 .9rem/24px var(--k-font); display: none;
+}
+.k-count-thing.done b { display: block; }
+.k-count-thing:disabled { cursor: default; }
+.k-opt-num { display: flex; flex-direction: column; align-items: center; justify-content: center; font: 700 3rem/1 var(--k-font); color: var(--k-ink); }
+.k-opt-num small { font-size: .95rem; font-weight: 400; color: var(--k-muted); margin-top: 4px; }

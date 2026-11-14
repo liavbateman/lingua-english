@@ -72,6 +72,7 @@ const Kids = (() => {
       vcAndroid: 'אנדרואיד: הגדרות ← נגישות ← המרת טקסט לדיבור ← התקנת נתוני קול ← עברית',
       vcEnTip: 'בלי קול אנגלי הילד לא ישמע את המילים. התקינו קול אנגלי באותו מקום בהגדרות.',
       vcSampleHe: 'שלום! ככה נשמעות ההוראות בעברית.',
+      count: 'כמה יש?', countTip: 'לחצו על כל אחד כדי לספור, ואז בחרו מספר',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -137,6 +138,7 @@ const Kids = (() => {
       vcAndroid: 'Android: Settings → Accessibility → Text-to-speech → Install voice data → Hebrew',
       vcEnTip: "Without an English voice your child won't hear the words. Install an English voice in the same settings.",
       vcSampleHe: 'שלום! ככה נשמעות ההוראות בעברית.',
+      count: 'How many?', countTip: 'Tap each one to count, then pick the number',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -1302,6 +1304,7 @@ const Kids = (() => {
       ...order.slice(half).map(w => ({ kind: 'pop', w })),
       { kind: 'drag' },
       ...(th.pairs ? K.shuffle(words).slice(0, 3).map(w => ({ kind: 'opp', w })) : []),
+      ...(th.id === 'numbers' ? K.shuffle(words.slice(1, 8)).slice(0, 3).map(w => ({ kind: 'count', w })) : []),
       ...(Rec() || canRecord() ? K.shuffle(words).slice(0, 2).map(w => ({ kind: 'say', w })) : []),
       { kind: 'match' }
     ];
@@ -1319,6 +1322,7 @@ const Kids = (() => {
       else if (s.kind === 'say') sayIt(s.w);
       else if (s.kind === 'drag') drag();
       else if (s.kind === 'opp') opposite(s.w);
+      else if (s.kind === 'count') count(s.w);
       else match();
     }
 
@@ -1647,6 +1651,60 @@ const Kids = (() => {
             b.classList.add('nope');
             K.Feel.wrong(b);
             $('.k-bubble').textContent = kt('tryAgain'); owlMood('think');
+          }
+        };
+      });
+    }
+
+    // Count with me (numbers island): a few things to count; tapping each one counts it out loud
+    // ("one, two, three…"), then the child picks the number among 3
+    function count(w) {
+      const n = words.indexOf(w) + 1;
+      const thing = pickOne(['🍎', '🐟', '⭐', '🎈', '🐱', '🌸', '🚗', '🍌', '🦆', '⚽']);
+      const near = words.filter(x => x !== w && Math.abs(words.indexOf(x) + 1 - n) <= 3);
+      const opts = K.shuffle([w, ...K.shuffle(near).slice(0, 2)]);
+      let counted = 0, missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🔢</span> ${kt('count')}</p>
+          <div class="k-card k-count-box" role="group" aria-label="${kt('count')}">
+            ${Array.from({ length: n }, (_, i) => `<button class="k-count-thing" data-i="${i}" aria-label="${i + 1}"><span aria-hidden="true">${thing}</span><b></b></button>`).join('')}
+          </div>
+          <div class="k-opts">${opts.map((o, i) => `<button class="k-opt k-opt-num" data-i="${i}" aria-label="${o.en}"><span aria-hidden="true">${words.indexOf(o) + 1}</span><small class="en">${o.en}</small></button>`).join('')}</div>
+          ${owl(kt('countTip'), 'small')}
+        </div>`;
+      setTimeout(() => say([['en', 'How many?']]), 200);
+      K.view.querySelectorAll('.k-count-thing').forEach(t => {
+        t.onclick = () => {
+          if (t.classList.contains('done')) return;
+          counted++;
+          t.classList.add('done');
+          t.querySelector('b').textContent = counted;
+          Sfx.tap();
+          sayEn(words[counted - 1].en, 1);
+        };
+      });
+      K.view.querySelectorAll('.k-opt').forEach(b => {
+        b.onclick = () => {
+          if (opts[+b.dataset.i] === w) {
+            K.view.querySelectorAll('.k-opt, .k-count-thing').forEach(x => { x.disabled = true; });
+            b.classList.add('right');
+            K.Feel.right();
+            if (!missed) { firstTry++; Store.kidsWordRight(w.id); }
+            tapped++;
+            $('.k-bubble').textContent = `${n}! ${w.en}!`;
+            owlMood('cheer');
+            // count them all together, lighting each one up
+            const things = [...K.view.querySelectorAll('.k-count-thing')];
+            things.forEach((t, i) => setTimeout(() => { t.classList.add('done', 'lit'); t.querySelector('b').textContent = i + 1; }, i * 380));
+            say([['en', words.slice(0, n).map(x => x.en).join(', ') + '!']]);
+            setTimeout(nextStep, Math.max(1800, n * 420 + 900));
+          } else {
+            missed = true;
+            b.disabled = true;
+            b.classList.add('nope');
+            K.Feel.wrong(b);
+            $('.k-bubble').textContent = kt('countTip'); owlMood('think');
           }
         };
       });
