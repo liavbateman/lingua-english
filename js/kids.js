@@ -2576,7 +2576,8 @@ const Kids = (() => {
     const THINGS = [['apple', 'apples', '🍎'], ['fish', 'fish', '🐟'], ['star', 'stars', '⭐'], ['balloon', 'balloons', '🎈'],
       ['duck', 'ducks', '🦆'], ['car', 'cars', '🚗'], ['flower', 'flowers', '🌸'], ['ball', 'balls', '⚽']];
     const max = little() ? 5 : 10;
-    const rounds = K.shuffle(THINGS).slice(0, 6).map((t, i) => ({ t, give: i % 2 === 1, n: 1 + Math.floor(Math.random() * max) }));
+    // 2 and up: one thing is nothing to count (and n repeats less often)
+    const rounds = K.shuffle(THINGS).slice(0, 6).map((t, i) => ({ t, give: i % 2 === 1, n: 2 + Math.floor(Math.random() * (max - 1)) }));
     let at = 0, firstTry = 0;
     const word = (n, t) => `${NUMS[n - 1]} ${n === 1 ? t[0] : t[1]}`;
     function countAlong(els, then) {
@@ -2640,6 +2641,8 @@ const Kids = (() => {
             next(!missed);
           } else {
             missed = true;
+            b.disabled = true;
+            b.classList.add('nope');
             K.Feel.wrong(b);
             owlMood('think');
             $('.k-bubble').textContent = kt('tryAgain');
