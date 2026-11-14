@@ -2206,3 +2206,5 @@ body:has(#update):not(.in-lesson) .view { padding-bottom: 96px; }
 
 /* Tense map opened from a rule: that tense is marked */
 .tn-cell.is-here { outline: 3px solid #ffd27a; outline-offset: 2px; }
+
+.backup .btn[hidden], .bk-last[hidden] { display: none !important; }

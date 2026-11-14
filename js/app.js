@@ -2643,11 +2643,12 @@
       ${LEVELS.filter(l => !isFresh() || l.id === Store.level).map(levelCard).join('')}
       <div class="card backup">
         <div class="bk-head"><span class="bk-ico" aria-hidden="true">💾</span>
-          <div class="grow"><b>${t('backup.title')}</b><span class="bk-last" id="bk-last">${lastBackupText()}</span></div></div>
-        <p class="small">${t('backup.sub')}</p>
+          <div class="grow"><b>${t('backup.title')}</b><span class="bk-last" id="bk-last"${empty ? ' hidden' : ''}>${lastBackupText()}</span></div></div>
+        ${/* before the first lesson there is nothing to save yet; the card only offers to bring back a backup */ ''}
+        <p class="small">${t(empty ? 'backup.sub.empty' : 'backup.sub')}</p>
         <div class="pager">
           <button class="btn ghost" id="restore"><span aria-hidden="true">📂</span> ${t('backup.restore')}</button>
-          <button class="btn" id="save"><span aria-hidden="true">⬇️</span> ${t('backup.save')}</button>
+          <button class="btn" id="save"${empty ? ' hidden' : ''}><span aria-hidden="true">⬇️</span> ${t('backup.save')}</button>
         </div>
         <input type="file" id="backup-file" accept=".json,application/json,text/plain" hidden>
         <p class="small backup-msg" id="backup-msg" role="status"></p>
