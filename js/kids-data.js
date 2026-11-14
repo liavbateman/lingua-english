@@ -193,6 +193,18 @@ const KIDS_THEMES = [
     ]
   },
   {
+    // Opposites come in pairs: words 0-1, 2-3, 4-5… are each other's opposite
+    id: 'opposites', title: 'Opposites', he: 'הפכים', pic: '🔄', color: '#f97316', sticker: '🎭', pairs: true,
+    words: [
+      { en: 'big', he: 'גדול', pic: '🐘' }, { en: 'small', he: 'קטן', pic: '🐭' },
+      { en: 'hot', he: 'חם', pic: '🔥' }, { en: 'cold', he: 'קר', pic: '🧊' },
+      { en: 'up', he: 'למעלה', pic: '⬆️' }, { en: 'down', he: 'למטה', pic: '⬇️' },
+      { en: 'fast', he: 'מהיר', pic: '🐆' }, { en: 'slow', he: 'איטי', pic: '🐢' },
+      { en: 'day', he: 'יום', pic: '🌞' }, { en: 'night', he: 'לילה', pic: '🌃' },
+      { en: 'wet', he: 'רטוב', pic: '💦' }, { en: 'dry', he: 'יבש', pic: '🏜️' }
+    ]
+  },
+  {
     id: 'school', title: 'At school', he: 'בבית הספר', pic: '🎒', color: '#5b8def', sticker: '🎓',
     words: [
       { en: 'school', he: 'בית ספר', pic: '🏫' },

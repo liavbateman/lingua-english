@@ -140,6 +140,7 @@ for (const id of Object.keys(EXPLAIN)) if (!GRAMMAR.some(g => g.id === id)) erro
       if (!str(th.sticker) || stickers.has(th.sticker)) errors.push(`${at}: sticker missing or used twice`);
       stickers.add(th.sticker);
       if (!Array.isArray(th.words) || th.words.length < 6) { errors.push(`${at}: needs at least 6 words (the games use 4 pairs and 3–4 choices)`); continue; }
+      if (th.pairs && th.words.length % 2) errors.push(`${at}: an island of opposites needs an even number of words (pairs)`);
       const pics = new Set();
       for (const w of th.words) {
         if (!hasEn(w.en) || hasHe(w.en)) errors.push(`${at} "${w.en}": "en" must be English`);

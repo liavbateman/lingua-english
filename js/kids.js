@@ -54,6 +54,7 @@ const Kids = (() => {
       owlHi: 'הינשוף',
       wotd: 'התמונה של היום', wotdTap: 'לחצו לשמוע', wotdPlanted: 'נשתלה בגינה שלכם 🌱',
       riddles: 'מי אני?', riddlesSub: 'חידות קטנות: הקשיבו ונחשו', riddleQ: 'מי אני?', riddleTip: 'הקשיבו לרמזים ובחרו תמונה',
+      opp: 'מה ההפך?', oppTip: 'מצאו את ההפך', isOpp: '{a} – {b}!',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -101,6 +102,7 @@ const Kids = (() => {
       owlHi: 'The owl',
       wotd: 'Picture of the day', wotdTap: 'Tap to hear it', wotdPlanted: 'Planted in your garden 🌱',
       riddles: 'Who am I?', riddlesSub: 'Little riddles: listen and guess', riddleQ: 'Who am I?', riddleTip: 'Listen to the clues and pick a picture',
+      opp: "What's the opposite?", oppTip: 'Find the opposite', isOpp: '{a} – {b}!',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -1130,12 +1132,13 @@ const Kids = (() => {
     const words = th.words;
     // Meet every word, then hear-and-find each one: half as picture cards, half as balloons to pop,
     // then the memory game. Two different games for the same skill keep it fresh.
-    const order = K.shuffle(words), half = Math.ceil(order.length / 2);
+    const order = K.shuffle(words).slice(0, 8), half = Math.ceil(order.length / 2);
     const steps = [
       ...words.map(w => ({ kind: 'meet', w })),
       ...order.slice(0, half).map(w => ({ kind: 'tap', w })),
       ...order.slice(half).map(w => ({ kind: 'pop', w })),
       { kind: 'drag' },
+      ...(th.pairs ? K.shuffle(words).slice(0, 3).map(w => ({ kind: 'opp', w })) : []),
       ...(Rec() ? K.shuffle(words).slice(0, 2).map(w => ({ kind: 'say', w })) : []),
       { kind: 'match' }
     ];
@@ -1152,6 +1155,7 @@ const Kids = (() => {
       else if (s.kind === 'pop') pop(s.w);
       else if (s.kind === 'say') sayIt(s.w);
       else if (s.kind === 'drag') drag();
+      else if (s.kind === 'opp') opposite(s.w);
       else match();
     }
 
@@ -1434,6 +1438,50 @@ const Kids = (() => {
       });
       const hit = (el, ev) => { const r = el.getBoundingClientRect(); return ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom; };
       targets.forEach(t => { t.onclick = () => { if (picked) drop(picked, t); else sayEn(set[+t.dataset.i].en); }; });
+    }
+
+    // Find the opposite (islands with pairs): see and hear a word, pick its opposite among 3
+    function opposite(w) {
+      const i = words.indexOf(w), pair = words[i ^ 1];
+      const opts = K.shuffle([pair, ...K.shuffle(words.filter(x => x !== w && x !== pair)).slice(0, 2)]);
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🔄</span> ${kt('opp')}</p>
+          <div class="k-opp-card">
+            <button class="k-card k-opp-word" id="k-say" aria-label="${w.en}"><span class="k-opp-pic" aria-hidden="true">${w.pic}</span><b class="en">${w.en}</b></button>
+            <span class="k-opp-arrow" aria-hidden="true">↔️</span>
+            <span class="k-card k-opp-word k-opp-q" aria-hidden="true"><span class="k-opp-pic">❓</span><b>?</b></span>
+          </div>
+          <div class="k-opts">${opts.map((o, n) => `<button class="k-opt" data-i="${n}" aria-label="${o.en}"><span aria-hidden="true">${o.pic}</span></button>`).join('')}</div>
+          ${owl(kt('oppTip'), 'small')}
+        </div>`;
+      $('#k-say').onclick = () => sayEn(w.en);
+      setTimeout(() => say([['en', w.en + '.'], ['en', "What's the opposite?"]]), 200);
+      K.view.querySelectorAll('.k-opt').forEach(b => {
+        b.onclick = () => {
+          if (opts[+b.dataset.i] === pair) {
+            K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; });
+            b.classList.add('right');
+            K.Feel.right();
+            if (!missed) { firstTry++; Store.kidsWordRight(pair.id); }
+            tapped++;
+            const q = $('.k-opp-q');
+            q.innerHTML = `<span class="k-opp-pic">${pair.pic}</span><b class="en">${pair.en}</b>`;
+            q.classList.add('got');
+            $('.k-bubble').textContent = kt('isOpp', { a: w.en, b: pair.en });
+            owlMood('cheer');
+            say([['en', `${w.en}, ${pair.en}!`]]);
+            setTimeout(nextStep, 1700);
+          } else {
+            missed = true;
+            b.disabled = true;
+            b.classList.add('nope');
+            K.Feel.wrong(b);
+            $('.k-bubble').textContent = kt('tryAgain'); owlMood('think');
+          }
+        };
+      });
     }
 
     // Memory game: 4 pairs, each a picture card and a word card, face down
