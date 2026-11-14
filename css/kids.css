@@ -1742,3 +1742,5 @@ bdi.k-q { white-space: nowrap; }
 .k-sh-thing.nope { opacity: .4; filter: grayscale(.8); }
 /* copy the owl: how to say it (the voice), clearly not a translation of the word */
 .k-copy-how { display: inline-block; margin-top: 6px; padding: 4px 12px; border-radius: 999px; background: #fff1c2; color: var(--k-ink); font-weight: 700; }
+button.k-ss-seat { border: 0; font-family: inherit; font-size: 2.6rem; cursor: pointer; }   /* stays absolutely placed on the plank, same size as the other seat */
+.k-ss-ear { position: absolute; top: -8px; inset-inline-start: -8px; font-size: 1rem; font-style: normal; background: #fff; border-radius: 50%; padding: 3px; box-shadow: 0 2px 0 var(--k-edge); }

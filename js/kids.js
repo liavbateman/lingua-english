@@ -3641,7 +3641,7 @@ const Kids = (() => {
           <p class="k-step"><span aria-hidden="true">⚖️</span> ${kt('seesaw')} · ${at + 1}/${rounds.length}</p>
           <div class="k-seesaw">
             <div class="k-ss-plank" id="k-plank">
-              <span class="k-ss-seat left"><span aria-hidden="true">${a.pic}</span><b class="en" lang="en">${a.en}</b></span>
+              <button class="k-ss-seat left" id="k-say" aria-label="${kt('listen')}: ${a.en}"><span aria-hidden="true">${a.pic}</span><b class="en" lang="en">${a.en}</b><i class="k-ss-ear" aria-hidden="true">🔊</i></button>
               <span class="k-ss-seat right" id="k-seat"><span aria-hidden="true">❔</span></span>
             </div>
             <span class="k-ss-base" aria-hidden="true"></span>
@@ -3651,6 +3651,7 @@ const Kids = (() => {
           ${owl(kt('seesawTip'), 'small')}
         </div>`;
       const ask = () => say([['en', a.en], ['en', `What is the opposite of ${a.en}?`]], 0.85);
+      $('#k-say').onclick = ask;   // tap the word on the see-saw to hear the question again
       setTimeout(ask, 300);
       const plank = $('#k-plank'), seat = $('#k-seat');
       K.view.querySelectorAll('.k-opt').forEach(btn => {
@@ -3670,10 +3671,12 @@ const Kids = (() => {
             setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 2600);
           } else {
             missed = true;
+            btn.disabled = true;
+            btn.classList.add('nope');
             plank.classList.add('tip');
             K.Feel.wrong(btn);
             owlMood('think');
-            $('.k-bubble').textContent = `${o.en}? ${kt('tryAgain')}`;
+            $('.k-bubble').innerHTML = `<bdi class="k-q" dir="ltr" lang="en">${o.en}?</bdi> ${kt('tryAgain')}`;
             sayEn(`${o.en}? Hmm, no.`, 0.9);
             setTimeout(() => { if (!plank.classList.contains('swing')) { seat.innerHTML = '<span aria-hidden="true">❔</span>'; plank.classList.remove('tip'); } }, 1100);
           }
