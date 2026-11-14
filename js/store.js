@@ -132,10 +132,19 @@ const Store = (() => {
     kidsWordRight(id) {
       state.kids = state.kids || { stars: {}, stickers: {}, words: {} };
       state.kids.words[id] = (state.kids.words[id] || 0) + 1;
+      if (state.kids.miss && state.kids.miss[id]) { if (--state.kids.miss[id] <= 0) delete state.kids.miss[id]; }   // a right answer makes a tricky word less tricky
       state.kids.first = state.kids.first || {};   // the day each word was first got right (for the weekly note)
       if (!state.kids.first[id]) state.kids.first[id] = dayKey();
       save();
     },
+    // Tricky words: every first miss in a game counts once; right answers count it down again
+    kidsWordMiss(id) {
+      state.kids = state.kids || { stars: {}, stickers: {}, words: {} };
+      state.kids.miss = state.kids.miss || {};
+      state.kids.miss[id] = Math.min(3, (state.kids.miss[id] || 0) + 1);
+      save();
+    },
+    kidsMissCount: id => (state.kids && state.kids.miss && state.kids.miss[id]) || 0,
     kidsWordCount: id => (state.kids && state.kids.words[id]) || 0,
     // Review garden: every word the child got right is a plant. It gets thirsty when the word is due
     // for review (1, 2, 4, then 8 days) and grows a stage each time it is watered with a right answer.

@@ -75,6 +75,7 @@ const Kids = (() => {
       count: 'כמה יש?', countTip: 'לחצו על כל אחד כדי לספור, ואז בחרו מספר',
       colour: 'צובעים!', colourSub: 'בחרו צבע וצבעו את התמונה', colourAsk: 'צבעו את ה{thing} ב{colour}', colourDone: 'איזו תמונה יפה!',
       colourFree: 'עכשיו צבעו מה שבא לכם!',
+      practice: 'נתרגל את המילים הקשות ({n})', practiceTitle: 'מתרגלים', practiceDone: 'המילים האלה כבר קלות יותר!',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -143,6 +144,7 @@ const Kids = (() => {
       count: 'How many?', countTip: 'Tap each one to count, then pick the number',
       colour: 'Colour it!', colourSub: 'Pick a colour and colour the picture', colourAsk: 'Colour the {thing} {colour}', colourDone: 'What a lovely picture!',
       colourFree: 'Now colour anything you like!',
+      practice: 'Practise the tricky words ({n})', practiceTitle: 'Practice', practiceDone: 'Those words are easier now!',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -467,7 +469,7 @@ const Kids = (() => {
           ${KIDS_THEMES.map((th, i) => {
             const open = isOpen(i), done = Store.kidsHasSticker(th.id), cur = i === next;
             return `
-            <li class="k-isle ${i % 2 ? 'r' : 'l'} ${open ? '' : 'locked'} ${done ? 'done' : ''} ${cur ? 'cur' : ''}" style="--c:${th.color}">
+            <li class="k-isle ${i % 2 ? 'r' : 'l'} ${open ? '' : 'locked'} ${done ? 'done' : ''} ${cur ? 'cur' : ''} ${Store.kidsStars(th.id) >= 3 ? 'gold' : ''}" style="--c:${th.color}">
               <a ${open ? `href="#/kids/play/${th.id}"` : 'role="link" aria-disabled="true"'} class="k-isle-btn" data-i="${i}"
                  aria-label="${themeName(th)}${open ? '' : ', ' + kt('locked')}">
                 <span class="k-isle-pic" aria-hidden="true">${open ? th.pic : '🔒'}</span>
@@ -580,7 +582,7 @@ const Kids = (() => {
             sayEn(w.en);
             setTimeout(() => { at++; at < due.length ? round() : end(); }, 1200);
           } else {
-            missed = true;
+            if (!missed) Store.kidsWordMiss(r.w.id); missed = true;
             b.disabled = true;
             b.classList.add('nope');
             K.Feel.wrong(b);
@@ -654,7 +656,7 @@ const Kids = (() => {
             $('.k-riddle-q').textContent = r.w.pic;
             setTimeout(() => { at++; at < set.length ? round() : end(); }, 2200);
           } else {
-            missed = true;
+            if (!missed) Store.kidsWordMiss(w.id); missed = true;
             b.disabled = true;
             b.classList.add('nope');
             K.Feel.wrong(b);
@@ -769,6 +771,75 @@ const Kids = (() => {
       sayEn('What a beautiful picture!', 0.9);
     }
     setTimeout(() => { say([['he', kt('colourSub')]]); setTimeout(ask, 400); }, 200);
+  }
+
+  // ---------- practice the tricky words of an island ----------
+  // Only the words the child missed: each one as find-the-picture; a right first tap makes it less tricky
+  function practice(id) {
+    const th = theme(id);
+    if (!th) return map();
+    const tricky = K.shuffle(th.words.filter(x => Store.kidsMissCount(x.id) > 0));
+    if (!tricky.length) { location.hash = '#/kids'; return; }
+    document.body.classList.add('in-lesson');
+    document.body.style.setProperty('--kc', th.color);
+    let at = 0;
+    function round() {
+      K.lessonBar(at / tricky.length);
+      const w = tricky[at];
+      const opts = K.shuffle([w, ...K.shuffle(th.words.filter(x => x !== w)).slice(0, 2)]);
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🎯</span> ${kt('practiceTitle')} · ${at + 1}/${tricky.length}</p>
+          <div class="k-prompt">
+            <button class="k-speaker" id="k-say" aria-label="${kt('listen')}: ${w.en}"><span aria-hidden="true">🔊</span></button>
+            <span class="k-target en" lang="en">${w.en}</span>
+          </div>
+          <div class="k-opts">${opts.map((o, i) => `<button class="k-opt" data-i="${i}" aria-label="${o.en}"><span aria-hidden="true">${o.pic}</span></button>`).join('')}</div>
+          ${owl(kt('tapTip'), 'small')}
+        </div>`;
+      $('#k-say').onclick = () => sayEn(w.en);
+      setTimeout(() => sayEn(w.en), 200);
+      K.view.querySelectorAll('.k-opt').forEach(b => {
+        b.onclick = () => {
+          if (opts[+b.dataset.i] === w) {
+            K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; });
+            b.classList.add('right');
+            if (w.move) b.querySelector('span').classList.add('mv', 'mv-' + w.move);
+            K.Feel.right();
+            if (!missed) Store.kidsWordRight(w.id);
+            owlMood('cheer');
+            $('.k-bubble').textContent = pickOne(kt('great'));
+            sayEn(w.en);
+            setTimeout(() => { at++; at < tricky.length ? round() : end(); }, 1200);
+          } else {
+            if (!missed) Store.kidsWordMiss(w.id);
+            missed = true;
+            b.disabled = true;
+            b.classList.add('nope');
+            K.Feel.wrong(b);
+            $('.k-bubble').textContent = kt('tryAgain'); owlMood('think');
+            setTimeout(() => sayEn(w.en), 350);
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const left = th.words.filter(x => Store.kidsMissCount(x.id) > 0).length;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>${kt('done')}</h1>
+            <p class="k-unlock">🎯 ${kt('practiceDone')}</p>
+          </div>
+          ${left ? `<a class="k-btn ghost" href="#/kids/practice/${th.id}">🎯 ${kt('practice', { n: left })}</a>` : ''}
+          <a class="k-btn" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('Practice makes perfect!', 0.9);
+    }
+    round();
   }
 
   // ---------- songs & chants ----------
@@ -1486,7 +1557,7 @@ const Kids = (() => {
             sayEn(w.en);
             setTimeout(nextStep, 1200);
           } else {
-            missed = true;
+            if (!missed) Store.kidsWordMiss(w.id); missed = true;
             b.disabled = true;
             b.classList.add('nope');
             K.Feel.wrong(b);
@@ -1540,7 +1611,7 @@ const Kids = (() => {
             setTimeout(() => sayEn(w.en), 250);
             setTimeout(nextStep, 1300);
           } else {
-            missed = true;
+            if (!missed) Store.kidsWordMiss(w.id); missed = true;
             b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope');
             K.Feel.wrong(b);
             $('.k-bubble').textContent = kt('tryAgain'); owlMood('think');
@@ -1660,7 +1731,7 @@ const Kids = (() => {
             setTimeout(nextStep, 1300);
           }
         } else if (target) {
-          chip.dataset.missed = '1';
+          if (!chip.dataset.missed) Store.kidsWordMiss(set[+chip.dataset.w].id); chip.dataset.missed = '1';
           K.Feel.wrong(target);
           $('.k-bubble').textContent = kt('tryAgain'); owlMood('think');
         }
@@ -1742,7 +1813,7 @@ const Kids = (() => {
             say([['en', `${w.en}, ${pair.en}!`]]);
             setTimeout(nextStep, 1700);
           } else {
-            missed = true;
+            if (!missed) Store.kidsWordMiss(pair.id); missed = true;
             b.disabled = true;
             b.classList.add('nope');
             K.Feel.wrong(b);
@@ -1796,7 +1867,7 @@ const Kids = (() => {
             say([['en', words.slice(0, n).map(x => x.en).join(', ') + '!']]);
             setTimeout(nextStep, Math.max(1800, n * 420 + 900));
           } else {
-            missed = true;
+            if (!missed) Store.kidsWordMiss(w.id); missed = true;
             b.disabled = true;
             b.classList.add('nope');
             K.Feel.wrong(b);
@@ -1875,6 +1946,8 @@ const Kids = (() => {
             ${opened >= 0 ? `<p class="k-unlock">🔓 ${kt('nextIsland')} <span aria-hidden="true">${KIDS_THEMES[opened].pic}</span></p>` : ''}
           </div>
           ${advButton()}
+          ${(() => { const n = th.words.filter(x => Store.kidsMissCount(x.id) > 0).length;
+            return n && !adv ? `<a class="k-btn k-practice-btn" href="#/kids/practice/${th.id}">🎯 ${kt('practice', { n })}</a>` : ''; })()}
           <button class="k-btn ${adv ? 'ghost' : ''}" id="k-map">${kt('backToMap')}</button>
           <button class="k-btn ghost" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
         </div>`;
@@ -2216,6 +2289,7 @@ const Kids = (() => {
       else if (a === 'owl') wardrobe();
       else if (a === 'stories') stories();
       else if (a === 'riddles') riddles();
+      else if (a === 'practice') practice(b);
       else if (a === 'colour') colourIt();
       else if (a === 'today') today(b);
       else if (a === 'songs') songs();

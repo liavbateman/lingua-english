@@ -849,3 +849,9 @@ body.kids.night .k-trophy:not(.got) { background: rgba(255, 255, 255, .85); }
 .k-paint-pot.on { border-color: var(--k-ink); transform: translateY(-3px); }
 .k-play .k-bubble b { white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { .k-part.hint > * { animation: none; stroke: #f2477f; stroke-width: 6; } }
+
+/* gold islands (3 stars) and the practice button */
+.k-isle.gold .k-isle-btn { box-shadow: 0 0 0 6px #ffd23f, 0 0 22px 6px rgba(255, 210, 63, .55), 0 8px 0 color-mix(in srgb, var(--c) 60%, #13235a); }
+.k-isle.gold .k-isle-name::after { content: ' 👑'; }
+.k-practice-btn { background: #2f9e6e; box-shadow: 0 6px 0 #1f7a52; }
+.k-practice-btn:active { box-shadow: 0 1px 0 #1f7a52; }
