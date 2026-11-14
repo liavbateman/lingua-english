@@ -1682,3 +1682,6 @@ bdi.k-q { white-space: nowrap; }
 
 /* the back link is a small pill, not a full-width bar, on play screens too (they stretch their children) */
 .k-play > .k-back { align-self: flex-start; }
+
+/* story / trace / song buttons stay on one line ("עוד פעם" was wrapping) */
+.k-story-nav .k-btn { white-space: nowrap; padding-inline: 10px; }

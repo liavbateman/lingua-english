@@ -4984,7 +4984,10 @@ const Kids = (() => {
             K.Feel.right();
             $('.k-bubble').textContent = pickOne(kt('great'));
             owlMood('cheer');
-            setTimeout(() => end(missed ? 2 : 3), 1200);
+            // say why it is right: the story line whose picture has the answer ("The owl says good night.")
+            const page = st.pages.find(pg => pg[0].includes(opts[0]));
+            say([['en', 'Yes!'], ...(page ? [['en', page[1]]] : [])], 0.85);
+            setTimeout(() => end(missed ? 2 : 3), page ? 2600 : 1400);
           } else {
             missed = true;
             b.disabled = true;
