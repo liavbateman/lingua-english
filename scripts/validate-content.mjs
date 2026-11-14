@@ -129,7 +129,7 @@ for (const id of Object.keys(EXPLAIN)) if (!GRAMMAR.some(g => g.id === id)) erro
   const kf = 'js/kids-data.js';
   const kctx = vm.createContext({});
   try {
-    vm.runInContext(fs.readFileSync(path.join(root, kf), 'utf8') + ';this.K = { KIDS_THEMES, KIDS_WORDS, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE, KIDS_RIDDLES, KIDS_MOVES, KIDS_WORDS, KIDS_HOLIDAYS, KIDS_PAIRS, KIDS_TIPS, KIDS_CVC };', kctx, { filename: kf });
+    vm.runInContext(fs.readFileSync(path.join(root, kf), 'utf8') + ';this.K = { KIDS_THEMES, KIDS_WORDS, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE, KIDS_RIDDLES, KIDS_MOVES, KIDS_WORDS, KIDS_HOLIDAYS, KIDS_PAIRS, KIDS_TIPS, KIDS_CVC, KIDS_SAYS };', kctx, { filename: kf });
     loaded.push(kf);
     const { KIDS_THEMES, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE } = kctx.K;
     const ids = new Set(), stickers = new Set(KIDS_TREASURE);
@@ -163,6 +163,7 @@ for (const id of Object.keys(EXPLAIN)) if (!GRAMMAR.some(g => g.id === id)) erro
     for (const pr of kctx.K.KIDS_PAIRS) if (pr.length !== 2 || pr.some(w => !hasEn(w.en) || !hasHe(w.he) || !str(w.pic)) || pr[0].pic === pr[1].pic) errors.push(`kids sound-alike pair "${pr.map(w => w.en).join('/')}": needs 2 words, each with English, Hebrew and its own picture`);
     for (const th of KIDS_THEMES) { const tip = kctx.K.KIDS_TIPS[th.id]; if (!tip || !hasHe(tip[0]) || !hasEn(tip[1])) errors.push(`kids island "${th.id}": needs a "try at home" tip in Hebrew and English`); }
     for (const w of kctx.K.KIDS_CVC) if (!/^[a-z]{3}$/.test(w.en) || !str(w.pic)) errors.push(`kids blend word "${w.en}": needs 3 lowercase letters and a picture`);
+    for (const id of Object.keys(kctx.K.KIDS_SAYS)) if (!kctx.K.KIDS_WORDS.some(w => w.id === id)) errors.push(`kids animal sound "${id}": no such word`);
     for (const sg of KIDS_SONGS) if (!sg.lines.length || sg.lines.some(l => !l.length)) errors.push(`kids song "${sg.id}": empty line`);
     console.log(`kids          ${String(KIDS_THEMES.length).padStart(2)} islands · ${String(ids.size).padStart(3)} words ·  ${KIDS_STORIES.length} stories ·  ${KIDS_SONGS.length} songs`);
   } catch (e) { errors.push(`${kf}: does not run: ${e.message}`); }

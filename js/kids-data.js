@@ -236,6 +236,13 @@ const KIDS_MOVES = {
 };
 KIDS_WORDS.forEach(w => { if (KIDS_MOVES[w.id]) w.move = KIDS_MOVES[w.id]; });
 
+// What the animals say, in English (a cow says "moo", a dog says "woof")
+const KIDS_SAYS = {
+  'animals/cat': 'meow', 'animals/dog': 'woof', 'animals/bird': 'tweet', 'animals/fish': 'blub',
+  'animals/cow': 'moo', 'animals/lion': 'roar', 'animals/monkey': 'ooh ooh', 'animals/elephant': 'toot'
+};
+KIDS_WORDS.forEach(w => { if (KIDS_SAYS[w.id]) w.says = KIDS_SAYS[w.id]; });
+
 // The owl's wardrobe: items open as the child collects stars (nothing is spent, so nothing is lost)
 const KIDS_OWL_COLORS = [
   { id: 'blue', c: '#3f7bff', stars: 0 }, { id: 'pink', c: '#ff5d8f', stars: 2 }, { id: 'green', c: '#2fbf7f', stars: 4 },

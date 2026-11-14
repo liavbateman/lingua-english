@@ -924,3 +924,12 @@ body.kids-big .k-mem-face.word.long { font-size: 1rem; }
 .k-blend-tile.lit { animation: k-boing .5s var(--ease-pop); background: #d8fbe9; }
 .k-blend-go { width: auto; margin: 0 auto 14px; padding: 10px 22px; font-size: 1.1rem; }
 body.kids-big .k-blend-tile { font-family: "Lexend", var(--k-font); }
+
+/* animal sounds: a speech bubble on the picture */
+.k-says {
+  position: absolute; top: 18px; inset-inline-start: 16px; padding: 6px 12px; border-radius: 18px 18px 18px 4px;
+  background: #fff6d6; color: #5a430c; font: 700 1.3rem var(--k-font); box-shadow: 0 3px 0 #e9b949; transform: rotate(-6deg);
+}
+.k-says-card .k-says { font-size: 1.6rem; }
+.k-says-opt { font-size: 1.4rem; }
+.k-says { inset-inline-start: auto; left: 60%; top: 16px; }

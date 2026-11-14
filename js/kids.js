@@ -88,6 +88,7 @@ const Kids = (() => {
       muteNoVoice: 'במכשיר לא נמצא קול באנגלית. בקשו מהורה לבדוק בפינת ההורים ← קולות.', muteOk: 'הבנתי',
       blend: 'מחברים צלילים', blendSub: 'שומעים צליל, ועוד צליל, ועוד אחד… איזו מילה יצאה?', blendTip: 'לחצו על כל אות לשמוע אותה, ואז בחרו את התמונה',
       blendGo: 'לחבר!',
+      says: 'מה החיה אומרת?', saysTip: 'בחרו את הקול של החיה',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -169,6 +170,7 @@ const Kids = (() => {
       muteNoVoice: 'No English voice was found on this device. Ask a grown-up to check Parent corner → Voices.', muteOk: 'Got it',
       blend: 'Blend it!', blendSub: 'A sound, another sound, one more… which word is it?', blendTip: 'Tap each letter to hear it, then pick the picture',
       blendGo: 'Blend!',
+      says: 'What does it say?', saysTip: 'Pick the sound the animal makes',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -1930,6 +1932,7 @@ const Kids = (() => {
       { kind: 'drag' },
       ...(th.pairs ? K.shuffle(words).slice(0, 3).map(w => ({ kind: 'opp', w })) : []),
       ...(th.id === 'numbers' ? K.shuffle(words.slice(1, 8)).slice(0, 3).map(w => ({ kind: 'count', w })) : []),
+      ...K.shuffle(words.filter(w => w.says)).slice(0, 3).map(w => ({ kind: 'says', w })),
       ...(Rec() || canRecord() ? K.shuffle(words).slice(0, 2).map(w => ({ kind: 'say', w })) : []),
       { kind: 'match' }
     ];
@@ -1948,6 +1951,7 @@ const Kids = (() => {
       else if (s.kind === 'drag') drag();
       else if (s.kind === 'opp') opposite(s.w);
       else if (s.kind === 'count') count(s.w);
+      else if (s.kind === 'says') animalSays(s.w);
       else match();
     }
 
@@ -1961,12 +1965,13 @@ const Kids = (() => {
             <span class="k-word en ${w.en.length > 8 ? 'long' : ''}" lang="en">${w.en}</span>
             <span class="k-he he" lang="he">${w.he}</span>
             <span class="k-ear" aria-hidden="true">🔊</span>
+            ${w.says ? `<span class="k-says en" aria-hidden="true">${w.says}!</span>` : ''}
           </button>
           <p class="k-tip">${kt('meetTip')}</p>
           <button class="k-btn" id="k-next">${kt('next')} <span aria-hidden="true">${isHe() ? '←' : '→'}</span></button>
         </div>`;
       const pic = $('#k-pic');
-      const hear = () => { sayEn(w.en); pic.classList.remove('boing'); void pic.offsetWidth; pic.classList.add('boing'); };
+      const hear = () => { w.says ? say([['en', w.en + '.'], ['en', `The ${w.en} says ${w.says}!`]]) : sayEn(w.en); pic.classList.remove('boing'); void pic.offsetWidth; pic.classList.add('boing'); };
       pic.onclick = hear;
       $('#k-next').onclick = nextStep;
       if (n === 0) say([['he', kt('sayMeet')], ['en', w.en]]); else setTimeout(hear, 150);
@@ -2330,6 +2335,51 @@ const Kids = (() => {
             b.classList.add('nope');
             K.Feel.wrong(b);
             $('.k-bubble').textContent = kt('countTip'); owlMood('think');
+          }
+        };
+      });
+    }
+
+    // What does it say? An animal, and three sound words to choose from
+    function animalSays(w) {
+      const opts = K.shuffle([w, ...K.shuffle(words.filter(x => x.says && x !== w)).slice(0, 2)]);
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🗯️</span> ${kt('says')}</p>
+          <button class="k-card k-meet k-says-card" id="k-say" aria-label="${w.en}">
+            <span class="k-pic ${w.move ? 'mv mv-' + w.move : ''}" aria-hidden="true">${w.pic}</span>
+            <span class="k-word en">${w.en}</span>
+            <span class="k-says en" aria-hidden="true">?</span>
+          </button>
+          <div class="k-peek-words">${opts.map((o, i) => `<button class="k-chip-word k-says-opt en" data-i="${i}">${o.says}!</button>`).join('')}</div>
+          ${owl(kt('saysTip'), 'small')}
+        </div>`;
+      const ask = () => sayEn(`What does the ${w.en} say?`);
+      $('#k-say').onclick = ask;
+      setTimeout(ask, 250);
+      K.view.querySelectorAll('.k-says-opt').forEach(b => {
+        b.onclick = () => {
+          const o = opts[+b.dataset.i];
+          if (o === w) {
+            K.view.querySelectorAll('.k-says-opt').forEach(x => { x.disabled = true; });
+            b.classList.add('right');
+            K.Feel.right();
+            if (!missed) { firstTry++; Store.kidsWordRight(w.id); }
+            tapped++;
+            $('.k-says-card .k-says').textContent = w.says + '!';
+            owlMood('cheer');
+            $('.k-bubble').textContent = `${w.pic} ${w.says}!`;
+            sayEn(`The ${w.en} says ${w.says}!`);
+            setTimeout(nextStep, 1900);
+          } else {
+            if (!missed) Store.kidsWordMiss(w.id);
+            missed = true;
+            b.disabled = true;
+            b.classList.add('nope');
+            K.Feel.wrong(b);
+            owlMood('think');
+            sayEn(`${o.says} is the ${o.en}!`);
           }
         };
       });
