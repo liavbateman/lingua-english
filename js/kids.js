@@ -3241,6 +3241,8 @@ const Kids = (() => {
             setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 2200);
           } else {
             missed = true;
+            b.disabled = true;
+            b.classList.add('nope');   // this animal is out of the round (dimmed after its rustle)
             b.classList.remove('rustle'); void b.offsetWidth; b.classList.add('rustle');
             K.Feel.wrong(b);
             owlMood('think');
