@@ -448,3 +448,24 @@ const KIDS_PAIRS = [
   [['sink', '🚰', 'כיור'], ['think', '🤔', 'לחשוב']],
   [['van', '🚐', 'טנדר'], ['fan', '🌀', 'מאוורר']]
 ].map(p => p.map(([en, pic, he]) => ({ en, pic, he })));
+
+// "Try at home": one small idea per island for grown-ups, to use the words in real life (he / en)
+const KIDS_TIPS = {
+  animals: ['כשרואים חיה בחוץ או בספר, שאלו "What is it?" ותנו לילד לענות באנגלית.', 'When you see an animal outside or in a book, ask "What is it?" and let your child answer in English.'],
+  colors: ['משחק "I spy": אמרו "I spy something red" והילד מחפש משהו אדום בחדר.', 'Play "I spy": say "I spy something red" and your child looks for something red in the room.'],
+  numbers: ['ספרו יחד באנגלית מדרגות, כפתורים או ענבים בצלחת.', 'Count stairs, buttons or grapes on the plate together in English.'],
+  food: ['בארוחה שאלו "Do you want an apple?" ועודדו לענות "Yes, please!"', 'At mealtime ask "Do you want an apple?" and encourage "Yes, please!"'],
+  family: ['הראו תמונות משפחתיות ושאלו "Who is it?" — "It\'s mom!"', 'Look at family photos and ask "Who is it?" — "It\'s mom!"'],
+  phrases: ['השתמשו כל יום ב-"thank you" ו-"please" באנגלית, גם אתם. ילדים מחקים!', 'Use "thank you" and "please" in English every day, yourselves too. Children copy!'],
+  body: ['שירו "Head, shoulders, knees and toes" ונגעו בכל חלק בגוף.', 'Sing "Head, shoulders, knees and toes" and touch each body part.'],
+  toys: ['בזמן משחק, בקשו "Give me the ball, please" והילד מגיש.', 'While playing, ask "Give me the ball, please" and let your child hand it over.'],
+  go: ['בנסיעה, שחקו "מי רואה ראשון": car, bus, truck, bike!', 'On the road, play "who sees it first": car, bus, truck, bike!'],
+  clothes: ['בבוקר, בזמן ההתלבשות, אמרו כל בגד באנגלית: shirt, pants, socks.', 'While getting dressed in the morning, name each item in English: shirt, pants, socks.'],
+  sky: ['הסתכלו מהחלון ושאלו "Is it sunny? Is it rainy?"', 'Look out of the window and ask "Is it sunny? Is it rainy?"'],
+  feelings: ['לפני השינה שאלו "How do you feel today? Happy? Tired?"', 'At bedtime ask "How do you feel today? Happy? Tired?"'],
+  home: ['הדביקו פתקים עם מילים באנגלית על דלת, חלון ומיטה בבית.', 'Stick notes with English words on the door, the window and the bed at home.'],
+  actions: ['משחק "Simon says": "Simon says jump! Simon says run!"', 'Play "Simon says": "Simon says jump! Simon says run!"'],
+  shapes: ['חפשו צורות בבית: "Find a circle!" (צלחת, שעון, כדור).', 'Hunt for shapes at home: "Find a circle!" (a plate, a clock, a ball).'],
+  opposites: ['הדגימו בגוף: big/small עם הידיים, up/down עם קפיצה, fast/slow בהליכה.', 'Act them out: big/small with your arms, up/down with a jump, fast/slow while walking.'],
+  school: ['כשמכינים את התיק, אמרו יחד: pencil, ruler, book, backpack.', 'When packing the school bag, say together: pencil, ruler, book, backpack.']
+};

@@ -79,6 +79,7 @@ const Kids = (() => {
       pairs: 'אוזן חדה', pairsSub: 'מילים שנשמעות כמעט אותו דבר', pairsTip: 'הקשיבו טוב! איזו מילה שמעתם?',
       isleSongs: 'שירי האיים', isleSongsSub: 'כל אי שסיימתם מקבל שיר משלו', singIsle: 'שירו את שיר האי',
       peek: 'מציצים!', peekSub: 'מה מסתתר מאחורי העננים?', peekTip: 'מה מסתתר שם? בחרו מילה. ככל שמוקדם יותר, יותר כוכבים!',
+      tryHome: 'לנסות בבית', tryHomeAny: 'השתמשו במילים של היום בבית: הצביעו, שאלו "What is it?" ושבחו כל ניסיון.',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -151,6 +152,7 @@ const Kids = (() => {
       pairs: 'Sharp ears', pairsSub: 'Words that sound almost the same', pairsTip: 'Listen carefully! Which word did you hear?',
       isleSongs: 'Island songs', isleSongsSub: 'Every island you finish gets its own song', singIsle: 'Sing the island song',
       peek: 'Peek-a-boo!', peekSub: "What's hiding behind the clouds?", peekTip: "What's hiding there? Pick a word. The earlier, the more stars!",
+      tryHome: 'Try at home', tryHomeAny: 'Use today\'s words at home: point, ask "What is it?" and praise every try.',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -390,6 +392,10 @@ const Kids = (() => {
     window.addEventListener('hashchange', bye);
     setTimeout(bye, 4200);
   }
+  // English inside a Hebrew sentence: each quoted English bit (and runs of English words) stays one left-to-right piece
+  const bidiEn = text => !isHe() ? text : text.split(/("[^"]+")/).map(part => part.startsWith('"')
+    ? `<bdi dir="ltr" lang="en">${part}</bdi>`
+    : part.replace(/[A-Za-z][A-Za-z ',.!?/-]*[A-Za-z!?.]|[A-Za-z]/g, m => `<bdi dir="ltr" lang="en">${m}</bdi>`)).join('');
   const endOwl = () => `<div class="k-end-owl">${owlAv()}</div>`;
   const starsHtml = (n, cls = '') => `<span class="k-stars ${cls}" aria-label="${n} / 3">${[1, 2, 3].map(i => `<i class="${i <= n ? 'on' : ''}">★</i>`).join('')}</span>`;
 
@@ -2133,6 +2139,7 @@ const Kids = (() => {
           </div>
           ${advButton()}
           ${!adv ? `<a class="k-btn ghost" href="#/kids/song/isle-${th.id}">🎵 ${kt('singIsle')}</a>` : ''}
+          <aside class="k-home-tip"><b>👪 ${kt('tryHome')}</b><span>${bidiEn((KIDS_TIPS[th.id] || [])[isHe() ? 0 : 1] || kt('tryHomeAny'))}</span></aside>
           ${(() => { const n = th.words.filter(x => Store.kidsMissCount(x.id) > 0).length;
             return n && !adv ? `<a class="k-btn k-practice-btn" href="#/kids/practice/${th.id}">🎯 ${kt('practice', { n })}</a>` : ''; })()}
           <button class="k-btn ${adv ? 'ghost' : ''}" id="k-map">${kt('backToMap')}</button>
