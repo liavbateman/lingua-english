@@ -216,6 +216,17 @@ const Store = (() => {
     // My scene: pictures the child placed on the playground ({ p: picture, w: word id or '', x, y } in %)
     get kidsScene() { return (state.kids && state.kids.scene) || []; },
     set kidsScene(v) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.scene = v.slice(-40); save(); },
+    // Daily check-in with the owl: how the child feels each day (word id), kept for 8 weeks
+    get kidsMoodToday() { const m = state.kids && state.kids.moods; return (m && m[dayKey()]) || null; },
+    kidsMoodOn: key => (state.kids && state.kids.moods && state.kids.moods[key]) || null,
+    kidsSetMood(id) {
+      state.kids = state.kids || { stars: {}, stickers: {}, words: {} };
+      const m = state.kids.moods = state.kids.moods || {};
+      m[dayKey()] = id;
+      const oldest = dayKey(new Date(Date.now() - 56 * DAY));
+      Object.keys(m).forEach(k => { if (k < oldest) delete m[k]; });
+      save();
+    },
     // The owl buddy's look: a colour and an accessory, chosen in the wardrobe
     get kidsOwl() { const o = state.kids && state.kids.owl; return { color: (o && o.color) || 'blue', acc: (o && o.acc) || '' }; },
     setKidsOwl(part, id) {

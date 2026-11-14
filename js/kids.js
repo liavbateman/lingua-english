@@ -93,6 +93,7 @@ const Kids = (() => {
       pcAgeText: 'בגיל 3–5 המשחקים בנויים רק על תמונות וצלילים: בלי מילים כתובות במשימות, בלי גרירת מילים ובלי משחקי קריאה',
       scene: 'העולם שלי', sceneTip: 'גררו תמונה לתוך הציור (או לחצו עליה ואז על הציור). כל תמונה אומרת את המילה שלה!',
       sceneClear: 'לנקות', sceneEmpty: 'עוד אין תמונות. שחקו באיים כדי לאסוף מילים!',
+      checkin: 'הינשוף שואל: איך אתם מרגישים היום?', checkinDone: 'היום הרגשתם:',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -179,6 +180,7 @@ const Kids = (() => {
       pcAgeText: 'At 3–5 the games use only pictures and sounds: no written words in the tasks, no word dragging and no reading games',
       scene: 'My world', sceneTip: 'Drag a picture into the scene (or tap it, then the scene). Every picture says its word!',
       sceneClear: 'Clear', sceneEmpty: 'No pictures yet. Play the islands to collect words!',
+      checkin: 'The owl asks: how do you feel today?', checkinDone: 'Today you feel:',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -469,6 +471,7 @@ const Kids = (() => {
             <span class="k-today-arrow" aria-hidden="true">${isHe() ? '‹' : '›'}</span>
           </a>`;
         })()}
+        ${checkinCard()}
         ${chestCard()}
         ${wotdCard()}
         <div class="k-tiles">
@@ -547,6 +550,18 @@ const Kids = (() => {
       Sfx.tap();
     };
     checkVoice();
+    K.view.querySelectorAll('.k-mood').forEach(b => {
+      b.onclick = () => {
+        const w = KIDS_WORDS.find(x => x.id === b.dataset.id);
+        Store.kidsSetMood(w.id);
+        Store.kidsWordRight(w.id);   // the feeling word goes into the garden too
+        const reply = { 'feelings/happy': 'Me too!', 'feelings/sad': "Oh no. A big hug!", 'feelings/tired': "Let's play something calm.", 'feelings/angry': 'Take a big breath with me.', 'feelings/surprised': 'Wow!', 'feelings/scared': "Don't worry, I'm here." }[w.id] || 'Thank you!';
+        say([['en', `You feel ${w.en}. ${reply}`]]);
+        owlMood(w.id === 'feelings/happy' ? 'cheer' : 'love');
+        const card = $('.k-checkin');
+        if (card) card.outerHTML = checkinCard();
+      };
+    });
     const wotdBtn = $('#k-wotd');
     if (wotdBtn) wotdBtn.onclick = () => {
       const w = KIDS_WORDS.find(x => x.id === wotdBtn.dataset.id);
@@ -1697,7 +1712,8 @@ const Kids = (() => {
       <section class="k-pc-box">
         <h2>📅 ${name ? kt('wkTitle', { name }) : kt('wkTitleAnon')}</h2>
         <div class="k-wk-days" aria-label="${kt('wkDays', { n: played, m: mins })}">
-          ${wk.days.map(d => `<span class="${d.sec ? 'on' : ''}"><i></i><small>${dayName(d)}</small></span>`).join('')}
+          ${wk.days.map(d => { const m = Store.kidsMoodOn(d.key), w = m && KIDS_WORDS.find(x => x.id === m);
+            return `<span class="${d.sec ? 'on' : ''}"><i></i><small>${dayName(d)}</small>${w ? `<em title="${w.en}">${w.pic}</em>` : ''}</span>`; }).join('')}
         </div>
         <p class="k-wk-line">${kt(played === 1 ? 'wkDay1' : 'wkDays', { n: played, m: mins })}</p>
         ${wk.words.length ? `
@@ -1887,6 +1903,19 @@ const Kids = (() => {
     if (!('speechSynthesis' in window)) return show(false);
     // voices load late on some devices: look again after a moment before saying anything
     setTimeout(() => { voices(); if (!enVoice) show(!navigator.onLine); }, 1500);
+  }
+
+  // ---------- the owl's daily check-in ----------
+  // One question a day, answered with a picture: practises the feelings words in a real moment
+  function checkinCard() {
+    const feels = ['happy', 'tired', 'sad', 'angry', 'surprised'].map(f => KIDS_WORDS.find(w => w.id === 'feelings/' + f)).filter(Boolean);
+    const today = Store.kidsMoodToday && KIDS_WORDS.find(w => w.id === Store.kidsMoodToday);
+    if (today) return `<div class="k-checkin done"><span>${kt('checkinDone')}</span><b class="en">${today.pic} ${today.en}</b></div>`;
+    return `
+      <div class="k-checkin" role="group" aria-label="${kt('checkin')}">
+        <p>🦉 ${kt('checkin')}</p>
+        <div class="k-moods">${feels.map(w => `<button class="k-mood" data-id="${w.id}" aria-label="${w.en}"><span aria-hidden="true">${w.pic}</span><small class="en">${w.en}</small></button>`).join('')}</div>
+      </div>`;
   }
 
   // ---------- daily treasure ----------
