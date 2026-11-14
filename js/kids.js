@@ -51,6 +51,7 @@ const Kids = (() => {
       stWater: 'גינה', stIsland: 'אי', stStory: 'סיפור', stAbc: 'אותיות',
       who: 'מי משחק עכשיו?', addKid: 'ילד נוסף', kidName: 'שם (לא חובה)', pickFace: 'בחרו פרצוף', save: 'שמירה',
       addGate: 'הוספת ילד היא להורים', player: 'שחקן',
+      owlHi: 'הינשוף',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -95,6 +96,7 @@ const Kids = (() => {
       stWater: 'garden', stIsland: 'island', stStory: 'story', stAbc: 'letters',
       who: "Who's playing?", addKid: 'Add a child', kidName: 'Name (optional)', pickFace: 'Pick a face', save: 'Save',
       addGate: 'Adding a child is for grown-ups', player: 'Player',
+      owlHi: 'The owl',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -215,6 +217,8 @@ const Kids = (() => {
     };
   })();
 
+  // after any celebration, the owl on the end card claps and sends hearts
+  const celebrate = () => { K.confetti('kids'); Sfx.jingle(); owlMood('clap'); setTimeout(() => owlMood('love'), 900); };
   const BALLOONS = ['#ff5d8f', '#3fa7ff', '#ffc93c', '#2fd093', '#b98cff'];
 
   // ---------- the owl buddy ----------
@@ -229,6 +233,30 @@ const Kids = (() => {
       ${owlAv()}
       <div class="k-bubble" role="status">${text}</div>
     </div>`;
+  // Owl moods: the buddy reacts with a little move and a floating emoji.
+  // cheer = hop + 🎉, think = head tilt + 💭 (never sad: a miss is just thinking), clap = 👏, love = 💖, giggle = wiggle + 😄
+  const MOOD_PIC = { cheer: ['🎉', '⭐', '✨'], think: ['💭', '🤔'], clap: ['👏'], love: ['💖', '💕'], giggle: ['😄', '🎵'] };
+  function owlMood(mood, root = K.view) {
+    const o = root.querySelector('.k-owl, .k-end-owl');
+    if (!o) return;
+    o.classList.remove('mood-cheer', 'mood-think', 'mood-clap', 'mood-love', 'mood-giggle', 'happy');
+    void o.offsetWidth;
+    o.classList.add('mood-' + mood);
+    const av = o.querySelector('.k-av');
+    if (!av) return;
+    const pics = MOOD_PIC[mood] || MOOD_PIC.cheer;
+    pics.forEach((pic, i) => {
+      const f = document.createElement('i');
+      f.className = 'k-mood-pop';
+      f.setAttribute('aria-hidden', 'true');
+      f.textContent = pic;
+      f.style.setProperty('--dx', ((i - (pics.length - 1) / 2) * 26) + 'px');
+      f.style.animationDelay = (i * .12) + 's';
+      av.appendChild(f);
+      setTimeout(() => f.remove(), 1600);
+    });
+  }
+  const endOwl = () => `<div class="k-end-owl">${owlAv()}</div>`;
   const starsHtml = (n, cls = '') => `<span class="k-stars ${cls}" aria-label="${n} / 3">${[1, 2, 3].map(i => `<i class="${i <= n ? 'on' : ''}">★</i>`).join('')}</span>`;
 
   // Two islands are open at the start; every finished island opens one more
@@ -243,7 +271,8 @@ const Kids = (() => {
       <div class="k-wrap">
         <div class="k-head">
           <div class="k-owl">
-            <a class="k-owl-link" href="#/kids/owl" aria-label="${kt('wardrobe')}">${owlAv()}<span class="k-owl-edit" aria-hidden="true">👕</span></a>
+            <span class="k-owl-link"><button class="k-owl-tap" id="k-owl-tap" aria-label="${kt('owlHi')}">${owlAv()}</button>
+              <a class="k-owl-edit" href="#/kids/owl" aria-label="${kt('wardrobe')}">👕</a></span>
             <div class="k-bubble" role="status">${Store.kidsStickerCount ? kt('pick') : kt('hi')}</div>
           </div>
           <div class="k-chips">
@@ -306,6 +335,7 @@ const Kids = (() => {
       </div>`;
     $('#k-parents').onclick = () => gate(() => { location.hash = '#/kids/parents'; });
     $('#k-face').onclick = whoSheet;
+    $('#k-owl-tap').onclick = () => { owlMood(pickOne(['giggle', 'love', 'cheer'])); sayEn(pickOne(['Hoo hoo!', 'Hello friend!', "Let's play!"])); };
     $('#k-sfx').onclick = () => {
       Store.kidsSfx = !Store.kidsSfx;
       $('#k-sfx').textContent = Store.kidsSfx ? '🔊' : '🔇';
@@ -386,7 +416,7 @@ const Kids = (() => {
             const before = due[at].lvl, after = Store.kidsWater(w.id, !missed);
             if (after > before) grown.push(w.id);
             $('.k-bubble').textContent = after > before ? `${PLANT[after]} ${pickOne(kt('great'))}` : pickOne(kt('great'));
-            $('.k-owl').classList.add('happy');
+            owlMood('cheer');
             sayEn(w.en);
             setTimeout(() => { at++; at < due.length ? round() : end(); }, 1200);
           } else {
@@ -394,7 +424,7 @@ const Kids = (() => {
             b.disabled = true;
             b.classList.add('nope');
             K.Feel.wrong(b);
-            $('.k-bubble').textContent = kt('tryAgain');
+            $('.k-bubble').textContent = kt('tryAgain'); owlMood('think');
             setTimeout(() => sayEn(w.en), 350);
           }
         };
@@ -415,7 +445,7 @@ const Kids = (() => {
         }
         const head = $('.k-sub');
         if (head) head.textContent = `💧 ${kt('watered')}${grown.length ? ' ' + kt('grew', { n: grown.length }) + ' 🌱' : ''}`;
-        K.confetti('kids'); Sfx.jingle();
+        celebrate();
         sayEn('Your garden is happy!', 0.9);
       }, 30);
     }
@@ -491,7 +521,7 @@ const Kids = (() => {
       const next = () => {
         if (run !== songRun || !document.body.contains(notes[0])) return;
         notes.forEach(n => n.classList.remove('lit'));
-        if (k >= flat.length) { $('.k-owl').classList.add('happy'); K.Feel.right(); return; }
+        if (k >= flat.length) { owlMood('cheer'); K.Feel.right(); return; }
         const b = notes[k], [w, , spoken] = flat[k];
         b.classList.add('lit');
         note(tune[k]);
@@ -617,14 +647,14 @@ const Kids = (() => {
             b.classList.add('right');
             K.Feel.right();
             $('.k-bubble').textContent = pickOne(kt('great'));
-            $('.k-owl').classList.add('happy');
+            owlMood('cheer');
             setTimeout(() => end(missed ? 2 : 3), 1200);
           } else {
             missed = true;
             b.disabled = true;
             b.classList.add('nope');
             K.Feel.wrong(b);
-            $('.k-bubble').textContent = kt('tryAgain');
+            $('.k-bubble').textContent = kt('tryAgain'); owlMood('think');
             setTimeout(() => sayEn(q), 350);
           }
         };
@@ -635,7 +665,7 @@ const Kids = (() => {
       const res = Store.kidsFinish('st-' + st.id, stars, 15);
       K.view.innerHTML = `
         <div class="k-wrap k-play k-end">
-          <div class="k-end-card">
+          <div class="k-end-card">${endOwl()}
             <span class="k-sticker" aria-hidden="true">📖</span>
             <h1>${kt('theEnd')}</h1>
             ${starsHtml(stars, 'big pop')}
@@ -645,7 +675,7 @@ const Kids = (() => {
           <a class="k-btn ${adv ? 'ghost' : ''}" href="#/kids/stories">📚 ${kt('stories')}</a>
           <button class="k-btn ghost" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
         </div>`;
-      K.confetti('kids'); Sfx.jingle();
+      celebrate();
       sayEn('The end! Great reading!', 0.9);
       $('#k-again').onclick = () => story(id);
     }
@@ -746,7 +776,7 @@ const Kids = (() => {
     back.querySelector('#k-add-ok').onclick = () => {
       Store.kidsAddProfile(face, back.querySelector('#k-name').value);
       back.remove();
-      K.confetti('kids'); Sfx.jingle();
+      celebrate();
       map();
       Kids.hello();
     };
@@ -888,7 +918,7 @@ const Kids = (() => {
     const tr = Store.kidsTreasure;
     K.view.innerHTML = `
       <div class="k-wrap k-play k-end">
-        <div class="k-end-card">
+        <div class="k-end-card">${endOwl()}
           <span class="k-sticker pop" aria-hidden="true">🏆</span>
           <h1>${kt('advDone')}</h1>
           <p class="k-unlock">${kt('advDoneSub')}</p>
@@ -896,7 +926,7 @@ const Kids = (() => {
         </div>
         <a class="k-btn" href="#/kids">${kt('backToMap')}</a>
       </div>`;
-    K.confetti('kids'); Sfx.jingle();
+    celebrate();
     sayEn('Hooray! You did it!', 0.9);
   }
 
@@ -924,7 +954,7 @@ const Kids = (() => {
     const item = pickOne(fresh.length ? fresh : KIDS_TREASURE);
     if (!Store.kidsOpenTreasure(item)) return;
     K.Feel.right();
-    K.confetti('kids'); Sfx.jingle();
+    celebrate();
     const back = document.createElement('div');
     back.className = 'k-reveal';
     back.setAttribute('role', 'dialog');
@@ -1034,7 +1064,7 @@ const Kids = (() => {
             tapped++;
             const cheer = pickOne(kt('great'));
             $('.k-bubble').textContent = cheer;
-            $('.k-owl').classList.add('happy');
+            owlMood('cheer');
             K.announce(cheer);
             sayEn(w.en);
             setTimeout(nextStep, 1200);
@@ -1043,7 +1073,7 @@ const Kids = (() => {
             b.disabled = true;
             b.classList.add('nope');
             K.Feel.wrong(b);
-            $('.k-bubble').textContent = kt('tryAgain');
+            $('.k-bubble').textContent = kt('tryAgain'); owlMood('think');
             setTimeout(() => sayEn(w.en), 350);   // hear the word again, then try again
           }
         };
@@ -1087,7 +1117,7 @@ const Kids = (() => {
             tapped++;
             const cheer = pickOne(kt('great'));
             $('.k-bubble').textContent = cheer;
-            $('.k-owl').classList.add('happy');
+            owlMood('cheer');
             K.announce(cheer);
             setTimeout(() => sayEn(w.en), 250);
             setTimeout(nextStep, 1300);
@@ -1095,7 +1125,7 @@ const Kids = (() => {
             missed = true;
             b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope');
             K.Feel.wrong(b);
-            $('.k-bubble').textContent = kt('tryAgain');
+            $('.k-bubble').textContent = kt('tryAgain'); owlMood('think');
             setTimeout(() => sayEn(w.en), 350);
           }
         };
@@ -1130,7 +1160,7 @@ const Kids = (() => {
       const done = text => {
         mic.disabled = true;
         bub().textContent = text;
-        $('.k-owl').classList.add('happy');
+        owlMood('cheer');
         K.announce(text);
         setTimeout(nextStep, 1600);
       };
@@ -1202,13 +1232,13 @@ const Kids = (() => {
           tapped++;
           if (++placed === set.length) {
             $('.k-bubble').textContent = pickOne(kt('great'));
-            $('.k-owl').classList.add('happy');
+            owlMood('cheer');
             setTimeout(nextStep, 1300);
           }
         } else if (target) {
           chip.dataset.missed = '1';
           K.Feel.wrong(target);
-          $('.k-bubble').textContent = kt('tryAgain');
+          $('.k-bubble').textContent = kt('tryAgain'); owlMood('think');
         }
         chip.classList.remove('picked');
         picked = null;
@@ -1311,7 +1341,7 @@ const Kids = (() => {
       const opened = KIDS_THEMES.findIndex((_, i) => !wasOpen[i] && isOpen(i));
       K.view.innerHTML = `
         <div class="k-wrap k-play k-end">
-          <div class="k-end-card">
+          <div class="k-end-card">${endOwl()}
             <h1>${kt('done')}</h1>
             ${starsHtml(stars, 'big pop')}
             ${res.firstSticker ? `
@@ -1325,7 +1355,7 @@ const Kids = (() => {
           <button class="k-btn ${adv ? 'ghost' : ''}" id="k-map">${kt('backToMap')}</button>
           <button class="k-btn ghost" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
         </div>`;
-      K.confetti('kids'); Sfx.jingle();
+      celebrate();
       K.Feel.right();
       for (let n = 0; n < stars; n++) setTimeout(() => Sfx.star(n), 450 + n * 250);
       sayEn(stars === 3 ? 'Amazing! Great job!' : 'Great job!', 0.9);
@@ -1472,12 +1502,12 @@ const Kids = (() => {
         K.Feel.right();
         Sfx.star(stage + 1);
         $('.k-bubble').textContent = pickOne(kt('great'));
-        $('.k-owl').classList.add('happy');
+        owlMood('cheer');
         cv.classList.add('k-trace-done');
         say([['en', x.name + '.'], ['en', enFor(x)]]);
         setTimeout(() => {
           if (stage === 0) { stage = 1; draw(); return; }
-          K.confetti('kids'); Sfx.jingle();
+          celebrate();
           Store.kidsTraced(x.L);
           location.hash = '#/kids/abc/' + x.L;
         }, 1800);
@@ -1520,7 +1550,7 @@ const Kids = (() => {
             K.Feel.right();
             if (!missed) firstTry++;
             $('.k-bubble').textContent = kt('isFor', { L: x.L, word: x.word });
-            $('.k-owl').classList.add('happy');
+            owlMood('cheer');
             sayLetter(x);
             setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 2200);
           } else {
@@ -1528,7 +1558,7 @@ const Kids = (() => {
             b.disabled = true;
             b.classList.add('nope');
             K.Feel.wrong(b);
-            $('.k-bubble').textContent = kt('tryAgain');
+            $('.k-bubble').textContent = kt('tryAgain'); owlMood('think');
             setTimeout(() => sayName(x), 350);
           }
         };
@@ -1541,7 +1571,7 @@ const Kids = (() => {
       const res = Store.kidsFinish('abc', stars, 10 + stars * 10);
       K.view.innerHTML = `
         <div class="k-wrap k-play k-end">
-          <div class="k-end-card">
+          <div class="k-end-card">${endOwl()}
             <h1>${kt('done')}</h1>
             ${starsHtml(stars, 'big pop')}
             ${res.firstSticker ? `<div class="k-sticker-new"><span class="k-sticker pop" aria-hidden="true">🔤</span><b>${kt('newSticker')}</b></div>`
@@ -1551,7 +1581,7 @@ const Kids = (() => {
           <a class="k-btn ${adv ? 'ghost' : ''}" href="#/kids/abc">ABC</a>
           <button class="k-btn ghost" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
         </div>`;
-      K.confetti('kids'); Sfx.jingle();
+      celebrate();
       sayEn(stars === 3 ? 'Amazing! Great job!' : 'Great job!', 0.9);
       $('#k-again').onclick = abcGame;
     }

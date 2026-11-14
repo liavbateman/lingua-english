@@ -566,3 +566,28 @@ body.kids :focus-visible { outline: 4px solid #1d2a5b; outline-offset: 3px; bord
 .k-face-opt.on { border-color: var(--k-pink, #f2477f); background: #fff; }
 .k-name { width: 100%; padding: 12px 14px; border: 2px solid var(--k-edge); border-radius: 16px; font: 1.05rem var(--k-font); color: var(--k-ink); background: #fff; text-align: center; }
 .k-who .k-btn { margin-top: 4px; }
+
+/* owl moods */
+.k-owl-tap { display: block; border: 0; padding: 0; background: none; cursor: pointer; border-radius: 20px; }
+.k-owl-edit { text-decoration: none; }
+.k-mood-pop {
+  position: absolute; left: 50%; top: 0; font-style: normal; font-size: 1.4rem; pointer-events: none;
+  animation: k-mood-up 1.4s ease-out both;
+}
+@keyframes k-mood-up {
+  0% { transform: translate(calc(-50% + var(--dx)), 10px) scale(.4); opacity: 0; }
+  20% { opacity: 1; transform: translate(calc(-50% + var(--dx)), -14px) scale(1.1); }
+  100% { transform: translate(calc(-50% + var(--dx) * 1.6), -58px) scale(.9); opacity: 0; }
+}
+.mood-cheer .k-av { animation: k-hop .5s var(--ease-pop) 2; }
+.mood-think .k-av { animation: k-tilt 1s ease-in-out; }
+.mood-clap .k-av { animation: k-clap .25s ease-in-out 4; }
+.mood-love .k-av { animation: k-boing .6s var(--ease-pop); }
+.mood-giggle .k-av { animation: k-giggle .12s ease-in-out 6; }
+@keyframes k-tilt { 30%, 70% { transform: rotate(-12deg); } }
+@keyframes k-clap { 50% { transform: scale(1.08, .94); } }
+@keyframes k-giggle { 50% { transform: rotate(6deg); } }
+.k-end-owl { display: flex; justify-content: center; margin: -54px 0 6px; }
+.k-end-owl .k-av { width: 76px; height: 76px; border-radius: 24px; }
+.k-end-card { margin-top: 40px; }
+@media (prefers-reduced-motion: reduce) { .k-mood-pop { animation: none !important; opacity: 0; } }
