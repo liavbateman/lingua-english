@@ -156,6 +156,7 @@ const Kids = (() => {
       lotw: 'האות של השבוע', lotwSub: 'כל שבוע אות אחת: הצליל שלה, מילים שמתחילות בה ושיר קטן', lotwChant: 'שיר האות', lotwTrace: 'לכתוב את האות',
       lotwTip: 'לחצו על מילה כדי לשמוע אותה. האות הראשונה מסומנת',
       netOff: 'אין אינטרנט כרגע. הכול עובד גם בלי!', netNoVoice: 'אין קול באנגלית במכשיר הזה. אפשר לשחק עם התמונות והמילים, ומבוגר יכול להקריא',
+      bath: 'זמן אמבטיה', bathSub: 'שמים את הברווז במים, מוציאים את הסירה, ומפוצצים בועות!', bathTip: 'הקשיבו ולחצו על הצעצוע הנכון. בסוף מפוצצים בועות',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -305,6 +306,7 @@ const Kids = (() => {
       lotw: 'Letter of the week', lotwSub: 'One letter each week: its sound, words that start with it and a little chant', lotwChant: 'Letter chant', lotwTrace: 'Write the letter',
       lotwTip: 'Tap a word to hear it. The first letter is marked',
       netOff: 'No internet right now. Everything still works!', netNoVoice: 'There is no English voice on this device. You can play with the pictures and words, and a grown-up can read aloud',
+      bath: 'Bath time', bathSub: 'Put the duck in the water, take the boat out, and pop the bubbles!', bathTip: 'Listen and tap the right toy. At the end, pop the bubbles',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -786,6 +788,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">📺</span>
           <span class="grow"><b>${kt('wxr')}</b><small>${bidiEn(kt('wxrSub'))}</small></span>
           ${Store.kidsHasSticker('wxr') ? starsHtml(Store.kidsStars('wxr'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-bath-card" href="#/kids/bath">
+          <span class="k-story-books" aria-hidden="true">🛁</span>
+          <span class="grow"><b>${kt('bath')}</b><small>${kt('bathSub')}</small></span>
+          ${Store.kidsHasSticker('bath') ? starsHtml(Store.kidsStars('bath'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -4188,6 +4195,110 @@ const Kids = (() => {
     setTimeout(() => say([['en', `The letter of the week is ${x.name}!`]], 0.85), 300);
   }
 
+  // ---------- bath time: in and out, a playful routine ----------
+  // Toys wait on the bath mat. "Put the duck in the water!" moves it into the tub; "Take the boat out!"
+  // moves it back. Commands always fit what is where. At the end bubbles rise: pop them to hear bath words.
+  function bathGame() {
+    document.body.classList.add('in-lesson');
+    const toys = [['duck', '🦆'], ['boat', '⛵'], ['fish', '🐟'], ['ball', '⚽'], ['frog', '🐸'], ['teddy', '🧸']].map(([en, pic]) => ({ en, pic, inside: false }));
+    const N = little() ? 5 : 7;
+    let done = 0, firstTry = 0;
+    K.lessonBar(0);
+    K.view.innerHTML = `
+      <div class="k-wrap k-play">
+        <p class="k-step"><span aria-hidden="true">🛁</span> ${kt('bath')}</p>
+        <div class="k-prompt">
+          <button class="k-speaker" id="k-say" aria-label="${kt('listen')}"><span aria-hidden="true">🔊</span></button>
+          <span class="k-target en" lang="en" id="k-bath-line"></span>
+        </div>
+        <div class="k-bath">
+          <div class="k-tub" id="k-tub"><div class="k-water"></div><div class="k-tub-toys" id="k-tub-toys"></div></div>
+          <div class="k-mat" id="k-mat"></div>
+        </div>
+        ${owl(kt('bathTip'), 'small')}
+      </div>`;
+    const btn = t => `<button class="k-bath-toy" data-en="${t.en}" aria-label="${t.en}"><span aria-hidden="true">${t.pic}</span></button>`;
+    const draw = () => {
+      $('#k-tub-toys').innerHTML = toys.filter(t => t.inside).map(btn).join('');
+      $('#k-mat').innerHTML = toys.filter(t => !t.inside).map(btn).join('');
+      K.view.querySelectorAll('.k-bath-toy').forEach(b => { b.onclick = () => tap(toys.find(t => t.en === b.dataset.en), b); });
+    };
+    let cmd = null, missed = false;
+    function next() {
+      K.lessonBar(done / N);
+      if (done >= N) return bubbles();
+      const ins = toys.filter(t => t.inside), outs = toys.filter(t => !t.inside);
+      const goIn = !ins.length || (outs.length && Math.random() < .6);
+      const t = pickOne(goIn ? outs : ins);
+      cmd = { t, goIn };
+      missed = false;
+      const line = goIn ? `Put the ${t.en} in the water!` : `Take the ${t.en} out!`;
+      $('#k-bath-line').textContent = line;
+      $('#k-say').onclick = () => sayEn(line, 0.85);
+      setTimeout(() => sayEn(line, 0.85), 250);
+    }
+    function tap(t, b) {
+      if (!cmd) return;
+      if (t === cmd.t) {
+        t.inside = cmd.goIn;
+        K.Feel.right();
+        if (!missed) firstTry++;
+        cmd.goIn ? popSound() : Sfx.whoosh();
+        $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${cmd.goIn ? 'in' : 'out'}</bdi> · ${cmd.goIn ? 'בפנים' : 'בחוץ'} ✓`;
+        sayEn(cmd.goIn ? `Splash! The ${t.en} is in the water.` : `The ${t.en} is out!`, 0.9);
+        cmd = null;
+        draw();
+        done++;
+        setTimeout(next, 1500);
+      } else {
+        missed = true;
+        K.Feel.wrong(b);
+        owlMood('think');
+        sayEn(`That's the ${t.en}.`, 0.9);
+      }
+    }
+    // the end: bubbles rise from the tub, each pop says a bath word
+    function bubbles() {
+      const words = ['water', 'bubbles', 'soap', 'splash', 'towel', 'wash'];
+      $('#k-bath-line').textContent = 'Pop the bubbles!';
+      sayEn('Pop the bubbles!', 0.9);
+      const tub = $('#k-tub');
+      let left = words.length;
+      words.forEach((w, i) => {
+        const b = document.createElement('button');
+        b.className = 'k-bath-bub';
+        b.style.left = `${8 + i * 15}%`;
+        b.style.animationDelay = `${i * .25}s`;
+        b.setAttribute('aria-label', w);
+        b.onclick = () => {
+          b.classList.add('pop'); b.disabled = true; popSound(); sayEn(w, 0.9);
+          b.textContent = w;
+          if (--left === 0) setTimeout(end, 1200);
+        };
+        tub.appendChild(b);
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = firstTry >= N ? 3 : firstTry >= N - 2 ? 2 : 1;
+      Store.kidsFinish('bath', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🛁 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('All clean! Time for the towel!', 0.9);
+      $('#k-again').onclick = bathGame;
+    }
+    draw();
+    next();
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -6260,6 +6371,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'bath') bathGame();
       else if (a === 'lotw') lotwScreen();
       else if (a === 'wxr') wxrGame();
       else if (a === 'pizza') pizzaGame();

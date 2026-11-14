@@ -2764,7 +2764,7 @@
     document.querySelectorAll('.sheet-back').forEach(s => s.remove());
     view.onkeydown = null;
     view.onscroll = null;
-    const inLesson = ['unit', 'quiz', 'speak'].includes(name) || (name === 'grammar' && b === 'quiz') || (name === 'kids' && ['play', 'abcgame', 'story', 'water', 'riddles', 'colour', 'practice', 'pairs', 'peek', 'speed', 'blend', 'together', 'shop', 'spell', 'path', 'hide', 'simon', 'fam', 'monster', 'rhyme', 'wear', 'call', 'zoo', 'teddy', 'safari', 'shunt', 'copy', 'seesaw', 'morning', 'peekaboo', 'cbw', 'feelst', 'pizza', 'wxr'].includes(a));
+    const inLesson = ['unit', 'quiz', 'speak'].includes(name) || (name === 'grammar' && b === 'quiz') || (name === 'kids' && ['play', 'abcgame', 'story', 'water', 'riddles', 'colour', 'practice', 'pairs', 'peek', 'speed', 'blend', 'together', 'shop', 'spell', 'path', 'hide', 'simon', 'fam', 'monster', 'rhyme', 'wear', 'call', 'zoo', 'teddy', 'safari', 'shunt', 'copy', 'seesaw', 'morning', 'peekaboo', 'cbw', 'feelst', 'pizza', 'wxr', 'bath'].includes(a));
     if (name !== 'kids' && name !== 'home' && name) Kids.leave();
     document.body.classList.toggle('in-lesson', inLesson);
     if (inLesson) lessonBar(0);

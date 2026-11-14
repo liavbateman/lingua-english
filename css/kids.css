@@ -1597,3 +1597,19 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 
 /* offline / no-voice note on the map */
 .k-net { margin: 8px 0 0; padding: 8px 14px; border-radius: 16px; background: rgba(255, 255, 255, .9); color: var(--k-ink); font-size: .9rem; font-weight: 700; text-align: center; }
+
+/* bath time */
+.k-bath { display: grid; gap: 12px; direction: ltr; }
+.k-tub { position: relative; height: 170px; border-radius: 22px 22px 70px 70px; background: #fff; box-shadow: 0 8px 0 #c9d6ef, inset 0 -6px 0 #e6edf9; overflow: hidden; }
+.k-water { position: absolute; left: 10px; right: 10px; bottom: 12px; height: 60%; border-radius: 12px 12px 58px 58px; background: linear-gradient(#8fd3ff, #4aa8f0); }
+.k-tub-toys { position: absolute; left: 0; right: 0; bottom: 30px; display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+.k-tub-toys .k-bath-toy { background: transparent; box-shadow: none; animation: k-bob 2s ease-in-out infinite; }
+@keyframes k-bob { 50% { transform: translateY(-6px) rotate(-4deg); } }
+.k-mat { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; min-height: 76px; padding: 8px; border-radius: 20px; background: repeating-linear-gradient(90deg, #ffd6e4 0 14px, #ffe9f0 14px 28px); }
+.k-bath-toy { width: 64px; height: 64px; border: 0; border-radius: 18px; background: #fff; font-size: 2.4rem; cursor: pointer; box-shadow: 0 4px 0 var(--k-edge); }
+.k-bath-bub { position: absolute; bottom: -60px; width: 58px; height: 58px; border: 3px solid #6fc3ff; box-shadow: 0 2px 6px rgba(29, 42, 91, .25); border-radius: 50%; cursor: pointer;
+  background: radial-gradient(circle at 30% 30%, #fff, rgba(190, 230, 255, .5) 40%, rgba(255, 255, 255, .15)); animation: k-bub-up 1.2s ease-out forwards;
+  font: 700 .7rem var(--k-font); color: #1d2a5b; }
+@keyframes k-bub-up { to { bottom: 70px; } }
+.k-bath-bub.pop { animation: none; bottom: 70px; background: #fff1c2; border-color: #ffd84d; }
+@media (prefers-reduced-motion: reduce) { .k-tub-toys .k-bath-toy { animation: none; } .k-bath-bub { animation-duration: .01s; } }
