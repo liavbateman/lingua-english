@@ -65,6 +65,13 @@ const Kids = (() => {
       tr_words: '50 מילים', tr_bloom: 'פרח פורח', tr_abc: 'משחק האותיות', tr_trace: '10 אותיות מצוירות', tr_traceAll: 'כל ה-ABC',
       tr_story: '3 סיפורים', tr_storyAll: 'כל הסיפורים', tr_riddle: 'בלש', tr_treasure: '7 ימי אוצר', tr_owl: 'ינשוף מגונדר',
       holidaySub: 'אי חג מיוחד, רק בימים אלה!', holidayStickers: 'מדבקות חג',
+      vcTitle: 'קולות', vcEn: 'קול באנגלית', vcHe: 'קול בעברית (הוראות)', vcOk: 'מותקן', vcMissing: 'חסר', vcTest: 'נסו',
+      vcNone: 'המכשיר לא מדבר בכלל. נסו דפדפן אחר (Safari באייפון, Chrome באנדרואיד).',
+      vcHeTip: 'בלי קול עברי הילד ישמע רק את המילים באנגלית, בלי הוראות בעברית. להתקנה:',
+      vcIos: 'אייפון / אייפד: הגדרות ← נגישות ← תוכן מדובר ← קולות ← עברית (כרמית)',
+      vcAndroid: 'אנדרואיד: הגדרות ← נגישות ← המרת טקסט לדיבור ← התקנת נתוני קול ← עברית',
+      vcEnTip: 'בלי קול אנגלי הילד לא ישמע את המילים. התקינו קול אנגלי באותו מקום בהגדרות.',
+      vcSampleHe: 'שלום! ככה נשמעות ההוראות בעברית.',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -123,6 +130,13 @@ const Kids = (() => {
       tr_words: '50 words', tr_bloom: 'In full bloom', tr_abc: 'Letter game', tr_trace: '10 letters traced', tr_traceAll: 'The whole ABC',
       tr_story: '3 stories', tr_storyAll: 'Every story', tr_riddle: 'Detective', tr_treasure: '7 treasure days', tr_owl: 'Dressed-up owl',
       holidaySub: 'A special holiday island, only these days!', holidayStickers: 'Holiday stickers',
+      vcTitle: 'Voices', vcEn: 'English voice', vcHe: 'Hebrew voice (instructions)', vcOk: 'Installed', vcMissing: 'Missing', vcTest: 'Test',
+      vcNone: "This device doesn't speak at all. Try another browser (Safari on iPhone, Chrome on Android).",
+      vcHeTip: 'Without a Hebrew voice your child hears only the English words, without Hebrew instructions. To install:',
+      vcIos: 'iPhone / iPad: Settings → Accessibility → Spoken Content → Voices → Hebrew (Carmit)',
+      vcAndroid: 'Android: Settings → Accessibility → Text-to-speech → Install voice data → Hebrew',
+      vcEnTip: "Without an English voice your child won't hear the words. Install an English voice in the same settings.",
+      vcSampleHe: 'שלום! ככה נשמעות ההוראות בעברית.',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -1071,6 +1085,7 @@ const Kids = (() => {
           }).join('')}
         </section>
         ${weekBox()}
+        ${voiceBox()}
         <p class="k-pc-tip">💡 ${kt('pcTip')}</p>
       </div>`;
     K.view.querySelectorAll('.k-pc-seg button').forEach(b => {
@@ -1086,6 +1101,9 @@ const Kids = (() => {
       try { await navigator.clipboard.writeText(text); } catch (e) { /* the text stays on screen to copy by hand */ }
       share.textContent = '✓ ' + kt('wkCopied');
     };
+    const vEn = $('#k-vc-en'), vHe = $('#k-vc-he');
+    if (vEn) vEn.onclick = () => sayEn('Hello! This is how the English words sound.', 0.9);
+    if (vHe) vHe.onclick = () => say([['he', kt('vcSampleHe')]]);
     $('#k-bed').onchange = e => { Store.kidsBedtime = e.target.checked; document.body.classList.toggle('night', isNight()); };
   }
 
@@ -1111,6 +1129,27 @@ const Kids = (() => {
           <div class="k-wk-words">${wk.words.slice(0, 18).map(w => `<span class="en"><i aria-hidden="true">${w.pic}</i>${w.en}</span>`).join('')}</div>
           <button class="k-btn ghost k-wk-share" id="k-wk-share" data-text="${text.replace(/"/g, '&quot;')}">📤 ${kt('wkShare')}</button>`
         : `<p class="k-wk-line">${kt('wkNone')}</p>`}
+      </section>`;
+  }
+
+  // Voices: the whole kids world speaks, so parents can check the device has the voices it needs
+  function voiceBox() {
+    if (!('speechSynthesis' in window)) return `<section class="k-pc-box"><h2>🔊 ${kt('vcTitle')}</h2><p class="k-wk-line">${kt('vcNone')}</p></section>`;
+    voices();
+    const row = (label, v, id) => `
+      <div class="k-vc-row">
+        <span class="grow"><b>${label}</b><small>${v ? `✅ ${kt('vcOk')} · ${esc(v.name)}` : `⚠️ ${kt('vcMissing')}`}</small></span>
+        ${v ? `<button class="k-btn ghost k-vc-test" id="${id}">▶ ${kt('vcTest')}</button>` : ''}
+      </div>`;
+    const tips = [];
+    if (!enVoice) tips.push(kt('vcEnTip'));
+    if (!heVoice) tips.push(kt('vcHeTip'));
+    return `
+      <section class="k-pc-box">
+        <h2>🔊 ${kt('vcTitle')}</h2>
+        ${row(kt('vcEn'), enVoice, 'k-vc-en')}
+        ${row(kt('vcHe'), heVoice, 'k-vc-he')}
+        ${tips.length ? `<div class="k-vc-tip">${tips.map(x => `<p>${x}</p>`).join('')}<p>📱 ${kt('vcIos')}</p><p>🤖 ${kt('vcAndroid')}</p></div>` : ''}
       </section>`;
   }
 
