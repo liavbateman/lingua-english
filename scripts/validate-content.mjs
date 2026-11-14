@@ -124,6 +124,44 @@ for (const g of GRAMMAR) {
 }
 for (const id of Object.keys(EXPLAIN)) if (!GRAMMAR.some(g => g.id === id)) errors.push(`explain "${id}": no grammar rule with this id`);
 
+// ---------- kids world ----------
+{
+  const kf = 'js/kids-data.js';
+  const kctx = vm.createContext({});
+  try {
+    vm.runInContext(fs.readFileSync(path.join(root, kf), 'utf8') + ';this.K = { KIDS_THEMES, KIDS_WORDS, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE };', kctx, { filename: kf });
+    loaded.push(kf);
+    const { KIDS_THEMES, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE } = kctx.K;
+    const ids = new Set(), stickers = new Set(KIDS_TREASURE);
+    if (stickers.size !== KIDS_TREASURE.length) errors.push('kids: duplicate treasure sticker');
+    for (const th of KIDS_THEMES) {
+      const at = `kids island "${th.id}"`;
+      if (!str(th.title) || !hasHe(th.he) || !str(th.pic) || !/^#[0-9a-f]{6}$/i.test(th.color)) errors.push(`${at}: needs title, Hebrew name, picture and a #rrggbb colour`);
+      if (!str(th.sticker) || stickers.has(th.sticker)) errors.push(`${at}: sticker missing or used twice`);
+      stickers.add(th.sticker);
+      if (!Array.isArray(th.words) || th.words.length < 6) { errors.push(`${at}: needs at least 6 words (the games use 4 pairs and 3–4 choices)`); continue; }
+      const pics = new Set();
+      for (const w of th.words) {
+        if (!hasEn(w.en) || hasHe(w.en)) errors.push(`${at} "${w.en}": "en" must be English`);
+        if (!hasHe(w.he)) errors.push(`${at} "${w.en}": "he" must be Hebrew`);
+        if (!str(w.pic) || pics.has(w.pic)) errors.push(`${at} "${w.en}": picture missing or used twice in the island`);
+        pics.add(w.pic);
+        if (ids.has(w.id)) errors.push(`${at} "${w.en}": word used twice`);
+        ids.add(w.id);
+      }
+    }
+    if (KIDS_ABC.length !== 26) errors.push('kids: the ABC needs 26 letters');
+    for (const x of KIDS_ABC) if (!x.word.toLowerCase().includes(x.L.toLowerCase())) errors.push(`kids ABC "${x.L}": "${x.word}" has no ${x.L}`);
+    for (const st of KIDS_STORIES) {
+      if (st.island && !KIDS_THEMES.some(th => th.id === st.island)) errors.push(`kids story "${st.id}": unknown island "${st.island}"`);
+      if (st.pages.length < 3 || st.pages.some(pg => !hasEn(pg[1]) || !hasHe(pg[2]))) errors.push(`kids story "${st.id}": every page needs English and Hebrew`);
+      if (st.ask[2].length !== 3) errors.push(`kids story "${st.id}": the question needs 3 pictures`);
+    }
+    for (const sg of KIDS_SONGS) if (!sg.lines.length || sg.lines.some(l => !l.length)) errors.push(`kids song "${sg.id}": empty line`);
+    console.log(`kids          ${String(KIDS_THEMES.length).padStart(2)} islands · ${String(ids.size).padStart(3)} words ·  ${KIDS_STORIES.length} stories ·  ${KIDS_SONGS.length} songs`);
+  } catch (e) { errors.push(`${kf}: does not run: ${e.message}`); }
+}
+
 // ---------- report ----------
 console.log('Loaded:', loaded.join(', '));
 for (const lv of levels) {

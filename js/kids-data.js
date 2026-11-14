@@ -129,6 +129,66 @@ const KIDS_THEMES = [
       { en: 'tree', he: 'עץ', pic: '🌳' },
       { en: 'flower', he: 'פרח', pic: '🌸' }
     ]
+  },
+  {
+    id: 'feelings', title: 'Feelings', he: 'רגשות', pic: '😀', color: '#ff8fab', sticker: '🤗',
+    words: [
+      { en: 'happy', he: 'שמח', pic: '😀' },
+      { en: 'sad', he: 'עצוב', pic: '😢' },
+      { en: 'angry', he: 'כועס', pic: '😠' },
+      { en: 'scared', he: 'מפחד', pic: '😨' },
+      { en: 'tired', he: 'עייף', pic: '🥱' },
+      { en: 'surprised', he: 'מופתע', pic: '😮' }
+    ]
+  },
+  {
+    id: 'home', title: 'My home', he: 'הבית שלי', pic: '🏠', color: '#ffb347', sticker: '🏰',
+    words: [
+      { en: 'house', he: 'בית', pic: '🏠' },
+      { en: 'bed', he: 'מיטה', pic: '🛏️' },
+      { en: 'chair', he: 'כיסא', pic: '🪑' },
+      { en: 'door', he: 'דלת', pic: '🚪' },
+      { en: 'window', he: 'חלון', pic: '🪟' },
+      { en: 'bath', he: 'אמבטיה', pic: '🛁' },
+      { en: 'lamp', he: 'מנורה', pic: '💡' },
+      { en: 'clock', he: 'שעון', pic: '⏰' }
+    ]
+  },
+  {
+    id: 'actions', title: "Let's move!", he: 'פעולות', pic: '🏃', color: '#00c2a8', sticker: '🥇',
+    words: [
+      { en: 'run', he: 'לרוץ', pic: '🏃' },
+      { en: 'swim', he: 'לשחות', pic: '🏊' },
+      { en: 'sing', he: 'לשיר', pic: '🎤' },
+      { en: 'dance', he: 'לרקוד', pic: '💃' },
+      { en: 'read', he: 'לקרוא', pic: '📖' },
+      { en: 'write', he: 'לכתוב', pic: '✍️' },
+      { en: 'sleep', he: 'לישון', pic: '🛌' },
+      { en: 'climb', he: 'לטפס', pic: '🧗' }
+    ]
+  },
+  {
+    id: 'shapes', title: 'Shapes', he: 'צורות', pic: '🔺', color: '#ff6b6b', sticker: '💎',
+    words: [
+      { en: 'circle', he: 'עיגול', pic: '⭕' },
+      { en: 'square', he: 'ריבוע', pic: '🟦' },
+      { en: 'triangle', he: 'משולש', pic: '🔺' },
+      { en: 'heart', he: 'לב', pic: '❤️' },
+      { en: 'diamond', he: 'מעוין', pic: '🔷' },
+      { en: 'star', he: 'כוכב', pic: '🌟' }
+    ]
+  },
+  {
+    id: 'school', title: 'At school', he: 'בבית הספר', pic: '🎒', color: '#5b8def', sticker: '🎓',
+    words: [
+      { en: 'school', he: 'בית ספר', pic: '🏫' },
+      { en: 'teacher', he: 'מורה', pic: '🧑‍🏫' },
+      { en: 'backpack', he: 'תיק', pic: '🎒' },
+      { en: 'pencil', he: 'עיפרון', pic: '✏️' },
+      { en: 'crayon', he: 'צבע', pic: '🖍️' },
+      { en: 'scissors', he: 'מספריים', pic: '✂️' },
+      { en: 'ruler', he: 'סרגל', pic: '📏' }
+    ]
   }
 ];
 
