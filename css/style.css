@@ -2162,3 +2162,8 @@ html[dir="rtl"] .why-ex { text-align: right; }
 .plabel bdi:only-of-type:last-child { display: block; font-size: .74rem; font-weight: 600; letter-spacing: -.01em;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .plabel bdi.nw:not(:only-of-type) { white-space: normal; }   /* labels with several English parts wrap rather than run past the edge */
+
+/* Rule titles: the English part of "Hebrew: English" takes its own line and may wrap, so a long one
+   ("much / many / some / any") never runs off a 320px screen */
+.rule-hero h1 bdi:only-of-type:last-child { display: block; }
+.rule-hero h1 bdi.nw { white-space: normal; }
