@@ -263,7 +263,6 @@
     const u = wordUnits.find(x => Store.unitProgress(x).seen < x.words.length);
     if (u && !done.vocab) {
       const fresh = u.words.length - Store.unitProgress(u).seen;
-      const unitDone = x => { const p = Store.unitProgress(x); return p.total > 0 && p.mastered / p.total >= 0.6; };
       return { href: `#/unit/${u.id}`, icon: 'book', color: 'blue', emoji: u.emoji,
         title: t('cont.lesson', { title: unitTitle(u) }), sub: t('cont.lesson.sub', lessonSize(u)),
         spot: pathSpot(wordUnits.map(unitDone), wordUnits.indexOf(u), Store.unitProgress(u).pct, '#/learn') };
@@ -522,7 +521,7 @@
       items = levelUnits().filter(u => (u.kind === 'phrases') === (part === 'phrases')).map(u => {
         const p = Store.unitProgress(u);
         return { href: `#/unit/${u.id}`, review: `#/quiz/choice/${u.id}`, face: u.emoji, label: unitTitle(u), plain: unitTitle(u), words: u.words,
-          done: p.total > 0 && p.mastered / p.total >= 0.6, started: p.seen > 0, pct: p.pct,
+          done: unitDone(u), started: p.seen > 0, pct: p.pct,
           progress: t(u.kind === 'phrases' ? 'learn.sentences' : 'learn.words', { a: p.mastered, b: p.total }) };
       });
     }
@@ -749,6 +748,10 @@
   // A lesson brings at most 8 new words at a time (a 15-word unit is two lessons: 8, then 7),
   // so the promise on Today stays the same whatever was peeked at before
   const LESSON_NEW = 8;
+  // A unit is done on the path (its node, its stage, its chest) once its lessons are done: every word met.
+  // Today moves on to the next unit at that point, so the path must not still say "5 more lessons".
+  // How well the words are known shows in the node's ring (mastery) and in Progress.
+  function unitDone(u) { return u.words.length > 0 && u.words.every(w => Store.isSeen(w.id)); }
   let lastLesson = { unit: '', ids: [] };   // the words a lesson's cards just showed, practised first after it
   // How many cards the next lesson of a unit really shows, and about how long it takes
   function lessonSize(u) {
@@ -1230,7 +1233,7 @@
       return list.length ? list.filter(g => Store.isGrammarDone(g.id)).length / list.length : 0;
     }
     const list = UNITS.filter(u => u.level === level && (u.kind === 'phrases') === (part === 'phrases'));
-    const done = list.filter(u => { const p = Store.unitProgress(u); return p.total && p.mastered / p.total >= 0.6; }).length;
+    const done = list.filter(unitDone).length;
     return list.length ? done / list.length : 0;
   }
   function bindLevelSeg(redraw) {
@@ -1904,12 +1907,12 @@
       endLesson(1);
       lastLesson = { unit: unit.id, ids: words.map(w => w.id) };   // its practice starts with these words
       // this lesson brought the unit's last new words: say so, the unit is a milestone on the path
-      const unitDone = fresh.length > 0 && unit.words.every(w => Store.isSeen(w.id));
+      const completesUnit = fresh.length > 0 && unitDone(unit);
       view.innerHTML = `
         <div class="card center result">
-          <div class="big">${unitDone ? '🎉' : '🃏'}</div>
+          <div class="big">${completesUnit ? '🎉' : '🃏'}</div>
           <h1>${t('cards.done.title')}</h1>
-          ${unitDone ? `<p class="unit-done">${t(unit.kind === 'phrases' ? 'unit.done.phr' : 'unit.done', { title: unitTitle(unit), n: unit.words.length })}</p>` : ''}
+          ${completesUnit ? `<p class="unit-done">${t(unit.kind === 'phrases' ? 'unit.done.phr' : 'unit.done', { title: unitTitle(unit), n: unit.words.length })}</p>` : ''}
           <p class="sub">${t(allNew ? 'cards.done.new' : 'cards.done', { a: known, b: words.length })}</p>
           <ol class="steps2" aria-label="${t('steps.aria')}">
             <li class="done"><span aria-hidden="true">✓</span>${t(unit.kind === 'phrases' ? 'steps.met.phr' : 'steps.met', { n: words.length })}</li>
