@@ -1123,7 +1123,7 @@ const Kids = (() => {
     K.lessonBar(0);
     K.view.innerHTML = `
       <div class="k-wrap k-play">
-        <p class="k-step"><span aria-hidden="true">🖍️</span> ${kt('colour')}</p>
+        <p class="k-step"><span aria-hidden="true">🖍️</span> ${kt('colour')} <span id="k-col-n"></span></p>
         <div class="k-card k-paint-card">
           <svg class="k-paint" viewBox="0 0 300 300" role="img" aria-label="${kt('colour')}">
             ${PARTS.map(([id, he, shape]) => `<g class="k-part" data-part="${id}" tabindex="0" role="button" aria-label="${id}">${shape.replace('/>', ' fill="#ffffff"/>')}</g>`).join('')}
@@ -1132,18 +1132,25 @@ const Kids = (() => {
           </svg>
         </div>
         <div class="k-paints">
-          ${Object.entries(PAINT).map(([name, hex]) => `<button class="k-paint-pot" data-c="${name}" style="--p:${hex}" aria-label="${name}"><i></i><span class="en">${name}</span></button>`).join('')}
+          ${Object.entries(PAINT).filter(([name]) => name !== 'pink').map(([name, hex]) => `<button class="k-paint-pot" data-c="${name}" style="--p:${hex}" aria-label="${name}"><i></i><span class="en">${name}</span></button>`).join('')}
         </div>
         ${owl('', 'small')}
       </div>`;
     const bub = () => $('.k-bubble');
-    function ask() {
+    // point at a paint pot (or all of them) with a short bounce
+    const nudgePots = c => K.view.querySelectorAll('.k-paint-pot').forEach(x => {
+      if (c && x.dataset.c !== c) return;
+      x.classList.remove('nudge'); void x.offsetWidth; x.classList.add('nudge');
+    });
+    function ask(first) {
       if (at >= asks.length) return finish();
       K.lessonBar(at / asks.length);
+      $('#k-col-n').textContent = `· ${at + 1}/${asks.length}`;
       const [part, col] = asks[at];
       const he = PARTS.find(p => p[0] === part)[1];
       bub().innerHTML = `${kt('colourAsk', { thing: isHe() ? he : part, colour: isHe() ? PAINT_HE[col] : col })} <b class="en" style="color:${PAINT[col] === '#ffffff' ? '#1d2a5b' : PAINT[col]}">● ${col}</b>`;
-      say([['en', `Colour the ${part} ${col}!`]]);
+      // the first time, the short Hebrew intro and the first instruction are one queue (nothing cut off)
+      say([...(first ? [['he', kt('colourSub')]] : []), ['en', `Colour the ${part} ${col}!`]]);
       K.view.querySelectorAll('.k-part').forEach(g => g.classList.toggle('hint', g.dataset.part === part));
     }
     K.view.querySelectorAll('.k-paint-pot').forEach(b => {
@@ -1154,7 +1161,7 @@ const Kids = (() => {
       };
     });
     const paint = g => {
-      if (!brush) { K.Feel.wrong(g); return; }
+      if (!brush) { K.Feel.wrong(g); sayEn('Pick a colour first!', 0.9); nudgePots(at < asks.length ? asks[at][1] : null); return; }
       g.firstElementChild.setAttribute('fill', PAINT[brush]);
       Sfx.tap();
       if (at >= asks.length) return;   // free colouring after the instructions
@@ -1169,6 +1176,7 @@ const Kids = (() => {
         missed++;
         owlMood('think');
         say([['en', `Hmm, ${col}!`]]);
+        nudgePots(col);
       }
     };
     K.view.querySelectorAll('.k-part').forEach(g => {
@@ -1184,7 +1192,7 @@ const Kids = (() => {
       celebrate();
       sayEn('What a beautiful picture!', 0.9);
     }
-    setTimeout(() => { say([['he', kt('colourSub')]]); setTimeout(ask, 400); }, 200);
+    setTimeout(() => ask(true), 200);
   }
 
   // ---------- practice the tricky words of an island ----------
