@@ -1466,3 +1466,20 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
   color: var(--k-ink); font-size: 2rem; cursor: pointer; box-shadow: 0 5px 0 var(--k-edge); }
 .k-copy-btn small { font: 700 .85rem var(--k-font); }
 .k-copy-btn:disabled { opacity: .4; cursor: default; }
+
+/* the opposite see-saw */
+.k-seesaw { position: relative; height: 210px; margin: 6px 0 4px; direction: ltr; }
+.k-ss-plank { position: absolute; left: 4%; right: 4%; top: 110px; height: 16px; border-radius: 8px; background: #ff9f43; box-shadow: 0 5px 0 #c96f1d;
+  transform-origin: 50% 50%; transition: transform .5s var(--ease-pop); }
+.k-ss-seat { position: absolute; bottom: 14px; display: flex; flex-direction: column; align-items: center; width: 92px; padding: 6px 4px; border-radius: 20px;
+  background: #fff; color: var(--k-ink); font-size: 2.6rem; box-shadow: 0 4px 0 var(--k-edge); }
+.k-ss-seat b { font: 700 1rem var(--k-font); }
+.k-ss-seat.left { left: 0; }
+.k-ss-seat.right { right: 0; border: 3px dashed #cfd7ee; }
+.k-ss-base { position: absolute; left: 50%; top: 124px; width: 0; height: 0; transform: translateX(-50%);
+  border-left: 34px solid transparent; border-right: 34px solid transparent; border-bottom: 70px solid #3f7bff; }
+.k-ss-plank.swing { animation: k-ss-swing 1.6s ease-in-out; }
+.k-ss-plank.swing .k-ss-seat.right { border-color: #2fd093; }
+@keyframes k-ss-swing { 20% { transform: rotate(-12deg); } 45% { transform: rotate(12deg); } 70% { transform: rotate(-7deg); } 90% { transform: rotate(4deg); } }
+.k-ss-plank.tip { transform: rotate(14deg); }
+@media (prefers-reduced-motion: reduce) { .k-ss-plank { transition: none; } .k-ss-plank.swing { animation: none; } }

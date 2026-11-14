@@ -140,6 +140,7 @@ const Kids = (() => {
       copy: 'מחקים את הינשוף', copySub: 'הינשוף מדבר בקול מצחיק: כמו עכבר, כמו דוב, בלחישה. מחקים אותו!',
       copyRec: 'עכשיו אני', copyOwl: 'הינשוף', copyMe: 'אני', copyNext: 'הבא', copyTip: 'הקשיבו לינשוף, לחצו על המיקרופון ואמרו את המילה באותו קול',
       copyNoRec: 'אמרו את המילה בקול באותו קול מצחיק, ואז לחצו "הבא"',
+      seesaw: 'נדנדת ההפכים', seesawSub: 'גדול וקטן, חם וקר: שמים את ההפך בצד השני והנדנדה עפה!', seesawTip: 'מי ההפך? לחצו על התמונה כדי לשים אותה בצד השני של הנדנדה',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -273,6 +274,7 @@ const Kids = (() => {
       copy: "Copy the owl's voice", copySub: 'The owl talks in a funny voice: like a mouse, like a bear, in a whisper. Copy it!',
       copyRec: 'My turn', copyOwl: 'Owl', copyMe: 'Me', copyNext: 'Next', copyTip: 'Listen to the owl, tap the mic and say the word in the same voice',
       copyNoRec: 'Say the word out loud in the same funny voice, then tap "Next"',
+      seesaw: 'Opposite see-saw', seesawSub: 'Big and small, hot and cold: put the opposite on the other side and the see-saw flies!', seesawTip: 'Which one is the opposite? Tap a picture to put it on the other seat',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -701,6 +703,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🎭</span>
           <span class="grow"><b>${kt('copy')}</b><small>${kt('copySub')}</small></span>
           ${Store.kidsHasSticker('copy') ? starsHtml(Store.kidsStars('copy'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-seesaw-card" href="#/kids/seesaw">
+          <span class="k-story-books" aria-hidden="true">⚖️</span>
+          <span class="grow"><b>${kt('seesaw')}</b><small>${kt('seesawSub')}</small></span>
+          ${Store.kidsHasSticker('seesaw') ? starsHtml(Store.kidsStars('seesaw'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -3342,6 +3349,86 @@ const Kids = (() => {
     round();
   }
 
+  // ---------- the opposite see-saw ----------
+  // One word sits on the see-saw; three pictures wait below. The opposite makes the see-saw swing up and
+  // down happily ("Big and small! Opposites!"); any other word makes it tip and slide back off.
+  function seesawGame() {
+    document.body.classList.add('in-lesson');
+    const th = KIDS_THEMES.find(t => t.id === 'opposites');
+    const pairs = [];
+    for (let i = 0; i + 1 < th.words.length; i += 2) pairs.push([th.words[i], th.words[i + 1]]);
+    const rounds = K.shuffle(pairs).slice(0, little() ? 4 : 6).map(p => (Math.random() < .5 ? p : [p[1], p[0]]));
+    let at = 0, firstTry = 0;
+    function round() {
+      K.lessonBar(at / rounds.length);
+      const [a, b] = rounds[at];
+      const others = K.shuffle(th.words.filter(w => w !== a && w !== b)).slice(0, 2);
+      const opts = K.shuffle([b, ...others]);
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">⚖️</span> ${kt('seesaw')} · ${at + 1}/${rounds.length}</p>
+          <div class="k-seesaw">
+            <div class="k-ss-plank" id="k-plank">
+              <span class="k-ss-seat left"><span aria-hidden="true">${a.pic}</span><b class="en" lang="en">${a.en}</b></span>
+              <span class="k-ss-seat right" id="k-seat"><span aria-hidden="true">❔</span></span>
+            </div>
+            <span class="k-ss-base" aria-hidden="true"></span>
+          </div>
+          <p class="k-tip en" lang="en">What is the opposite of <b>${a.en}</b>?</p>
+          <div class="k-opts">${opts.map((o, i) => `<button class="k-opt k-rh-opt" data-i="${i}" aria-label="${o.en}"><span aria-hidden="true">${o.pic}</span><small class="en">${o.en}</small></button>`).join('')}</div>
+          ${owl(kt('seesawTip'), 'small')}
+        </div>`;
+      const ask = () => say([['en', a.en], ['en', `What is the opposite of ${a.en}?`]], 0.85);
+      setTimeout(ask, 300);
+      const plank = $('#k-plank'), seat = $('#k-seat');
+      K.view.querySelectorAll('.k-opt').forEach(btn => {
+        btn.onclick = () => {
+          const o = opts[+btn.dataset.i];
+          seat.innerHTML = `<span aria-hidden="true">${o.pic}</span><b class="en" lang="en">${o.en}</b>`;
+          plank.classList.remove('tip', 'swing'); void plank.offsetWidth;
+          if (o === b) {
+            K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; });
+            btn.classList.add('right');
+            plank.classList.add('swing');
+            K.Feel.right();
+            if (!missed) { firstTry++; Store.kidsWordRight(a.id); Store.kidsWordRight(b.id); }
+            owlMood('cheer');
+            $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${a.en} - ${b.en}</bdi> · ${a.he} - ${b.he}`;
+            say([['en', `${a.en[0].toUpperCase() + a.en.slice(1)} and ${b.en}! Opposites!`]], 0.85);
+            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 2600);
+          } else {
+            missed = true;
+            plank.classList.add('tip');
+            K.Feel.wrong(btn);
+            owlMood('think');
+            $('.k-bubble').textContent = `${o.en}? ${kt('tryAgain')}`;
+            sayEn(`${o.en}? Hmm, no.`, 0.9);
+            setTimeout(() => { if (!plank.classList.contains('swing')) { seat.innerHTML = '<span aria-hidden="true">❔</span>'; plank.classList.remove('tip'); } }, 1100);
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = firstTry >= rounds.length ? 3 : firstTry >= rounds.length - 2 ? 2 : 1;
+      Store.kidsFinish('seesaw', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>⚖️ ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('Up and down, big and small. You know your opposites!', 0.9);
+      $('#k-again').onclick = seesawGame;
+    }
+    round();
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -5398,6 +5485,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'seesaw') seesawGame();
       else if (a === 'copy') copyGame();
       else if (a === 'brush') brushGame(b === 'fast');
       else if (a === 'shunt') shuntGame();
