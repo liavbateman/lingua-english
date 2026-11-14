@@ -1692,3 +1692,5 @@ bdi.k-q { white-space: nowrap; }
 .k-path-ends span { display: grid; place-items: center; min-width: 64px; height: 52px; padding: 0 6px; border-radius: 16px; background: rgba(255,255,255,.55); font-size: 1.5rem; }
 .k-path-ends .got { background: #fff; }
 .k-path-ends .now { background: #fff1c2; box-shadow: 0 0 0 3px #ffd84d; animation: k-pop .5s var(--ease-pop) both; }
+
+.k-riddle-hint { display: block; margin: 0 auto 8px; }

@@ -165,6 +165,7 @@ const Kids = (() => {
       ftree: 'המשפחה שלי', ftreeSub: 'בוחרים פרצוף לאמא, לאבא, לסבתא... ושומעים: This is my mom!', ftreeTip: 'לחצו על עיגול ובחרו פרצוף. אפשר להשאיר ריק',
       ftreeRead: 'הינשוף מספר על המשפחה', ftreeNone: 'בלי', ftreeMe: 'אני',
       tipTitle: 'הטיפ של השבוע', tipTry: 'לנסות להגיד', tipWords: 'המילים החדשות של השבוע', tipMore: 'עוד טיפ',
+      riddleHint: 'רמז בעברית',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -323,6 +324,7 @@ const Kids = (() => {
       ftree: 'My family', ftreeSub: 'Pick a face for mom, dad, grandma... and hear: This is my mom!', ftreeTip: 'Tap a circle and pick a face. You can leave it empty',
       ftreeRead: 'The owl tells about my family', ftreeNone: 'None', ftreeMe: 'Me',
       tipTitle: 'Tip of the week', tipTry: 'Try saying', tipWords: "This week's new words", tipMore: 'Another tip',
+      riddleHint: 'Hint in Hebrew',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -1036,7 +1038,8 @@ const Kids = (() => {
           <div class="k-card k-page k-riddle">
             <span class="k-riddle-q" aria-hidden="true">❓</span>
             <p class="k-sentence en" lang="en">${r.en.split(' ').map(w => `<button class="k-w">${w}</button>`).join(' ')}</p>
-            <p class="k-he he" lang="he">${r.he}</p>
+            <p class="k-he he k-riddle-he" lang="he" hidden>${r.he}</p>
+            <button class="k-chip k-riddle-hint" id="k-hint">💡 ${kt('riddleHint')}</button>
             <button class="k-speaker sm" id="k-say" aria-label="${kt('listen')}"><span aria-hidden="true">🔊</span></button>
           </div>
           <div class="k-opts">${opts.map((o, i) => `<button class="k-opt" data-i="${i}" aria-label="${o.en}"><span aria-hidden="true">${o.pic}</span></button>`).join('')}</div>
@@ -1045,6 +1048,9 @@ const Kids = (() => {
       const words = [...K.view.querySelectorAll('.k-w')];
       words.forEach(w => { w.onclick = () => sayEn(w.textContent.replace(/[^A-Za-z']/g, '')); });
       const read = () => readAlong(r.en + ' Who am I?', words);
+      // the Hebrew stays hidden at first so the child listens to the English; a tap (or a wrong answer) shows it
+      const hint = () => { const he = $('.k-riddle-he'); if (!he || !he.hidden) return; he.hidden = false; $('#k-hint').hidden = true; };
+      $('#k-hint').onclick = () => { hint(); say([['he', r.he]]); };
       $('#k-say').onclick = read;
       setTimeout(read, 300);
       K.view.querySelectorAll('.k-opt').forEach(b => {
@@ -1061,11 +1067,14 @@ const Kids = (() => {
             $('.k-riddle-q').textContent = r.w.pic;
             setTimeout(() => { at++; at < set.length ? round() : end(); }, 2200);
           } else {
-            if (!missed) Store.kidsWordMiss(w.id); missed = true;
+            if (!missed) Store.kidsWordMiss(r.w.id);
+            missed = true;
             b.disabled = true;
             b.classList.add('nope');
             K.Feel.wrong(b);
+            hint();
             $('.k-bubble').textContent = kt('tryAgain'); owlMood('think');
+            sayEn(opts[+b.dataset.i].en);
           }
         };
       });
