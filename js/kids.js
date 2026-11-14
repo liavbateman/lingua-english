@@ -116,7 +116,7 @@ const Kids = (() => {
       rhyme: 'מילים מתחרזות', rhymeSub: 'cat - hat! מוצאים מילים שנגמרות באותו צליל', rhymeTip: 'הקשיבו לסוף של המילה. איזו תמונה נשמעת אותו דבר בסוף?',
       wear: 'מלבישים לפי מזג האוויר', wearSub: 'קר? שמש? גשם? מלבישים את הינשוף', wearTip: 'הקשיבו למזג האוויר ולחצו על מה שהינשוף צריך',
       call: 'הינשוף מתקשר', callSub: 'שיחת טלפון באנגלית: איך קוראים לך? בן כמה אתה?', callIn: 'הינשוף מתקשר אליכם!', callAnswer: 'לענות',
-      callTip: 'בחרו תשובה, והינשוף ישמע אתכם', callEnd: 'שיחה ראשונה באנגלית!', callHint: 'אפשר גם להגיד בקול', callName: 'אמרו בקול: <bdi dir="ltr" lang="en">My name is…</bdi> ואת השם שלכם',
+      callTip: 'בחרו תשובה, והינשוף ישמע אתכם', callEnd: 'שיחה ראשונה באנגלית!', callHint: 'אפשר גם להגיד בקול', callName: 'אמרו בקול: <bdi dir="ltr" lang="en">My name is…</bdi> ואת השם שלכם', callMic: 'לחצו על המיקרופון וענו באנגלית, או בחרו תמונה', callSorry: 'לא שמעתי טוב. נסו שוב או בחרו תמונה',
       zoo: 'סופרים ביחד', zooSub: 'כמה תפוחים? תן לי שלושה! סופרים באנגלית', zooCount: 'סופרים איתי', zooDone: 'מוכן!',
       zooTipHow: 'לחצו על כל אחד כדי לספור, ואז בחרו את המספר', zooTipGive: 'לחצו על הדברים כדי לשים אותם בסל. לחיצה בסל מחזירה',
       lull: 'שיר ערש של היום', lullSub: 'לילה טוב לכל המילים שלמדנו היום', lullPlay: 'לשיר שוב', lullEnd: 'לילה טוב! חלומות פז',
@@ -229,7 +229,7 @@ const Kids = (() => {
       rhyme: 'Rhyme time', rhymeSub: 'cat - hat! Find words that end with the same sound', rhymeTip: 'Listen to the end of the word. Which picture sounds the same at the end?',
       wear: 'Dress for the weather', wearSub: 'Cold? Sunny? Rainy? Dress the owl', wearTip: 'Listen to the weather and tap what the owl needs',
       call: 'The owl calls', callSub: 'A phone call in English: what is your name? how old are you?', callIn: 'The owl is calling you!', callAnswer: 'Answer',
-      callTip: 'Pick an answer and the owl will hear you', callEnd: 'Your first call in English!', callHint: 'You can say it out loud too', callName: 'Say it out loud: My name is... and your name',
+      callTip: 'Pick an answer and the owl will hear you', callEnd: 'Your first call in English!', callHint: 'You can say it out loud too', callName: 'Say it out loud: My name is... and your name', callMic: 'Tap the mic and answer in English, or pick a picture', callSorry: 'I did not hear that well. Try again or pick a picture',
       zoo: 'Count with me', zooSub: 'How many apples? Give me three! Counting in English', zooCount: 'Count with me', zooDone: 'Done!',
       zooTipHow: 'Tap each one to count, then pick the number', zooTipGive: 'Tap things to put them in the basket. Tap in the basket to take one out',
       lull: "Today's lullaby", lullSub: 'Good night to every word we learned today', lullPlay: 'Sing again', lullEnd: 'Good night! Sweet dreams',
@@ -2126,28 +2126,70 @@ const Kids = (() => {
           <div class="k-chat" aria-live="polite">
             <p class="k-msg owl en" lang="en">${t.q}</p>
           </div>
+          ${Rec() ? `<div class="k-mic-row"><button class="k-mic" id="k-call-mic" aria-label="${kt('callMic')}"><span aria-hidden="true">🎤</span></button></div>` : ''}
           <div class="k-call-opts ${t.opts.length > 4 ? 'many' : ''}">${t.opts.map((o, i) => `<button class="k-call-opt" data-i="${i}" aria-label="${o.say}"><span aria-hidden="true">${o.pic}</span><small class="en">${o.label}</small></button>`).join('')}</div>
-          ${owl(at === 0 && !name ? kt('callName') : kt('callTip'), 'small')}
+          ${owl(Rec() ? kt('callMic') : at === 0 && !name ? kt('callName') : kt('callTip'), 'small')}
         </div>`;
       setTimeout(() => sayEn(t.q, 0.85), 250);
+      let answered = false;
+      // what the child said -> one of the answers (or, for the name, the name itself)
+      const fromVoice = alts => {
+        const said = alts.map(a => a.toLowerCase().trim());
+        if (at === 0) {
+          const m = said.map(a => a.match(/(?:my name is|i am|i'm|name's)\s+([a-z][a-z '-]*)/i)).find(Boolean);
+          const raw = m ? m[1] : alts[0].trim().split(/\s+/).slice(-1)[0];
+          if (!raw || !/^[a-z][a-z'-]*$/i.test(raw.trim())) return null;
+          const nm = raw.trim().split(/\s+/)[0].replace(/^./, c => c.toUpperCase());
+          return { pic: '🎤', label: nm, say: `My name is ${nm}.`, voiceName: nm };
+        }
+        const words = said.join(' ').replace(/[.!?,]/g, ' ').split(/\s+/);
+        return t.opts.find(o => {
+          const k = o.label.toLowerCase().replace(/[!.]/g, '');
+          return words.includes(k) || words.includes(k.replace(/s$/, '')) || words.includes(String(o.pic))
+            || (k === 'bye' && words.some(w => /^(bye|goodbye)$/.test(w)));
+        }) || null;
+      };
+      const mic = $('#k-call-mic');
+      if (mic) mic.onclick = () => {
+        if (answered) return;
+        if (rec) { stopRec(); return; }
+        K.Feel.prime();
+        speechSynthesis.cancel();
+        const r = new (Rec())();
+        r.lang = 'en-US';
+        r.interimResults = false;
+        r.maxAlternatives = 5;
+        rec = r;
+        mic.classList.add('on');
+        $('.k-bubble').textContent = kt('listening');
+        r.onresult = e => {
+          const o = fromVoice(Array.from(e.results[0]).map(a => a.transcript));
+          if (o) { K.Feel.right(); $('.k-bubble').innerHTML = `👂 <bdi dir="ltr" lang="en">${esc(o.say)}</bdi> ✓`; answer(o, null); }
+          else { owlMood('think'); $('.k-bubble').textContent = kt('callSorry'); }
+        };
+        r.onerror = () => {};
+        r.onend = () => { mic.classList.remove('on'); if (rec === r) rec = null; };
+        try { r.start(); } catch (err) { rec = null; mic.classList.remove('on'); }
+      };
       K.view.querySelectorAll('.k-call-opt').forEach(b => {
-        b.onclick = () => {
-          const o = t.opts[+b.dataset.i];
-          K.view.querySelectorAll('.k-call-opt').forEach(x => { x.disabled = true; });
-          b.classList.add('right');
-          Sfx.tap();
+        b.onclick = () => { stopRec(); answer(t.opts[+b.dataset.i], b); };
+      });
+      function answer(o, b) {
+          if (answered) return;
+          answered = true;
+          K.view.querySelectorAll('.k-call-opt, #k-call-mic').forEach(x => { x.disabled = true; });
+          if (b) { b.classList.add('right'); Sfx.tap(); }
           const chat = $('.k-chat');
           chat.insertAdjacentHTML('beforeend', `<p class="k-msg me en" lang="en">${o.say}</p>`);
-          const react = t.react(o);
-          say([['en', o.say]], 0.85);
+          const react = o.voiceName ? `Hello, ${o.voiceName}! Nice to meet you!` : t.react(o);
+          if (b) say([['en', o.say]], 0.85);   // a spoken answer was already said by the child
           setTimeout(() => {
             chat.insertAdjacentHTML('beforeend', `<p class="k-msg owl en" lang="en">${react}</p>`);
             owlMood('cheer');
             sayEn(react, 0.9);
           }, 1600);
-          setTimeout(() => { at++; at < turns.length ? turn() : end(); }, 3800);
-        };
-      });
+          setTimeout(() => { at++; at < turns.length ? turn() : end(); }, b ? 3800 : 2600);
+      }
     }
     function end() {
       clearInterval(callTimer);
