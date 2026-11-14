@@ -1232,9 +1232,9 @@
       const list = GRAMMAR.filter(g => g.level === level);
       return list.length ? list.filter(g => Store.isGrammarDone(g.id)).length / list.length : 0;
     }
-    const list = UNITS.filter(u => u.level === level && (u.kind === 'phrases') === (part === 'phrases'));
-    const done = list.filter(unitDone).length;
-    return list.length ? done / list.length : 0;
+    // words met out of all the level's words: a first lesson already shows on the level, not 0% until a whole unit is done
+    const words = UNITS.filter(u => u.level === level && (u.kind === 'phrases') === (part === 'phrases')).flatMap(u => u.words);
+    return words.length ? words.filter(w => Store.isSeen(w.id)).length / words.length : 0;
   }
   function bindLevelSeg(redraw) {
     const btn = document.getElementById('levelbtn');
