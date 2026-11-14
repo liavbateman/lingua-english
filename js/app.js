@@ -196,8 +196,9 @@
     document.getElementById('stat-streak').textContent = s;
     document.getElementById('stat-streak-label').textContent = t(s === 1 ? 'streak.one' : 'streak.many');
     document.querySelector('.streak').classList.toggle('lit', s > 0);   // a live streak glows, 0 stays quiet
-    // A small dot on a tab when something waits there: rules to review (Grammar), words due (Learn)
-    const waiting = { grammar: Store.weakRules().length ? t('tab.grev') : '', learn: Store.dueWords().length ? t('tab.review') : '' };
+    // A small dot on a tab when something waits there: rules to review (Grammar).
+    // Words due are not dotted on Learn: Today already leads with that review, and a second signal pulls away from it.
+    const waiting = { grammar: Store.weakRules().length ? t('tab.grev') : '' };
     document.querySelectorAll('.tabbar a').forEach(a => {
       a.classList.toggle('active', a.dataset.tab === tab);
       if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
