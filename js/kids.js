@@ -78,6 +78,7 @@ const Kids = (() => {
       practice: 'נתרגל את המילים הקשות ({n})', practiceTitle: 'מתרגלים', practiceDone: 'המילים האלה כבר קלות יותר!',
       pairs: 'אוזן חדה', pairsSub: 'מילים שנשמעות כמעט אותו דבר', pairsTip: 'הקשיבו טוב! איזו מילה שמעתם?',
       isleSongs: 'שירי האיים', isleSongsSub: 'כל אי שסיימתם מקבל שיר משלו', singIsle: 'שירו את שיר האי',
+      peek: 'מציצים!', peekSub: 'מה מסתתר מאחורי העננים?', peekTip: 'מה מסתתר שם? בחרו מילה. ככל שמוקדם יותר, יותר כוכבים!',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -149,6 +150,7 @@ const Kids = (() => {
       practice: 'Practise the tricky words ({n})', practiceTitle: 'Practice', practiceDone: 'Those words are easier now!',
       pairs: 'Sharp ears', pairsSub: 'Words that sound almost the same', pairsTip: 'Listen carefully! Which word did you hear?',
       isleSongs: 'Island songs', isleSongsSub: 'Every island you finish gets its own song', singIsle: 'Sing the island song',
+      peek: 'Peek-a-boo!', peekSub: "What's hiding behind the clouds?", peekTip: "What's hiding there? Pick a word. The earlier, the more stars!",
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -468,6 +470,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">👂</span>
           <span class="grow"><b>${kt('pairs')}</b><small>${kt('pairsSub')}</small></span>
           ${Store.kidsHasSticker('pairs') ? starsHtml(Store.kidsStars('pairs'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-peek-card" href="#/kids/peek">
+          <span class="k-story-books" aria-hidden="true">☁️</span>
+          <span class="grow"><b>${kt('peek')}</b><small>${kt('peekSub')}</small></span>
+          ${Store.kidsHasSticker('peek') ? starsHtml(Store.kidsStars('peek'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -914,6 +921,88 @@ const Kids = (() => {
       celebrate();
       sayEn('What sharp ears!', 0.9);
       $('#k-again').onclick = pairsGame;
+    }
+    round();
+  }
+
+  // ---------- peek-a-boo ----------
+  // A picture hides behind 9 clouds that blow away one by one; the child picks its word among 3
+  // as soon as they can tell. Guessing early scores more; a wrong guess just greys out the word.
+  let peekTimer = null;
+  function peekGame() {
+    document.body.classList.add('in-lesson');
+    const known = KIDS_WORDS.filter(w => Store.kidsWordCount(w.id) > 0);
+    const pool = known.length >= 8 ? known : KIDS_WORDS.filter(w => isOpen(KIDS_THEMES.findIndex(th => th.id === w.theme)));
+    const rounds = K.shuffle(pool).slice(0, 6);
+    let at = 0, points = 0;
+    function round() {
+      clearInterval(peekTimer);
+      K.lessonBar(at / rounds.length);
+      const w = rounds[at];
+      const opts = K.shuffle([w, ...K.shuffle(pool.filter(x => x !== w && x.pic !== w.pic && x.en.length < 12)).slice(0, 2)]);
+      const order = K.shuffle([...Array(9).keys()]);
+      let shown = 0, done = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">☁️</span> ${kt('peek')} · ${at + 1}/${rounds.length}</p>
+          <div class="k-card k-peek-box" aria-hidden="true">
+            <span class="k-peek-pic">${w.pic}</span>
+            <div class="k-peek-clouds">${order.map(() => '<i></i>').join('')}</div>
+          </div>
+          <div class="k-peek-words">${opts.map((o, i) => `<button class="k-chip-word k-peek-word en" data-i="${i}">${o.en}</button>`).join('')}</div>
+          ${owl(kt('peekTip'), 'small')}
+        </div>`;
+      const clouds = [...K.view.querySelectorAll('.k-peek-clouds i')];
+      const blow = () => {
+        if (shown >= 9) return clearInterval(peekTimer);
+        clouds[order[shown++]].classList.add('gone');
+      };
+      blow();
+      peekTimer = setInterval(blow, 900);
+      K.view.querySelectorAll('.k-peek-word').forEach(b => {
+        b.onclick = () => {
+          if (done) return;
+          if (opts[+b.dataset.i] === w) {
+            done = true;
+            clearInterval(peekTimer);
+            clouds.forEach(c => c.classList.add('gone'));
+            b.classList.add('right');
+            const got = shown <= 3 ? 3 : shown <= 6 ? 2 : 1;
+            points += got;
+            K.Feel.right();
+            Store.kidsWordRight(w.id);
+            owlMood('cheer');
+            $('.k-bubble').textContent = `${'⭐'.repeat(got)} ${w.en}!`;
+            if (w.move) $('.k-peek-pic').classList.add('mv', 'mv-' + w.move);
+            sayEn(w.en);
+            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 1700);
+          } else {
+            b.disabled = true;
+            b.classList.add('nope');
+            K.Feel.wrong(b);
+            owlMood('think');
+            sayEn(opts[+b.dataset.i].en);
+          }
+        };
+      });
+    }
+    function end() {
+      clearInterval(peekTimer);
+      K.endLesson(1);
+      const avg = points / rounds.length, stars = avg >= 2.5 ? 3 : avg >= 1.6 ? 2 : 1;
+      Store.kidsFinish('peek', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <a class="k-btn" href="#/kids">${kt('backToMap')}</a>
+          <button class="k-btn ghost" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+        </div>`;
+      celebrate();
+      sayEn('Peek-a-boo! Great guessing!', 0.9);
+      $('#k-again').onclick = peekGame;
     }
     round();
   }
@@ -2371,6 +2460,7 @@ const Kids = (() => {
     // First meeting: the owl greets the child (Hebrew when there is a Hebrew voice, then English)
     hello() { say([['he', 'היי! אני הינשוף. בואו נלמד אנגלית ביחד!'], ['en', "Hello! Let's play!"]]); },
     show(a, b) {
+      clearInterval(peekTimer);
       stopRec();
       stopRecording();
       clearHands();
@@ -2387,6 +2477,7 @@ const Kids = (() => {
       else if (a === 'owl') wardrobe();
       else if (a === 'stories') stories();
       else if (a === 'riddles') riddles();
+      else if (a === 'peek') peekGame();
       else if (a === 'pairs') pairsGame();
       else if (a === 'practice') practice(b);
       else if (a === 'colour') colourIt();
