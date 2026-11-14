@@ -4561,17 +4561,22 @@ const Kids = (() => {
             if (!missed) firstTry++;
             owlMood('cheer');
             const ONE = { animals: 'an animal', food: 'food', toys: 'a toy', 'things that go': 'a thing that goes', clothes: 'something you wear', 'body parts': 'a body part' };
-            const why = `${art(odd.en)[0].toUpperCase() + art(odd.en).slice(1)} ${odd.en} is not ${ONE[fam.en] || fam.en}! ${(l => l[0].toUpperCase() + l.slice(1))(list(three.map(w => w.en)))} are ${fam.en}.`;
+            // "A car is not food!" / "Grapes are not a toy!" / "Milk is not an animal!" (plurals and mass nouns too)
+            const cap = t => t[0].toUpperCase() + t.slice(1);
+            const subj = isPlural(odd.en) ? `${cap(odd.en)} are not` : MASS.includes(odd.en) ? `${cap(odd.en)} is not` : `${cap(art(odd.en))} ${odd.en} is not`;
+            const why = `${subj} ${isPlural(odd.en) ? (fam.en === 'food' ? 'food' : fam.en) : (ONE[fam.en] || fam.en)}! ${cap(list(three.map(w => w.en)))} are ${fam.en}.`;
             $('.k-odd-why').textContent = why;
             $('.k-bubble').textContent = `${fam.pic} ${fam.he}`;
             say([['en', why]], 0.85);
             setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 4200);
           } else {
             missed = true;
+            b.disabled = true;
+            b.classList.add('nope');
             K.Feel.wrong(b);
             owlMood('think');
             $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${o.en}</bdi> ${fam.pic}? ${kt('tryAgain')}`;
-            sayEn(`${o.en[0].toUpperCase() + o.en.slice(1)} is in the ${fam.en} family. Look again!`, 0.9);
+            sayEn(`${o.en[0].toUpperCase() + o.en.slice(1)} ${isPlural(o.en) ? 'are' : 'is'} in the ${fam.en} family. Look again!`, 0.9);
           }
         };
       });
