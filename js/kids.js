@@ -137,6 +137,9 @@ const Kids = (() => {
       brush: 'מצחצחים שיניים עם הינשוף', brushSub: '2 דקות של צחצוח עם הוראות באנגלית: top, bottom, left, right', brushGo: 'מתחילים לצחצח!',
       brushStop: 'עצירה', brushTip: 'מצחצחים יחד עם הינשוף. החלק שמאיר הוא החלק לצחצח', brushDone: 'שיניים נקיות ונוצצות!',
       whoPlays: 'מי משחק?', whoPick: 'בחרו 2 או 3 ילדים', whoGo: 'מתחילים!', passTo: 'עכשיו התור של {name}!',
+      copy: 'מחקים את הינשוף', copySub: 'הינשוף מדבר בקול מצחיק: כמו עכבר, כמו דוב, בלחישה. מחקים אותו!',
+      copyRec: 'עכשיו אני', copyOwl: 'הינשוף', copyMe: 'אני', copyNext: 'הבא', copyTip: 'הקשיבו לינשוף, לחצו על המיקרופון ואמרו את המילה באותו קול',
+      copyNoRec: 'אמרו את המילה בקול באותו קול מצחיק, ואז לחצו "הבא"',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -267,6 +270,9 @@ const Kids = (() => {
       brush: 'Brush your teeth with the owl', brushSub: '2 minutes of brushing with English steps: top, bottom, left, right', brushGo: "Let's brush!",
       brushStop: 'Stop', brushTip: 'Brush along with the owl. Brush the part that lights up', brushDone: 'Clean, shiny teeth!',
       whoPlays: "Who's playing?", whoPick: 'Pick 2 or 3 children', whoGo: "Let's play!", passTo: 'Pass it to {name}!',
+      copy: "Copy the owl's voice", copySub: 'The owl talks in a funny voice: like a mouse, like a bear, in a whisper. Copy it!',
+      copyRec: 'My turn', copyOwl: 'Owl', copyMe: 'Me', copyNext: 'Next', copyTip: 'Listen to the owl, tap the mic and say the word in the same voice',
+      copyNoRec: 'Say the word out loud in the same funny voice, then tap "Next"',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -690,6 +696,11 @@ const Kids = (() => {
         <a class="k-abc-card k-brush-card" href="#/kids/brush">
           <span class="k-story-books" aria-hidden="true">🦷</span>
           <span class="grow"><b>${kt('brush')}</b><small>${kt('brushSub')}</small></span>
+        </a>
+        <a class="k-abc-card k-copy-card" href="#/kids/copy">
+          <span class="k-story-books" aria-hidden="true">🎭</span>
+          <span class="grow"><b>${kt('copy')}</b><small>${kt('copySub')}</small></span>
+          ${Store.kidsHasSticker('copy') ? starsHtml(Store.kidsStars('copy'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -3222,6 +3233,115 @@ const Kids = (() => {
     };
   }
 
+  // ---------- copy the owl's voice: pronunciation as a game ----------
+  // The owl says a word as a squeaky mouse, a big bear, a sleepy sloth, a busy bee or in a whisper.
+  // The child records the same word in the same voice and plays the two side by side. Copying a voice
+  // makes children listen closely to the sounds, and being silly makes speaking English feel safe.
+  const VOICES = [
+    { id: 'mouse', pic: '🐭', he: 'קול של עכבר', pitch: 2, rate: 1, vol: 1 },
+    { id: 'bear', pic: '🐻', he: 'קול של דוב', pitch: 0.1, rate: 0.75, vol: 1 },
+    { id: 'sloth', pic: '🦥', he: 'לאט לאט', pitch: 0.9, rate: 0.45, vol: 1 },
+    { id: 'bee', pic: '🐝', he: 'מהר מהר', pitch: 1.4, rate: 1.7, vol: 1 },
+    { id: 'whisper', pic: '🤫', he: 'בלחישה', pitch: 1.2, rate: 0.7, vol: 0.35 }
+  ];
+  function sayVoice(text, v) {
+    if (!('speechSynthesis' in window)) return;
+    if (!enVoice) voices();
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    if (enVoice) u.voice = enVoice;
+    u.pitch = v.pitch; u.rate = v.rate; u.volume = v.vol;
+    speechSynthesis.speak(u);
+  }
+  // record a short clip and hand back its address (kept so it can be played again)
+  async function recordClip(btn, done) {
+    if (btn.classList.contains('on')) return;
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    K.Feel.prime();
+    let stream;
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+    catch (e) { $('.k-bubble').textContent = kt('recNo'); done(null); return; }   // no mic: the game goes on without recording
+    recStream = stream;
+    const chunks = [], mr = new MediaRecorder(stream);
+    mr.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+    mr.onstop = () => {
+      stopRecording();
+      btn.classList.remove('on');
+      done(URL.createObjectURL(new Blob(chunks, { type: mr.mimeType || 'audio/mp4' })));
+    };
+    btn.classList.add('on');
+    $('.k-bubble').textContent = kt('recGo');
+    mr.start();
+    setTimeout(() => { if (mr.state === 'recording') mr.stop(); }, 2500);
+  }
+  function copyGame() {
+    document.body.classList.add('in-lesson');
+    const known = KIDS_WORDS.filter(w => Store.kidsWordCount(w.id) > 0 && !/\s/.test(w.en) && w.en.length <= 8);
+    const words = K.shuffle(known.length >= 5 ? known : KIDS_WORDS.filter(w => !/\s/.test(w.en) && w.en.length <= 8)).slice(0, 5);
+    const voicesOrder = K.shuffle(VOICES);
+    let at = 0, mine = null;
+    function round() {
+      if (mine) { URL.revokeObjectURL(mine); mine = null; }
+      K.lessonBar(at / words.length);
+      const w = words[at], v = voicesOrder[at % voicesOrder.length];
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🎭</span> ${kt('copy')} · ${at + 1}/${words.length}</p>
+          <div class="k-card k-meet k-copy-card-in">
+            <span class="k-copy-voice" aria-hidden="true">${v.pic}</span>
+            <span class="k-pic" aria-hidden="true">${w.pic}</span>
+            <span class="k-word en" lang="en">${w.en}</span>
+            <span class="k-he he">${v.he}</span>
+          </div>
+          <div class="k-copy-row">
+            <button class="k-copy-btn" id="k-copy-owl"><span aria-hidden="true">🦉</span><small>${kt('copyOwl')}</small></button>
+            ${canRecord() ? `<button class="k-mic" id="k-copy-rec" aria-label="${kt('copyRec')}"><span aria-hidden="true">🎤</span></button>` : ''}
+            <button class="k-copy-btn" id="k-copy-me" disabled><span aria-hidden="true">🙂</span><small>${kt('copyMe')}</small></button>
+          </div>
+          <button class="k-btn" id="k-copy-next" ${canRecord() ? 'disabled' : ''}>${kt('copyNext')} <span aria-hidden="true">${isHe() ? '←' : '→'}</span></button>
+          ${owl(canRecord() ? kt('copyTip') : bidiEn(kt('copyNoRec')), 'small')}
+        </div>`;
+      const owlSays = () => { sayVoice(w.en, v); const c = $('.k-copy-voice'); if (c) { c.classList.remove('talk'); void c.offsetWidth; c.classList.add('talk'); } };
+      $('#k-copy-owl').onclick = owlSays;
+      setTimeout(owlSays, 350);
+      const me = $('#k-copy-me'), next = $('#k-copy-next'), rec = $('#k-copy-rec');
+      if (rec) rec.onclick = () => recordClip(rec, url => {
+        if (!url) { next.disabled = false; $('.k-bubble').innerHTML = bidiEn(kt('copyNoRec')); return; }
+        if (mine) URL.revokeObjectURL(mine);
+        mine = url;
+        me.disabled = false;
+        next.disabled = false;
+        owlMood('giggle');
+        $('.k-bubble').textContent = kt('recYou');
+        // play the child, then the owl again, so the two can be heard one after the other
+        const a = new Audio(mine);
+        a.onended = () => setTimeout(owlSays, 300);
+        a.play().catch(() => setTimeout(owlSays, 300));
+      });
+      me.onclick = () => { if (mine) new Audio(mine).play().catch(() => {}); };
+      next.onclick = () => { K.Feel.right(); at++; at < words.length ? round() : end(); };
+    }
+    function end() {
+      if (mine) { URL.revokeObjectURL(mine); mine = null; }
+      K.endLesson(1);
+      Store.kidsFinish('copy', 3, 15);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🎭 ${kt('done')}</h1>
+            ${starsHtml(3, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayVoice('You are a great copycat!', VOICES[0]);
+      $('#k-again').onclick = copyGame;
+    }
+    round();
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -5278,6 +5398,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'copy') copyGame();
       else if (a === 'brush') brushGame(b === 'fast');
       else if (a === 'shunt') shuntGame();
       else if (a === 'mybook') myBook();
