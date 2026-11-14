@@ -2879,10 +2879,11 @@ const Kids = (() => {
   // A room with places (on the bed, under the table, in the box...) and a tray of friends. Put a friend
   // somewhere and the owl says the whole sentence: "The cat is on the bed!". Nothing is wrong; it is play
   // that turns words into sentences. Four friends placed = stars.
+  // same room shape as hide and seek (8:7, furniture sized from the room's width), so places sit on the furniture
   const TALK_SPOTS = [
-    { id: 'on the bed', he: 'על המיטה', x: 4, y: 36, w: 40, h: 16 }, { id: 'under the bed', he: 'מתחת למיטה', x: 4, y: 74, w: 40, h: 18 },
-    { id: 'on the table', he: 'על השולחן', x: 54, y: 34, w: 30, h: 16 }, { id: 'under the table', he: 'מתחת לשולחן', x: 54, y: 72, w: 30, h: 20 },
-    { id: 'in the box', he: 'בתוך הקופסה', x: 84, y: 62, w: 15, h: 22 }, { id: 'next to the door', he: 'ליד הדלת', x: 68, y: 4, w: 16, h: 28 }
+    { id: 'on the bed', he: 'על המיטה', x: 2, y: 36, w: 42, h: 24 }, { id: 'under the bed', he: 'מתחת למיטה', x: 2, y: 62, w: 42, h: 26 },
+    { id: 'on the table', he: 'על השולחן', x: 50, y: 36, w: 32, h: 16 }, { id: 'under the table', he: 'מתחת לשולחן', x: 50, y: 56, w: 32, h: 30 },
+    { id: 'in the box', he: 'בתוך הקופסה', x: 84, y: 64, w: 16, h: 24 }, { id: 'next to the door', he: 'ליד הדלת', x: 54, y: 3, w: 22, h: 30 }
   ];
   const TALK_FRIENDS = [['cat', '🐱', 'החתול'], ['dog', '🐶', 'הכלב'], ['duck', '🦆', 'הברווז'], ['ball', '⚽', 'הכדור'],
     ['teddy', '🧸', 'הדובי'], ['frog', '🐸', 'הצפרדע'], ['apple', '🍎', 'התפוח'], ['robot', '🤖', 'הרובוט']].map(([en, pic, he]) => ({ en, pic, he }));
@@ -2895,11 +2896,11 @@ const Kids = (() => {
         <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
         <h1 class="k-title">🖼️ ${kt('talk')}</h1>
         <p class="k-talk-line en" lang="en" dir="ltr" aria-live="polite">&nbsp;</p>
-        <div class="k-room k-talk-room">
-          <span class="k-room-obj" style="left:5%;top:38%;font-size:6.6rem" aria-hidden="true">🛏️</span>
-          <span class="k-room-obj k-talk-table" style="left:55%;top:48%" aria-hidden="true"></span>
-          <span class="k-room-obj" style="left:85%;top:66%;font-size:2.8rem" aria-hidden="true">📦</span>
-          <span class="k-room-obj" style="left:85%;top:6%;font-size:5.2rem" aria-hidden="true">🚪</span>
+        <div class="k-room k-hide-room k-talk-room">
+          <span class="k-room-obj" style="left:2%;top:30%;font-size:42cqw" aria-hidden="true">🛏️</span>
+          <span class="k-room-obj k-talk-table" style="left:51%;top:52%" aria-hidden="true"></span>
+          <span class="k-room-obj" style="left:85%;top:66%;font-size:15cqw" aria-hidden="true">📦</span>
+          <span class="k-room-obj" style="left:76%;top:2%;font-size:24cqw" aria-hidden="true">🚪</span>
           ${TALK_SPOTS.map((p, i) => `<button class="k-spot k-talk-spot" data-i="${i}" data-spot="${p.id}" style="left:${p.x}%;top:${p.y}%;width:${p.w}%;height:${p.h}%" aria-label="${p.id}"></button>`).join('')}
         </div>
         <div class="k-talk-tray">${TALK_FRIENDS.map((f, i) => `<button class="k-talk-friend" data-i="${i}" aria-label="${f.en}"><span aria-hidden="true">${f.pic}</span><small class="en">${f.en}</small></button>`).join('')}</div>
@@ -2948,10 +2949,16 @@ const Kids = (() => {
     });
     // read the whole picture, place by place
     $('#k-talk-read').onclick = () => {
-      const lines = TALK_SPOTS.filter(p => placed[p.id]).map(p => sentence(placed[p.id], p));
-      if (!lines.length) { $('.k-bubble').textContent = kt('talkTip'); return; }
-      say(lines.map(l => ['en', l]), 0.85);
-      $('.k-talk-line').textContent = lines.join(' ');
+      const full = TALK_SPOTS.filter(p => placed[p.id]);
+      if (!full.length) { $('.k-bubble').textContent = kt('talkTip'); return; }
+      // sentence by sentence; the place being described glows and its sentence shows above the room
+      const spots = full.map(p => K.view.querySelector(`.k-talk-spot[data-spot="${p.id}"]`));
+      speakSeq(full.map(p => sentence(placed[p.id], p)), 0.85, i => {
+        spots.forEach(x => x.classList.remove('say'));
+        if (!spots[i].isConnected) return;
+        spots[i].classList.add('say');
+        $('.k-talk-line').textContent = sentence(placed[full[i].id], full[i]);
+      }, () => spots.forEach(x => x.classList.remove('say')));
     };
     $('#k-talk-clear').onclick = talkGame;
     setTimeout(() => say([['he', kt('talkTip')]]), 300);

@@ -1082,7 +1082,8 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
   background: linear-gradient(#fde8c8 0 68%, #c9935f 68% 100%); box-shadow: 0 8px 0 var(--k-edge), inset 0 -8px 0 #a8743f;
 }
 .k-room-obj { position: absolute; line-height: 1; pointer-events: none; filter: drop-shadow(0 4px 2px rgba(0, 0, 0, .18)); }
-.k-hide-room { height: auto; aspect-ratio: 8 / 7; container-type: inline-size; max-height: 62vh; }
+/* a room that keeps its shape: as wide as it can be while its height stays within 60% of the screen */
+.k-hide-room { height: auto; aspect-ratio: 8 / 7; container-type: inline-size; width: min(100%, calc(60vh * 8 / 7)); margin-inline: auto; }
 .k-spot {
   position: absolute; border: 3px dashed transparent; border-radius: 18px; background: transparent; cursor: pointer;
   transition: border-color var(--dur-quick), background var(--dur-quick);
@@ -1307,12 +1308,13 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 
 /* picture talk */
 .k-talk-line { min-height: 2.6em; margin: 0 0 8px; padding: 8px 14px; border-radius: 18px; background: #fff; color: var(--k-ink); font: 700 1.25rem var(--k-font); text-align: center; }
-.k-talk-room { height: 280px; }
-.k-talk-table { width: 30%; height: 14px; border-radius: 6px; background: #a8743f; box-shadow: 0 46px 0 -4px transparent; }
-.k-talk-table::before, .k-talk-table::after { content: ''; position: absolute; top: 12px; width: 8px; height: 52px; background: #8a5a2b; border-radius: 3px; }
-.k-talk-table::before { left: 8px; } .k-talk-table::after { right: 8px; }
+.k-talk-room { margin-bottom: 4px; }
+.k-talk-table { width: 30%; height: 3.5cqw; border-radius: 6px; background: #a8743f; }
+.k-talk-table::before, .k-talk-table::after { content: ''; position: absolute; top: 3cqw; width: 2.4cqw; height: 26cqw; background: #8a5a2b; border-radius: 3px; }
+.k-talk-table::before { left: 2cqw; } .k-talk-table::after { right: 2cqw; }
 .k-talk-spot { border-color: rgba(29, 42, 91, .18); display: grid; place-items: center; }
-.k-talk-on { font-size: 2.6rem; line-height: 1; animation: k-pop .45s var(--ease-pop) both; }
+.k-talk-spot.say { border-color: #f2c94c; background: rgba(255, 241, 194, .55); }
+.k-talk-on { font-size: 11cqw; line-height: 1; animation: k-pop .45s var(--ease-pop) both; }
 .k-talk-tray { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0; direction: ltr; }
 .k-talk-friend {
   display: flex; flex-direction: column; align-items: center; padding: 6px 2px; border: 0; border-radius: 18px; background: #fff;
