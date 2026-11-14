@@ -123,6 +123,8 @@ const Kids = (() => {
       teddy: 'גוגעים בדובי', teddySub: 'איפה האף של הדובי? האוזניים? הרגליים?', teddyTip: 'הקשיבו וגעו בחלק הנכון בדובי',
       talk: 'מציירים ומדברים', talkSub: 'שמים חתול על המיטה, והינשוף אומר את המשפט', talkTip: 'בחרו חבר למטה ואז לחצו על מקום בחדר',
       talkRead: 'הינשוף מספר על התמונה', talkClear: 'חדר חדש',
+      band: 'להקת החיות', bandSub: 'מוסיפים חיות ללהקה וכל אחת שרה בקצב: moo! woof!', bandTip: 'לחצו על חיה כדי להוסיף אותה ללהקה. לחיצה על הבמה מוציאה',
+      bandPlay: 'לנגן', bandStop: 'עצור',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -239,6 +241,8 @@ const Kids = (() => {
       teddy: "Touch the teddy", teddySub: "Where is the teddy's nose? ears? feet?", teddyTip: 'Listen and touch the right part of the teddy',
       talk: 'Picture talk', talkSub: 'Put a cat on the bed and the owl says the sentence', talkTip: 'Pick a friend below, then tap a place in the room',
       talkRead: 'The owl tells the picture', talkClear: 'New room',
+      band: 'Animal band', bandSub: 'Add animals to the band; each one sings on the beat: moo! woof!', bandTip: 'Tap an animal to add it to the band. Tap it on the stage to take it out',
+      bandPlay: 'Play', bandStop: 'Stop',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -637,6 +641,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🖼️</span>
           <span class="grow"><b>${kt('talk')}</b><small>${kt('talkSub')}</small></span>
           ${Store.kidsHasSticker('talk') ? starsHtml(Store.kidsStars('talk'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-band-card" href="#/kids/band">
+          <span class="k-story-books" aria-hidden="true">🥁</span>
+          <span class="grow"><b>${kt('band')}</b><small>${bidiEn(kt('bandSub'))}</small></span>
+          ${Store.kidsHasSticker('band') ? starsHtml(Store.kidsStars('band'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -2608,6 +2617,71 @@ const Kids = (() => {
     };
     $('#k-talk-clear').onclick = talkGame;
     setTimeout(() => say([['he', kt('talkTip')]]), 300);
+  }
+
+  // ---------- animal band: a music toy that repeats animal words in rhythm ----------
+  // Up to four animals on stage; a soft drum keeps the beat and each animal in turn bounces and sings its
+  // sound. Adding one introduces it: "The cow says moo!". A toy to play with, nothing to get right.
+  let bandTimer = null;
+  function bandGame() {
+    K.endLesson();
+    clearInterval(bandTimer);
+    const extra = [['duck', '🦆', 'quack'], ['sheep', '🐑', 'baa'], ['frog', '🐸', 'ribbit'], ['pig', '🐷', 'oink']];
+    const animals = [...KIDS_WORDS.filter(w => w.says && w.en !== 'fish').map(w => ({ en: w.en, pic: w.pic, says: w.says })),
+      ...extra.map(([en, pic, says]) => ({ en, pic, says }))];
+    const stage = [];
+    let beat = 0, added = 0, rewarded = false;
+    K.view.innerHTML = `
+      <div class="k-wrap">
+        <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
+        <h1 class="k-title">🥁 ${kt('band')}</h1>
+        <div class="k-band-stage" id="k-stage" aria-live="polite"></div>
+        <p class="k-band-line en" lang="en" dir="ltr">&nbsp;</p>
+        <button class="k-btn" id="k-band-go">▶️ ${kt('bandPlay')}</button>
+        <div class="k-band-pick">${animals.map((a, i) => `<button class="k-band-animal" data-i="${i}" aria-label="${a.en}"><span aria-hidden="true">${a.pic}</span><small class="en">${a.en}</small></button>`).join('')}</div>
+        ${owl(kt('bandTip'), 'small')}
+      </div>`;
+    const drawStage = () => {
+      $('#k-stage').innerHTML = [0, 1, 2, 3].map(i => stage[i]
+        ? `<button class="k-band-seat on" data-s="${i}" aria-label="${stage[i].en}"><span aria-hidden="true">${stage[i].pic}</span></button>`
+        : `<span class="k-band-seat" aria-hidden="true">🎤</span>`).join('');
+      K.view.querySelectorAll('.k-band-seat.on').forEach(b => {
+        b.onclick = () => { stage.splice(+b.dataset.s, 1); Sfx.tap(); drawStage(); if (!stage.length) stop(); };
+      });
+    };
+    const tick = () => {
+      if (!$('#k-stage')) return stop();
+      note(beat % 2 ? 196 : 131, .18);
+      if (!stage.length) return;
+      const i = beat % stage.length, a = stage[i];
+      const seat = K.view.querySelector(`.k-band-seat[data-s="${i}"]`);
+      if (seat) { seat.classList.remove('sing'); void seat.offsetWidth; seat.classList.add('sing'); }
+      $('.k-band-line').textContent = `${a.says}!`;
+      speechSynthesis.cancel();
+      sayEn(`${a.says}!`, 1.1);
+      beat++;
+    };
+    const play = () => { clearInterval(bandTimer); bandTimer = setInterval(tick, 1300); tick(); $('#k-band-go').innerHTML = `⏸️ ${kt('bandStop')}`; };
+    function stop() { clearInterval(bandTimer); bandTimer = null; const g = $('#k-band-go'); if (g) g.innerHTML = `▶️ ${kt('bandPlay')}`; }
+    $('#k-band-go').onclick = () => (bandTimer ? stop() : play());
+    K.view.querySelectorAll('.k-band-animal').forEach(b => {
+      b.onclick = () => {
+        const a = animals[+b.dataset.i];
+        if (stage.includes(a)) return;
+        if (stage.length >= 4) stage.shift();
+        stage.push(a);
+        drawStage();
+        stop();
+        $('.k-band-line').textContent = `The ${a.en} says ${a.says}!`;
+        owlMood('giggle');
+        speechSynthesis.cancel();
+        sayEn(`The ${a.en} says ${a.says}!`, 0.9);
+        // start the music once the animal has been introduced
+        setTimeout(() => { if ($('#k-stage') && !bandTimer) play(); }, 2200);
+        if (++added >= 4 && !rewarded) { rewarded = true; Store.kidsFinish('band', 3, 15); }
+      };
+    });
+    drawStage();
   }
 
   // ---------- songs & chants ----------
@@ -4595,6 +4669,7 @@ const Kids = (() => {
       clearInterval(peekTimer);
       clearInterval(speedTimer);
       clearInterval(callTimer);
+      clearInterval(bandTimer);
       stopRec();
       stopRecording();
       clearHands();
@@ -4615,6 +4690,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'band') bandGame();
       else if (a === 'talk') talkGame();
       else if (a === 'teddy') teddyGame();
       else if (a === 'lullaby') lullaby();

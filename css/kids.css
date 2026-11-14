@@ -1293,3 +1293,19 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-talk-friend small { font: 700 .85rem var(--k-font); }
 .k-talk-friend.picked { background: #fff1c2; box-shadow: 0 4px 0 #f2c94c; transform: translateY(-4px); }
 .k-talk-friend.nudge { animation: k-boing .6s var(--ease-pop); }
+
+/* animal band */
+.k-band-stage {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 18px 10px 26px; border-radius: 26px; direction: ltr;
+  background: linear-gradient(#ff6b8b, #c2185b 70%, #7a1240 70%); box-shadow: 0 6px 0 var(--k-edge);
+}
+.k-band-seat { display: grid; place-items: center; aspect-ratio: 1; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .18); font-size: 1.6rem; opacity: .6; }
+.k-band-seat.on { background: #fff; font-size: 2.6rem; opacity: 1; cursor: pointer; box-shadow: 0 4px 0 rgba(0, 0, 0, .2); }
+.k-band-seat.sing { animation: k-band-hop .5s var(--ease-pop); }
+@keyframes k-band-hop { 40% { transform: translateY(-14px) scale(1.12); } }
+.k-band-line { min-height: 1.6em; margin: 10px 0 4px; text-align: center; font: 700 1.5rem var(--k-font); color: #ffe9a6; }
+.k-band-pick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 14px 0; direction: ltr; }
+.k-band-animal { display: flex; flex-direction: column; align-items: center; padding: 6px 2px; border: 0; border-radius: 18px; background: #fff; color: var(--k-ink);
+  font-size: 2rem; cursor: pointer; box-shadow: 0 4px 0 var(--k-edge); }
+.k-band-animal small { font: 700 .85rem var(--k-font); }
+@media (prefers-reduced-motion: reduce) { .k-band-seat.sing { animation: none; outline: 3px solid #ffe9a6; } }
