@@ -223,7 +223,7 @@
       : [];
     return [
       ...review,
-      { id: 'vocab', title: t('task.vocab'), sub: t('task.vocab.sub', { n: (u.words.length - Store.unitProgress(u).seen) || u.words.length }), href: `#/unit/${u.id}`, icon: 'book', color: 'blue' },
+      { id: 'vocab', title: t('task.vocab'), sub: t('task.vocab.sub', lessonSize(u)), href: `#/unit/${u.id}`, icon: 'book', color: 'blue' },
       { id: 'speak', title: t('task.speak'), sub: t('task.speak.sub'), href: '#/speak', icon: 'mic', color: 'purple' },
       { id: 'grammar', title: t('task.grammar'), sub: t('task.grammar.sub', { title: ruleTitle(g) }), href: `#/grammar/${g.id}`, icon: 'pencil', color: 'gold' }
     ];
@@ -260,7 +260,7 @@
       const fresh = u.words.length - Store.unitProgress(u).seen;
       const unitDone = x => { const p = Store.unitProgress(x); return p.total > 0 && p.mastered / p.total >= 0.6; };
       return { href: `#/unit/${u.id}`, icon: 'book', color: 'blue', emoji: u.emoji,
-        title: t('cont.lesson', { title: unitTitle(u) }), sub: t('cont.lesson.sub', { n: fresh }),
+        title: t('cont.lesson', { title: unitTitle(u) }), sub: t('cont.lesson.sub', lessonSize(u)),
         spot: pathSpot(wordUnits.map(unitDone), wordUnits.indexOf(u), Store.unitProgress(u).pct, '#/learn') };
     }
     const rules = levelGrammar();
@@ -711,6 +711,15 @@
   const startedCount = () => GRAMMAR.filter(g => Store.isGrammarDone(g.id)).length + UNITS.filter(u => Store.unitProgress(u).seen > 0).length;
   const isFresh = () => startedCount() < 3;
   const freshHide = (extraShow = false) => (isFresh() && !extraShow ? ' hidden' : '');
+
+  // How many cards the next lesson of a unit really shows, and about how long it takes:
+  // the very first lesson is 8 cards, a unit already begun shows only the words not met yet
+  function lessonSize(u) {
+    const firstEver = !ALL_WORDS.some(w => Store.isSeen(w.id));
+    const fresh = u.words.length - Store.unitProgress(u).seen;
+    const n = firstEver ? Math.min(8, u.words.length) : fresh || u.words.length;
+    return { n, m: Math.max(3, Math.round(n * 0.55)) };
+  }
 
   function miniMap(items, sections) {
     const curS = items.cur >= 0 ? stageAt(items, items.cur) : -1;
