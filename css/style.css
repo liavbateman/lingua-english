@@ -2146,3 +2146,7 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
   .result .steps2 { margin: 2px 0 10px; gap: 6px; }
   .result .steps2 li { padding: 8px 10px; }
 }
+
+/* The task that the next-lesson card opens wears a small "Now" tag, so the card and the task read as one step */
+.task-now { display: inline-block; margin-inline-start: 6px; padding: 1px 8px; border-radius: 999px; vertical-align: 2px;
+  font-size: .72rem; font-weight: 800; background: rgba(142, 125, 255, .22); color: #d8d2ff; text-decoration: none; }

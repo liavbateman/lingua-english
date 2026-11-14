@@ -317,7 +317,7 @@
       ${tasks.map(x => `
         <a class="task${done[x.id] ? ' is-done' : ''}" href="${x.href}">
           <span class="tile ${x.color}">${ICON[x.icon]}</span>
-          <span class="grow"><b>${x.title}</b><span class="small">${x.sub}</span></span>
+          <span class="grow"><b>${x.title}${!done[x.id] && x.href === step.href ? ` <span class="task-now">${t('task.now')}</span>` : ''}</b><span class="small">${x.sub}</span></span>
           <span class="check ${done[x.id] ? 'done' : ''}" ${done[x.id] ? `aria-label="${t('path.state.done')}"` : 'aria-hidden="true"'}>${done[x.id] ? ICON.check : ''}</span>
         </a>`).join('')}
       </div>`;
