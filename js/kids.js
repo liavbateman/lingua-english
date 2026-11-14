@@ -1308,8 +1308,13 @@ const Kids = (() => {
             K.Feel.wrong(b);
             owlMood('think');
             const other = p[+b.dataset.i];
-            $('.k-bubble').textContent = `${other.en} ≠ ${w.en}`;
-            say([['en', other.en + '.'], ['en', w.en + '!']], 0.7);
+            // both words, one after the other, and each card glows while its word is said
+            $('.k-bubble').textContent = `${other.pic} ${other.en} · ${w.pic} ${w.en}`;
+            const cards = [b, K.view.querySelector(`.k-opt[data-i="${p.indexOf(w)}"]`)];
+            speakSeq([other.en + '.', w.en + '!'], 0.7, i => {
+              cards.forEach(c => c.classList.remove('say'));
+              if (cards[i].isConnected) cards[i].classList.add('say');
+            }, () => cards.forEach(c => c.classList.remove('say')));
           }
         };
       });
