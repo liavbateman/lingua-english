@@ -99,6 +99,7 @@ const Kids = (() => {
       teamTip: 'מעבירים את הטלפון! כל תשובה נכונה עוזרת לשניכם',
       shop: 'החנות', shopSub: 'משחקים בחנות: מה הלקוח רוצה?', shopTip: 'הקשיבו ללקוח, שימו בסל ולחצו "Here you are!"',
       shopGive: 'Here you are!', shopBasket: 'הסל', shopCoins: '{n} מטבעות',
+      spell: 'מאייתים', spellTip: 'הקשיבו למילה ולחצו על האותיות לפי הסדר. לחיצה על אות בשורה מחזירה אותה',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -191,6 +192,7 @@ const Kids = (() => {
       teamTip: 'Pass the phone! Every right answer helps you both',
       shop: 'The shop', shopSub: 'Play shop: what does the customer want?', shopTip: 'Listen to the customer, fill the basket and tap "Here you are!"',
       shopGive: 'Here you are!', shopBasket: 'Basket', shopCoins: '{n} coins',
+      spell: 'Spell it!', spellTip: 'Listen to the word and tap the letters in order. Tap a letter in the row to take it back',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -1404,6 +1406,102 @@ const Kids = (() => {
       celebrate();
       sayEn('What a great shopkeeper!', 0.9);
       $('#k-again').onclick = shopGame;
+    }
+    round();
+  }
+
+  // ---------- spelling bee jr. (6–9) ----------
+  // Hear a short word and see its picture; tap letter tiles into the slots in order (two extra tiles to
+  // think about). A wrong spelling sends back only the letters in the wrong place; after two tries the
+  // next right letter glows.
+  function spellGame() {
+    document.body.classList.add('in-lesson');
+    const words = K.shuffle([...KIDS_CVC, { en: 'fish', pic: '🐟' }, { en: 'star', pic: '⭐' }, { en: 'frog', pic: '🐸' }, { en: 'duck', pic: '🦆' }, { en: 'cake', pic: '🎂' }, { en: 'moon', pic: '🌙' }]).slice(0, 5);
+    let at = 0, firstTry = 0;
+    function round() {
+      K.lessonBar(at / words.length);
+      const w = words[at], letters = w.en.split('');
+      const extra = K.shuffle('abcdefghijklmnopqrstuvwxyz'.split('').filter(c => !letters.includes(c))).slice(0, 2);
+      const tiles = K.shuffle([...letters, ...extra]).map((c, i) => ({ c, i, used: false }));
+      const slots = letters.map(() => null);
+      let tries = 0;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🐝</span> ${kt('spell')} · ${at + 1}/${words.length}</p>
+          <button class="k-card k-meet k-spell-card" id="k-say" aria-label="${kt('listen')}">
+            <span class="k-pic" aria-hidden="true">${w.pic}</span>
+            <span class="k-ear" aria-hidden="true">🔊</span>
+          </button>
+          <div class="k-slots" dir="ltr" id="k-slots"></div>
+          <div class="k-blend k-spell-tiles" dir="ltr" id="k-tiles"></div>
+          ${owl(kt('spellTip'), 'small')}
+        </div>`;
+      const sayIt = () => sayEn(w.en, 0.75);
+      $('#k-say').onclick = sayIt;
+      setTimeout(sayIt, 300);
+      function draw() {
+        $('#k-slots').innerHTML = slots.map((t, i) => `<button class="k-slot-l ${t ? 'full' : ''}" data-s="${i}" aria-label="${t ? t.c : '_'}">${t ? t.c : ''}</button>`).join('');
+        $('#k-tiles').innerHTML = tiles.map(t => `<button class="k-blend-tile k-spell-tile ${t.used ? 'used' : ''}" data-t="${t.i}" ${t.used ? 'disabled' : ''} aria-label="${t.c}">${t.c}</button>`).join('');
+        K.view.querySelectorAll('.k-spell-tile').forEach(b => {
+          b.onclick = () => {
+            const free = slots.indexOf(null);
+            if (free < 0) return;
+            const t = tiles.find(x => x.i === +b.dataset.t);
+            t.used = true;
+            slots[free] = t;
+            Sfx.tap();
+            sayEn(KIDS_ABC.find(x => x.L === t.c.toUpperCase()).name, 1);
+            draw();
+            if (!slots.includes(null)) check();
+          };
+        });
+        K.view.querySelectorAll('.k-slot-l.full').forEach(b => {
+          b.onclick = () => { const i = +b.dataset.s; slots[i].used = false; slots[i] = null; draw(); };
+        });
+      }
+      function check() {
+        if (slots.map(t => t.c).join('') === w.en) {
+          if (!tries) firstTry++;
+          K.Feel.right();
+          owlMood('cheer');
+          $('#k-slots').classList.add('right');
+          $('.k-bubble').textContent = `${w.en.toUpperCase().split('').join('-')}: ${w.en}! ${w.pic}`;
+          say([['en', w.en.split('').map(c => KIDS_ABC.find(x => x.L === c.toUpperCase()).name).join(', ') + '.'], ['en', w.en + '!']], 0.9);
+          setTimeout(() => { at++; at < words.length ? round() : end(); }, 2600);
+          return;
+        }
+        tries++;
+        K.Feel.wrong($('#k-slots'));
+        owlMood('think');
+        // letters in the right place stay; the others go back to the row
+        slots.forEach((t, i) => { if (t.c !== letters[i]) { t.used = false; slots[i] = null; } });
+        draw();
+        if (tries >= 2) {
+          const i = slots.indexOf(null), want = tiles.find(t => !t.used && t.c === letters[i]);
+          const hint = want && K.view.querySelector(`.k-spell-tile[data-t="${want.i}"]`);
+          if (hint) hint.classList.add('hint');
+        }
+        $('.k-bubble').textContent = kt('tryAgain');
+        setTimeout(sayIt, 300);
+      }
+      draw();
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = firstTry >= 5 ? 3 : firstTry >= 3 ? 2 : 1;
+      Store.kidsFinish('spell', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🐝 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <a class="k-btn" href="#/kids/abc">ABC</a>
+          <button class="k-btn ghost" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+        </div>`;
+      celebrate();
+      sayEn('Super speller!', 0.9);
+      $('#k-again').onclick = spellGame;
     }
     round();
   }
@@ -2746,7 +2844,8 @@ const Kids = (() => {
         <h1 class="k-title">🔤 ${kt('abc')}</h1>
         <p class="k-sub">${kt('abcTip')}</p>
         <a class="k-btn" href="#/kids/abcgame"><span aria-hidden="true">🎮</span> ${kt('abcGame')}</a>
-        ${little() ? '' : `<a class="k-btn ghost" href="#/kids/blend"><span aria-hidden="true">🧩</span> ${kt('blend')}</a>`}
+        ${little() ? '' : `<a class="k-btn ghost" href="#/kids/blend"><span aria-hidden="true">🧩</span> ${kt('blend')}</a>
+        <a class="k-btn ghost" href="#/kids/spell"><span aria-hidden="true">🐝</span> ${kt('spell')}</a>`}
         <div class="k-letters">
           ${KIDS_ABC.map((x, i) => `<a class="k-letter" href="#/kids/abc/${x.L}" style="--c:${BALLOONS[i % BALLOONS.length]}" aria-label="${x.L}"><b>${x.L}</b><small>${x.L.toLowerCase()}</small>${Store.kidsHasTraced(x.L) ? '<i class="k-traced" aria-hidden="true">✍️</i>' : ''}</a>`).join('')}
         </div>
@@ -3147,6 +3246,7 @@ const Kids = (() => {
       else if (a === 'owl') wardrobe();
       else if (a === 'stories') stories();
       else if (a === 'riddles') riddles();
+      else if (a === 'spell') spellGame();
       else if (a === 'shop') shopGame();
       else if (a === 'together') togetherGame();
       else if (a === 'blend') blendGame();

@@ -1011,3 +1011,19 @@ body.kids.wx-rainy .view, body.kids.wx-snowy .view { position: relative; z-index
 .k-basket-items { display: flex; flex-wrap: wrap; gap: 4px; direction: ltr; }
 .k-basket-item { border: 0; background: none; font-size: 2rem; cursor: pointer; animation: k-pop .3s var(--ease-pop) both; }
 body.kids-big .k-customer-says { font-family: "Lexend", var(--k-font); letter-spacing: .04em; }
+
+/* spelling bee jr. */
+.k-spell-card { padding: 14px; }
+.k-spell-card .k-pic { font-size: 6rem; }
+.k-slots { display: flex; justify-content: center; gap: 8px; margin: 16px 0 10px; }
+.k-slot-l {
+  width: 58px; height: 68px; border: 3px dashed rgba(255, 255, 255, .7); border-radius: 16px; background: rgba(255, 255, 255, .25);
+  color: var(--k-ink); font: 700 2.4rem/1 var(--k-font); cursor: pointer;
+}
+.k-slot-l.full { border-style: solid; border-color: #fff; background: #fff; box-shadow: 0 4px 0 var(--k-edge); }
+.k-slots.right .k-slot-l { background: #d8fbe9; border-color: #2fd093; animation: k-boing .5s var(--ease-pop); }
+.k-spell-tiles { flex-wrap: wrap; gap: 8px; }
+.k-spell-tile { width: 56px; height: 64px; font-size: 2.2rem; }
+.k-spell-tile.used { opacity: .25; }
+.k-spell-tile.hint { background: #fff1c2; animation: k-wiggle 1s ease-in-out infinite; }
+body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", var(--k-font); }
