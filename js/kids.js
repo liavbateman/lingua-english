@@ -1867,6 +1867,12 @@ const Kids = (() => {
       function draw() {
         $('#k-slots').innerHTML = slots.map((t, i) => `<button class="k-slot-l ${t ? 'full' : ''}" data-s="${i}" aria-label="${t ? t.c : '_'}">${t ? t.c : ''}</button>`).join('');
         $('#k-tiles').innerHTML = tiles.map(t => `<button class="k-blend-tile k-spell-tile ${t.used ? 'used' : ''}" data-t="${t.i}" ${t.used ? 'disabled' : ''} aria-label="${t.c}">${t.c}</button>`).join('');
+        // after two tries, the tile for the next missing letter keeps glowing (also after every redraw)
+        if (tries >= 2) {
+          const i = slots.indexOf(null), want = i >= 0 && tiles.find(t => !t.used && t.c === letters[i]);
+          const hint = want && K.view.querySelector(`.k-spell-tile[data-t="${want.i}"]`);
+          if (hint) hint.classList.add('hint');
+        }
         K.view.querySelectorAll('.k-spell-tile').forEach(b => {
           b.onclick = () => {
             const free = slots.indexOf(null);
@@ -1890,7 +1896,7 @@ const Kids = (() => {
           K.Feel.right();
           owlMood('cheer');
           $('#k-slots').classList.add('right');
-          $('.k-bubble').textContent = `${w.en.toUpperCase().split('').join('-')}: ${w.en}! ${w.pic}`;
+          $('.k-bubble').innerHTML = `<bdi class="k-q" dir="ltr" lang="en">${w.en.toUpperCase().split('').join('-')}: ${w.en}! ${w.pic}</bdi>`;
           say([['en', w.en.split('').map(c => KIDS_ABC.find(x => x.L === c.toUpperCase()).name).join(', ') + '.'], ['en', w.en + '!']], 0.9);
           setTimeout(() => { at++; at < words.length ? round() : end(); }, 2600);
           return;
@@ -1901,13 +1907,8 @@ const Kids = (() => {
         // letters in the right place stay; the others go back to the row
         slots.forEach((t, i) => { if (t.c !== letters[i]) { t.used = false; slots[i] = null; } });
         draw();
-        if (tries >= 2) {
-          const i = slots.indexOf(null), want = tiles.find(t => !t.used && t.c === letters[i]);
-          const hint = want && K.view.querySelector(`.k-spell-tile[data-t="${want.i}"]`);
-          if (hint) hint.classList.add('hint');
-        }
         $('.k-bubble').textContent = kt('tryAgain');
-        setTimeout(sayIt, 300);
+        setTimeout(sayIt, 900);   // after the last letter's name, not on top of it
       }
       draw();
     }
