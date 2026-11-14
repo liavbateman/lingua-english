@@ -749,6 +749,7 @@
   // A lesson brings at most 8 new words at a time (a 15-word unit is two lessons: 8, then 7),
   // so the promise on Today stays the same whatever was peeked at before
   const LESSON_NEW = 8;
+  let lastLesson = { unit: '', ids: [] };   // the words a lesson's cards just showed, practised first after it
   // How many cards the next lesson of a unit really shows, and about how long it takes
   function lessonSize(u) {
     const fresh = u.words.length - Store.unitProgress(u).seen;
@@ -1901,6 +1902,7 @@
 
     function finish() {
       endLesson(1);
+      lastLesson = { unit: unit.id, ids: words.map(w => w.id) };   // its practice starts with these words
       view.innerHTML = `
         <div class="card center result">
           <div class="big">🃏</div>
@@ -2157,9 +2159,17 @@
 
     // "Complete the sentence" and typing use single words (sentences are too long to type on a phone)
     const usable = mode === 'cloze' || mode === 'type' ? src.pool.filter(w => !w.phrase) : src.pool;
-    // A lesson's own practice covers all of its words; mixed rounds (level, review…) stay at 8
+    // Every round is 8 questions. A lesson's practice starts with the words not practised yet (the ones just
+    // met on its cards), so after a second lesson of 7 new words the "short practice" is not 15 questions
     const isUnit = UNITS.some(u => u.id === source);
-    const queue = shuffle(usable.length ? usable : src.pool).slice(0, isUnit ? 15 : 8);
+    let mixed = shuffle(usable.length ? usable : src.pool);
+    // first the words the lesson's cards just showed, then words missed earlier, then the rest
+    if (isUnit) {
+      const justMet = lastLesson.unit === source ? lastLesson.ids : [];
+      const rank = w => justMet.includes(w.id) ? 0 : Store.box(w.id) <= 1 ? 1 : 2;
+      mixed = [0, 1, 2].flatMap(r => mixed.filter(w => rank(w) === r));
+    }
+    const queue = mixed.slice(0, 8);
     const total = queue.length;           // the score counts first tries only
     const tried = new Set();              // words already answered once this round
     const retries = new Map();            // how many times each word was sent back
