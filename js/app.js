@@ -248,6 +248,15 @@
       </div>`;
   }
 
+  // A unit's progress line. Mastery takes days of reviews, so right after a lesson "0 of 15 learned" read as if
+  // the lesson was lost: until a word is mastered the line counts the words met, then it adds how many are learned
+  function unitLine(u, p = Store.unitProgress(u)) {
+    const phr = u.kind === 'phrases';
+    if (!p.mastered && p.seen) return t(phr ? 'learn.sentences.met' : 'learn.words.met', { a: p.seen, b: p.total });
+    if (p.mastered && p.seen > p.mastered) return t(phr ? 'learn.sentences.both' : 'learn.words.both', { a: p.seen, b: p.total, m: p.mastered });
+    return t(phr ? 'learn.sentences' : 'learn.words', { a: p.mastered, b: p.total });
+  }
+
   // ---------- Home ----------
   // The single best next step, shown as one big card at the top of Home (as Babbel's "Continue"
   // and Duolingo's "Start"): words about to be forgotten first, then new words, then grammar,
@@ -408,7 +417,7 @@
           <span class="tile dim">${u.emoji}</span>
           <div class="grow">
             <b>${unitTitle(u)}</b>
-            <div class="small">${t(u.kind === 'phrases' ? 'learn.sentences' : 'learn.words', { a: p.mastered, b: p.total })}</div>
+            <div class="small">${unitLine(u, p)}</div>
             ${bar(p.pct)}
           </div>
         </div>
@@ -527,7 +536,7 @@
         const p = Store.unitProgress(u);
         return { href: `#/unit/${u.id}`, review: `#/quiz/choice/${u.id}`, face: u.emoji, label: unitTitle(u), plain: unitTitle(u), words: u.words,
           done: unitDone(u), started: p.seen > 0, pct: p.pct,
-          progress: t(u.kind === 'phrases' ? 'learn.sentences' : 'learn.words', { a: p.mastered, b: p.total }) };
+          progress: unitLine(u, p) };
       });
     }
     let cur = items.findIndex(x => !x.done);
