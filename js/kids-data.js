@@ -507,3 +507,8 @@ const KIDS_SIMON = [
   ['Turn around!', 'הסתובבו', '🔄'], ['Sit down!', 'שבו', '🪑'], ['Stand up!', 'קומו', '🧍'], ['Open your mouth!', 'פתחו את הפה', '👄'],
   ['Touch your head!', 'געו בראש', '🙆'], ['Be a cat! Meow!', 'תהיו חתול! מיאו!', '🐱']
 ].map(([en, he, pic]) => ({ en, he, pic }));
+
+// Twin words: English words that sound almost the same in Hebrew - a bridge that says "you already know this!"
+const KIDS_TWINS = {
+  banana: 'בננה', pizza: 'פיצה', balloon: 'בלון', robot: 'רובוט', bus: 'אוטובוס', mom: 'אמא'
+};

@@ -108,6 +108,7 @@ const Kids = (() => {
       simon: 'הינשוף אומר', simonSub: 'עושים מה שהינשוף אומר: לגעת באף, לקפוץ, למחוא כפיים', simonDid: 'עשיתי!', simonTip: 'עשו את התנועה ואז לחצו "עשיתי!"',
       fam: 'משפחות של מילים', famSub: 'מוצאים את כל החיות, כל האוכל, כל הצעצועים', famTip: 'לחצו על כל התמונות מהמשפחה. כל מילה נכנסת לסל',
       famLeft: 'עוד {n}',
+      twin: 'כמעט כמו בעברית!', twinSay: 'כמעט כמו בעברית!', twinsTitle: 'מילים תאומות', twinsSub: 'מילים באנגלית שנשמעות כמו בעברית · פגשתם {n} מתוך {all}',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -209,6 +210,7 @@ const Kids = (() => {
       simon: 'Owl says', simonSub: 'Do what the owl says: touch your nose, jump, clap', simonDid: 'I did it!', simonTip: 'Do the move, then tap "I did it!"',
       fam: 'Word families', famSub: 'Find all the animals, all the food, all the toys', famTip: 'Tap every picture in the family. Each word jumps into the basket',
       famLeft: '{n} more',
+      twin: 'Almost like in Hebrew!', twinSay: 'Almost like in Hebrew!', twinsTitle: 'Twin words', twinsSub: 'English words that sound like Hebrew · you met {n} of {all}',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -2698,14 +2700,17 @@ const Kids = (() => {
             <span class="k-ear" aria-hidden="true">🔊</span>
             ${w.says ? `<span class="k-says en" aria-hidden="true">${w.says}!</span>` : ''}
           </button>
-          <p class="k-tip">${kt('meetTip')}</p>
+          ${twinOf(w) ? `<p class="k-twin"><span aria-hidden="true">🤝</span> ${kt('twin')} <bdi dir="ltr" lang="en">${w.en}</bdi> = <bdi lang="he">${twinOf(w)}</bdi></p>` : `<p class="k-tip">${kt('meetTip')}</p>`}
           <button class="k-btn" id="k-next">${kt('next')} <span aria-hidden="true">${isHe() ? '←' : '→'}</span></button>
         </div>`;
       const pic = $('#k-pic');
       const hear = () => { w.says ? say([['en', w.en + '.'], ['en', `The ${w.en} says ${w.says}!`]]) : sayEn(w.en); pic.classList.remove('boing'); void pic.offsetWidth; pic.classList.add('boing'); };
       pic.onclick = hear;
       $('#k-next').onclick = nextStep;
-      if (n === 0) say([['he', kt('sayMeet')], ['en', w.en]]); else setTimeout(hear, 150);
+      const twin = twinOf(w) && isHe() ? [['en', w.en], ['he', `${kt('twinSay')} ${twinOf(w)}`]] : null;
+      if (n === 0) say([['he', kt('sayMeet')], ['en', w.en], ...(twin ? twin.slice(1) : [])]);
+      else if (twin) setTimeout(() => say(twin), 150);
+      else setTimeout(hear, 150);
       if (n === 0) setTimeout(() => coach('meet', '#k-pic'), 400);
       if (n === 1) setTimeout(() => coach('next', '#k-next'), 400);
     }
@@ -3433,6 +3438,21 @@ const Kids = (() => {
     round();
   }
 
+  // ---------- twin words: English that sounds like Hebrew ----------
+  function twinOf(w) { return w && KIDS_TWINS[w.en]; }
+  function twinsHtml() {
+    const all = Object.keys(KIDS_TWINS);
+    const met = en => KIDS_WORDS.some(w => w.en === en && Store.kidsWordCount(w.id) > 0);
+    const pic = en => (KIDS_WORDS.find(w => w.en === en) || {}).pic || '❔';
+    const n = all.filter(met).length;
+    return `
+      <h2 class="k-title k-h2">🤝 ${kt('twinsTitle')}</h2>
+      <p class="k-sub">${kt('twinsSub', { n, all: all.length })}</p>
+      <div class="k-twins">${all.map(en => met(en)
+        ? `<button class="k-twin-chip" data-en="${en}"><span aria-hidden="true">${pic(en)}</span><b class="en">${en}</b><small class="he">${KIDS_TWINS[en]}</small></button>`
+        : `<span class="k-twin-chip locked" aria-hidden="true"><span>❔</span></span>`).join('')}</div>`;
+  }
+
   // ---------- sticker calendar: this month, a sticker on every day the child played (never a broken streak) ----------
   function calendarHtml() {
     const now = new Date(), y = now.getFullYear(), m = now.getMonth();
@@ -3576,6 +3596,7 @@ const Kids = (() => {
         <h1 class="k-title">🎁 ${kt('album')}</h1>
         <a class="k-btn" href="#/kids/scene">🎨 ${kt('scene')}</a>
         ${calendarHtml()}
+        ${twinsHtml()}
         ${trophiesHtml()}
         <h2 class="k-title k-h2">🎁 ${kt('stickers')}</h2>
         <p class="k-sub">${kt('albumSub')} · ${Store.kidsStickerCount}/${KIDS_THEMES.length}</p>
@@ -3619,6 +3640,11 @@ const Kids = (() => {
         const el = e.target.closest('.k-btn, .k-isle-btn, .k-abc-card, .k-chip:not(.k-sfx), .k-back, .k-letter, .k-book, .k-ward-item, .k-note, .k-plant, .k-parents, .k-skip, .k-chest-card, #k-pic, #k-letter, .k-chip-word, .k-target-pic');
         if (el) Sfx.tap();
       }, true);
+      // a twin word chip in the album says both twins: "banana - בננה"
+      document.addEventListener('click', e => {
+        const chip = e.target.closest('.k-twin-chip[data-en]');
+        if (chip) say([['en', chip.dataset.en], ['he', KIDS_TWINS[chip.dataset.en]]]);
+      });
     },
     // First meeting: the owl greets the child (Hebrew when there is a Hebrew voice, then English)
     hello() { say([['he', 'היי! אני הינשוף. בואו נלמד אנגלית ביחד!'], ['en', "Hello! Let's play!"]]); },

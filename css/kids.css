@@ -1098,3 +1098,17 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-fam-bk { font-size: 2.4rem; }
 #k-fam-in i { font-style: normal; font-size: 2rem; animation: k-pop .4s var(--ease-pop) both; }
 @media (prefers-reduced-motion: reduce) { .k-fam-pic.in { animation: none; opacity: .25; } }
+
+/* twin words */
+.k-twin {
+  margin: 14px auto 0; padding: 10px 16px; width: fit-content; max-width: 100%; border-radius: 999px; text-align: center;
+  background: #fff1c2; color: var(--k-ink); font-weight: 700; font-size: 1.15rem; box-shadow: 0 4px 0 #f2c94c; animation: k-pop .5s var(--ease-pop) both;
+}
+.k-twins { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.k-twin-chip {
+  display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 8px 2px; border: 0; border-radius: 16px;
+  background: #fff; color: var(--k-ink); box-shadow: 0 4px 0 var(--k-edge); font-size: 1.7rem; cursor: pointer; min-width: 0;
+}
+.k-twin-chip b { font-size: .72rem; overflow-wrap: anywhere; }
+.k-twin-chip small { font-size: .7rem; color: var(--k-muted); }
+.k-twin-chip.locked { opacity: .45; cursor: default; justify-content: center; }
