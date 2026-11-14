@@ -2198,6 +2198,17 @@
       return;
     }
 
+    // Typing a word from memory needs to have met it: a choice can be guessed, a spelling cannot. So the level's
+    // typing practice uses only words already learned, and before the first lesson it sends the learner there
+    if (mode === 'type' && source === 'level') {
+      src.pool = src.pool.filter(w => Store.isSeen(w.id));
+      if (!src.pool.some(w => !w.phrase)) {
+        endLesson();
+        view.innerHTML = emptyState(`<b class="empty-title">${t('type.first')}</b>${t('type.first.sub')}`,
+          `<a class="btn" href="#/unit/${nextUnit().id}">${t('type.first.go')}</a>`);
+        return;
+      }
+    }
     // "Complete the sentence" and typing use single words (sentences are too long to type on a phone)
     const usable = mode === 'cloze' || mode === 'type' ? src.pool.filter(w => !w.phrase) : src.pool;
     // Every round is 8 questions. A lesson's practice starts with the words not practised yet (the ones just

@@ -157,7 +157,7 @@ const STR = {
     'tricky.title': 'Tricky words', 'tricky.one': 'One word keeps slipping away. Practice it now',
     'tricky.some': '{n} words keep slipping away. Practice just them',
     'quiz.missed': 'Words to go over', 'quiz.again.missed': 'Practice these words again', 'quiz.missedTitle': 'Your mistakes',
-    'quiz.empty': 'Nothing to review', 'quiz.empty.sub': 'Learn a new lesson and its words will come back here at the right time.',
+    'type.first': 'Learn first, then type', 'type.first.sub': 'Here you write from memory words you have already learned. After one lesson you will have words to practice.', 'type.first.go': 'To the next lesson', 'quiz.empty': 'Nothing to review', 'quiz.empty.sub': 'Learn a new lesson and its words will come back here at the right time.',
 
     'speak.title': 'Speaking Practice', 'speak.count': 'Speaking Practice · {a} of {b}', 'speak.do': 'Listen, then say it out loud',
     'speak.rate': 'After saying it out loud, mark how it went:', 'speak.hard': 'Still hard', 'speak.said': 'I said it',
@@ -343,7 +343,7 @@ const STR = {
     'tricky.title': 'מילים קשות', 'tricky.one': 'מילה אחת ממשיכה לחמוק. כדאי לתרגל אותה עכשיו',
     'tricky.some': '{n} מילים ממשיכות לחמוק. תרגול רק שלהן',
     'quiz.missed': 'מילים לחזור עליהן', 'quiz.again.missed': 'לתרגל שוב את המילים האלה', 'quiz.missedTitle': 'הטעויות שלך',
-    'quiz.empty': 'אין מילים לחזרה', 'quiz.empty.sub': 'אחרי שיעור חדש, המילים שלו יחזרו לכאן בזמן הנכון.',
+    'type.first': 'קודם לומדים, אחר כך מקלידים', 'type.first.sub': 'כאן כותבים מהזיכרון מילים שכבר למדת. אחרי שיעור אחד יהיו לך מילים לתרגל.', 'type.first.go': 'לשיעור הבא', 'quiz.empty': 'אין מילים לחזרה', 'quiz.empty.sub': 'אחרי שיעור חדש, המילים שלו יחזרו לכאן בזמן הנכון.',
 
     'speak.title': 'תרגול דיבור', 'speak.count': 'תרגול דיבור · {a} מתוך {b}', 'speak.do': 'מקשיבים, ואז אומרים בקול',
     'speak.rate': 'אחרי שאמרתם בקול, סמנו איך הלך:', 'speak.hard': 'עדיין קשה', 'speak.said': 'אמרתי',
