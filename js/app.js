@@ -1524,8 +1524,10 @@
   const isTenseRule = id => TENSES.some(([, cells]) => cells.some(c => c[1] === id));
 
   function tenses() {
+    // arrived from a rule's page: the back link returns to that rule, and the map opens at its tense
+    const fromRule = tensesFrom && GRAMMAR.find(g => g.id === tensesFrom);
     view.innerHTML = `
-      <a class="back" href="#/grammar">${bwd()} ${t('grammar.back')}</a>
+      <a class="back" href="${fromRule ? '#/grammar/' + fromRule.id : '#/grammar'}">${bwd()} ${fromRule ? ruleTitle(fromRule) : t('grammar.back')}</a>
       <h1>⏱️ ${t('tn.title')}</h1>
       <p class="sub">${t('tn.sub')}</p>
       <div class="tn-key" aria-hidden="true">${['simple', 'prog', 'perf', 'pp'].map(a => `<span class="asp-${a}">${t('tn.' + a)}</span>`).join('')}</div>
@@ -1545,6 +1547,8 @@
             }).join('')}
           </div>
         </section>`).join('')}`;
+    const here = fromRule && view.querySelector(`.tn-cell[href="#/grammar/${fromRule.id}"]`);
+    if (here) { here.classList.add('is-here'); here.setAttribute('aria-current', 'page'); here.scrollIntoView({ block: 'center' }); }
   }
 
   // In a rule's example, the words the rule is about stand out: any of its quiz answers found in the sentence
@@ -2944,13 +2948,17 @@
   // A rule page's back link goes where the learner came from: Today, or the grammar path
   // (from the grammar path or the tense map: back to the path; from anywhere else, such as Today or a
   // lesson's "What's next": back to Today; the rule's own quiz keeps whichever it was)
-  let lastName = '', ruleBack = '#/';
+  let lastName = '', ruleBack = '#/', lastRule = '', tensesFrom = '';
   function route() {
     const [name, a, b] = location.hash.replace(/^#\/?/, '').split('/');
-    if (name === 'grammar' && a && !b && lastName !== 'rule') {
+    // back from the tense map to the rule it was opened from: that rule keeps its own way back
+    if (name === 'grammar' && a && !b && lastName !== 'rule' && !(lastName === 'tenses' && a === tensesFrom)) {
       ruleBack = lastName === 'grammar' || lastName === 'tenses' ? '#/grammar' : '#/';
     }
     // the rule's own quiz keeps the rule's way back; only the grammar list itself counts as "grammar"
+    // the tense map remembers the rule it was opened from (and keeps it on a way back from that rule)
+    if (name === 'tenses') tensesFrom = lastName === 'rule' ? lastRule : lastName === 'grammar' ? '' : tensesFrom;
+    if (name === 'grammar' && a) lastRule = a;
     lastName = !name ? 'home' : name === 'grammar' && a ? 'rule' : name;
     if ('speechSynthesis' in window) speechSynthesis.cancel();
     if (recognition) recognition.abort();
