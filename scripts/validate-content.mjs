@@ -129,7 +129,7 @@ for (const id of Object.keys(EXPLAIN)) if (!GRAMMAR.some(g => g.id === id)) erro
   const kf = 'js/kids-data.js';
   const kctx = vm.createContext({});
   try {
-    vm.runInContext(fs.readFileSync(path.join(root, kf), 'utf8') + ';this.K = { KIDS_THEMES, KIDS_WORDS, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE, KIDS_RIDDLES, KIDS_MOVES, KIDS_WORDS, KIDS_HOLIDAYS, KIDS_PAIRS, KIDS_TIPS, KIDS_CVC, KIDS_SAYS, KIDS_PATH, KIDS_SIMON, KIDS_TWINS, KIDS_RHYMES, KIDS_WEAR, KIDS_QOTD, KIDS_SHAPE_HUNT, KIDS_MORNING };', kctx, { filename: kf });
+    vm.runInContext(fs.readFileSync(path.join(root, kf), 'utf8') + ';this.K = { KIDS_THEMES, KIDS_WORDS, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE, KIDS_RIDDLES, KIDS_MOVES, KIDS_WORDS, KIDS_HOLIDAYS, KIDS_PAIRS, KIDS_TIPS, KIDS_CVC, KIDS_SAYS, KIDS_PATH, KIDS_SIMON, KIDS_TWINS, KIDS_RHYMES, KIDS_WEAR, KIDS_QOTD, KIDS_SHAPE_HUNT, KIDS_MORNING, KIDS_FEEL_STORIES };', kctx, { filename: kf });
     loaded.push(kf);
     const { KIDS_THEMES, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE } = kctx.K;
     const ids = new Set(), stickers = new Set(KIDS_TREASURE);
@@ -178,6 +178,8 @@ for (const id of Object.keys(EXPLAIN)) if (!GRAMMAR.some(g => g.id === id)) erro
     for (const q of kctx.K.KIDS_QOTD) if (!hasEn(q.en) || !hasHe(q.he) || q.answers.length !== 3 || q.answers.some(a => !str(a.pic) || !hasEn(a.en))) errors.push(`kids question of the day "${q.en}": needs English, Hebrew and 3 picture answers`);
     for (const [shape, s] of Object.entries(kctx.K.KIDS_SHAPE_HUNT)) if (!hasHe(s.he) || s.things.length < 3 || s.things.some(([en, pic]) => !hasEn(en) || !str(pic))) errors.push(`kids shape hunt "${shape}": needs Hebrew and at least 3 things with a picture`);
     for (const m of kctx.K.KIDS_MORNING) if (!hasEn(m.en) || !hasHe(m.he) || !str(m.pic)) errors.push(`kids morning step "${m.en}": needs English, Hebrew and a picture`);
+    const feelWords = (kctx.K.KIDS_THEMES.find(t => t.id === 'feelings') || { words: [] }).words.map(w => w.en);
+    for (const f of kctx.K.KIDS_FEEL_STORIES) if (!hasEn(f.en) || !hasHe(f.he) || !feelWords.includes(f.feel) || !hasHe(f.kindHe)) errors.push(`kids feelings story "${f.en}": needs English, Hebrew and a feeling from the feelings island`);
     for (const sg of KIDS_SONGS) if (!sg.lines.length || sg.lines.some(l => !l.length)) errors.push(`kids song "${sg.id}": empty line`);
     console.log(`kids          ${String(KIDS_THEMES.length).padStart(2)} islands · ${String(ids.size).padStart(3)} words ·  ${KIDS_STORIES.length} stories ·  ${KIDS_SONGS.length} songs`);
   } catch (e) { errors.push(`${kf}: does not run: ${e.message}`); }

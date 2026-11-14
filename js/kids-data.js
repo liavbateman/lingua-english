@@ -572,3 +572,13 @@ const KIDS_MORNING = [
   ['get dressed', 'מתלבשים', '👕'], ['eat breakfast', 'אוכלים ארוחת בוקר', '🥣'], ['put on your shoes', 'נועלים נעליים', '👟'],
   ['go to school', 'הולכים לגן או לבית הספר', '🎒']
 ].map(([en, he, pic]) => ({ en, he, pic }));
+
+// How does the bear feel? Little situations, the feeling word, and something kind to do about it
+const KIDS_FEEL_STORIES = [
+  { scene: '🐻🍦⬇️', en: "Oh no! The bear's ice cream fell down.", he: 'אוי! הגלידה של הדוב נפלה.', feel: 'sad', face: '😢', kind: "Let's give the bear a hug!", kindHe: 'בואו ניתן לדוב חיבוק', kpic: '🤗' },
+  { scene: '🐰🎁🎂', en: 'The bunny gets a big present for her birthday.', he: 'הארנבת מקבלת מתנה גדולה ליום ההולדת.', feel: 'happy', face: '😀', kind: 'Happy birthday, bunny!', kindHe: 'יום הולדת שמח, ארנבת!', kpic: '🎉' },
+  { scene: '🐶⚡🌩️', en: 'Boom! There is a big storm. The puppy hides.', he: 'בום! יש סערה גדולה. הכלבלב מתחבא.', feel: 'scared', face: '😨', kind: "It's OK, puppy. We are here.", kindHe: 'הכול בסדר, כלבלב. אנחנו פה.', kpic: '💛' },
+  { scene: '🐱🧱🏰💥', en: 'The cat built a tower. The dog knocked it down!', he: 'החתולה בנתה מגדל. הכלב הפיל אותו!', feel: 'angry', face: '😠', kind: "Take a deep breath, cat. Let's build again.", kindHe: 'נושמים עמוק, חתולה. בונים שוב.', kpic: '🌬️' },
+  { scene: '🐨🏃‍♂️🌙', en: 'The koala played all day. Now it is night.', he: 'הקואלה שיחקה כל היום. עכשיו לילה.', feel: 'tired', face: '😴', kind: 'Good night, koala. Sleep well.', kindHe: 'לילה טוב, קואלה. שינה טובה.', kpic: '🛏️' },
+  { scene: '🐸🎈🐘', en: 'The frog opens the door and sees... an elephant!', he: 'הצפרדע פותחת את הדלת ורואה... פיל!', feel: 'surprised', face: '😮', kind: 'Wow! Hello, elephant!', kindHe: 'וואו! שלום, פיל!', kpic: '👋' }
+];

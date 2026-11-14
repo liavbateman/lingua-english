@@ -149,6 +149,7 @@ const Kids = (() => {
       rsRec: 'הקלטה', rsStop: 'עצירה', rsPlay: 'השמעה', rsDel: 'מחיקה', rsCount: '{n} מתוך {m} עמודים', rsNoMic: 'אין גישה למיקרופון בדפדפן הזה',
       rsVoice: 'הקול של אמא ואבא', rsRobot: 'קול הינשוף',
       cbw: 'צובעים לפי מילה', cbwSub: 'קוראים את שם הצבע על כל חלק בתמונה וצובעים', cbwTip: 'קראו את המילה על החלק, בחרו את הצבע ולחצו על החלק',
+      feelst: 'איך הוא מרגיש?', feelstSub: 'סיפורים קטנים על רגשות: עצוב, שמח, מפחד, כועס', feelstTip: 'הקשיבו לסיפור. איך החבר מרגיש?', feelstFace: 'הסתכלו על הפנים',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -291,6 +292,7 @@ const Kids = (() => {
       rsRec: 'Record', rsStop: 'Stop', rsPlay: 'Play', rsDel: 'Delete', rsCount: '{n} of {m} pages', rsNoMic: 'No microphone access in this browser',
       rsVoice: "Mum and dad's voice", rsRobot: "Owl's voice",
       cbw: 'Colour by word', cbwSub: 'Read the colour word on each part of the picture and paint it', cbwTip: 'Read the word on the part, pick that colour and tap the part',
+      feelst: 'How do they feel?', feelstSub: 'Little stories about feelings: sad, happy, scared, angry', feelstTip: 'Listen to the story. How does the friend feel?', feelstFace: 'Look at the face',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -739,6 +741,11 @@ const Kids = (() => {
           <span class="grow"><b>${kt('cbw')}</b><small>${kt('cbwSub')}</small></span>
           ${Store.kidsHasSticker('cbw') ? starsHtml(Store.kidsStars('cbw'), 'sm') : ''}
         </a>`}
+        <a class="k-abc-card k-feelst-card" href="#/kids/feelst">
+          <span class="k-story-books" aria-hidden="true">🤗</span>
+          <span class="grow"><b>${kt('feelst')}</b><small>${kt('feelstSub')}</small></span>
+          ${Store.kidsHasSticker('feelst') ? starsHtml(Store.kidsStars('feelst'), 'sm') : ''}
+        </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
           <span class="grow"><b>${kt('songs')}</b><small>${kt('songsSub')}</small></span>
@@ -3831,6 +3838,81 @@ const Kids = (() => {
     }
   }
 
+  // ---------- how do they feel? feelings in little stories ----------
+  // A tiny situation ("The bear's ice cream fell down."), then "How does the bear feel?" with feeling
+  // faces. After the answer the owl says it in a sentence and shows something kind to do: empathy + words.
+  function feelStoryGame() {
+    document.body.classList.add('in-lesson');
+    const feels = (KIDS_THEMES.find(t => t.id === 'feelings') || { words: [] }).words;
+    const faceOf = en => (feels.find(w => w.en === en) || {}).pic;
+    const rounds = K.shuffle(KIDS_FEEL_STORIES).slice(0, 5);
+    let at = 0, firstTry = 0;
+    function round() {
+      K.lessonBar(at / rounds.length);
+      const r = rounds[at];
+      const who = r.en.match(/The (\w+)/) ? r.en.match(/The (\w+)/)[1] : 'friend';
+      const opts = K.shuffle([r.feel, ...K.shuffle(KIDS_FEEL_STORIES.map(x => x.feel).filter(f => f !== r.feel)).slice(0, little() ? 1 : 2)]);
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🤗</span> ${kt('feelst')} · ${at + 1}/${rounds.length}</p>
+          <div class="k-card k-page">
+            <div class="k-scene" aria-hidden="true">${r.scene}</div>
+            <p class="k-sentence en" lang="en">${r.en}</p>
+            <p class="k-he he" lang="he">${r.he}</p>
+          </div>
+          <p class="k-tip en" lang="en">How does the ${who} feel?</p>
+          <div class="k-opts">${opts.map(f => `<button class="k-opt k-rh-opt" data-f="${f}" aria-label="${f}"><span aria-hidden="true">${faceOf(f) || ''}</span><small class="en">${f}</small></button>`).join('')}</div>
+          ${owl(kt('feelstTip'), 'small')}
+        </div>`;
+      setTimeout(() => say([['en', r.en], ['en', `How does the ${who} feel?`]], 0.85), 300);
+      K.view.querySelectorAll('.k-opt').forEach(b => {
+        b.onclick = () => {
+          if (b.dataset.f === r.feel) {
+            K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; });
+            b.classList.add('right');
+            K.Feel.right();
+            if (!missed) firstTry++;
+            const w = feels.find(x => x.en === r.feel);
+            if (w && !missed) Store.kidsWordRight(w.id);
+            owlMood(r.feel === 'happy' || r.feel === 'surprised' ? 'cheer' : 'love');
+            $('.k-scene').textContent = r.scene.replace(/^(\S+)/u, m => m) + ' ' + r.face;
+            $('.k-tip').innerHTML = `<b>The ${who} is ${r.feel}.</b> <span aria-hidden="true">${r.kpic}</span> ${r.kind}`;
+            $('.k-bubble').textContent = `${r.kindHe} ${r.kpic}`;
+            say([['en', `Yes. The ${who} is ${r.feel}.`], ['en', r.kind]], 0.85);
+            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 4200);
+          } else {
+            missed = true;
+            K.Feel.wrong(b);
+            owlMood('think');
+            // the face appears as a hint: feelings are read in faces
+            $('.k-scene').textContent = `${r.scene} ${r.face}`;
+            $('.k-bubble').textContent = `${kt('feelstFace')} ${r.face}`;
+            sayEn(`Hmm. Look at the face.`, 0.85);
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = firstTry >= 5 ? 3 : firstTry >= 3 ? 2 : 1;
+      Store.kidsFinish('feelst', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🤗 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('You are a kind friend!', 0.9);
+      $('#k-again').onclick = feelStoryGame;
+    }
+    round();
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -5903,6 +5985,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'feelst') feelStoryGame();
       else if (a === 'cbw') cbwGame();
       else if (a === 'peekaboo') peekabooGame();
       else if (a === 'morning') morningGame();
