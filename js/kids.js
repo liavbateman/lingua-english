@@ -43,6 +43,7 @@ const Kids = (() => {
       sayDrag: 'גררו כל מילה לתמונה שלה',
       songs: 'שירים', songsSub: 'שרים ומדקלמים יחד עם הינשוף', listenSong: 'הקשיבו', singAlong: 'שירו איתי', singTip: 'עכשיו אתם! הינשוף שר בשקט',
       stop: 'עצור',
+      sfx: 'צלילי משחק',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -79,6 +80,7 @@ const Kids = (() => {
       sayDrag: 'Drag each word to its picture',
       songs: 'Songs', songsSub: 'Sing and chant with the owl', listenSong: 'Listen', singAlong: 'Sing along', singTip: 'Your turn! The owl sings quietly',
       stop: 'Stop',
+      sfx: 'Game sounds',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -121,6 +123,7 @@ const Kids = (() => {
   // A soft "pop" for a balloon: a short falling tone and a puff of noise (quiet; silence is fine too)
   let actx = null;
   function popSound() {
+    if (!Store.kidsSfx) return;
     try {
       actx = actx || new (window.AudioContext || window.webkitAudioContext)();
       if (actx.state === 'suspended') actx.resume();
@@ -164,6 +167,35 @@ const Kids = (() => {
     return words.some(x => dist(t, x) <= allow || (t.length >= 4 && x.length >= 3 && t.slice(0, 3) === x.slice(0, 3))) || dist(t, h) <= allow;
   }
 
+  // ---------- game sounds: soft, short and quiet (a tap, a flip, a sparkle, a happy jingle) ----------
+  const Sfx = (() => {
+    function tone(freq, at, len, vol = .08, type = 'sine', slide = 0) {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === 'suspended') actx.resume();
+      const t = actx.currentTime + at, o = actx.createOscillator(), g = actx.createGain();
+      o.type = type;
+      o.frequency.setValueAtTime(freq, t);
+      if (slide) o.frequency.exponentialRampToValueAtTime(freq * slide, t + len);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol, t + .008);
+      g.gain.exponentialRampToValueAtTime(.0001, t + len);
+      o.connect(g).connect(actx.destination);
+      o.start(t); o.stop(t + len + .02);
+    }
+    const play = fn => { if (!Store.kidsSfx) return; try { fn(); } catch (e) { /* no sound is fine */ } };
+    return {
+      tap: () => play(() => tone(660, 0, .07, .05, 'triangle', 1.4)),
+      flip: () => play(() => tone(420, 0, .12, .06, 'triangle', 1.8)),
+      whoosh: () => play(() => tone(300, 0, .22, .04, 'sine', 3)),
+      // a little "ta-da": four rising notes and a bright chord
+      jingle: () => play(() => {
+        [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, i * .11, .25, .07, 'triangle'));
+        [1046.5, 1318.5, 1568].forEach(f => tone(f, .46, .6, .045, 'sine'));
+      }),
+      star: n => play(() => tone(880 * Math.pow(1.26, n), 0, .3, .06, 'sine'))
+    };
+  })();
+
   const BALLOONS = ['#ff5d8f', '#3fa7ff', '#ffc93c', '#2fd093', '#b98cff'];
 
   // ---------- the owl buddy ----------
@@ -195,6 +227,7 @@ const Kids = (() => {
             <div class="k-bubble" role="status">${Store.kidsStickerCount ? kt('pick') : kt('hi')}</div>
           </div>
           <div class="k-chips">
+            <button class="k-chip k-sfx" id="k-sfx" aria-pressed="${Store.kidsSfx}" aria-label="${kt('sfx')}">${Store.kidsSfx ? '🔊' : '🔇'}</button>
             <span class="k-chip star"><b>★ ${Store.kidsTotalStars}</b> ${kt('stars')}</span>
             <a class="k-chip sticker" href="#/kids/stickers"><b>🎁 ${Store.kidsStickerCount}/${KIDS_THEMES.length}</b> ${kt('stickers')}</a>
           </div>
@@ -243,6 +276,12 @@ const Kids = (() => {
         <button class="k-parents" id="k-parents"><span aria-hidden="true">👪</span> ${kt('parents')}</button>
       </div>`;
     $('#k-parents').onclick = () => gate(() => { location.hash = '#/kids/parents'; });
+    $('#k-sfx').onclick = () => {
+      Store.kidsSfx = !Store.kidsSfx;
+      $('#k-sfx').textContent = Store.kidsSfx ? '🔊' : '🔇';
+      $('#k-sfx').setAttribute('aria-pressed', String(Store.kidsSfx));
+      Sfx.tap();
+    };
     const chest = $('#k-chest');
     if (chest) chest.onclick = () => openChest(chest);
     K.view.querySelectorAll('.k-isle.locked .k-isle-btn').forEach(a => {
@@ -338,7 +377,7 @@ const Kids = (() => {
         garden(grown);
         const head = $('.k-sub');
         if (head) head.textContent = `💧 ${kt('watered')}${grown.length ? ' ' + kt('grew', { n: grown.length }) + ' 🌱' : ''}`;
-        K.confetti('kids');
+        K.confetti('kids'); Sfx.jingle();
         sayEn('Your garden is happy!', 0.9);
       }, 30);
     }
@@ -351,6 +390,7 @@ const Kids = (() => {
   // song with the voice quiet, so the child sings it.
   const SCALE = [523.25, 587.33, 659.25, 783.99, 880, 1046.5];   // C major pentatonic
   function note(freq, len = .35) {
+    if (!Store.kidsSfx) return;
     try {
       actx = actx || new (window.AudioContext || window.webkitAudioContext)();
       if (actx.state === 'suspended') actx.resume();
@@ -566,7 +606,7 @@ const Kids = (() => {
           <a class="k-btn" href="#/kids/stories">📚 ${kt('stories')}</a>
           <button class="k-btn ghost" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
         </div>`;
-      K.confetti('kids');
+      K.confetti('kids'); Sfx.jingle();
       sayEn('The end! Great reading!', 0.9);
       $('#k-again').onclick = () => story(id);
     }
@@ -739,7 +779,7 @@ const Kids = (() => {
     const item = pickOne(fresh.length ? fresh : KIDS_TREASURE);
     if (!Store.kidsOpenTreasure(item)) return;
     K.Feel.right();
-    K.confetti('kids');
+    K.confetti('kids'); Sfx.jingle();
     const back = document.createElement('div');
     back.className = 'k-reveal';
     back.setAttribute('role', 'dialog');
@@ -1094,6 +1134,7 @@ const Kids = (() => {
           const i = +b.dataset.i, c = cards[i];
           if (busy || b.classList.contains('up')) return;
           b.classList.add('up');
+          Sfx.flip();
           b.setAttribute('aria-label', c.side === 'pic' ? c.w.en + ' 🖼️' : c.w.en);
           sayEn(c.w.en);
           open.push({ b, c });
@@ -1138,8 +1179,9 @@ const Kids = (() => {
           <button class="k-btn" id="k-map">${kt('backToMap')}</button>
           <button class="k-btn ghost" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
         </div>`;
-      K.confetti('kids');
+      K.confetti('kids'); Sfx.jingle();
       K.Feel.right();
+      for (let n = 0; n < stars; n++) setTimeout(() => Sfx.star(n), 450 + n * 250);
       sayEn(stars === 3 ? 'Amazing! Great job!' : 'Great job!', 0.9);
       $('#k-map').onclick = () => { location.hash = '#/kids'; };
       $('#k-again').onclick = () => play(id);
@@ -1260,7 +1302,7 @@ const Kids = (() => {
           <a class="k-btn" href="#/kids/abc">ABC</a>
           <button class="k-btn ghost" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
         </div>`;
-      K.confetti('kids');
+      K.confetti('kids'); Sfx.jingle();
       sayEn(stars === 3 ? 'Amazing! Great job!' : 'Great job!', 0.9);
       $('#k-again').onclick = abcGame;
     }
@@ -1302,7 +1344,15 @@ const Kids = (() => {
   }
 
   return {
-    init(helpers) { K = helpers; },
+    init(helpers) {
+      K = helpers;
+      // a soft tap on the kids world's buttons and cards (answers have their own sounds)
+      document.addEventListener('click', e => {
+        if (!document.body.classList.contains('kids')) return;
+        const el = e.target.closest('.k-btn, .k-isle-btn, .k-abc-card, .k-chip:not(.k-sfx), .k-back, .k-letter, .k-book, .k-ward-item, .k-note, .k-plant, .k-parents, .k-skip, .k-chest-card, #k-pic, #k-letter, .k-chip-word, .k-target-pic');
+        if (el) Sfx.tap();
+      }, true);
+    },
     // First meeting: the owl greets the child (Hebrew when there is a Hebrew voice, then English)
     hello() { say([['he', 'היי! אני הינשוף. בואו נלמד אנגלית ביחד!'], ['en', "Hello! Let's play!"]]); },
     show(a, b) {

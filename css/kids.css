@@ -476,3 +476,7 @@ a.k-btn { text-decoration: none; text-align: center; }
 .k-note.lit, .k-note.hit { background: var(--kc); color: #fff; transform: translateY(-8px) scale(1.12); }
 .k-note.hit { animation: k-boing .5s var(--ease-pop); }
 .k-song + .k-story-nav { margin-top: 14px; }
+
+/* game sounds on / off */
+.k-sfx { border: 0; cursor: pointer; font-size: 1.1rem; padding: 8px 12px; }
+.k-sfx[aria-pressed="false"] { opacity: .7; }
