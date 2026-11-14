@@ -2155,3 +2155,10 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
    splits into pieces that read out of order */
 .why-ex { display: block; margin-top: 3px; }
 html[dir="rtl"] .why-ex { text-align: right; }
+
+/* Path labels: the English part of a rule name ("should / must / have to / might") takes a line of its own
+   under the Hebrew, in reading order; a long one ends in an ellipsis instead of being cut at the edge
+   (the full name is on the rule's card and page), and the label stays two lines so it never meets the next node */
+.plabel bdi:only-of-type:last-child { display: block; font-size: .74rem; font-weight: 600; letter-spacing: -.01em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.plabel bdi.nw:not(:only-of-type) { white-space: normal; }   /* labels with several English parts wrap rather than run past the edge */

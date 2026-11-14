@@ -164,7 +164,8 @@
   // English phrases inside a Hebrew sentence: keep each one as a single left-to-right unit,
   // so commas, quotes and brackets around it stay where the Hebrew sentence puts them.
   // A colon inside the phrase stays with it ("to be: am / is / are"); one at its end stays with the Hebrew.
-  const heMix = text => text.replace(/[A-Za-z](?:[A-Za-z0-9 ,'’\/\-…?!:]*[A-Za-z0-9?!…])?/g,
+  // an English run may end in a hyphen ("every-") when no letter follows it, so the hyphen stays with its word
+  const heMix = text => text.replace(/[A-Za-z](?:[A-Za-z0-9 ,'’\/\-…?!:]*[A-Za-z0-9?!…])?(?:-(?![A-Za-z\u0590-\u05FF]))?/g,
     m => `<bdi dir="ltr"${m.length <= 30 ? ' class="nw"' : ''}>${m}</bdi>`);
 
   // Names shown in the current interface language
