@@ -334,6 +334,8 @@
     const streak = Store.streak;
     const msg = !left ? t('today.done')
       : !activeToday && streak ? t(streak === 1 ? 'today.risk.one' : 'today.risk', { n: streak })
+      // back after a break (learned before, streak gone): a warm welcome instead of "starts a new streak"
+      : !activeToday && Store.xp > 0 ? t('today.back')
       : !activeToday ? t('today.start')
       : left === 1 ? t('today.left1') : t('today.left', { n: left });
     const C = 2 * Math.PI * 26;
