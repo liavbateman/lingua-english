@@ -125,6 +125,8 @@ const Kids = (() => {
       talkRead: 'הינשוף מספר על התמונה', talkClear: 'חדר חדש',
       band: 'להקת החיות', bandSub: 'מוסיפים חיות ללהקה וכל אחת שרה בקצב: moo! woof!', bandTip: 'לחצו על חיה כדי להוסיף אותה ללהקה. לחיצה על הבמה מוציאה',
       bandPlay: 'לנגן', bandStop: 'עצור',
+      prBtn: 'דף עבודה להדפסה', prTitle: 'דף ציור ועקיבה', prSub: 'המילים של השבוע: מציירים את התמונה בריבוע ועוברים בעיפרון על המילה',
+      prPrint: 'הדפסה', prNew: 'מילים אחרות', prName: 'Name', prDraw: 'Draw it!',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -243,6 +245,8 @@ const Kids = (() => {
       talkRead: 'The owl tells the picture', talkClear: 'New room',
       band: 'Animal band', bandSub: 'Add animals to the band; each one sings on the beat: moo! woof!', bandTip: 'Tap an animal to add it to the band. Tap it on the stage to take it out',
       bandPlay: 'Play', bandStop: 'Stop',
+      prBtn: 'Practice page to print', prTitle: 'Draw and trace page', prSub: "This week's words: draw the picture in the box and trace the word with a pencil",
+      prPrint: 'Print', prNew: 'Other words', prName: 'Name', prDraw: 'Draw it!',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -2684,6 +2688,46 @@ const Kids = (() => {
     drawStage();
   }
 
+  // ---------- a practice page to print: draw it and trace the word (off-screen practice) ----------
+  // Six of this week's words (else known words), each with a small picture, an empty box to draw it in
+  // and the English word in outline letters to trace. Reached from the parents corner only.
+  function printPage(shuffle) {
+    K.endLesson();
+    if (Date.now() >= gateUntil) { location.hash = '#/kids'; return; }
+    // things a child can draw (animals, food, toys...), one short word each
+    const DRAW = ['animals', 'food', 'family', 'body', 'toys', 'go', 'clothes', 'sky', 'home', 'shapes', 'school'];
+    const one = w => DRAW.includes(String(w.id).split('/')[0]) && !/\s/.test(w.en) && w.en.length <= 9;
+    const week = Store.kidsWeek().words.filter(one);
+    const known = KIDS_WORDS.filter(w => Store.kidsWordCount(w.id) > 0).filter(one);
+    let pool = week.length >= 6 ? week : [...week, ...known.filter(w => !week.includes(w))];
+    if (pool.length < 6) pool = [...pool, ...KIDS_WORDS.filter(one).filter(w => !pool.includes(w))];
+    const words = (shuffle ? K.shuffle(pool) : pool.slice(-6)).slice(0, 6);
+    const me = Store.kidsProfiles.find(p => p.active) || {};
+    K.view.innerHTML = `
+      <div class="k-wrap k-print">
+        <a class="k-back k-noprint" href="#/kids/parents"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('pcTitle')}</a>
+        <h1 class="k-title k-noprint">🖍️ ${kt('prTitle')}</h1>
+        <p class="k-sub k-noprint">${kt('prSub')}</p>
+        <div class="k-noprint k-print-btns">
+          <button class="k-btn" id="k-pr-go">🖨️ ${kt('prPrint')}</button>
+          <button class="k-btn ghost" id="k-pr-new">🔀 ${kt('prNew')}</button>
+        </div>
+        <section class="k-print-sheet" dir="ltr" lang="en">
+          <header><b>🦉 My English words</b><span>${kt('prName')}: ${me.name && /^[A-Za-z]/.test(me.name) ? esc(me.name) : '________________'}</span></header>
+          <div class="k-print-grid">${words.map(w => `
+            <div class="k-print-cell">
+              <span class="k-print-pic" aria-hidden="true">${w.pic}</span>
+              <div class="k-print-draw"><small>${kt('prDraw')}</small></div>
+              <p class="k-print-word">${w.en}</p>
+              <p class="k-print-he" lang="he" dir="rtl">${w.he}</p>
+            </div>`).join('')}</div>
+          <footer>Lingua Kids · ${new Date().toLocaleDateString('en-GB')}</footer>
+        </section>
+      </div>`;
+    $('#k-pr-go').onclick = () => window.print();
+    $('#k-pr-new').onclick = () => printPage(true);
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -3183,6 +3227,7 @@ const Kids = (() => {
         </section>
         ${remindBox()}
         ${weekBox()}
+        <a class="k-btn ghost" href="#/kids/print">🖍️ ${kt('prBtn')}</a>
         <button class="k-btn ghost" id="k-card">🖼️ ${kt('cardBtn')}</button>
         ${voiceBox()}
         <p class="k-pc-tip">💡 ${kt('pcTip')}</p>
@@ -4679,6 +4724,7 @@ const Kids = (() => {
       document.body.classList.toggle('kids-big', Store.kidsBigPrint);
       document.body.classList.toggle('kids-little', little());
       if (a === 'parents') return parents();
+      if (a === 'print') return printPage();
       if (overLimit()) return rest();   // checked between screens, never in the middle of a game
       if (a === 'play') play(b);
       else if (a === 'stickers') stickers();

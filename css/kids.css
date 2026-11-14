@@ -1309,3 +1309,28 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
   font-size: 2rem; cursor: pointer; box-shadow: 0 4px 0 var(--k-edge); }
 .k-band-animal small { font: 700 .85rem var(--k-font); }
 @media (prefers-reduced-motion: reduce) { .k-band-seat.sing { animation: none; outline: 3px solid #ffe9a6; } }
+
+/* practice page to print */
+.k-print-btns { display: grid; gap: 8px; margin-bottom: 14px; }
+.k-print-sheet { padding: 16px; border-radius: 18px; background: #fff; color: #111; box-shadow: 0 6px 0 var(--k-edge); }
+.k-print-sheet header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; font: 700 1.1rem var(--k-font); }
+.k-print-sheet header span { font-weight: 400; }
+.k-print-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.k-print-cell { position: relative; padding: 8px; border: 2px dashed #bbb; border-radius: 14px; text-align: center; }
+.k-print-pic { position: absolute; top: 6px; left: 8px; font-size: 1.4rem; filter: grayscale(1); opacity: .7; }
+.k-print-draw { height: 96px; margin: 0 0 6px; border: 2px solid #ddd; border-radius: 10px; display: flex; align-items: flex-end; justify-content: flex-end; padding: 2px 6px; }
+.k-print-draw small { color: #bbb; font-size: .7rem; }
+.k-print-word { margin: 0; font: 700 2.2rem/1.1 var(--k-font); color: transparent; -webkit-text-stroke: 1.4px #888; letter-spacing: .06em;
+  background: repeating-linear-gradient(transparent 0 calc(1.1em - 2px), #ddd calc(1.1em - 2px) 1.1em); }
+.k-print-he { margin: 2px 0 0; font-size: .8rem; color: #666; }
+.k-print-sheet footer { margin-top: 10px; font-size: .75rem; color: #888; text-align: center; }
+@media print {
+  @page { size: A4; margin: 12mm; }
+  body { background: #fff !important; }
+  body * { visibility: hidden; }
+  .k-print-sheet, .k-print-sheet * { visibility: visible; }
+  .k-print-sheet { position: absolute; inset: 0 0 auto 0; box-shadow: none; padding: 0; }
+  .k-print-draw { height: 150px; }
+  .k-print-word { font-size: 3rem; }
+  .k-print-pic { filter: grayscale(1); }
+}
