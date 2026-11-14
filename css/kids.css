@@ -1333,7 +1333,8 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-band-seat.on { background: #fff; font-size: 2.6rem; opacity: 1; cursor: pointer; box-shadow: 0 4px 0 rgba(0, 0, 0, .2); }
 .k-band-seat.sing { animation: k-band-hop .5s var(--ease-pop); }
 @keyframes k-band-hop { 40% { transform: translateY(-14px) scale(1.12); } }
-.k-band-line { min-height: 1.6em; margin: 10px 0 4px; text-align: center; font: 700 1.5rem var(--k-font); color: #ffe9a6; }
+.k-band-line { min-height: 1.6em; margin: 10px 0 4px; text-align: center; font: 700 1.5rem var(--k-font); color: var(--k-ink); }
+body.kids.night .k-band-line { color: #ffe9a6; }
 .k-band-pick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 14px 0; direction: ltr; }
 .k-band-animal { display: flex; flex-direction: column; align-items: center; padding: 6px 2px; border: 0; border-radius: 18px; background: #fff; color: var(--k-ink);
   font-size: 2rem; cursor: pointer; box-shadow: 0 4px 0 var(--k-edge); }
@@ -1527,7 +1528,8 @@ body.kids .k-btn:disabled { opacity: .45; filter: grayscale(.6); box-shadow: non
 .k-mo-slot.done { background: #fff; }
 .k-mo-slot.now { outline: 3px dashed #e0457b; }
 .k-mo-slot.pop { animation: k-pop .45s var(--ease-pop) both; }
-.k-mo-last { margin: 12px 0 0; text-align: center; font: 700 1.25rem var(--k-font); color: #ffe9a6; }
+.k-mo-last { margin: 12px 0 0; text-align: center; font: 700 1.25rem var(--k-font); color: var(--k-ink); }
+body.kids.night .k-mo-last { color: #ffe9a6; }
 .k-morning-line.done { margin: 8px 0; }
 
 /* star of the week certificate */
@@ -1559,7 +1561,8 @@ body.kids .k-btn:disabled { opacity: .45; filter: grayscale(.6); box-shadow: non
 .k-pkb-hand.r { left: 50%; transform: translate(-4%, -50%); }
 .k-pkb-stage.open .k-pkb-hand.l { transform: translate(-210%, -50%) scaleX(-1) rotate(-20deg); }
 .k-pkb-stage.open .k-pkb-hand.r { transform: translate(110%, -50%) rotate(20deg); }
-.k-pkb-word { min-height: 1.4em; margin: 18px 0 6px; font: 700 2rem var(--k-font); color: #ffe9a6; }
+.k-pkb-word { min-height: 1.4em; margin: 18px 0 6px; font: 700 2rem var(--k-font); color: var(--k-ink); }
+body.kids.night .k-pkb-word { color: #ffe9a6; }   /* light text only on the dark night sky */
 .k-first { order: -1; }
 @media (prefers-reduced-motion: reduce) { .k-pkb-hand, .k-pkb-pic { transition: none; } }
 
@@ -1652,7 +1655,8 @@ body.kids .k-btn:disabled { opacity: .45; filter: grayscale(.6); box-shadow: non
 /* odd one out */
 .k-odd-grid { grid-template-columns: 1fr 1fr; }
 .k-opt.same { opacity: .55; }
-.k-odd-why { min-height: 2.8em; margin: 12px 0 0; text-align: center; font: 700 1.1rem var(--k-font); color: #ffe9a6; }
+.k-odd-why { min-height: 2.8em; margin: 12px 0 0; text-align: center; font: 700 1.1rem var(--k-font); color: var(--k-ink); }
+body.kids.night .k-odd-why { color: #ffe9a6; }
 
 /* shopping list */
 .k-slist-paper { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; padding: 10px 12px; border-radius: 8px 8px 18px 18px;

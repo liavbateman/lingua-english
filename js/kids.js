@@ -3854,7 +3854,10 @@ const Kids = (() => {
       const w = words[at];
       stage.classList.add('open');
       open = true;
-      const art = w.id && w.id.startsWith('family/') ? '' : (/^[aeiou]/.test(w.en) ? 'an ' : 'a ');
+      // names need no article (mom, dad, grandma, grandpa), nor do plurals and mass nouns (grapes, milk, bread);
+      // everything else gets a/an (a cat, an egg, a baby, a sister)
+      const NAMES = ['mom', 'dad', 'grandma', 'grandpa'];
+      const art = NAMES.includes(w.en) || isPlural(w.en) || MASS.includes(w.en) ? '' : (/^[aeiou]/.test(w.en) ? 'an ' : 'a ');
       $('#k-pkb-word').textContent = `Peekaboo! ${w.en[0].toUpperCase() + w.en.slice(1)}!`;
       popSound();
       owlMood('giggle');
@@ -3872,6 +3875,7 @@ const Kids = (() => {
     box.addEventListener('click', tap);
     box.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tap(); } });
     $('#k-pkb-pic').textContent = words[0].pic;
+    K.lessonBar(0);
     setTimeout(() => sayEn('Where is it?', 0.85), 300);
     function end() {
       K.endLesson(1);
