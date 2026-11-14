@@ -71,6 +71,20 @@ const KIDS_THEMES = [
     ]
   },
   {
+    // Whole little phrases, learned as chunks (the way children pick up a language)
+    id: 'phrases', title: 'Little phrases', he: 'משפטים קטנים', pic: '💬', color: '#d946ef', sticker: '🗨️',
+    words: [
+      { en: 'thank you', he: 'תודה', pic: '🙏' },
+      { en: 'please', he: 'בבקשה', pic: '🥺' },
+      { en: "I'm sorry", he: 'סליחה', pic: '😔' },
+      { en: 'I want water', he: 'אני רוצה מים', pic: '💧' },
+      { en: "I'm hungry", he: 'אני רעב', pic: '😋' },
+      { en: "let's play", he: 'בוא נשחק', pic: '🤾' },
+      { en: 'I love you', he: 'אני אוהב אותך', pic: '💖' },
+      { en: 'good night', he: 'לילה טוב', pic: '🌙' }
+    ]
+  },
+  {
     id: 'body', title: 'My body', he: 'הגוף שלי', pic: '✋', color: '#ffc93c', sticker: '⭐',
     words: [
       { en: 'eye', he: 'עין', pic: '👁️' },

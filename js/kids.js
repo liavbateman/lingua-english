@@ -169,9 +169,14 @@ const Kids = (() => {
     return d[a.length][b.length];
   }
   function closeEnough(target, heard) {
-    const t = clean(target), h = clean(heard);
+    const t = clean(target).replace(/\s+/g, ' '), h = clean(heard);
     if (!h) return false;
     if (h.includes(t)) return true;
+    if (t.includes(' ')) {   // a phrase: most of its words, each a little off at most
+      const want = t.split(' '), got = h.split(' ');
+      const found = want.filter(x => got.some(y => y === x || (x.length >= 4 && dist(x, y) <= 1))).length;
+      return found >= Math.ceil(want.length * 0.6);
+    }
     const words = h.split(' ');
     const allow = t.length >= 6 ? 2 : 1;
     return words.some(x => dist(t, x) <= allow || (t.length >= 4 && x.length >= 3 && t.slice(0, 3) === x.slice(0, 3))) || dist(t, h) <= allow;
@@ -910,7 +915,7 @@ const Kids = (() => {
           <p class="k-step"><span aria-hidden="true">👀</span> ${kt('meet')} · ${n + 1}/${words.length}</p>
           <button class="k-card k-meet" id="k-pic" aria-label="${w.en}">
             <span class="k-pic" aria-hidden="true">${w.pic}</span>
-            <span class="k-word en" lang="en">${w.en}</span>
+            <span class="k-word en ${w.en.length > 8 ? 'long' : ''}" lang="en">${w.en}</span>
             <span class="k-he he" lang="he">${w.he}</span>
             <span class="k-ear" aria-hidden="true">🔊</span>
           </button>
@@ -1191,7 +1196,7 @@ const Kids = (() => {
               <button class="k-mem" data-i="${i}" aria-label="?">
                 <span class="k-mem-in">
                   <span class="k-mem-back" aria-hidden="true">?</span>
-                  <span class="k-mem-face ${c.side}" aria-hidden="true">${c.side === 'pic' ? c.w.pic : c.w.en}</span>
+                  <span class="k-mem-face ${c.side} ${c.w.en.length > 8 ? 'long' : ''}" aria-hidden="true">${c.side === 'pic' ? c.w.pic : c.w.en}</span>
                 </span>
               </button>`).join('')}
           </div>
