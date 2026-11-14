@@ -219,3 +219,38 @@ const KIDS_STORIES = [
     ask: ['Who is the baby?', 'מי התינוקת?', ['👶', '👵', '👨']]
   }
 ];
+
+// Songs & chants: each line is a row of [word, picture]; the owl sings one word per note.
+// sing: what is spoken for that word (a letter's name, for the ABC)
+const KIDS_SONGS = [
+  {
+    id: 'numbers', title: 'Number song', he: 'שיר המספרים', pic: '🔢', color: '#3fa7ff',
+    lines: [
+      [['one', '1️⃣'], ['two', '2️⃣'], ['three', '3️⃣'], ['four', '4️⃣'], ['five', '5️⃣']],
+      [['six', '6️⃣'], ['seven', '7️⃣'], ['eight', '8️⃣'], ['nine', '9️⃣'], ['ten', '🔟']],
+      [['Yay!', '🎉']]
+    ]
+  },
+  {
+    id: 'colors', title: 'Rainbow song', he: 'שיר הקשת', pic: '🌈', color: '#ff5d8f',
+    lines: [
+      [['red', '🔴'], ['orange', '🟠'], ['yellow', '🟡']],
+      [['green', '🟢'], ['blue', '🔵'], ['purple', '🟣']],
+      [['a', '🌈'], ['rainbow!', '🌈']]
+    ]
+  },
+  {
+    id: 'abc', title: 'ABC chant', he: 'שיר ה-ABC', pic: '🔤', color: '#ffc93c',
+    lines: [
+      'ABCDEFG', 'HIJKLMNOP', 'QRSTUV', 'WXYZ'
+    ].map(row => row.split('').map(L => [L, L, KIDS_ABC.find(x => x.L === L).name]))
+  },
+  {
+    id: 'hello', title: 'Hello song', he: 'שיר השלום', pic: '👋', color: '#2fd093',
+    lines: [
+      [['Hello,', '👋'], ['hello,', '👋']],
+      [['how', '🙂'], ['are', '❓'], ['you?', '🫵']],
+      [["I'm", '😀'], ['fine,', '👍'], ['thank', '🙏'], ['you!', '💖']]
+    ]
+  }
+];

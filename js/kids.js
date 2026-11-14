@@ -41,6 +41,8 @@ const Kids = (() => {
       watered: 'הגינה שתתה!', grew: '{n} צמחים גדלו',
       drag: 'גררו את המילה לתמונה', dragTip: 'גררו כל מילה לתמונה שלה (או לחצו על מילה ואז על התמונה)',
       sayDrag: 'גררו כל מילה לתמונה שלה',
+      songs: 'שירים', songsSub: 'שרים ומדקלמים יחד עם הינשוף', listenSong: 'הקשיבו', singAlong: 'שירו איתי', singTip: 'עכשיו אתם! הינשוף שר בשקט',
+      stop: 'עצור',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -75,6 +77,8 @@ const Kids = (() => {
       watered: 'The garden had a drink!', grew: '{n} plants grew',
       drag: 'Drag the word to its picture', dragTip: 'Drag each word onto its picture (or tap a word, then the picture)',
       sayDrag: 'Drag each word to its picture',
+      songs: 'Songs', songsSub: 'Sing and chant with the owl', listenSong: 'Listen', singAlong: 'Sing along', singTip: 'Your turn! The owl sings quietly',
+      stop: 'Stop',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -197,6 +201,7 @@ const Kids = (() => {
         </div>
         <h1 class="sr-only">${kt('title')}</h1>
         ${chestCard()}
+        <div class="k-tiles">
         ${(() => {
           const g = Store.kidsGarden(), dry = g.filter(p => p.thirsty).length;
           return `<a class="k-abc-card k-garden-card ${dry ? 'dry' : ''}" href="#/kids/garden">
@@ -215,6 +220,11 @@ const Kids = (() => {
           <span class="grow"><b>${kt('abc')}</b><small>${kt('abcSub')}</small></span>
           ${Store.kidsHasSticker('abc') ? starsHtml(Store.kidsStars('abc'), 'sm') : ''}
         </a>
+        <a class="k-abc-card k-songs-card" href="#/kids/songs">
+          <span class="k-story-books" aria-hidden="true">🎵</span>
+          <span class="grow"><b>${kt('songs')}</b><small>${kt('songsSub')}</small></span>
+        </a>
+        </div>
         <ol class="k-map">
           ${KIDS_THEMES.map((th, i) => {
             const open = isOpen(i), done = Store.kidsHasSticker(th.id), cur = i === next;
@@ -333,6 +343,97 @@ const Kids = (() => {
       }, 30);
     }
     round();
+  }
+
+  // ---------- songs & chants ----------
+  // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
+  // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
+  // song with the voice quiet, so the child sings it.
+  const SCALE = [523.25, 587.33, 659.25, 783.99, 880, 1046.5];   // C major pentatonic
+  function note(freq, len = .35) {
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === 'suspended') actx.resume();
+      const now = actx.currentTime, o = actx.createOscillator(), g = actx.createGain();
+      o.type = 'sine';
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0, now);
+      g.gain.linearRampToValueAtTime(.16, now + .01);
+      g.gain.exponentialRampToValueAtTime(.0001, now + len);
+      o.connect(g).connect(actx.destination);
+      o.start(now); o.stop(now + len + .02);
+    } catch (e) { /* no sound is fine */ }
+  }
+  function songs() {
+    K.endLesson();
+    K.view.innerHTML = `
+      <div class="k-wrap">
+        <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
+        <h1 class="k-title">🎵 ${kt('songs')}</h1>
+        <p class="k-sub">${kt('songsSub')}</p>
+        <div class="k-books">
+          ${KIDS_SONGS.map(sg => `
+            <a class="k-book" href="#/kids/song/${sg.id}" style="--c:${sg.color}">
+              <span class="k-book-pic" aria-hidden="true">${sg.pic}</span>
+              <span class="k-book-title en">${sg.title}</span>
+              <span class="k-book-he">${sg.he}</span>
+            </a>`).join('')}
+        </div>
+      </div>`;
+  }
+  let songRun = 0;   // a newer play (or leaving the screen) stops the one before
+  function song(id) {
+    const sg = KIDS_SONGS.find(x => x.id === id);
+    if (!sg) { location.hash = '#/kids/songs'; return; }
+    K.endLesson();
+    document.body.style.setProperty('--kc', sg.color);
+    K.view.innerHTML = `
+      <div class="k-wrap k-play">
+        <a class="k-back" href="#/kids/songs"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('songs')}</a>
+        <h1 class="k-title en">${sg.pic} ${sg.title}</h1>
+        <div class="k-card k-song">
+          ${sg.lines.map((line, r) => `<div class="k-song-line">${line.map(([w, pic], i) => `
+            <button class="k-note" data-r="${r}" data-i="${i}"><span class="k-note-pic" aria-hidden="true">${pic}</span><span class="en">${w}</span></button>`).join('')}</div>`).join('')}
+        </div>
+        <div class="k-story-nav">
+          <button class="k-btn ghost" id="k-sing">🎤 ${kt('singAlong')}</button>
+          <button class="k-btn" id="k-play">🎵 ${kt('listenSong')}</button>
+        </div>
+        ${owl(kt('songsSub'), 'small')}
+      </div>`;
+    const notes = [...K.view.querySelectorAll('.k-note')];
+    const flat = sg.lines.flatMap(l => l);
+    const tune = flat.map((_, k) => SCALE[[0, 1, 2, 3, 4, 3, 2, 1][k % 8] + (k % 16 >= 8 ? 1 : 0)]);
+    notes.forEach((b, k) => { b.onclick = () => { note(tune[k]); sayEn(flat[k][2] || flat[k][0]); b.classList.remove('hit'); void b.offsetWidth; b.classList.add('hit'); }; });
+    const play = quiet => {
+      const run = ++songRun;
+      speechSynthesis.cancel();
+      $('.k-bubble').textContent = quiet ? kt('singTip') : '🎶';
+      let k = 0;
+      const next = () => {
+        if (run !== songRun || !document.body.contains(notes[0])) return;
+        notes.forEach(n => n.classList.remove('lit'));
+        if (k >= flat.length) { $('.k-owl').classList.add('happy'); K.Feel.right(); return; }
+        const b = notes[k], [w, , spoken] = flat[k];
+        b.classList.add('lit');
+        note(tune[k]);
+        const u = new SpeechSynthesisUtterance((spoken || w).replace(/[!?,]/g, ''));
+        u.lang = 'en-US';
+        if (enVoice) u.voice = enVoice;
+        u.rate = 0.9;
+        u.pitch = 1.3;
+        u.volume = quiet ? 0.25 : 1;
+        const lineEnd = k + 1 < flat.length && notes[k + 1].dataset.r !== b.dataset.r;
+        let moved = false;
+        const go = () => { if (moved) return; moved = true; k++; setTimeout(next, lineEnd ? 450 : 120); };
+        u.onend = go;
+        setTimeout(go, 1600);   // never wait forever for a voice that doesn't answer
+        if ('speechSynthesis' in window) speechSynthesis.speak(u); else setTimeout(go, 500);
+      };
+      next();
+    };
+    $('#k-play').onclick = () => play(false);
+    $('#k-sing').onclick = () => play(true);
   }
 
   // ---------- picture stories ----------
@@ -1206,6 +1307,7 @@ const Kids = (() => {
     hello() { say([['he', 'היי! אני הינשוף. בואו נלמד אנגלית ביחד!'], ['en', "Hello! Let's play!"]]); },
     show(a, b) {
       stopRec();
+      songRun++;   // a song still playing stops
       document.body.classList.add('kids');
       if (a === 'parents') return parents();
       if (overLimit()) return rest();   // checked between screens, never in the middle of a game
@@ -1215,6 +1317,8 @@ const Kids = (() => {
       else if (a === 'abcgame') abcGame();
       else if (a === 'owl') wardrobe();
       else if (a === 'stories') stories();
+      else if (a === 'songs') songs();
+      else if (a === 'song') song(b);
       else if (a === 'garden') garden();
       else if (a === 'water') water();
       else if (a === 'story') story(b);
