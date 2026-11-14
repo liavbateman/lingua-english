@@ -255,7 +255,9 @@
     const done = Store.tasks;
     const due = Store.dueWords().length;
     if (due && !done.review) return { href: '#/quiz/choice/review', icon: 'repeat', color: 'coral',
-      title: t(due === 1 ? 'cont.review.one' : 'cont.review', { n: due }), sub: t('cont.review.sub') };
+      // a review round holds 8 words, so the card promises one round, and says how many wait in all
+      title: t(due === 1 ? 'cont.review.one' : 'cont.review', { n: Math.min(due, 8) }),
+      sub: due > 8 ? t('cont.review.more', { n: due }) : t('cont.review.sub') };
     const wordUnits = levelUnits().filter(x => x.kind !== 'phrases');
     const u = wordUnits.find(x => Store.unitProgress(x).seen < x.words.length);
     if (u && !done.vocab) {
