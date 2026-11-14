@@ -5143,7 +5143,7 @@ const Kids = (() => {
             <span class="k-target en" lang="en">${q}</span>
             <span class="k-qhe" lang="he">${qhe}</span>
           </div>
-          <div class="k-opts">${shown.map((o, i) => `<button class="k-opt" data-i="${i}"><span aria-hidden="true">${o}</span></button>`).join('')}</div>
+          <div class="k-opts">${shown.map((o, i) => `<button class="k-opt" data-i="${i}" aria-label="${(KIDS_WORDS.find(w => w.pic === o) || { en: o }).en}"><span aria-hidden="true">${o}</span></button>`).join('')}</div>
           ${owl(kt('tapTip'), 'small')}
         </div>`;
       $('#k-say').onclick = () => sayEn(q);
@@ -5818,7 +5818,9 @@ const Kids = (() => {
       <small>${kt('advStep', { a: adv.at + 1, b: adv.steps.length })}</small></a>`;
   }
   function today(step) {
-    if (step === 'start' || !adv) adv = { steps: todayPlan(), at: 0 };
+    // reopened or refreshed on "next" with no adventure running: back to the map, never a surprise new adventure
+    if (step !== 'start' && !adv) { location.replace('#/kids'); return; }
+    if (step === 'start') adv = { steps: todayPlan(), at: 0 };
     else adv.at++;
     if (adv.at < adv.steps.length) { location.replace(adv.steps[adv.at].hash); return; }
     adv = null;
