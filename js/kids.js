@@ -4647,6 +4647,8 @@ const Kids = (() => {
             }
           } else if (!want.includes(w)) {
             misses++;
+            b.disabled = true;   // not on the list: greyed, one mistake
+            b.classList.add('nope');
             K.Feel.wrong(b);
             owlMood('think');
             $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${w.en}?</bdi> 🤔 ${kt('slistAgain')}`;
