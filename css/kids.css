@@ -933,3 +933,7 @@ body.kids-big .k-blend-tile { font-family: "Lexend", var(--k-font); }
 .k-says-card .k-says { font-size: 1.6rem; }
 .k-says-opt { font-size: 1.4rem; }
 .k-says { inset-inline-start: auto; left: 60%; top: 16px; }
+
+/* little kids (3-5): the task word is heard, not shown */
+body.kids-little .k-prompt .k-target { display: none; }
+body.kids-little .k-speaker { width: 120px; height: 120px; font-size: 3.6rem; }

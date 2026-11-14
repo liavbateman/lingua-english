@@ -89,6 +89,8 @@ const Kids = (() => {
       blend: 'מחברים צלילים', blendSub: 'שומעים צליל, ועוד צליל, ועוד אחד… איזו מילה יצאה?', blendTip: 'לחצו על כל אות לשמוע אותה, ואז בחרו את התמונה',
       blendGo: 'לחבר!',
       says: 'מה החיה אומרת?', saysTip: 'בחרו את הקול של החיה',
+      pcAge: 'גיל', pcAgeLittle: '3–5 · בלי קריאה', pcAgeBig: '6–9 · עם מילים כתובות',
+      pcAgeText: 'בגיל 3–5 המשחקים בנויים רק על תמונות וצלילים: בלי מילים כתובות במשימות, בלי גרירת מילים ובלי משחקי קריאה',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -171,6 +173,8 @@ const Kids = (() => {
       blend: 'Blend it!', blendSub: 'A sound, another sound, one more… which word is it?', blendTip: 'Tap each letter to hear it, then pick the picture',
       blendGo: 'Blend!',
       says: 'What does it say?', saysTip: 'Pick the sound the animal makes',
+      pcAge: 'Age', pcAgeLittle: '3–5 · no reading', pcAgeBig: '6–9 · with written words',
+      pcAgeText: 'At 3–5 the games use only pictures and sounds: no written words in the tasks, no word dragging and no reading games',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -231,6 +235,7 @@ const Kids = (() => {
     });
   }
   // Bedtime: from 7 in the evening until 6 in the morning the sky turns to night
+  const little = () => Store.kidsAge === 'little';
   const isNight = () => { const h = new Date().getHours(); return Store.kidsBedtime && (h >= 19 || h < 6); };
   const sayEn = (text, rate) => say([['en', text]], rate);
 
@@ -496,7 +501,7 @@ const Kids = (() => {
           <span class="grow"><b>${kt('pairs')}</b><small>${kt('pairsSub')}</small></span>
           ${Store.kidsHasSticker('pairs') ? starsHtml(Store.kidsStars('pairs'), 'sm') : ''}
         </a>
-        <a class="k-abc-card k-peek-card" href="#/kids/peek">
+        ${little() ? '' : `<a class="k-abc-card k-peek-card" href="#/kids/peek">
           <span class="k-story-books" aria-hidden="true">☁️</span>
           <span class="grow"><b>${kt('peek')}</b><small>${kt('peekSub')}</small></span>
           ${Store.kidsHasSticker('peek') ? starsHtml(Store.kidsStars('peek'), 'sm') : ''}
@@ -504,7 +509,7 @@ const Kids = (() => {
         <a class="k-abc-card k-speed-card" href="#/kids/speed">
           <span class="k-story-books" aria-hidden="true">⚡</span>
           <span class="grow"><b>${kt('speed')}</b><small>${Store.kidsSpeedBest ? kt('speedBest', { n: Store.kidsSpeedBest }) : kt('speedSub')}</small></span>
-        </a>
+        </a>`}
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
           <span class="grow"><b>${kt('songs')}</b><small>${kt('songsSub')}</small></span>
@@ -1612,6 +1617,13 @@ const Kids = (() => {
           <div><b>${kt('pcMin', { n: mins })}</b><span>${kt('pcToday')}</span></div>
         </div>
         <section class="k-pc-box">
+          <h2>🎂 ${kt('pcAge')}</h2>
+          <div class="k-pc-seg" role="radiogroup" aria-label="${kt('pcAge')}">
+            ${['little', 'big'].map(a => `<button role="radio" aria-checked="${Store.kidsAge === a}" class="k-age ${Store.kidsAge === a ? 'on' : ''}" data-age="${a}">${kt(a === 'little' ? 'pcAgeLittle' : 'pcAgeBig')}</button>`).join('')}
+          </div>
+          <p class="k-wk-line"><small>${kt('pcAgeText')}</small></p>
+        </section>
+        <section class="k-pc-box">
           <h2>${kt('pcLimit')}</h2>
           <div class="k-pc-seg" role="radiogroup" aria-label="${kt('pcLimit')}">
             ${limits.map(n => `<button role="radio" aria-checked="${Store.kidsLimit === n}" class="${Store.kidsLimit === n ? 'on' : ''}" data-n="${n}">${n ? kt('pcMin', { n }) : kt('pcOff')}</button>`).join('')}
@@ -1644,8 +1656,11 @@ const Kids = (() => {
         ${voiceBox()}
         <p class="k-pc-tip">💡 ${kt('pcTip')}</p>
       </div>`;
-    K.view.querySelectorAll('.k-pc-seg button').forEach(b => {
+    K.view.querySelectorAll('.k-pc-seg button[data-n]').forEach(b => {
       b.onclick = () => { Store.kidsLimit = +b.dataset.n; parents(); };
+    });
+    K.view.querySelectorAll('.k-age').forEach(b => {
+      b.onclick = () => { Store.kidsAge = b.dataset.age; document.body.classList.toggle('kids-little', little()); parents(); };
     });
     $('#k-mode').onchange = e => { Store.kidsMode = e.target.checked; };
     const share = $('#k-wk-share');
@@ -1929,10 +1944,10 @@ const Kids = (() => {
       ...words.map(w => ({ kind: 'meet', w })),
       ...order.slice(0, half).map(w => ({ kind: 'tap', w })),
       ...order.slice(half).map(w => ({ kind: 'pop', w })),
-      { kind: 'drag' },
+      ...(little() ? [] : [{ kind: 'drag' }]),
       ...(th.pairs ? K.shuffle(words).slice(0, 3).map(w => ({ kind: 'opp', w })) : []),
       ...(th.id === 'numbers' ? K.shuffle(words.slice(1, 8)).slice(0, 3).map(w => ({ kind: 'count', w })) : []),
-      ...K.shuffle(words.filter(w => w.says)).slice(0, 3).map(w => ({ kind: 'says', w })),
+      ...(little() ? [] : K.shuffle(words.filter(w => w.says)).slice(0, 3).map(w => ({ kind: 'says', w }))),
       ...(Rec() || canRecord() ? K.shuffle(words).slice(0, 2).map(w => ({ kind: 'say', w })) : []),
       { kind: 'match' }
     ];
@@ -2388,7 +2403,7 @@ const Kids = (() => {
     // Memory game: 4 pairs, each a picture card and a word card, face down
     function match() {
       const pairs = K.shuffle(words).slice(0, 4);
-      const cards = K.shuffle(pairs.flatMap(w => [{ w, side: 'pic' }, { w, side: 'word' }]));
+      const cards = K.shuffle(pairs.flatMap(w => [{ w, side: 'pic' }, { w, side: little() ? 'pic' : 'word' }]));
       let open = [], found = 0, busy = false;
       K.view.innerHTML = `
         <div class="k-wrap k-play">
@@ -2486,7 +2501,7 @@ const Kids = (() => {
         <h1 class="k-title">🔤 ${kt('abc')}</h1>
         <p class="k-sub">${kt('abcTip')}</p>
         <a class="k-btn" href="#/kids/abcgame"><span aria-hidden="true">🎮</span> ${kt('abcGame')}</a>
-        <a class="k-btn ghost" href="#/kids/blend"><span aria-hidden="true">🧩</span> ${kt('blend')}</a>
+        ${little() ? '' : `<a class="k-btn ghost" href="#/kids/blend"><span aria-hidden="true">🧩</span> ${kt('blend')}</a>`}
         <div class="k-letters">
           ${KIDS_ABC.map((x, i) => `<a class="k-letter" href="#/kids/abc/${x.L}" style="--c:${BALLOONS[i % BALLOONS.length]}" aria-label="${x.L}"><b>${x.L}</b><small>${x.L.toLowerCase()}</small>${Store.kidsHasTraced(x.L) ? '<i class="k-traced" aria-hidden="true">✍️</i>' : ''}</a>`).join('')}
         </div>
@@ -2793,6 +2808,7 @@ const Kids = (() => {
       document.body.classList.add('kids');
       document.body.classList.toggle('night', isNight());
       document.body.classList.toggle('kids-big', Store.kidsBigPrint);
+      document.body.classList.toggle('kids-little', little());
       if (a === 'parents') return parents();
       if (overLimit()) return rest();   // checked between screens, never in the middle of a game
       if (a === 'play') play(b);
@@ -2818,6 +2834,6 @@ const Kids = (() => {
       else map();
     },
     gate,
-    leave() { stopRec(); document.body.classList.remove('kids', 'night', 'kids-big'); document.body.style.removeProperty('--kc'); }
+    leave() { stopRec(); document.body.classList.remove('kids', 'night', 'kids-big', 'kids-little'); document.body.style.removeProperty('--kc'); }
   };
 })();
