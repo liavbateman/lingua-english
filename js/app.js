@@ -2768,7 +2768,7 @@
     if (name !== 'kids' && name !== 'home' && name) Kids.leave();
     document.body.classList.toggle('in-lesson', inLesson);
     if (inLesson) lessonBar(0);
-    else if (name !== 'x') lessonExit = location.hash || '#/';
+    else if (name !== 'x' && !(name === 'kids' && a === 'today')) lessonExit = location.hash || '#/';   // a kids adventure step is left back to the map, not restarted
     switch (name || 'home') {
       case 'home':
       case 'kids': refreshChrome('kids'); Kids.show(name === 'kids' ? a : '', b); break;

@@ -46,6 +46,9 @@ const Kids = (() => {
       sfx: 'צלילי משחק',
       trace: 'ציירו את האות', traceTip: 'עברו עם האצבע על האות', traceSmall: 'עכשיו האות הקטנה!', clear: 'מחק',
       sound: 'הצליל', traceBtn: 'לצייר',
+      today: 'משחקים היום!', todaySub: '{n} תחנות: {list}', advNext: 'לתחנה הבאה', advStep: 'תחנה {a} מתוך {b}',
+      advDone: 'סיימתם את ההרפתקה של היום!', advDoneSub: 'איזה כיף! הינשוף גאה בכם.', advTreasure: 'יש אוצר שמחכה לכם במפה 🎁',
+      stWater: 'גינה', stIsland: 'אי', stStory: 'סיפור', stAbc: 'אותיות',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -85,6 +88,9 @@ const Kids = (() => {
       sfx: 'Game sounds',
       trace: 'Trace the letter', traceTip: 'Trace over the letter with your finger', traceSmall: 'Now the small letter!', clear: 'Clear',
       sound: 'Sound', traceBtn: 'Trace',
+      today: 'Play today!', todaySub: '{n} stops: {list}', advNext: 'Next stop', advStep: 'Stop {a} of {b}',
+      advDone: "You finished today's adventure!", advDoneSub: 'So much fun! The owl is proud of you.', advTreasure: 'A treasure is waiting on the map 🎁',
+      stWater: 'garden', stIsland: 'island', stStory: 'story', stAbc: 'letters',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -237,6 +243,14 @@ const Kids = (() => {
           </div>
         </div>
         <h1 class="sr-only">${kt('title')}</h1>
+        ${(() => {
+          const plan = todayPlan();
+          return `<a class="k-today" href="#/kids/today/start">
+            <span class="k-today-go" aria-hidden="true">🚀</span>
+            <span class="grow"><b>${kt('today')}</b><small>${kt('todaySub', { n: plan.length, list: plan.map(p => p.icon).join(' ') })}</small></span>
+            <span class="k-today-arrow" aria-hidden="true">${isHe() ? '‹' : '›'}</span>
+          </a>`;
+        })()}
         ${chestCard()}
         <div class="k-tiles">
         ${(() => {
@@ -376,9 +390,17 @@ const Kids = (() => {
     }
     function end() {
       K.endLesson(1);
+      const fromAdv = adv && adv.steps[adv.at].hash === '#/kids/water';
       location.replace('#/kids/garden');   // back to the garden without a history step, plants that grew bounce
       setTimeout(() => {
         garden(grown);
+        if (fromAdv) {
+          const b = document.createElement('div');
+          b.innerHTML = `<a class="k-btn k-adv-next" href="#/kids/today/next">${adv.steps[adv.at + 1] ? adv.steps[adv.at + 1].icon : '🏆'} ${kt('advNext')}<small>${kt('advStep', { a: adv.at + 1, b: adv.steps.length })}</small></a>`;
+          $('.k-sub').after(b.firstChild);
+          const old = $('.k-allwet, a.k-btn[href="#/kids/water"]');
+          if (old) old.remove();
+        }
         const head = $('.k-sub');
         if (head) head.textContent = `💧 ${kt('watered')}${grown.length ? ' ' + kt('grew', { n: grown.length }) + ' 🌱' : ''}`;
         K.confetti('kids'); Sfx.jingle();
@@ -607,7 +629,8 @@ const Kids = (() => {
             ${starsHtml(stars, 'big pop')}
             ${res.better && !res.firstSticker ? `<b class="k-best">${kt('best')}</b>` : ''}
           </div>
-          <a class="k-btn" href="#/kids/stories">📚 ${kt('stories')}</a>
+          ${advButton()}
+          <a class="k-btn ${adv ? 'ghost' : ''}" href="#/kids/stories">📚 ${kt('stories')}</a>
           <button class="k-btn ghost" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
         </div>`;
       K.confetti('kids'); Sfx.jingle();
@@ -757,6 +780,48 @@ const Kids = (() => {
       </div>`;
     say([['he', kt('restTitle')], ['en', 'Good night!']]);
     $('#k-more').onclick = () => gate(() => { Store.kidsAddExtra(10); map(); });
+  }
+
+  // ---------- today's adventure ----------
+  // One button strings a short mixed session: thirsty garden words first (review), then the next
+  // island, then a story (or the letter game). Each step's end screen leads on to the next stop.
+  let adv = null;   // { steps: [{ hash, icon }], at }
+  function todayPlan() {
+    const plan = [];
+    if (Store.kidsGarden().some(p => p.thirsty)) plan.push({ hash: '#/kids/water', icon: '🌻', name: 'stWater' });
+    const isle = KIDS_THEMES.find((th, i) => isOpen(i) && !Store.kidsHasSticker(th.id))
+      || KIDS_THEMES.filter((th, i) => isOpen(i)).sort((a, b) => Store.kidsStars(a.id) - Store.kidsStars(b.id))[0];
+    plan.push({ hash: '#/kids/play/' + isle.id, icon: isle.pic, name: 'stIsland' });
+    const st = KIDS_STORIES.find(x => storyOpen(x) && !Store.kidsHasSticker('st-' + x.id));
+    plan.push(st ? { hash: '#/kids/story/' + st.id, icon: '📚', name: 'stStory' } : { hash: '#/kids/abcgame', icon: '🔤', name: 'stAbc' });
+    return plan;
+  }
+  // The end screen of a step shows this instead of "back to the map"
+  function advButton() {
+    if (!adv || adv.steps[adv.at].hash !== location.hash) return '';
+    const last = adv.at === adv.steps.length - 1;
+    return `<a class="k-btn k-adv-next" href="#/kids/today/next">${last ? '🏆' : adv.steps[adv.at + 1].icon} ${last ? kt('done') : kt('advNext')}
+      <small>${kt('advStep', { a: adv.at + 1, b: adv.steps.length })}</small></a>`;
+  }
+  function today(step) {
+    if (step === 'start' || !adv) adv = { steps: todayPlan(), at: 0 };
+    else adv.at++;
+    if (adv.at < adv.steps.length) { location.replace(adv.steps[adv.at].hash); return; }
+    adv = null;
+    K.endLesson();
+    const tr = Store.kidsTreasure;
+    K.view.innerHTML = `
+      <div class="k-wrap k-play k-end">
+        <div class="k-end-card">
+          <span class="k-sticker pop" aria-hidden="true">🏆</span>
+          <h1>${kt('advDone')}</h1>
+          <p class="k-unlock">${kt('advDoneSub')}</p>
+          ${tr.ready ? `<p class="k-unlock"><b>${kt('advTreasure')}</b></p>` : ''}
+        </div>
+        <a class="k-btn" href="#/kids">${kt('backToMap')}</a>
+      </div>`;
+    K.confetti('kids'); Sfx.jingle();
+    sayEn('Hooray! You did it!', 0.9);
   }
 
   // ---------- daily treasure ----------
@@ -1180,7 +1245,8 @@ const Kids = (() => {
               </div>` : res.better ? `<b class="k-best">${kt('best')}</b>` : ''}
             ${opened >= 0 ? `<p class="k-unlock">🔓 ${kt('nextIsland')} <span aria-hidden="true">${KIDS_THEMES[opened].pic}</span></p>` : ''}
           </div>
-          <button class="k-btn" id="k-map">${kt('backToMap')}</button>
+          ${advButton()}
+          <button class="k-btn ${adv ? 'ghost' : ''}" id="k-map">${kt('backToMap')}</button>
           <button class="k-btn ghost" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
         </div>`;
       K.confetti('kids'); Sfx.jingle();
@@ -1405,7 +1471,8 @@ const Kids = (() => {
             ${res.firstSticker ? `<div class="k-sticker-new"><span class="k-sticker pop" aria-hidden="true">🔤</span><b>${kt('newSticker')}</b></div>`
               : res.better ? `<b class="k-best">${kt('best')}</b>` : ''}
           </div>
-          <a class="k-btn" href="#/kids/abc">ABC</a>
+          ${advButton()}
+          <a class="k-btn ${adv ? 'ghost' : ''}" href="#/kids/abc">ABC</a>
           <button class="k-btn ghost" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
         </div>`;
       K.confetti('kids'); Sfx.jingle();
@@ -1474,6 +1541,7 @@ const Kids = (() => {
       else if (a === 'trace') trace(b);
       else if (a === 'owl') wardrobe();
       else if (a === 'stories') stories();
+      else if (a === 'today') today(b);
       else if (a === 'songs') songs();
       else if (a === 'song') song(b);
       else if (a === 'garden') garden();

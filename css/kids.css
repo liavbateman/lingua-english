@@ -526,3 +526,19 @@ body.kids :focus-visible { outline: 4px solid #1d2a5b; outline-offset: 3px; bord
 .k-trace-dots i.cur { background: #9fb0d2; }
 .k-trace-dots i.on { background: #2fd093; }
 .k-trace-box + .k-story-nav { margin-top: 14px; }
+
+/* today's adventure */
+.k-today {
+  display: flex; align-items: center; gap: 12px; margin: 12px 0 0; padding: 14px 16px; border-radius: 26px; text-decoration: none;
+  background: linear-gradient(135deg, #ff5d8f, #ff8a5b); color: #fff; box-shadow: 0 7px 0 #c42b5e, 0 14px 26px rgba(196, 43, 94, .3);
+  transition: transform var(--dur-press), box-shadow var(--dur-press);
+}
+.k-today:active { transform: translateY(6px); box-shadow: 0 1px 0 #c42b5e; }
+.k-today .grow { display: flex; flex-direction: column; flex: 1; }
+.k-today b { font-size: 1.35rem; text-shadow: 0 2px 0 rgba(0, 0, 0, .18); }
+.k-today small { font-size: .95rem; color: #fff; text-shadow: 0 1px 1px rgba(0, 0, 0, .3); }
+.k-today-go { font-size: 2.4rem; animation: k-float 2.4s ease-in-out infinite; }
+.k-today-arrow { font-size: 2rem; font-weight: 700; }
+.k-adv-next { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.k-adv-next small { font-size: .85rem; font-weight: 400; opacity: .95; }
+@media (prefers-reduced-motion: reduce) { .k-today-go { animation: none !important; } }
