@@ -2342,9 +2342,10 @@
           <div class="he ${w.phrase ? 'long' : ''}">${w.he}</div>
           ${w.ex ? `<div class="example en">${w.ex}</div>` : ''}
         </div>
+        <p class="sp-rate">${t('speak.rate')}</p>
         <div class="pager fc-btns lv-${lvl}">
-          <button class="btn fc-again" id="hard">${t('speak.hard')}</button>
-          <button class="btn fc-know" id="said">${t('speak.said')}</button>
+          <button class="btn fc-again" id="hard">↺ ${t('speak.hard')}</button>
+          <button class="btn fc-know" id="said">✓ ${t('speak.said')}</button>
         </div>`;
       $('#speak').onclick = () => speak(w.en);
       speak(w.en);   // hear it first, then say it

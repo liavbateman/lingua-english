@@ -155,7 +155,7 @@ const STR = {
     'quiz.empty': 'Nothing to review', 'quiz.empty.sub': 'Learn a new lesson and its words will come back here at the right time.',
 
     'speak.title': 'Speaking Practice', 'speak.count': 'Speaking Practice · {a} of {b}', 'speak.do': 'Listen, then say it out loud',
-    'speak.hard': 'Still hard', 'speak.said': 'I said it',
+    'speak.rate': 'After saying it out loud, mark how it went:', 'speak.hard': 'Still hard', 'speak.said': 'I said it',
     'speak.do.mic': 'Listen, then tap the microphone and say it', 'speak.mic': 'Say it into the microphone',
     'speak.listening': 'Listening…', 'speak.great': 'Excellent! That was clear ✓',
     'speak.heard': 'What I heard:', 'speak.again': 'Listen again and try once more.',
@@ -334,7 +334,7 @@ const STR = {
     'quiz.empty': 'אין מילים לחזרה', 'quiz.empty.sub': 'אחרי שיעור חדש, המילים שלו יחזרו לכאן בזמן הנכון.',
 
     'speak.title': 'תרגול דיבור', 'speak.count': 'תרגול דיבור · {a} מתוך {b}', 'speak.do': 'מקשיבים, ואז אומרים בקול',
-    'speak.hard': 'עדיין קשה', 'speak.said': 'אמרתי',
+    'speak.rate': 'אחרי שאמרתם בקול, סמנו איך הלך:', 'speak.hard': 'עדיין קשה', 'speak.said': 'אמרתי',
     'speak.do.mic': 'מקשיבים, מקישים על המיקרופון ואומרים בקול', 'speak.mic': 'אמירה למיקרופון',
     'speak.listening': 'האזנה…', 'speak.great': 'מצוין! זה נשמע ברור ✓',
     'speak.heard': 'מה ששמעתי:', 'speak.again': 'כדאי להקשיב שוב ולנסות עוד פעם.',
