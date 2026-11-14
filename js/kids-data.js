@@ -434,3 +434,17 @@ const KIDS_HOLIDAYS = [
   }
 ];
 KIDS_HOLIDAYS.forEach(th => th.words.forEach(w => { w.id = th.id + '/' + w.en; w.theme = th.id; }));
+
+// Sound-alike pairs: words Hebrew speakers easily mix up when listening (ee/i, th/t, a/u, r/l…)
+const KIDS_PAIRS = [
+  [['ship', '🚢', 'ספינה'], ['sheep', '🐑', 'כבשה']],
+  [['three', '3️⃣', 'שלוש'], ['tree', '🌳', 'עץ']],
+  [['cat', '🐱', 'חתול'], ['cut', '✂️', 'לגזור']],
+  [['hat', '🧢', 'כובע'], ['hot', '🔥', 'חם']],
+  [['pen', '🖊️', 'עט'], ['pan', '🍳', 'מחבת']],
+  [['bag', '👜', 'תיק'], ['bug', '🐛', 'חרק']],
+  [['rock', '🪨', 'סלע'], ['lock', '🔒', 'מנעול']],
+  [['mouse', '🐭', 'עכבר'], ['mouth', '👄', 'פה']],
+  [['sink', '🚰', 'כיור'], ['think', '🤔', 'לחשוב']],
+  [['van', '🚐', 'טנדר'], ['fan', '🌀', 'מאוורר']]
+].map(p => p.map(([en, pic, he]) => ({ en, pic, he })));

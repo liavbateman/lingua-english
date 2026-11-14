@@ -76,6 +76,7 @@ const Kids = (() => {
       colour: 'צובעים!', colourSub: 'בחרו צבע וצבעו את התמונה', colourAsk: 'צבעו את ה{thing} ב{colour}', colourDone: 'איזו תמונה יפה!',
       colourFree: 'עכשיו צבעו מה שבא לכם!',
       practice: 'נתרגל את המילים הקשות ({n})', practiceTitle: 'מתרגלים', practiceDone: 'המילים האלה כבר קלות יותר!',
+      pairs: 'אוזן חדה', pairsSub: 'מילים שנשמעות כמעט אותו דבר', pairsTip: 'הקשיבו טוב! איזו מילה שמעתם?',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -145,6 +146,7 @@ const Kids = (() => {
       colour: 'Colour it!', colourSub: 'Pick a colour and colour the picture', colourAsk: 'Colour the {thing} {colour}', colourDone: 'What a lovely picture!',
       colourFree: 'Now colour anything you like!',
       practice: 'Practise the tricky words ({n})', practiceTitle: 'Practice', practiceDone: 'Those words are easier now!',
+      pairs: 'Sharp ears', pairsSub: 'Words that sound almost the same', pairsTip: 'Listen carefully! Which word did you hear?',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -459,6 +461,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🖍️</span>
           <span class="grow"><b>${kt('colour')}</b><small>${kt('colourSub')}</small></span>
           ${Store.kidsHasSticker('colour') ? starsHtml(Store.kidsStars('colour'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-pairs-card" href="#/kids/pairs">
+          <span class="k-story-books" aria-hidden="true">👂</span>
+          <span class="grow"><b>${kt('pairs')}</b><small>${kt('pairsSub')}</small></span>
+          ${Store.kidsHasSticker('pairs') ? starsHtml(Store.kidsStars('pairs'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -838,6 +845,73 @@ const Kids = (() => {
         </div>`;
       celebrate();
       sayEn('Practice makes perfect!', 0.9);
+    }
+    round();
+  }
+
+  // ---------- sharp ears: sound-alike pairs ----------
+  // 8 rounds: two pictures whose words sound almost the same (ship / sheep); hear one, tap it.
+  // After a miss the owl says both words one after the other, so the child hears the difference.
+  function pairsGame() {
+    document.body.classList.add('in-lesson');
+    const rounds = K.shuffle(KIDS_PAIRS).slice(0, 8).map(p => ({ p: K.shuffle(p), w: pickOne(p) }));
+    let at = 0, firstTry = 0;
+    function round() {
+      K.lessonBar(at / rounds.length);
+      const { p, w } = rounds[at];
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">👂</span> ${kt('pairs')} · ${at + 1}/${rounds.length}</p>
+          <div class="k-prompt">
+            <button class="k-speaker" id="k-say" aria-label="${kt('listen')}"><span aria-hidden="true">🔊</span></button>
+          </div>
+          <div class="k-opts k-pair-opts">${p.map((o, i) => `<button class="k-opt k-pair-opt" data-i="${i}" aria-label="${o.en}"><span aria-hidden="true">${o.pic}</span><small class="en">${o.en}</small></button>`).join('')}</div>
+          ${owl(kt('pairsTip'), 'small')}
+        </div>`;
+      const hear = () => sayEn(w.en, 0.7);
+      $('#k-say').onclick = hear;
+      setTimeout(hear, 250);
+      K.view.querySelectorAll('.k-opt').forEach(b => {
+        b.onclick = () => {
+          if (p[+b.dataset.i] === w) {
+            K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; });
+            b.classList.add('right');
+            K.Feel.right();
+            if (!missed) firstTry++;
+            owlMood('cheer');
+            $('.k-bubble').textContent = `${w.pic} ${w.en}!`;
+            sayEn(w.en, 0.8);
+            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 1400);
+          } else {
+            missed = true;
+            b.disabled = true;
+            b.classList.add('nope');
+            K.Feel.wrong(b);
+            owlMood('think');
+            const other = p[+b.dataset.i];
+            $('.k-bubble').textContent = `${other.en} ≠ ${w.en}`;
+            say([['en', other.en + '.'], ['en', w.en + '!']], 0.7);
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = firstTry >= 7 ? 3 : firstTry >= 5 ? 2 : 1;
+      Store.kidsFinish('pairs', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <a class="k-btn" href="#/kids">${kt('backToMap')}</a>
+          <button class="k-btn ghost" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+        </div>`;
+      celebrate();
+      sayEn('What sharp ears!', 0.9);
+      $('#k-again').onclick = pairsGame;
     }
     round();
   }
@@ -2289,6 +2363,7 @@ const Kids = (() => {
       else if (a === 'owl') wardrobe();
       else if (a === 'stories') stories();
       else if (a === 'riddles') riddles();
+      else if (a === 'pairs') pairsGame();
       else if (a === 'practice') practice(b);
       else if (a === 'colour') colourIt();
       else if (a === 'today') today(b);

@@ -855,3 +855,8 @@ body.kids.night .k-trophy:not(.got) { background: rgba(255, 255, 255, .85); }
 .k-isle.gold .k-isle-name::after { content: ' 👑'; }
 .k-practice-btn { background: #2f9e6e; box-shadow: 0 6px 0 #1f7a52; }
 .k-practice-btn:active { box-shadow: 0 1px 0 #1f7a52; }
+
+/* sharp ears: two big pictures */
+.k-pair-opts { grid-template-columns: 1fr 1fr; }
+.k-pair-opt { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 4.6rem; }
+.k-pair-opt small { font: 700 1.2rem var(--k-font); color: var(--k-ink); }
