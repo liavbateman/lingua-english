@@ -1749,7 +1749,7 @@ const Kids = (() => {
       let basket = [], missed = false;
       K.view.innerHTML = `
         <div class="k-wrap k-play">
-          <p class="k-step"><span aria-hidden="true">🏪</span> ${kt('shop')} · ${at + 1}/${customers.length} · 🪙 ${coins}</p>
+          <p class="k-step"><span aria-hidden="true">🏪</span> ${kt('shop')} · ${at + 1}/${customers.length} · 💰 ${coins}</p>
           <div class="k-customer">
             <span class="k-customer-face" aria-hidden="true">${who}</span>
             <button class="k-customer-says en" id="k-say">${o.text}</button>
@@ -1776,17 +1776,26 @@ const Kids = (() => {
           showBasket();
         };
       });
+      let busy = false;   // one tap on "Here you are!" is one handover (a double tap must not skip a customer)
       $('#k-give').onclick = () => {
+        if (busy) return;
+        if (!basket.length) {   // nothing to hand over yet: point at the shelf
+          K.Feel.wrong($('.k-basket'));
+          sayEn('Put it in the basket first!', 0.9);
+          return;
+        }
+        busy = true;
         sayEn('Here you are!', 1);
         const ok = basket.length === o.n && basket.every(w => w === o.w);
         setTimeout(() => {
+          if (!ok) busy = false;
           if (ok) {
             if (!missed) firstTry++;
             coins += o.n;
             Store.kidsWordRight(o.w.id);
             K.Feel.right();
             owlMood('cheer');
-            $('.k-customer-says').textContent = 'Thank you! 🪙';
+            $('.k-customer-says').textContent = 'Thank you! 💰';
             $('.k-customer').classList.add('happy');
             say([['en', 'Thank you! Bye bye!']]);
             setTimeout(() => { at++; at < customers.length ? round() : end(); }, 1700);
@@ -1797,6 +1806,9 @@ const Kids = (() => {
             $('.k-customer-says').textContent = 'Hmm… ' + o.text;
             basket = [];
             showBasket();
+            // after a miss the wanted thing on the shelf glows, so the child links the word to it
+            const want = K.view.querySelector(`.k-shelf-item[data-i="${shelf.indexOf(o.w)}"]`);
+            if (want) want.classList.add('want');
             setTimeout(ask, 300);
           }
         }, 700);
@@ -1811,7 +1823,7 @@ const Kids = (() => {
           <div class="k-end-card">${endOwl()}
             <h1>🏪 ${kt('done')}</h1>
             ${starsHtml(stars, 'big pop')}
-            <p class="k-unlock">🪙 ${kt('shopCoins', { n: coins })}</p>
+            <p class="k-unlock">💰 ${kt('shopCoins', { n: coins })}</p>
           </div>
           <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
           <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
