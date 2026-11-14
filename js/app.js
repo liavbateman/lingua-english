@@ -2334,7 +2334,13 @@
   // Listen, say it into the microphone and get feedback. Where the browser can't listen,
   // the learner rates themselves ("I said it" / "Still hard").
   function speaking() {
-    const queue = shuffle(poolFor('level').pool).slice(0, 6);
+    // Say words you already know: the ones met so far first, topped up from the next lesson's words,
+    // so a new learner says "hello" and "thank you", not a word never seen before
+    const lvlPool = poolFor('level').pool;
+    const met = shuffle(lvlPool.filter(w => Store.isSeen(w.id)));
+    const upNext = nextUnit().words.filter(w => !Store.isSeen(w.id));
+    const queue = met.length >= 6 ? met.slice(0, 6)
+      : [...met, ...upNext].slice(0, 6).concat(shuffle(lvlPool)).filter((w, k, arr) => arr.indexOf(w) === k).slice(0, 6);
     let i = 0, good = 0;
 
     function draw() {
