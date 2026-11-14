@@ -2479,15 +2479,21 @@
           ${row('✏️', t('progress.rules', { a: r, b: rules.length }), r, rules.length)}
         </section>`;
     };
+    // Before the first lesson there is nothing to chart: one line on what will show here, and the way to start
+    const empty = !met && !Store.xp && !GRAMMAR.some(g => Store.isGrammarDone(g.id));
     view.innerHTML = `
       <h1>${t('progress.title')}</h1>
+      ${empty ? `<div class="card pg-empty">
+        <p>${t('progress.empty')}</p>
+        ${nextCard()}
+      </div>` : `
       <p class="sub">${t('progress.sub', { x: Store.xp })}</p>
       <div class="stats">
         <div class="card stat st-words"><span class="st-ico" aria-hidden="true">📚</span><b>${met}</b><span class="small">${t('progress.met')}</span></div>
         <div class="card stat st-streak"><span class="st-ico" aria-hidden="true">🔥</span><b>${Store.streak}</b><span class="small">${t('progress.streak')}</span></div>
         <div class="card stat st-best"><span class="st-ico" aria-hidden="true">🏆</span><b>${Store.best}</b><span class="small">${t('progress.best')}</span></div>
       </div>
-      ${weekCard()}
+      ${weekCard()}`}
       ${Store.days(35).filter(d => d.count > 0).length >= 3 ? monthCard() : ''}
       ${LEVELS.filter(l => !isFresh() || l.id === Store.level).map(levelCard).join('')}
       <div class="card backup">
@@ -2501,7 +2507,7 @@
         <input type="file" id="backup-file" accept=".json,application/json,text/plain" hidden>
         <p class="small backup-msg" id="backup-msg" role="status"></p>
       </div>
-      <button class="btn plain" id="reset">${t('progress.reset')}</button>`;
+      <button class="btn plain" id="reset"${empty ? ' hidden' : ''}>${t('progress.reset')}</button>`;
     const msg = (text, ok) => { const m = $('#backup-msg'); m.textContent = text; m.className = 'small backup-msg ' + (ok ? 'ok' : 'bad'); };
 
     // On iPhone the share sheet offers "Save to Files", Notes, Mail…; elsewhere the file is downloaded
