@@ -77,6 +77,7 @@ const Kids = (() => {
       colourFree: 'עכשיו צבעו מה שבא לכם!',
       practice: 'נתרגל את המילים הקשות ({n})', practiceTitle: 'מתרגלים', practiceDone: 'המילים האלה כבר קלות יותר!',
       pairs: 'אוזן חדה', pairsSub: 'מילים שנשמעות כמעט אותו דבר', pairsTip: 'הקשיבו טוב! איזו מילה שמעתם?',
+      isleSongs: 'שירי האיים', isleSongsSub: 'כל אי שסיימתם מקבל שיר משלו', singIsle: 'שירו את שיר האי',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -147,6 +148,7 @@ const Kids = (() => {
       colourFree: 'Now colour anything you like!',
       practice: 'Practise the tricky words ({n})', practiceTitle: 'Practice', practiceDone: 'Those words are easier now!',
       pairs: 'Sharp ears', pairsSub: 'Words that sound almost the same', pairsTip: 'Listen carefully! Which word did you hear?',
+      isleSongs: 'Island songs', isleSongsSub: 'Every island you finish gets its own song', singIsle: 'Sing the island song',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -951,18 +953,39 @@ const Kids = (() => {
               <span class="k-book-he">${sg.he}</span>
             </a>`).join('')}
         </div>
+        <h2 class="k-title k-h2">🏝️ ${kt('isleSongs')}</h2>
+        <p class="k-sub">${kt('isleSongsSub')}</p>
+        <div class="k-books">
+          ${KIDS_THEMES.map(th => {
+            const open = Store.kidsHasSticker(th.id);
+            return `<a class="k-book ${open ? '' : 'locked'}" ${open ? `href="#/kids/song/isle-${th.id}"` : 'role="link" aria-disabled="true"'} style="--c:${th.color}">
+              <span class="k-book-pic" aria-hidden="true">${open ? th.pic : '🔒'}</span>
+              <span class="k-book-title">${themeName(th)}</span>
+            </a>`;
+          }).join('')}
+        </div>
       </div>`;
+    K.view.querySelectorAll('.k-book.locked').forEach(b => { b.onclick = e => { e.preventDefault(); K.Feel.wrong(b); }; });
+  }
+  // An island's own song: its words four to a line, then a cheer
+  function isleSong(th) {
+    const items = th.words.map(w => [w.en, w.pic]);
+    const lines = [];
+    for (let i = 0; i < items.length; i += 4) lines.push(items.slice(i, i + 4));
+    lines.push([['Hooray!', th.sticker]]);
+    return { id: 'isle-' + th.id, title: th.title, he: th.he, pic: th.pic, color: th.color, lines };
   }
   let songRun = 0;   // a newer play (or leaving the screen) stops the one before
   function song(id) {
-    const sg = KIDS_SONGS.find(x => x.id === id);
+    const isle = id && id.startsWith('isle-') && theme(id.slice(5));
+    const sg = isle ? isleSong(isle) : KIDS_SONGS.find(x => x.id === id);
     if (!sg) { location.hash = '#/kids/songs'; return; }
     K.endLesson();
     document.body.style.setProperty('--kc', sg.color);
     K.view.innerHTML = `
       <div class="k-wrap k-play">
         <a class="k-back" href="#/kids/songs"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('songs')}</a>
-        <h1 class="k-title en">${sg.pic} ${sg.title}</h1>
+        <h1 class="k-title ${isle ? '' : 'en'}">${sg.pic} ${isle ? themeName(isle) : sg.title}</h1>
         <div class="k-card k-song">
           ${sg.lines.map((line, r) => `<div class="k-song-line">${line.map(([w, pic], i) => `
             <button class="k-note" data-r="${r}" data-i="${i}"><span class="k-note-pic" aria-hidden="true">${pic}</span><span class="en">${w}</span></button>`).join('')}</div>`).join('')}
@@ -2020,6 +2043,7 @@ const Kids = (() => {
             ${opened >= 0 ? `<p class="k-unlock">🔓 ${kt('nextIsland')} <span aria-hidden="true">${KIDS_THEMES[opened].pic}</span></p>` : ''}
           </div>
           ${advButton()}
+          ${!adv ? `<a class="k-btn ghost" href="#/kids/song/isle-${th.id}">🎵 ${kt('singIsle')}</a>` : ''}
           ${(() => { const n = th.words.filter(x => Store.kidsMissCount(x.id) > 0).length;
             return n && !adv ? `<a class="k-btn k-practice-btn" href="#/kids/practice/${th.id}">🎯 ${kt('practice', { n })}</a>` : ''; })()}
           <button class="k-btn ${adv ? 'ghost' : ''}" id="k-map">${kt('backToMap')}</button>
