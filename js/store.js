@@ -179,6 +179,14 @@ const Store = (() => {
       save();
     },
     // Picture of the day: the word picked today stays the same all day
+    // My family tree: the face picked for each family member (per child)
+    get kidsFamily() { return (state.kids && state.kids.family) || {}; },
+    kidsSetFamily(role, face) {
+      state.kids = state.kids || { stars: {}, stickers: {}, words: {} };
+      const f = state.kids.family = state.kids.family || {};
+      if (face) f[role] = face; else delete f[role];
+      save();
+    },
     // The question of the day: answered today?
     get kidsQotdDone() { return !!(state.kids && state.kids.qotd === dayKey()); },
     kidsQotdAnswer() { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.qotd = dayKey(); state.kids.qotdN = (state.kids.qotdN || 0) + 1; save(); return state.kids.qotdN; },

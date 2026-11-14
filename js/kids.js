@@ -162,6 +162,8 @@ const Kids = (() => {
       slistAgain: 'לשמוע שוב את הרשימה',
       calm: 'פינת הרוגע', calmSub: 'נושמים עם הינשוף והבלון: שואפים... נושפים...', calmGo: 'מתחילים לנשום', calmStop: 'עצירה',
       calmTip: 'כשהבלון גדל שואפים אוויר, כשהוא קטן נושפים', calmEnd: 'כל הכבוד. הגוף רגוע יותר עכשיו', calmHint: 'מרגישים כועסים או עצובים? אפשר לנשום עם הינשוף',
+      ftree: 'המשפחה שלי', ftreeSub: 'בוחרים פרצוף לאמא, לאבא, לסבתא... ושומעים: This is my mom!', ftreeTip: 'לחצו על עיגול ובחרו פרצוף. אפשר להשאיר ריק',
+      ftreeRead: 'הינשוף מספר על המשפחה', ftreeNone: 'בלי', ftreeMe: 'אני',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -317,6 +319,8 @@ const Kids = (() => {
       slistAgain: 'Hear the list again',
       calm: 'Calm corner', calmSub: 'Breathe with the owl and the balloon: in... and out...', calmGo: "Let's breathe", calmStop: 'Stop',
       calmTip: 'When the balloon grows, breathe in. When it shrinks, breathe out', calmEnd: 'Well done. Your body feels calmer now', calmHint: 'Feeling angry or sad? You can breathe with the owl',
+      ftree: 'My family', ftreeSub: 'Pick a face for mom, dad, grandma... and hear: This is my mom!', ftreeTip: 'Tap a circle and pick a face. You can leave it empty',
+      ftreeRead: 'The owl tells about my family', ftreeNone: 'None', ftreeMe: 'Me',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -817,6 +821,10 @@ const Kids = (() => {
         <a class="k-abc-card k-calm-card ${['feelings/sad', 'feelings/angry', 'feelings/scared', 'feelings/tired'].includes(Store.kidsMoodToday) ? 'k-first k-calm-now' : ''}" href="#/kids/calm">
           <span class="k-story-books" aria-hidden="true">🎈</span>
           <span class="grow"><b>${kt('calm')}</b><small>${['feelings/sad', 'feelings/angry', 'feelings/scared'].includes(Store.kidsMoodToday) ? kt('calmHint') : kt('calmSub')}</small></span>
+        </a>
+        <a class="k-abc-card k-ftree-card" href="#/kids/ftree">
+          <span class="k-story-books" aria-hidden="true">🌳</span>
+          <span class="grow"><b>${kt('ftree')}</b><small>${bidiEn(kt('ftreeSub'))}</small></span>
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -4532,6 +4540,69 @@ const Kids = (() => {
     setTimeout(() => soft("Let's breathe together.", 0.75), 300);
   }
 
+  // ---------- my family tree ----------
+  // The child builds their own family: a face for each person (any skin tone, any family shape - every
+  // circle can stay empty). Each pick says "This is my mum!"; the owl can then tell the whole family.
+  const FAMILY = [
+    { role: 'grandma', he: 'סבתא', row: 0, faces: ['👵', '👵🏻', '👵🏽', '👵🏿'] },
+    { role: 'grandpa', he: 'סבא', row: 0, faces: ['👴', '👴🏻', '👴🏽', '👴🏿'] },
+    { role: 'mom', he: 'אמא', row: 1, faces: ['👩', '👩🏻', '👩🏽', '👩🏿', '👩‍🦰', '👱‍♀️', '🧕', '👩‍🦱'] },
+    { role: 'dad', he: 'אבא', row: 1, faces: ['👨', '👨🏻', '👨🏽', '👨🏿', '👨‍🦰', '👱‍♂️', '🧔', '👨‍🦱'] },
+    { role: 'sister', he: 'אחות', row: 2, faces: ['👧', '👧🏻', '👧🏽', '👧🏿'] },
+    { role: 'brother', he: 'אח', row: 2, faces: ['👦', '👦🏻', '👦🏽', '👦🏿'] },
+    { role: 'baby', he: 'תינוק', row: 2, faces: ['👶', '👶🏻', '👶🏽', '👶🏿'] },
+    { role: 'pet', he: 'חיית מחמד', row: 2, faces: ['🐶', '🐱', '🐰', '🐟', '🐢', '🦜'] }
+  ];
+  const PET = { '🐶': 'dog', '🐱': 'cat', '🐰': 'bunny', '🐟': 'fish', '🐢': 'turtle', '🦜': 'parrot' };
+  function familyTree() {
+    K.endLesson();
+    const fam = Store.kidsFamily, me = Store.kidsProfiles.find(p => p.active) || {};
+    const slot = m => `<button class="k-ft-slot ${fam[m.role] ? 'on' : ''}" data-role="${m.role}" aria-label="${m.role}">
+        <span class="k-ft-face" aria-hidden="true">${fam[m.role] || '➕'}</span><small class="en">${m.role}</small></button>`;
+    K.view.innerHTML = `
+      <div class="k-wrap">
+        <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
+        <h1 class="k-title">🌳 ${kt('ftree')}</h1>
+        <div class="k-ftree">
+          ${[0, 1, 2].map(r => `<div class="k-ft-row">${FAMILY.filter(m => m.row === r).map(slot).join('')}${r === 2 ? `<span class="k-ft-slot me on"><span class="k-ft-face" aria-hidden="true">${me.face || '🙂'}</span><small>${kt('ftreeMe')}</small></span>` : ''}</div>`).join('')}
+        </div>
+        <button class="k-btn" id="k-ft-read">🦉 ${kt('ftreeRead')}</button>
+        ${owl(kt('ftreeTip'), 'small')}
+      </div>`;
+    const says = (m, face) => m.role === 'pet' ? `This is my ${PET[face] || 'pet'}!` : `This is my ${m.role}!`;
+    K.view.querySelectorAll('.k-ft-slot[data-role]').forEach(b => {
+      b.onclick = () => {
+        const m = FAMILY.find(x => x.role === b.dataset.role);
+        const back = document.createElement('div');
+        back.className = 'k-reveal';
+        back.setAttribute('role', 'dialog');
+        back.innerHTML = `<div class="k-reveal-card"><b class="en" lang="en">${m.role} · ${m.he}</b>
+          <div class="k-ft-pick">${m.faces.map(f => `<button class="k-ft-face-btn" data-f="${f}" aria-label="${m.role}">${f}</button>`).join('')}
+            <button class="k-ft-face-btn none" data-f="" aria-label="${kt('ftreeNone')}">${kt('ftreeNone')}</button></div></div>`;
+        document.body.appendChild(back);
+        sayEn(m.role, 0.9);
+        back.onclick = e => { if (e.target === back) back.remove(); };
+        back.querySelectorAll('.k-ft-face-btn').forEach(fb => {
+          fb.onclick = () => {
+            const face = fb.dataset.f;
+            Store.kidsSetFamily(m.role, face);
+            back.remove();
+            if (face) { popSound(); say([['en', says(m, face)]], 0.85); }
+            if (Object.keys(Store.kidsFamily).length >= 3) Store.kidsFinish('ftree', 3, 10);
+            familyTree();
+          };
+        });
+      };
+    });
+    $('#k-ft-read').onclick = () => {
+      const f = Store.kidsFamily;
+      const lines = FAMILY.filter(m => f[m.role]).map(m => says(m, f[m.role]));
+      if (!lines.length) { $('.k-bubble').textContent = kt('ftreeTip'); return; }
+      say([['en', 'This is my family!'], ...lines.map(l => ['en', l]), ['en', 'I love my family!']], 0.85);
+      K.view.querySelectorAll('.k-ft-slot.on').forEach((s, i) => setTimeout(() => { s.classList.add('lit'); setTimeout(() => s.classList.remove('lit'), 900); }, 1200 + i * 1300));
+    };
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -6605,6 +6676,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'ftree') familyTree();
       else if (a === 'calm') calmScreen();
       else if (a === 'slist') slistGame();
       else if (a === 'odd') oddGame();
