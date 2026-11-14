@@ -132,6 +132,8 @@ const Store = (() => {
     kidsWordRight(id) {
       state.kids = state.kids || { stars: {}, stickers: {}, words: {} };
       state.kids.words[id] = (state.kids.words[id] || 0) + 1;
+      state.kids.first = state.kids.first || {};   // the day each word was first got right (for the weekly note)
+      if (!state.kids.first[id]) state.kids.first[id] = dayKey();
       save();
     },
     kidsWordCount: id => (state.kids && state.kids.words[id]) || 0,
@@ -176,6 +178,17 @@ const Store = (() => {
     // Bedtime look in the evening (on unless a grown-up turned it off)
     get kidsBedtime() { return !(state.kids && state.kids.bedtime === false); },
     set kidsBedtime(v) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.bedtime = !!v; save(); },
+    // The last 7 days for the weekly note: words first got right, and play time per day (oldest first)
+    kidsWeek() {
+      const k = state.kids || {}, first = k.first || {}, ds = k.daysec || {};
+      const days = Array.from({ length: 7 }, (_, n) => {
+        const d = new Date(Date.now() - (6 - n) * DAY);
+        return { date: d, key: dayKey(d), sec: ds[dayKey(d)] || 0 };
+      });
+      const from = days[0].key;
+      const words = KIDS_WORDS.filter(w => first[w.id] && first[w.id] >= from);
+      return { days, words };
+    },
     // The owl buddy's look: a colour and an accessory, chosen in the wardrobe
     get kidsOwl() { const o = state.kids && state.kids.owl; return { color: (o && o.color) || 'blue', acc: (o && o.acc) || '' }; },
     setKidsOwl(part, id) {
@@ -229,6 +242,11 @@ const Store = (() => {
       const t = state.kids.time && state.kids.time.day === dayKey() ? state.kids.time : { day: dayKey(), sec: 0, extra: 0 };
       t.sec += sec;
       state.kids.time = t;
+      // play time per day, kept for 8 weeks (the weekly note)
+      const ds = state.kids.daysec = state.kids.daysec || {};
+      if (sec) ds[dayKey()] = (ds[dayKey()] || 0) + sec;
+      const oldest = dayKey(new Date(Date.now() - 56 * DAY));
+      Object.keys(ds).forEach(k => { if (k < oldest) delete ds[k]; });
       save();
     },
     kidsAddExtra(min) { this.kidsAddTime(0); state.kids.time.extra = (state.kids.time.extra || 0) + min; save(); },

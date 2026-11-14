@@ -667,3 +667,15 @@ body.kids.night .k-confetti, body.kids.night .confetti { opacity: .6; }
 /* text that sits straight on the night sky turns light (the white cards keep their dark text) */
 body.kids.night .k-tip, body.kids.night .k-isle-sub, body.kids.night .k-sub, body.kids.night .k-title { color: #eef0ff; text-shadow: none; }
 body.kids.night .k-sub b { color: #ffe08a; }
+
+/* weekly note for parents */
+.k-wk-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+.k-wk-days span { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.k-wk-days i { width: 26px; height: 26px; border-radius: 50%; background: #eef1fa; }
+.k-wk-days .on i { background: #2fd093; box-shadow: inset 0 -3px 0 #1d9a6b; }
+.k-wk-days small { font-size: .8rem; color: var(--k-muted); }
+.k-wk-line { margin: 10px 0 0; color: var(--k-ink); }
+.k-wk-words { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; direction: ltr; }
+.k-wk-words span { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; background: #f3f6ff; color: var(--k-ink); font-size: .95rem; }
+.k-wk-words i { font-style: normal; }
+.k-wk-share { margin-top: 12px; font-size: 1.05rem; padding: 12px; }

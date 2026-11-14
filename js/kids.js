@@ -57,6 +57,9 @@ const Kids = (() => {
       opp: 'מה ההפך?', oppTip: 'מצאו את ההפך', isOpp: '{a} – {b}!',
       night: 'לילה טוב! 🌙', nightSub: 'סיפור קטן לפני השינה', nightHi: 'כבר ערב… בוא נקרא סיפור לפני השינה 🌙',
       pcBed: 'מראה לילה בערב', pcBedText: 'מ-19:00 השמיים נעשים לילה, הצבעים רגועים והקול איטי יותר',
+      wkTitle: 'השבוע של {name}', wkTitleAnon: 'השבוע', wkWords: '{n} מילים חדשות', wkNone: 'עוד אין מילים חדשות השבוע. אולי משחק קצר היום?',
+      wkDays: '{n} ימי משחק · {m} דק׳', wkShare: 'לשתף', wkCopied: 'הועתק! אפשר להדביק בוואטסאפ',
+      wkMsg: '🦉 {name}השבוע ב-Lingua: {n} מילים חדשות באנגלית ({list}) ו-{d} ימי משחק. כל הכבוד!',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -107,6 +110,9 @@ const Kids = (() => {
       opp: "What's the opposite?", oppTip: 'Find the opposite', isOpp: '{a} – {b}!',
       night: 'Good night! 🌙', nightSub: 'A little story before bed', nightHi: "It's evening… let's read a bedtime story 🌙",
       pcBed: 'Bedtime look in the evening', pcBedText: 'From 7pm the sky turns to night, colours calm down and the voice slows',
+      wkTitle: "{name}'s week", wkTitleAnon: 'This week', wkWords: '{n} new words', wkNone: 'No new words this week yet. Maybe a short game today?',
+      wkDays: '{n} play days · {m} min', wkShare: 'Share', wkCopied: 'Copied! Paste it into WhatsApp',
+      wkMsg: '🦉 {name}This week in Lingua: {n} new English words ({list}) and {d} play days. Well done!',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -997,13 +1003,47 @@ const Kids = (() => {
               <span class="k-pc-n">${n}/${th.words.length}</span></div>`;
           }).join('')}
         </section>
+        ${weekBox()}
         <p class="k-pc-tip">💡 ${kt('pcTip')}</p>
       </div>`;
     K.view.querySelectorAll('.k-pc-seg button').forEach(b => {
       b.onclick = () => { Store.kidsLimit = +b.dataset.n; parents(); };
     });
     $('#k-mode').onchange = e => { Store.kidsMode = e.target.checked; };
+    const share = $('#k-wk-share');
+    if (share) share.onclick = async () => {
+      const text = share.dataset.text;
+      try {
+        if (navigator.share) { await navigator.share({ text }); return; }
+      } catch (e) { if (e && e.name === 'AbortError') return; }
+      try { await navigator.clipboard.writeText(text); } catch (e) { /* the text stays on screen to copy by hand */ }
+      share.textContent = '✓ ' + kt('wkCopied');
+    };
     $('#k-bed').onchange = e => { Store.kidsBedtime = e.target.checked; document.body.classList.toggle('night', isNight()); };
+  }
+
+  // The week in a box: new words as pictures, play days as dots, and a message to share with family
+  function weekBox() {
+    const wk = Store.kidsWeek(), me = Store.kidsProfiles.find(p => p.active);
+    const played = wk.days.filter(d => d.sec > 0).length;
+    const mins = Math.round(wk.days.reduce((a, d) => a + d.sec, 0) / 60);
+    const name = me && me.name ? esc(me.name) : '';
+    const dayName = d => d.date.toLocaleDateString(isHe() ? 'he-IL' : 'en-US', { weekday: 'narrow' });
+    const text = kt('wkMsg', { name: me && me.name ? me.name + ' · ' : '', n: wk.words.length,
+      list: wk.words.slice(0, 10).map(w => w.en).join(', ') + (wk.words.length > 10 ? '…' : ''), d: played });
+    return `
+      <section class="k-pc-box">
+        <h2>📅 ${name ? kt('wkTitle', { name }) : kt('wkTitleAnon')}</h2>
+        <div class="k-wk-days" aria-label="${kt('wkDays', { n: played, m: mins })}">
+          ${wk.days.map(d => `<span class="${d.sec ? 'on' : ''}"><i></i><small>${dayName(d)}</small></span>`).join('')}
+        </div>
+        <p class="k-wk-line">${kt('wkDays', { n: played, m: mins })}</p>
+        ${wk.words.length ? `
+          <p class="k-wk-line"><b>${kt('wkWords', { n: wk.words.length })}</b></p>
+          <div class="k-wk-words">${wk.words.slice(0, 18).map(w => `<span class="en"><i aria-hidden="true">${w.pic}</i>${w.en}</span>`).join('')}</div>
+          <button class="k-btn ghost k-wk-share" id="k-wk-share" data-text="${text.replace(/"/g, '&quot;')}">📤 ${kt('wkShare')}</button>`
+        : `<p class="k-wk-line">${kt('wkNone')}</p>`}
+      </section>`;
   }
 
   // ---------- daily time limit ----------
