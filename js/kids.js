@@ -1935,13 +1935,21 @@ const Kids = (() => {
   // ---------- hide and seek: little place words (under, on, in, behind) ----------
   // A room with a bed, a chair, a box and a door. The owl hides and says where ("The owl is under the bed!");
   // the child taps that spot and the owl peeks out. A wrong spot just puffs and the sentence is said again.
+  // The room keeps one shape (8:7) and the furniture is sized from its width, so the tap areas (in % of
+  // the room) always sit on the furniture: "on" = the top of a thing, "under" = the space below it.
+  const ROOM_OBJ = [
+    { pic: '🛏️', x: 2, y: 30, size: 42 },
+    { pic: '🪑', x: 52, y: 54, size: 22 },
+    { pic: '🚪', x: 72, y: 2, size: 26 },
+    { pic: '📦', x: 78, y: 62, size: 19 }
+  ];
   const SPOTS = [
-    { id: 'on the bed', he: 'על המיטה', x: 4, y: 36, w: 40, h: 18 },
-    { id: 'under the bed', he: 'מתחת למיטה', x: 4, y: 76, w: 40, h: 16 },
-    { id: 'on the chair', he: 'על הכיסא', x: 52, y: 42, w: 20, h: 16 },
-    { id: 'under the chair', he: 'מתחת לכיסא', x: 52, y: 78, w: 20, h: 14 },
-    { id: 'in the box', he: 'בתוך הקופסה', x: 77, y: 60, w: 20, h: 24 },
-    { id: 'behind the door', he: 'מאחורי הדלת', x: 76, y: 6, w: 20, h: 40 }
+    { id: 'on the bed', he: 'על המיטה', x: 2, y: 38, w: 42, h: 22 },
+    { id: 'under the bed', he: 'מתחת למיטה', x: 2, y: 62, w: 42, h: 26 },
+    { id: 'on the chair', he: 'על הכיסא', x: 50, y: 50, w: 24, h: 22 },
+    { id: 'under the chair', he: 'מתחת לכיסא', x: 50, y: 74, w: 24, h: 18 },
+    { id: 'in the box', he: 'בתוך הקופסה', x: 76, y: 60, w: 23, h: 27 },
+    { id: 'behind the door', he: 'מאחורי הדלת', x: 72, y: 3, w: 26, h: 34 }
   ];
   function hideGame() {
     document.body.classList.add('in-lesson');
@@ -1958,11 +1966,8 @@ const Kids = (() => {
             <button class="k-speaker" id="k-say" aria-label="${kt('listen')}: ${line}"><span aria-hidden="true">🔊</span></button>
             <span class="k-target en" lang="en">${line}</span>
           </div>
-          <div class="k-room" aria-label="room">
-            <span class="k-room-obj" style="left:6%;top:44%;font-size:7rem" aria-hidden="true">🛏️</span>
-            <span class="k-room-obj" style="left:54%;top:48%;font-size:4.6rem" aria-hidden="true">🪑</span>
-            <span class="k-room-obj" style="left:78%;top:8%;font-size:6.4rem" aria-hidden="true">🚪</span>
-            <span class="k-room-obj" style="left:79%;top:62%;font-size:4rem" aria-hidden="true">📦</span>
+          <div class="k-room k-hide-room" aria-label="room">
+            ${ROOM_OBJ.map(o => `<span class="k-room-obj" style="left:${o.x}%;top:${o.y}%;font-size:${o.size}cqw" aria-hidden="true">${o.pic}</span>`).join('')}
             ${SPOTS.map((p, i) => `<button class="k-spot" data-i="${i}" style="left:${p.x}%;top:${p.y}%;width:${p.w}%;height:${p.h}%" aria-label="${p.id}"></button>`).join('')}
           </div>
           ${owl(kt('hideTip'), 'small')}
@@ -1990,7 +1995,8 @@ const Kids = (() => {
             K.Feel.wrong(b);
             owlMood('think');
             $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${p.id}?</bdi> ${kt('tryAgain')}`;
-            setTimeout(ask, 400);
+            // say where the child looked, then where the owl really is - the two places side by side
+            setTimeout(() => say([['en', `Not ${p.id}.`], ['en', line]], 0.8), 400);
           }
         };
       });
@@ -2009,7 +2015,7 @@ const Kids = (() => {
           <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
         </div>`;
       celebrate();
-      sayEn('You found me every time!', 0.9);
+      sayEn(firstTry === rounds.length ? 'You found me every time!' : 'You found me!', 0.9);
       $('#k-again').onclick = hideGame;
     }
     round();

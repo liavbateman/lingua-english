@@ -1082,6 +1082,7 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
   background: linear-gradient(#fde8c8 0 68%, #c9935f 68% 100%); box-shadow: 0 8px 0 var(--k-edge), inset 0 -8px 0 #a8743f;
 }
 .k-room-obj { position: absolute; line-height: 1; pointer-events: none; filter: drop-shadow(0 4px 2px rgba(0, 0, 0, .18)); }
+.k-hide-room { height: auto; aspect-ratio: 8 / 7; container-type: inline-size; max-height: 62vh; }
 .k-spot {
   position: absolute; border: 3px dashed transparent; border-radius: 18px; background: transparent; cursor: pointer;
   transition: border-color var(--dur-quick), background var(--dur-quick);
