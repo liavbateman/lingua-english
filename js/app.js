@@ -2873,12 +2873,25 @@
     slideTabs();
     // After a screen change, put keyboard and screen-reader focus on its heading (not on the first load)
     if (!firstRoute) {
-      const head = view.querySelector('h1') || view.querySelector('.sub') || view;
+      const head = view.querySelector('h1') || view.querySelector('.gq-head') || view.querySelector('.sub') || view;
       head.setAttribute('tabindex', '-1');
       head.focus({ preventScroll: true });
     }
     firstRoute = false;
   }
+
+  // Inside a lesson the next question or card replaces the view without a route change. When that drops
+  // focus to <body>, keyboard and screen-reader users lose their place: put it on the new heading instead.
+  // Screens that focus something themselves (the typing field, Next) keep their own focus.
+  new MutationObserver(() => {
+    if (firstRoute) return;
+    const a = document.activeElement;
+    if (a && a !== document.body && document.contains(a)) return;
+    if (document.querySelector('.tour, .sheet-back')) return;
+    const head = view.querySelector('h1') || view.querySelector('.gq-head') || view.querySelector('.sub') || view;
+    head.setAttribute('tabindex', '-1');
+    head.focus({ preventScroll: true });
+  }).observe(view, { childList: true });
 
   // Language switch in the header
   document.getElementById('lang').onclick = () => {
