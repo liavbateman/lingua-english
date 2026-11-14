@@ -1677,3 +1677,5 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
   body.kids .k-tiles { grid-template-columns: repeat(4, 1fr); }
   body.kids .k-play { max-width: 760px; }
 }
+/* a quoted English phrase inside Hebrew never breaks across lines ("What is / it?") */
+bdi.k-q { white-space: nowrap; }

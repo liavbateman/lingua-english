@@ -612,7 +612,7 @@ const Kids = (() => {
   }
   // English inside a Hebrew sentence: each quoted English bit (and runs of English words) stays one left-to-right piece
   const bidiEn = text => !isHe() ? text : text.split(/("[^"]+")/).map(part => part.startsWith('"')
-    ? `<bdi dir="ltr" lang="en">${part}</bdi>`
+    ? `<bdi class="k-q" dir="ltr" lang="en">${part}</bdi>`
     : part.replace(/[A-Za-z][A-Za-z ',.!?/-]*[A-Za-z!?.]|[A-Za-z]/g, m => `<bdi dir="ltr" lang="en">${m}</bdi>`)).join('');
   const endOwl = () => `<div class="k-end-owl">${owlAv()}</div>`;
   const starsHtml = (n, cls = '') => `<span class="k-stars ${cls}" aria-label="${n} / 3">${[1, 2, 3].map(i => `<i class="${i <= n ? 'on' : ''}">★</i>`).join('')}</span>`;
@@ -6323,10 +6323,14 @@ const Kids = (() => {
           if (x.c.w === y.c.w) {
             found++;
             setTimeout(() => { x.b.classList.add('got'); y.b.classList.add('got'); x.b.disabled = y.b.disabled = true; K.Feel.right(); }, 250);
+            owlMood('cheer');
+            $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${x.c.w.en}</bdi> · ${x.c.w.he} ✓`;
             K.lessonBar((steps.length - 1 + found / pairs.length) / steps.length);
             if (found === pairs.length) setTimeout(finish, 1100);
           } else {
             busy = true;
+            owlMood('think');
+            $('.k-bubble').textContent = kt('tryAgain');   // not a pair: a gentle nudge, the cards turn back
             setTimeout(() => {
               [x, y].forEach(o => { o.b.classList.remove('up'); o.b.setAttribute('aria-label', '?'); });
               busy = false;
