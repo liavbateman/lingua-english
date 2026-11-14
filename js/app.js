@@ -1802,7 +1802,9 @@
     if (!unit) return notFound();
     // The very first lesson is a short one: 8 cards, then a short practice of just those words
     const firstEver = !ALL_WORDS.some(w => Store.isSeen(w.id));
-    const words = firstEver ? unit.words.slice(0, 8) : unit.words;
+    // Coming back to a unit begun earlier: the cards show the words not met yet, not the whole unit again
+    const fresh = unit.words.filter(w => !Store.isSeen(w.id));
+    const words = firstEver ? unit.words.slice(0, 8) : fresh.length && fresh.length < unit.words.length ? fresh : unit.words;
     let i = 0, known = 0;
 
     function finish() {
