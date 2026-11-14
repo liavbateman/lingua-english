@@ -104,6 +104,7 @@ const Kids = (() => {
       pathAgain: 'דרך אחרת', pathFound: 'מצאתם {n} מתוך 4 סופים',
       calTitle: 'לוח המדבקות שלי', calSub: 'כל יום שמשחקים מקבל מדבקה', calCount: '{n} ימי משחק החודש',
       hide: 'מחבואים', hideSub: 'איפה הינשוף? מתחת, על, בתוך, מאחורי', hideTip: 'הקשיבו איפה הינשוף התחבא ולחצו שם',
+      cardBtn: 'כרטיס התקדמות לשיתוף', cardTitle: 'כרטיס התקדמות', cardShare: 'שיתוף', cardSave: 'שמירת תמונה', cardClose: 'סגירה',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -201,6 +202,7 @@ const Kids = (() => {
       pathAgain: 'Another way', pathFound: 'You found {n} of 4 endings',
       calTitle: 'My sticker calendar', calSub: 'Every day you play gets a sticker', calCount: '{n} play days this month',
       hide: 'Hide and seek', hideSub: 'Where is the owl? under, on, in, behind', hideTip: 'Listen where the owl is hiding and tap there',
+      cardBtn: 'Share a progress card', cardTitle: 'Progress card', cardShare: 'Share', cardSave: 'Save image', cardClose: 'Close',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -2095,6 +2097,7 @@ const Kids = (() => {
           }).join('')}
         </section>
         ${weekBox()}
+        <button class="k-btn ghost" id="k-card">🖼️ ${kt('cardBtn')}</button>
         ${voiceBox()}
         <p class="k-pc-tip">💡 ${kt('pcTip')}</p>
       </div>`;
@@ -2118,6 +2121,7 @@ const Kids = (() => {
     if (vEn) vEn.onclick = () => sayEn('Hello! This is how the English words sound.', 0.9);
     if (vHe) vHe.onclick = () => say([['he', kt('vcSampleHe')]]);
     $('#k-big').onchange = e => { Store.kidsBigPrint = e.target.checked; document.body.classList.toggle('kids-big', Store.kidsBigPrint); };
+    $('#k-card').onclick = progressCard;
     $('#k-bed').onchange = e => { Store.kidsBedtime = e.target.checked; document.body.classList.toggle('night', isNight()); };
   }
 
@@ -2166,6 +2170,73 @@ const Kids = (() => {
         ${row(kt('vcHe'), heVoice, 'k-vc-he')}
         ${tips.length ? `<div class="k-vc-tip">${tips.map(x => `<p>${x}</p>`).join('')}<p>📱 ${kt('vcIos')}</p><p>🤖 ${kt('vcAndroid')}</p></div>` : ''}
       </section>`;
+  }
+
+  // A progress card to share with family: one square picture of what the child has done
+  function drawCard() {
+    const me = Store.kidsProfiles.find(p => p.active);
+    const learned = KIDS_WORDS.filter(w => Store.kidsWordCount(w.id) > 0);
+    const trophies = trophyList().filter(t => t.got).length;
+    const S = 1080, c = document.createElement('canvas');
+    c.width = c.height = S;
+    const g = c.getContext('2d');
+    const sky = g.createLinearGradient(0, 0, 0, S);
+    sky.addColorStop(0, '#57c1ff'); sky.addColorStop(1, '#d9f3ff');
+    g.fillStyle = sky; g.fillRect(0, 0, S, S);
+    const font = (px, w = 700) => `${w} ${px}px "Varela Round", "Heebo", sans-serif`;
+    const round = (x, y, w, h, r, fill) => { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h); g.fillStyle = fill; g.fill(); };   // older Safari has no roundRect
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    // header
+    g.font = font(150, 400); g.fillText(me ? me.face : '🦉', S / 2, 150);
+    g.fillStyle = '#1d2a5b'; g.font = font(62);
+    g.fillText(me && me.name ? me.name : 'Lingua Kids', S / 2, 270);
+    g.font = font(36, 400); g.fillStyle = '#2b3c7a';
+    g.fillText(new Date().toLocaleDateString(isHe() ? 'he-IL' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' }), S / 2, 330);
+    // four big numbers
+    const stats = [['⭐', Store.kidsTotalStars, 'stars'], ['💬', learned.length, 'words'], ['🏝️', Store.kidsStickerCount, 'islands'], ['🏆', trophies, 'trophies']];
+    stats.forEach(([pic, n, label], i) => {
+      const x = 90 + (i % 2) * 460, y = 390 + Math.floor(i / 2) * 230;
+      round(x, y, 440, 200, 40, '#ffffff');
+      g.font = font(80, 400); g.fillText(pic, x + 90, y + 100);
+      g.fillStyle = '#1d2a5b'; g.textAlign = 'left';
+      g.font = font(78); g.fillText(String(n), x + 170, y + 82);
+      g.font = font(34, 400); g.fillStyle = '#4b5a8c'; g.fillText(label, x + 172, y + 148);
+      g.textAlign = 'center';
+    });
+    // a row of learned word pictures
+    round(90, 870, 900, 120, 40, 'rgba(255,255,255,.85)');
+    g.font = font(64, 400);
+    learned.slice(-11).forEach((w, i) => g.fillText(w.pic, 150 + i * 79, 930));
+    g.font = font(30, 400); g.fillStyle = '#1d2a5b';
+    g.fillText('🦉 Lingua Kids · English for children', S / 2, 1040);
+    return c;
+  }
+  function progressCard() {
+    const c = drawCard(), url = c.toDataURL('image/png');
+    const back = document.createElement('div');
+    back.className = 'k-reveal';
+    back.setAttribute('role', 'dialog');
+    back.setAttribute('aria-modal', 'true');
+    back.innerHTML = `
+      <div class="k-reveal-card k-card-preview">
+        <b>${kt('cardTitle')}</b>
+        <img src="${url}" alt="${kt('cardTitle')}">
+        <button class="k-btn" id="k-card-share">📤 ${kt('cardShare')}</button>
+        <a class="k-btn ghost" id="k-card-save" href="${url}" download="lingua-kids.png">💾 ${kt('cardSave')}</a>
+        <button class="k-skip" id="k-card-close">${kt('cardClose')}</button>
+      </div>`;
+    document.body.appendChild(back);
+    const close = () => back.remove();
+    back.querySelector('#k-card-close').onclick = close;
+    back.onclick = e => { if (e.target === back) close(); };
+    const share = back.querySelector('#k-card-share');
+    share.onclick = () => c.toBlob(async blob => {
+      const file = new File([blob], 'lingua-kids.png', { type: 'image/png' });
+      try {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: 'Lingua Kids' });
+        else back.querySelector('#k-card-save').click();
+      } catch (e) { /* closed the share sheet */ }
+    });
   }
 
   // ---------- daily time limit ----------

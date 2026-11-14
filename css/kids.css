@@ -1069,3 +1069,7 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-spot.puff { animation: k-puff .5s ease-out; }
 @keyframes k-puff { 0% { background: rgba(255, 255, 255, .8); } 100% { background: transparent; } }
 .k-peek-owl { display: grid; place-items: center; height: 100%; font-size: 2.6rem; animation: k-pop .5s var(--ease-pop) both; }
+
+/* progress card preview */
+.k-card-preview img { width: 100%; border-radius: 18px; box-shadow: 0 4px 12px rgba(20, 40, 110, .25); }
+.k-card-preview .k-btn { margin-top: 6px; }
