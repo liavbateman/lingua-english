@@ -112,6 +112,7 @@ const Kids = (() => {
       fam: 'משפחות של מילים', famSub: 'מוצאים את כל החיות, כל האוכל, כל הצעצועים', famTip: 'לחצו על כל התמונות מהמשפחה. כל מילה נכנסת לסל',
       famLeft: 'עוד {n}',
       twin: 'כמעט כמו בעברית!', twinSay: 'כמעט כמו בעברית!', twinsTitle: 'מילים תאומות', twinsSub: 'מילים באנגלית שנשמעות כמו בעברית · פגשתם {n} מתוך {all}',
+      mon: 'מאכילים את המפלצת', monSub: 'המפלצת רעבה! מה היא רוצה לאכול?', monTip: 'הקשיבו מה המפלצת רוצה, וגררו את האוכל לפה שלה (או לחצו עליו)',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -217,6 +218,7 @@ const Kids = (() => {
       fam: 'Word families', famSub: 'Find all the animals, all the food, all the toys', famTip: 'Tap every picture in the family. Each word jumps into the basket',
       famLeft: '{n} more',
       twin: 'Almost like in Hebrew!', twinSay: 'Almost like in Hebrew!', twinsTitle: 'Twin words', twinsSub: 'English words that sound like Hebrew · you met {n} of {all}',
+      mon: 'Feed the monster', monSub: 'The monster is hungry! What does it want?', monTip: 'Listen to what the monster wants, then drag the food to its mouth (or tap it)',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -575,6 +577,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🧺</span>
           <span class="grow"><b>${kt('fam')}</b><small>${kt('famSub')}</small></span>
           ${Store.kidsHasSticker('fam') ? starsHtml(Store.kidsStars('fam'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-mon-card" href="#/kids/monster">
+          <span class="k-story-books" aria-hidden="true">👹</span>
+          <span class="grow"><b>${kt('mon')}</b><small>${kt('monSub')}</small></span>
+          ${Store.kidsHasSticker('monster') ? starsHtml(Store.kidsStars('monster'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -1765,6 +1772,114 @@ const Kids = (() => {
       celebrate();
       sayEn('You sorted them all!', 0.9);
       $('#k-again').onclick = famGame;
+    }
+    round();
+  }
+
+  // ---------- feed the hungry monster: listen for the food, drag it to the mouth ----------
+  // A friendly monster says "I want a banana!". Dragging (or tapping) the right food: chomp, "Yum!".
+  // The wrong food: the monster shakes its head, says what it is, and asks again. Never a fail.
+  function monsterGame() {
+    document.body.classList.add('in-lesson');
+    const food = (KIDS_THEMES.find(t => t.id === 'food') || { words: [] }).words;
+    const rounds = K.shuffle(food).slice(0, 6);
+    const nOpts = little() ? 3 : 4;
+    let at = 0, firstTry = 0;
+    function round() {
+      K.lessonBar(at / rounds.length);
+      const w = rounds[at], line = `I want ${/^[aeiou]/.test(w.en) ? 'an' : 'a'} ${w.en}!`;
+      const say1 = ['milk', 'bread', 'grapes', 'pizza'].includes(w.en) ? `I want ${w.en === 'grapes' ? 'grapes' : 'some ' + w.en}!` : line;
+      const opts = K.shuffle([w, ...K.shuffle(food.filter(x => x !== w)).slice(0, nOpts - 1)]);
+      let missed = false, done = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">👹</span> ${kt('mon')} · ${at + 1}/${rounds.length}</p>
+          <button class="k-monster" id="k-mon" aria-label="${kt('listen')}: ${say1}">
+            <span class="k-mon-eyes" aria-hidden="true"><i></i><i></i></span>
+            <span class="k-mon-mouth" aria-hidden="true"></span>
+            <span class="k-mon-say en" lang="en">${say1}</span>
+          </button>
+          <div class="k-mon-food">${opts.map((o, i) => `<button class="k-mon-dish" data-i="${i}" aria-label="${o.en}"><span aria-hidden="true">${o.pic}</span></button>`).join('')}</div>
+          ${owl(kt('monTip'), 'small')}
+        </div>`;
+      const mon = $('#k-mon');
+      const ask = () => sayEn(say1, 0.85);
+      mon.onclick = ask;
+      setTimeout(ask, 300);
+      const feed = (b, o) => {
+        if (done) return;
+        if (o === w) {
+          done = true;
+          const m = mon.getBoundingClientRect(), r = b.getBoundingClientRect();
+          b.style.transition = 'transform .45s ease-in, opacity .45s';
+          b.style.transform = `translate(${m.left + m.width / 2 - (r.left + r.width / 2)}px, ${m.top + m.height * .62 - (r.top + r.height / 2)}px) scale(.3)`;
+          b.style.opacity = '0';
+          K.view.querySelectorAll('.k-mon-dish').forEach(x => { x.disabled = true; });
+          setTimeout(() => { mon.classList.add('chomp'); popSound(); setTimeout(popSound, 250); }, 380);
+          K.Feel.right();
+          if (!missed) { firstTry++; Store.kidsWordRight(w.id); }
+          owlMood('cheer');
+          $('.k-mon-say').textContent = `Yum! ${w.en}!`;
+          $('.k-bubble').textContent = `${w.en} · ${w.he} 😋`;
+          setTimeout(() => say([['en', `Yum yum! ${w.en}! Thank you!`]], 0.9), 450);
+          setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 2300);
+        } else {
+          if (!missed) Store.kidsWordMiss(w.id);
+          missed = true;
+          b.style.transform = '';
+          mon.classList.remove('nope'); void mon.offsetWidth; mon.classList.add('nope');
+          K.Feel.wrong(b);
+          owlMood('think');
+          $('.k-bubble').textContent = `${o.en}? ${kt('tryAgain')}`;
+          say([['en', o.en === 'grapes' ? 'No, those are grapes.' : ['milk', 'bread'].includes(o.en) ? `No, that is ${o.en}.` : `No, that is ${/^[aeiou]/.test(o.en) ? 'an' : 'a'} ${o.en}.`], ['en', say1]], 0.85);
+        }
+      };
+      K.view.querySelectorAll('.k-mon-dish').forEach(b => {
+        const o = opts[+b.dataset.i];
+        b.onclick = () => { if (b.dataset.dragged) { delete b.dataset.dragged; return; } feed(b, o); };
+        b.onpointerdown = e => {
+          if (b.disabled) return;
+          const sx = e.clientX, sy = e.clientY;
+          let moving = false;
+          const move = ev => {
+            const dx = ev.clientX - sx, dy = ev.clientY - sy;
+            if (!moving && Math.hypot(dx, dy) < 8) return;
+            if (!moving) { moving = true; b.classList.add('dragging'); sayEn(o.en); }
+            b.style.transform = `translate(${dx}px, ${dy}px) scale(1.1)`;
+          };
+          const up = ev => {
+            window.removeEventListener('pointermove', move);
+            window.removeEventListener('pointerup', up);
+            window.removeEventListener('pointercancel', up);
+            b.classList.remove('dragging');
+            if (!moving) return;
+            b.dataset.dragged = '1';
+            const m = mon.getBoundingClientRect();
+            const over = ev.clientX > m.left && ev.clientX < m.right && ev.clientY > m.top && ev.clientY < m.bottom;
+            if (over) feed(b, o); else b.style.transform = '';
+          };
+          window.addEventListener('pointermove', move);
+          window.addEventListener('pointerup', up);
+          window.addEventListener('pointercancel', up);
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = firstTry >= 6 ? 3 : firstTry >= 4 ? 2 : 1;
+      Store.kidsFinish('monster', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>👹 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('I am so full! Thank you!', 0.9);
+      $('#k-again').onclick = monsterGame;
     }
     round();
   }
@@ -3768,6 +3883,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'monster') monsterGame();
       else if (a === 'fam') famGame();
       else if (a === 'simon') simonGame();
       else if (a === 'hide') hideGame();

@@ -1125,3 +1125,38 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
   border-radius: 22px; background: #fff; color: var(--k-ink); font-weight: 700; box-shadow: 0 8px 24px rgba(20, 40, 110, .3);
   animation: k-pop .5s var(--ease-pop) both;
 }
+
+/* feed the monster */
+.k-monster {
+  position: relative; display: block; width: 210px; height: 210px; margin: 6px auto 70px; border: 0; padding: 0; cursor: pointer;
+  border-radius: 50% 50% 46% 46%; background: radial-gradient(circle at 35% 30%, #9cf28a, #46c46a 60%, #2e9e52);
+  box-shadow: 0 8px 0 #23804a, inset 0 -10px 0 rgba(0, 0, 0, .08); animation: k-mon-bob 2.4s ease-in-out infinite;
+}
+.k-monster::before, .k-monster::after { /* little horns */
+  content: ''; position: absolute; top: -14px; width: 26px; height: 34px; border-radius: 50% 50% 6px 6px; background: #ffd166;
+}
+.k-monster::before { left: 42px; transform: rotate(-18deg); }
+.k-monster::after { right: 42px; transform: rotate(18deg); }
+.k-mon-eyes { position: absolute; top: 48px; left: 0; right: 0; display: flex; justify-content: center; gap: 22px; }
+.k-mon-eyes i { width: 44px; height: 44px; border-radius: 50%; background: #fff; box-shadow: inset 12px 6px 0 -2px #fff, inset 0 0 0 13px #fff, inset 0 0 0 30px #1d2a5b; }
+.k-mon-mouth {
+  position: absolute; left: 50%; top: 118px; width: 96px; height: 46px; transform: translateX(-50%);
+  border-radius: 10px 10px 60px 60px; background: #7a1f3d; box-shadow: inset 0 10px 0 #fff; /* teeth */
+  transition: height .15s;
+}
+.k-monster.chomp .k-mon-mouth { animation: k-chomp .5s ease-in-out 2; }
+@keyframes k-chomp { 50% { height: 8px; } }
+.k-monster.nope { animation: k-mon-no .5s ease-in-out; }
+@keyframes k-mon-no { 20%, 60% { transform: rotate(-8deg); } 40%, 80% { transform: rotate(8deg); } }
+@keyframes k-mon-bob { 50% { transform: translateY(-6px); } }
+.k-mon-say {
+  position: absolute; left: 50%; bottom: -58px; transform: translateX(-50%); white-space: nowrap; padding: 8px 16px; border-radius: 18px;
+  background: #fff; color: var(--k-ink); font: 700 1.3rem var(--k-font); box-shadow: 0 4px 0 var(--k-edge);
+}
+.k-mon-food { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.k-mon-dish {
+  width: 76px; height: 76px; border: 0; border-radius: 50%; background: #fff; font-size: 2.6rem; cursor: grab; touch-action: none;
+  box-shadow: 0 5px 0 var(--k-edge);
+}
+.k-mon-dish.dragging { cursor: grabbing; z-index: 5; position: relative; box-shadow: 0 12px 20px rgba(0, 0, 0, .25); }
+@media (prefers-reduced-motion: reduce) { .k-monster { animation: none; } }
