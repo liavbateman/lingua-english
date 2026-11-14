@@ -157,6 +157,7 @@ const Kids = (() => {
       lotwTip: 'לחצו על מילה כדי לשמוע אותה. האות הראשונה מסומנת',
       netOff: 'אין אינטרנט כרגע. הכול עובד גם בלי!', netNoVoice: 'אין קול באנגלית במכשיר הזה. אפשר לשחק עם התמונות והמילים, ומבוגר יכול להקריא',
       bath: 'זמן אמבטיה', bathSub: 'שמים את הברווז במים, מוציאים את הסירה, ומפוצצים בועות!', bathTip: 'הקשיבו ולחצו על הצעצוע הנכון. בסוף מפוצצים בועות',
+      odd: 'מי לא שייך?', oddSub: 'שלושה דברים מאותה משפחה ואחד אחר. מי לא שייך?', oddTip: 'מצאו את התמונה שלא שייכת לשאר',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -307,6 +308,7 @@ const Kids = (() => {
       lotwTip: 'Tap a word to hear it. The first letter is marked',
       netOff: 'No internet right now. Everything still works!', netNoVoice: 'There is no English voice on this device. You can play with the pictures and words, and a grown-up can read aloud',
       bath: 'Bath time', bathSub: 'Put the duck in the water, take the boat out, and pop the bubbles!', bathTip: 'Listen and tap the right toy. At the end, pop the bubbles',
+      odd: 'Odd one out', oddSub: 'Three things from one family and one that is different. Which one?', oddTip: 'Find the picture that does not belong',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -793,6 +795,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🛁</span>
           <span class="grow"><b>${kt('bath')}</b><small>${kt('bathSub')}</small></span>
           ${Store.kidsHasSticker('bath') ? starsHtml(Store.kidsStars('bath'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-odd-card" href="#/kids/odd">
+          <span class="k-story-books" aria-hidden="true">🔎</span>
+          <span class="grow"><b>${kt('odd')}</b><small>${kt('oddSub')}</small></span>
+          ${Store.kidsHasSticker('odd') ? starsHtml(Store.kidsStars('odd'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -4299,6 +4306,78 @@ const Kids = (() => {
     next();
   }
 
+  // ---------- odd one out: thinking in categories ----------
+  // Four pictures: three from one family (food) and one from another (a car). Tapping the odd one makes
+  // the owl say why: "A car is not food! Apple, banana and egg are food." Reasoning in English words.
+  function oddGame() {
+    document.body.classList.add('in-lesson');
+    const themeOf = id => (KIDS_THEMES.find(t => t.id === id) || { words: [] }).words.filter(w => w.pic && !/\s/.test(w.en));
+    const fams = FAMILIES.filter(f => themeOf(f.id).length >= 3);
+    const rounds = Array.from({ length: 6 }, () => { const [a, b] = K.shuffle(fams); return { fam: a, other: b }; });
+    const art = en => (/^[aeiou]/.test(en) ? 'an' : 'a');
+    const list = ws => `${ws.slice(0, -1).join(', ')} and ${ws[ws.length - 1]}`;
+    let at = 0, firstTry = 0;
+    function round() {
+      K.lessonBar(at / rounds.length);
+      const { fam, other } = rounds[at];
+      const three = K.shuffle(themeOf(fam.id)).slice(0, 3);
+      const odd = pickOne(themeOf(other.id).filter(w => !three.some(t => t.pic === w.pic)));
+      const opts = K.shuffle([...three, odd]);
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🔎</span> ${kt('odd')} · ${at + 1}/${rounds.length}</p>
+          <p class="k-tip en" lang="en">Which one does not belong?</p>
+          <div class="k-opts four k-odd-grid">${opts.map((o, i) => `<button class="k-opt k-rh-opt" data-i="${i}" aria-label="${o.en}"><span aria-hidden="true">${o.pic}</span><small class="en">${o.en}</small></button>`).join('')}</div>
+          <p class="k-odd-why en" lang="en" aria-live="polite"></p>
+          ${owl(kt('oddTip'), 'small')}
+        </div>`;
+      setTimeout(() => sayEn('Which one does not belong?', 0.85), 300);
+      K.view.querySelectorAll('.k-opt').forEach(b => {
+        b.onclick = () => {
+          const o = opts[+b.dataset.i];
+          if (o === odd) {
+            K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; x.classList.toggle('same', x !== b); });
+            b.classList.add('right');
+            K.Feel.right();
+            if (!missed) firstTry++;
+            owlMood('cheer');
+            const ONE = { animals: 'an animal', food: 'food', toys: 'a toy', 'things that go': 'a thing that goes', clothes: 'something you wear', 'body parts': 'a body part' };
+            const why = `${art(odd.en)[0].toUpperCase() + art(odd.en).slice(1)} ${odd.en} is not ${ONE[fam.en] || fam.en}! ${(l => l[0].toUpperCase() + l.slice(1))(list(three.map(w => w.en)))} are ${fam.en}.`;
+            $('.k-odd-why').textContent = why;
+            $('.k-bubble').textContent = `${fam.pic} ${fam.he}`;
+            say([['en', why]], 0.85);
+            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 4200);
+          } else {
+            missed = true;
+            K.Feel.wrong(b);
+            owlMood('think');
+            $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${o.en}</bdi> ${fam.pic}? ${kt('tryAgain')}`;
+            sayEn(`${o.en[0].toUpperCase() + o.en.slice(1)} is in the ${fam.en} family. Look again!`, 0.9);
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = firstTry >= 6 ? 3 : firstTry >= 4 ? 2 : 1;
+      Store.kidsFinish('odd', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🔎 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('You are a super thinker!', 0.9);
+      $('#k-again').onclick = oddGame;
+    }
+    round();
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -6371,6 +6450,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'odd') oddGame();
       else if (a === 'bath') bathGame();
       else if (a === 'lotw') lotwScreen();
       else if (a === 'wxr') wxrGame();

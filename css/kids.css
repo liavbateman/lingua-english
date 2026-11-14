@@ -1613,3 +1613,8 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 @keyframes k-bub-up { to { bottom: 70px; } }
 .k-bath-bub.pop { animation: none; bottom: 70px; background: #fff1c2; border-color: #ffd84d; }
 @media (prefers-reduced-motion: reduce) { .k-tub-toys .k-bath-toy { animation: none; } .k-bath-bub { animation-duration: .01s; } }
+
+/* odd one out */
+.k-odd-grid { grid-template-columns: 1fr 1fr; }
+.k-opt.same { opacity: .55; }
+.k-odd-why { min-height: 2.8em; margin: 12px 0 0; text-align: center; font: 700 1.1rem var(--k-font); color: #ffe9a6; }
