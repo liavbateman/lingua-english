@@ -5038,7 +5038,9 @@ const Kids = (() => {
           <p class="k-he he" lang="he">${pg.he}</p>
         </div>
         ${pg.end ? `
-          <p class="k-tip">🏁 ${kt('pathEnd')} · ${kt('pathFound', { n: found.length })}</p>
+          <p class="k-tip">🏁 ${kt('pathEnd')} · ${kt('pathFound', { n: Math.max(found.length, found.includes(id) ? found.length : found.length + 1) })}</p>
+          <div class="k-path-ends" aria-hidden="true">${Object.entries(KIDS_PATH.pages).filter(([, p]) => p.end).map(([k, p]) =>
+            `<span class="${k === id ? 'now' : found.includes(k) ? 'got' : ''}">${k === id || found.includes(k) ? [...p.scene][0] + [...p.scene][1] : '❔'}</span>`).join('')}</div>
           <button class="k-btn" id="k-path-again">🔀 ${kt('pathAgain')}</button>
           <a class="k-btn ghost" href="#/kids/stories">📚 ${kt('stories')}</a>`
         : `
@@ -5047,7 +5049,16 @@ const Kids = (() => {
       </div>`;
     const words = [...K.view.querySelectorAll('.k-w')];
     words.forEach(w => { w.onclick = () => sayEn(w.textContent.replace(/[^A-Za-z']/g, '')); });
-    setTimeout(() => readAlong(pg.en, words), 250);
+    // after the page, the owl reads the choices aloud ("the red door, or the bridge?") and each one glows as it
+    // is said - so a child who can't read yet knows what they are choosing
+    const readChoices = () => {
+      const btns = [...K.view.querySelectorAll('.k-path-choice')];
+      if (!btns.length || !btns[0].isConnected) return;
+      speakSeq(pg.choices.map((c, i) => (i ? `or ${c.en}?` : `${c.en},`)), 0.85, i => {
+        btns.forEach((b, k) => b.classList.toggle('say', k === i));
+      }, () => btns.forEach(b => b.classList.remove('say')));
+    };
+    setTimeout(() => readAlong(pg.en, words, pg.end ? null : readChoices), 250);
     if (pg.end) {
       celebrate();
       if (isNew) Store.kidsFinish('path', Math.min(3, Store.kidsPathEnds().length), 10);
