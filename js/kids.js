@@ -2847,7 +2847,7 @@ const Kids = (() => {
           g.classList.add('nope');
           owlMood('think');
           $('.k-bubble').textContent = `${id} · ${p.he}. ${kt('tryAgain')}`;
-          say([['en', `That is the ${id}.`], ['en', line]], 0.9);
+          say([['en', `${/s$/.test(id) || id === 'feet' ? 'Those are' : 'That is'} the ${id}.`], ['en', line]], 0.9);
         }
       };
       K.view.querySelectorAll('.k-td-part').forEach(g => {

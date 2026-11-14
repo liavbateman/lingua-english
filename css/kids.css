@@ -1287,7 +1287,7 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 
 /* touch the teddy */
 .k-teddy-box { display: flex; justify-content: center; padding: 10px 0 4px; border-radius: 26px; background: rgba(255, 255, 255, .9); box-shadow: 0 6px 0 var(--k-edge); }
-.k-teddy { width: min(72vw, 280px); height: auto; overflow: visible; }
+.k-teddy { width: min(72vw, 280px); height: auto; max-height: 46vh; overflow: visible; }   /* the feet stay on screen on short phones */
 .k-teddy.giggle { animation: k-td-giggle .6s ease-in-out; }
 @keyframes k-td-giggle { 25% { transform: rotate(-4deg); } 75% { transform: rotate(4deg); } }
 .k-td-part { cursor: pointer; fill: #c98a4b; stroke: #8a5527; stroke-width: 2; transform-box: fill-box; transform-origin: center; outline: none; }
