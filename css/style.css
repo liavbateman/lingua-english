@@ -793,7 +793,7 @@ body.in-lesson .view.has-check { padding-bottom: calc(132px + env(safe-area-inse
 .pbadge.ok { background: var(--good); color: #08111f; }
 .pbubble {
   position: absolute; top: -42px; z-index: 2; padding: 7px 14px; border-radius: 12px; white-space: nowrap;
-  background: #fff; color: #e2553a; font-weight: 900; font-size: .9rem; box-shadow: 0 4px 0 #d9d9e8;
+  background: #fff; color: #c93f25; font-weight: 900; font-size: .9rem; box-shadow: 0 4px 0 #d9d9e8;
   animation: bob 1.6s ease-in-out infinite;
 }
 .pbubble::after {
@@ -837,7 +837,7 @@ body.in-lesson .view.has-check { padding-bottom: calc(132px + env(safe-area-inse
 }
 .pcard b { font-size: 1.1rem; position: relative; }
 .pcard p { margin: 0; opacity: .92; position: relative; }
-.pcard .btn { background: #fff; color: #e2553a; box-shadow: 0 4px 0 #f0c9bd; margin-top: 4px; }
+.pcard .btn { background: #fff; color: #c93f25; box-shadow: 0 4px 0 #f0c9bd; margin-top: 4px; }
 .pcard .btn:active { box-shadow: 0 0 0 #f0c9bd; }
 .pcard-link { text-align: center; color: inherit; opacity: .9; font-weight: 700; font-size: .9rem; padding: 6px; }
 .pcard.done { background: #ffc53d; color: #4a3200; box-shadow: 0 5px 0 #c9921a, 0 18px 40px rgba(0, 0, 0, .45); }
@@ -1785,7 +1785,7 @@ body.in-lesson .view.has-fb { padding-bottom: calc(var(--fb-h, 230px) + 24px + e
   background: color-mix(in srgb, var(--c) 28%, transparent); color: color-mix(in srgb, var(--c) 45%, #fff); }
 .ptile .tile { position: relative; }
 .pt-badge { position: absolute; top: -7px; inset-inline-end: -9px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px;
-  display: grid; place-items: center; font-size: .75rem; font-weight: 900; background: #ff6b7a; color: #fff; box-shadow: 0 0 0 2px #1a2052; }
+  display: grid; place-items: center; font-size: .75rem; font-weight: 900; background: #cc3346; color: #fff; box-shadow: 0 0 0 2px #1a2052; }
 
 /* ---------- Tab bar: each screen's own colour on its active pill, a dot when something waits (design round D29) ---------- */
 .tabbar a[data-tab="grammar"] { --tc: #ff9a6b; }
@@ -2118,3 +2118,5 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
 /* The translation under the answer sits on the answer's side, so the two read as one pair */
 .fb-sub.fb-sub-en { text-align: left; padding-inline: 4px; }
 .fb-sub.fb-sub-he { text-align: right; padding-inline: 4px; }
+
+/* Contrast (round 31): the path's 'start here' bubble and the practice count badge reach 4.5:1 with their text */
