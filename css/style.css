@@ -2150,3 +2150,8 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
 /* The task that the next-lesson card opens wears a small "Now" tag, so the card and the task read as one step */
 .task-now { display: inline-block; margin-inline-start: 6px; padding: 1px 8px; border-radius: 999px; vertical-align: 2px;
   font-size: .72rem; font-weight: 800; background: rgba(142, 125, 255, .22); color: #d8d2ff; text-decoration: none; }
+
+/* The example sentence in "Why?" gets a line of its own: an English sentence wrapped inside a Hebrew line
+   splits into pieces that read out of order */
+.why-ex { display: block; margin-top: 3px; }
+html[dir="rtl"] .why-ex { text-align: right; }

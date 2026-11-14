@@ -2186,7 +2186,7 @@
         const means = x => x.phrase
           ? `<span class="why-line en" dir="ltr">${x.en}</span><span class="why-line" dir="rtl">"${x.he}"</span>`
           : t('v.means', { en: `<b class="en" dir="ltr">${x.en}</b>`, he: x.he });
-        const answerWhy = means(w) + (w.ex && kind !== 'cloze' ? ` ${t('v.ex', { ex: `<span class="en" dir="ltr">${w.ex}</span>` })}` : '');
+        const answerWhy = means(w) + (w.ex && kind !== 'cloze' ? ` ${t('v.ex', { ex: `<span class="en why-ex" dir="ltr">${w.ex}</span>` })}` : '');
         if (ok && typed === undefined) return whyHtml({ answer: kind === 'choice' && toHebrew ? w.he : w.en, answerWhy });
         let pickedWhy = '';
         if (typed !== undefined) {
