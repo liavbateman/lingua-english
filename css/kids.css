@@ -1547,3 +1547,17 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-cbw-word { font: 700 15px var(--k-font); fill: #1d2a5b; paint-order: stroke; stroke: #fff; stroke-width: 4px; }
 .k-cbw-word.done { opacity: .35; }
 .k-cbw-pot.picked { transform: translateY(-6px) scale(1.08); box-shadow: 0 0 0 4px #ffd84d; }
+
+/* pizza maker */
+.k-pizza-wrap { position: relative; display: flex; justify-content: center; margin: 10px 0 14px; }
+.k-pizza { position: relative; width: 210px; height: 210px; border-radius: 50%; background: radial-gradient(circle, #ff7043 0 62%, #f4c27a 63% 100%);
+  box-shadow: 0 8px 0 #c98a3e, inset 0 0 0 10px #f4c27a; transition: filter .6s; }
+.k-pz-piece { position: absolute; transform: translate(-50%, -50%); font-size: 1.7rem; line-height: 1; animation: k-pop .35s var(--ease-pop) both; }
+.k-oven { position: absolute; bottom: -6px; font-size: 3rem; opacity: 0; transition: opacity .4s; }
+.k-pizza-wrap.bake .k-pizza { filter: brightness(.92) saturate(1.3); animation: k-boing 1s var(--ease-pop); }
+.k-pizza-wrap.bake .k-oven { opacity: 1; animation: k-boing .6s ease-in-out 3; }
+.k-pizza-tops { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; direction: ltr; }
+.k-pizza-top { display: flex; flex-direction: column; align-items: center; padding: 8px 2px; border: 0; border-radius: 18px; background: #fff; color: var(--k-ink);
+  font-size: 2rem; cursor: pointer; box-shadow: 0 4px 0 var(--k-edge); }
+.k-pizza-top small { font: 700 .85rem var(--k-font); }
+.k-pizza-top.used { background: #d8fbe9; box-shadow: 0 4px 0 #2fd093; }

@@ -150,6 +150,7 @@ const Kids = (() => {
       rsVoice: 'הקול של אמא ואבא', rsRobot: 'קול הינשוף',
       cbw: 'צובעים לפי מילה', cbwSub: 'קוראים את שם הצבע על כל חלק בתמונה וצובעים', cbwTip: 'קראו את המילה על החלק, בחרו את הצבע ולחצו על החלק',
       feelst: 'איך הוא מרגיש?', feelstSub: 'סיפורים קטנים על רגשות: עצוב, שמח, מפחד, כועס', feelstTip: 'הקשיבו לסיפור. איך החבר מרגיש?', feelstFace: 'הסתכלו על הפנים',
+      pizza: 'מכינים פיצה', pizzaSub: 'הינשוף מזמין: גבינה ועגבנייה! שמים את התוספות ואופים', pizzaTip: 'הקשיבו מה הינשוף רוצה על הפיצה ולחצו על התוספות',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -293,6 +294,7 @@ const Kids = (() => {
       rsVoice: "Mum and dad's voice", rsRobot: "Owl's voice",
       cbw: 'Colour by word', cbwSub: 'Read the colour word on each part of the picture and paint it', cbwTip: 'Read the word on the part, pick that colour and tap the part',
       feelst: 'How do they feel?', feelstSub: 'Little stories about feelings: sad, happy, scared, angry', feelstTip: 'Listen to the story. How does the friend feel?', feelstFace: 'Look at the face',
+      pizza: 'Pizza maker', pizzaSub: 'The owl orders: cheese and tomato! Add the toppings and bake', pizzaTip: 'Listen to what the owl wants on the pizza and tap the toppings',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -745,6 +747,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🤗</span>
           <span class="grow"><b>${kt('feelst')}</b><small>${kt('feelstSub')}</small></span>
           ${Store.kidsHasSticker('feelst') ? starsHtml(Store.kidsStars('feelst'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-pizza-card" href="#/kids/pizza">
+          <span class="k-story-books" aria-hidden="true">🍕</span>
+          <span class="grow"><b>${kt('pizza')}</b><small>${kt('pizzaSub')}</small></span>
+          ${Store.kidsHasSticker('pizza') ? starsHtml(Store.kidsStars('pizza'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -3913,6 +3920,92 @@ const Kids = (() => {
     round();
   }
 
+  // ---------- pizza maker: listen to an order with "and" ----------
+  // The owl orders "I want cheese and tomato!" (three toppings for big kids). Tapping a topping spreads it
+  // on the pizza; something not ordered gets a giggle ("Corn? I didn't ask for corn!"). When the order
+  // is complete the pizza goes into the oven.
+  const TOPPINGS = [['cheese', '🧀', 'גבינה'], ['tomato', '🍅', 'עגבנייה'], ['mushrooms', '🍄', 'פטריות'], ['corn', '🌽', 'תירס'],
+    ['pineapple', '🍍', 'אננס'], ['broccoli', '🥦', 'ברוקולי']].map(([en, pic, he]) => ({ en, pic, he }));
+  function pizzaGame() {
+    document.body.classList.add('in-lesson');
+    const n = little() ? 2 : 3, orders = Array.from({ length: 4 }, () => K.shuffle(TOPPINGS).slice(0, n));
+    let at = 0, misses = 0;
+    const list = ts => ts.length === 2 ? `${ts[0].en} and ${ts[1].en}` : `${ts.slice(0, -1).map(t => t.en).join(', ')} and ${ts[ts.length - 1].en}`;
+    function round() {
+      K.lessonBar(at / orders.length);
+      const order = orders[at], on = new Set();
+      const line = `I want ${list(order)}!`;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🍕</span> ${kt('pizza')} · ${at + 1}/${orders.length}</p>
+          <div class="k-prompt">
+            <button class="k-speaker" id="k-say" aria-label="${kt('listen')}: ${line}"><span aria-hidden="true">🔊</span></button>
+            <span class="k-target en" lang="en">🦉 ${line}</span>
+          </div>
+          <div class="k-pizza-wrap"><div class="k-pizza" id="k-pizza"></div><span class="k-oven" aria-hidden="true">🔥</span></div>
+          <div class="k-pizza-tops">${TOPPINGS.map((t, i) => `<button class="k-pizza-top" data-i="${i}" aria-label="${t.en}"><span aria-hidden="true">${t.pic}</span><small class="en">${t.en}</small></button>`).join('')}</div>
+          ${owl(kt('pizzaTip'), 'small')}
+        </div>`;
+      const ask = () => sayEn(line, 0.85);
+      $('#k-say').onclick = ask;
+      setTimeout(ask, 300);
+      const pizza = $('#k-pizza');
+      K.view.querySelectorAll('.k-pizza-top').forEach(b => {
+        b.onclick = () => {
+          const t = TOPPINGS[+b.dataset.i];
+          if (on.has(t)) return;
+          if (!order.includes(t)) {
+            misses++;
+            K.Feel.wrong(b);
+            owlMood('giggle');
+            $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${t.en}? 😄</bdi> ${t.he}`;
+            sayEn(`${t.en[0].toUpperCase() + t.en.slice(1)}? I didn't ask for ${t.en}!`, 0.9);
+            return;
+          }
+          on.add(t);
+          b.classList.add('used');
+          b.disabled = true;
+          // spread a few pieces around the pizza
+          for (let k = 0; k < 4; k++) {
+            const a = (k / 4) * 6.28 + on.size, r = 18 + (k % 2) * 16;
+            pizza.insertAdjacentHTML('beforeend', `<span class="k-pz-piece" style="left:${50 + Math.cos(a) * r}%;top:${50 + Math.sin(a) * r}%">${t.pic}</span>`);
+          }
+          popSound();
+          sayEn(t.en, 0.9);
+          $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${t.en}</bdi> · ${t.he} ✓`;
+          if (on.size === order.length) {
+            K.view.querySelectorAll('.k-pizza-top').forEach(x => { x.disabled = true; });
+            setTimeout(() => {
+              $('.k-pizza-wrap').classList.add('bake');
+              K.Feel.right();
+              owlMood('cheer');
+              say([['en', `Into the oven! Yum! A ${list(order)} pizza!`]], 0.9);
+              setTimeout(() => { at++; at < orders.length ? round() : end(); }, 3000);
+            }, 700);
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = misses <= 1 ? 3 : misses <= 3 ? 2 : 1;
+      Store.kidsFinish('pizza', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🍕 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('You are a great pizza chef!', 0.9);
+      $('#k-again').onclick = pizzaGame;
+    }
+    round();
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -5985,6 +6078,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'pizza') pizzaGame();
       else if (a === 'feelst') feelStoryGame();
       else if (a === 'cbw') cbwGame();
       else if (a === 'peekaboo') peekabooGame();
