@@ -607,3 +607,19 @@ body.kids :focus-visible { outline: 4px solid #1d2a5b; outline-offset: 3px; bord
 .k-wotd-he { flex: none; padding: 4px 10px; border-radius: 12px; background: #f3f6ff; color: var(--k-ink); font-size: 1rem; }
 .k-wotd.planted small { color: #157a54; }
 .k-wotd.boing .k-wotd-pic { animation: k-boing .5s var(--ease-pop); }
+
+/* tap-along tutorial hand */
+.k-hand {
+  position: fixed; z-index: 70; margin: -6px 0 0 -14px; font-size: 3rem; pointer-events: none;
+  filter: drop-shadow(0 4px 4px rgba(20, 40, 110, .35));
+}
+.k-hand.tap { animation: k-hand-tap 1s ease-in-out infinite; }
+.k-hand.move { animation: k-hand-move 2s ease-in-out infinite; }
+@keyframes k-hand-tap { 0%, 100% { transform: translate(0, 18px); } 45% { transform: translate(0, 4px) scale(.88); } }
+@keyframes k-hand-move {
+  0% { transform: translate(0, 18px); opacity: 0; } 10% { opacity: 1; }
+  20% { transform: translate(0, 10px) scale(.9); }
+  75% { transform: translate(var(--dx), calc(var(--dy) + 10px)) scale(.9); opacity: 1; }
+  100% { transform: translate(var(--dx), calc(var(--dy) + 18px)); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .k-hand { animation: none !important; transform: translateY(14px); } }

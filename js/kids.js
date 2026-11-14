@@ -258,6 +258,32 @@ const Kids = (() => {
       setTimeout(() => f.remove(), 1600);
     });
   }
+  // Tap-along tutorial: the first time a game type appears, a pointing hand shows what to do
+  // (tap here, or move from here to there), so a child who can't read doesn't need a grown-up.
+  // It goes away at the first touch, or after a few seconds, and never comes back for that game.
+  const clearHands = () => document.querySelectorAll('.k-hand').forEach(h => h.remove());
+  function coach(kind, from, to) {
+    if (Store.kidsTipSeen(kind)) return;
+    clearHands();
+    const a = typeof from === 'string' ? $(from) : from, b = typeof to === 'string' ? $(to) : to;
+    if (!a) return;
+    Store.kidsTipDone(kind);
+    const c = r => [r.left + r.width / 2, r.top + r.height / 2];
+    const [x1, y1] = c(a.getBoundingClientRect()), [x2, y2] = b ? c(b.getBoundingClientRect()) : [x1, y1];
+    const hand = document.createElement('div');
+    hand.className = 'k-hand ' + (b ? 'move' : 'tap');
+    hand.setAttribute('aria-hidden', 'true');
+    hand.textContent = '👆';
+    hand.style.left = x1 + 'px';
+    hand.style.top = y1 + 'px';
+    hand.style.setProperty('--dx', (x2 - x1) + 'px');
+    hand.style.setProperty('--dy', (y2 - y1) + 'px');
+    document.body.appendChild(hand);
+    const bye = () => { hand.remove(); document.removeEventListener('pointerdown', bye, true); window.removeEventListener('hashchange', bye); };
+    document.addEventListener('pointerdown', bye, true);
+    window.addEventListener('hashchange', bye);
+    setTimeout(bye, 4200);
+  }
   const endOwl = () => `<div class="k-end-owl">${owlAv()}</div>`;
   const starsHtml = (n, cls = '') => `<span class="k-stars ${cls}" aria-label="${n} / 3">${[1, 2, 3].map(i => `<i class="${i <= n ? 'on' : ''}">★</i>`).join('')}</span>`;
 
@@ -1037,7 +1063,7 @@ const Kids = (() => {
     let at = 0, firstTry = 0, tapped = 0;
 
     const progress = () => K.lessonBar(at / steps.length);
-    function nextStep() { at++; at < steps.length ? show() : finish(); }
+    function nextStep() { clearHands(); at++; at < steps.length ? show() : finish(); }
 
     function show() {
       progress();
@@ -1069,6 +1095,8 @@ const Kids = (() => {
       pic.onclick = hear;
       $('#k-next').onclick = nextStep;
       if (n === 0) say([['he', kt('sayMeet')], ['en', w.en]]); else setTimeout(hear, 150);
+      if (n === 0) setTimeout(() => coach('meet', '#k-pic'), 400);
+      if (n === 1) setTimeout(() => coach('next', '#k-next'), 400);
     }
 
     // Find the picture: hear a word, tap its picture among 3 (4 once the child is warmed up)
@@ -1094,6 +1122,7 @@ const Kids = (() => {
       const ask = () => say(tapsShown === 1 ? [['he', kt('sayFind')], ['en', w.en]] : [['en', w.en]]);
       $('#k-say').onclick = () => sayEn(w.en);
       setTimeout(ask, 200);
+      setTimeout(() => coach('tap', '#k-say', '.k-opts'), 500);
       K.view.querySelectorAll('.k-opt').forEach(b => {
         b.onclick = () => {
           const o = opts[+b.dataset.i];
@@ -1146,6 +1175,7 @@ const Kids = (() => {
         </div>`;
       $('#k-say').onclick = () => sayEn(w.en);
       setTimeout(() => say(popsShown === 1 ? [['he', kt('sayPop')], ['en', w.en]] : [['en', w.en]]), 200);
+      setTimeout(() => coach('pop', '.k-balloon'), 500);
       K.view.querySelectorAll('.k-balloon').forEach(b => {
         b.onclick = () => {
           const o = opts[+b.dataset.i];
@@ -1198,6 +1228,7 @@ const Kids = (() => {
       pic.onclick = hear;
       $('#k-skip').onclick = () => { stopRec(); nextStep(); };
       setTimeout(() => say(saysShown === 1 ? [['he', kt('sayHe')], ['en', w.en]] : [['en', w.en]]), 200);
+      setTimeout(() => coach('say', '#k-mic'), 500);
       const done = text => {
         mic.disabled = true;
         bub().textContent = text;
@@ -1258,6 +1289,7 @@ const Kids = (() => {
           ${owl(kt('dragTip'), 'small')}
         </div>`;
       say([['he', kt('sayDrag')]]);
+      setTimeout(() => { const ch = $('.k-chip-word'); if (ch) coach('drag', ch, targets[+ch.dataset.w]); }, 500);
       const targets = [...K.view.querySelectorAll('.k-target-pic')];
       const drop = (chip, target) => {
         const w = set[+chip.dataset.w];
@@ -1345,6 +1377,7 @@ const Kids = (() => {
           ${owl(kt('matchTip'), 'small')}
         </div>`;
       say([['he', kt('sayMatch')]]);
+      setTimeout(() => coach('match', '.k-mem'), 500);
       K.view.querySelectorAll('.k-mem').forEach(b => {
         b.onclick = () => {
           const i = +b.dataset.i, c = cards[i];
@@ -1554,6 +1587,12 @@ const Kids = (() => {
         }, 1800);
       }
       say(stage ? [['he', kt('traceSmall')]] : [['en', x.name + '.']]);
+      if (!stage) setTimeout(() => {
+        const r = cv.getBoundingClientRect(), top = document.createElement('i'), bottom = document.createElement('i');
+        [[top, .25], [bottom, .75]].forEach(([el, y]) => { el.style.cssText = `position:fixed;left:${r.left + r.width / 2}px;top:${r.top + r.height * y}px;width:1px;height:1px`; document.body.appendChild(el); });
+        coach('trace', top, bottom);
+        top.remove(); bottom.remove();
+      }, 500);
     }
     draw();
   }
@@ -1677,6 +1716,7 @@ const Kids = (() => {
     hello() { say([['he', 'היי! אני הינשוף. בואו נלמד אנגלית ביחד!'], ['en', "Hello! Let's play!"]]); },
     show(a, b) {
       stopRec();
+      clearHands();
       songRun++;   // a song still playing stops
       document.body.classList.add('kids');
       if (a === 'parents') return parents();
