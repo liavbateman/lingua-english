@@ -1000,7 +1000,8 @@ const Kids = (() => {
             sayEn(w.en);
             setTimeout(() => { at++; at < due.length ? round() : end(); }, 1200);
           } else {
-            if (!missed) Store.kidsWordMiss(r.w.id); missed = true;
+            if (!missed) Store.kidsWordMiss(w.id);   // (was r.w.id: no r here, every wrong tap threw an error)
+            missed = true;
             b.disabled = true;
             b.classList.add('nope');
             K.Feel.wrong(b);
@@ -1014,7 +1015,9 @@ const Kids = (() => {
       K.endLesson(1);
       const fromAdv = adv && adv.steps[adv.at].hash === '#/kids/water';
       location.replace('#/kids/garden');   // back to the garden without a history step, plants that grew bounce
-      setTimeout(() => {
+      // window.setTimeout on purpose: this step belongs to the garden screen we are going to, so the
+      // screen change must not cancel it like it cancels a game's leftover steps
+      window.setTimeout(() => {
         garden(grown);
         if (fromAdv) {
           const b = document.createElement('div');
