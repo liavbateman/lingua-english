@@ -1561,3 +1561,22 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
   font-size: 2rem; cursor: pointer; box-shadow: 0 4px 0 var(--k-edge); }
 .k-pizza-top small { font: 700 .85rem var(--k-font); }
 .k-pizza-top.used { background: #d8fbe9; box-shadow: 0 4px 0 #2fd093; }
+
+/* weather reporter */
+.k-wxr-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; direction: ltr; margin-bottom: 8px; }
+.k-wxr-row.three { grid-template-columns: repeat(3, 1fr); }
+.k-wxr-opt { display: flex; flex-direction: column; align-items: center; padding: 8px 2px; border: 0; border-radius: 18px; background: #fff; color: var(--k-ink);
+  font-size: 1.9rem; cursor: pointer; box-shadow: 0 4px 0 var(--k-edge); }
+.k-wxr-opt small { font: 700 .75rem var(--k-font); }
+.k-wxr-opt.on { background: #d8fbe9; box-shadow: 0 4px 0 #2fd093; transform: translateY(-3px); }
+.k-tv { display: flex; flex-direction: column; align-items: center; margin: 6px 0 4px; }
+.k-tv-screen { position: relative; width: 100%; aspect-ratio: 16 / 10; border: 12px solid #2b2f45; border-radius: 22px; overflow: hidden;
+  background: linear-gradient(#7fd3ff, #d8f3ff); box-shadow: 0 6px 0 #14172a; }
+.k-tv-live { position: absolute; top: 8px; left: 10px; padding: 2px 8px; border-radius: 6px; background: #e0457b; color: #fff; font: 700 .75rem var(--k-font); }
+.k-tv-sky { position: absolute; top: 10px; right: 14px; font-size: 2.6rem; }
+.k-tv-owl { position: absolute; bottom: 30%; left: 10%; font-size: 4rem; animation: k-boing 1.8s ease-in-out infinite; }
+.k-tv-text { position: absolute; left: 0; right: 0; bottom: 0; margin: 0; padding: 6px 10px; background: rgba(29, 42, 91, .88); color: #fff; font: 700 1rem/1.3 var(--k-font); text-align: left; }
+.k-tv-text b { color: #ffe9a6; font-size: 1.15rem; }
+.k-tv-stand { width: 90px; height: 14px; margin-top: 2px; border-radius: 0 0 10px 10px; background: #2b2f45; }
+.k-tv.me .k-tv-screen { background: linear-gradient(#ffd9e6, #fff1c2); }
+@media (prefers-reduced-motion: reduce) { .k-tv-owl { animation: none; } }

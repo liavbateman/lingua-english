@@ -151,6 +151,8 @@ const Kids = (() => {
       cbw: 'צובעים לפי מילה', cbwSub: 'קוראים את שם הצבע על כל חלק בתמונה וצובעים', cbwTip: 'קראו את המילה על החלק, בחרו את הצבע ולחצו על החלק',
       feelst: 'איך הוא מרגיש?', feelstSub: 'סיפורים קטנים על רגשות: עצוב, שמח, מפחד, כועס', feelstTip: 'הקשיבו לסיפור. איך החבר מרגיש?', feelstFace: 'הסתכלו על הפנים',
       pizza: 'מכינים פיצה', pizzaSub: 'הינשוף מזמין: גבינה ועגבנייה! שמים את התוספות ואופים', pizzaTip: 'הקשיבו מה הינשוף רוצה על הפיצה ולחצו על התוספות',
+      wxr: 'חזאי מזג האוויר', wxrSub: 'מגישים את התחזית בטלוויזיה: Today it is sunny and hot!', wxrSky: 'איך מזג האוויר היום?', wxrTemp: 'חם או קר?',
+      wxrSay: 'עכשיו אתם! אמרו את התחזית', wxrMine: 'השמעה', wxrDone: 'סיימתי', wxrTip: 'לחצו על המיקרופון ותגידו את התחזית כמו בטלוויזיה',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -295,6 +297,8 @@ const Kids = (() => {
       cbw: 'Colour by word', cbwSub: 'Read the colour word on each part of the picture and paint it', cbwTip: 'Read the word on the part, pick that colour and tap the part',
       feelst: 'How do they feel?', feelstSub: 'Little stories about feelings: sad, happy, scared, angry', feelstTip: 'Listen to the story. How does the friend feel?', feelstFace: 'Look at the face',
       pizza: 'Pizza maker', pizzaSub: 'The owl orders: cheese and tomato! Add the toppings and bake', pizzaTip: 'Listen to what the owl wants on the pizza and tap the toppings',
+      wxr: 'Weather reporter', wxrSub: 'Present the weather on TV: Today it is sunny and hot!', wxrSky: 'What is the weather today?', wxrTemp: 'Hot or cold?',
+      wxrSay: 'Your turn! Say the report', wxrMine: 'Play', wxrDone: "I'm done", wxrTip: 'Tap the mic and say the report like on TV',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -752,6 +756,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🍕</span>
           <span class="grow"><b>${kt('pizza')}</b><small>${kt('pizzaSub')}</small></span>
           ${Store.kidsHasSticker('pizza') ? starsHtml(Store.kidsStars('pizza'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-wxr-card" href="#/kids/wxr">
+          <span class="k-story-books" aria-hidden="true">📺</span>
+          <span class="grow"><b>${kt('wxr')}</b><small>${bidiEn(kt('wxrSub'))}</small></span>
+          ${Store.kidsHasSticker('wxr') ? starsHtml(Store.kidsStars('wxr'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -4006,6 +4015,95 @@ const Kids = (() => {
     round();
   }
 
+  // ---------- weather reporter: say a whole sentence, like on TV ----------
+  // Pick today's sky and hot/cold; the owl builds the report on a little TV ("Good morning! Today it is
+  // sunny and hot!") and says it, then it's the child's turn: record it and watch yourself on "TV".
+  function wxrGame() {
+    document.body.classList.add('in-lesson');
+    const SKY = [{ id: 'sunny', pic: '☀️' }, { id: 'cloudy', pic: '☁️' }, { id: 'rainy', pic: '🌧️' }, { id: 'windy', pic: '🌬️' }, { id: 'snowy', pic: '❄️' }];
+    const TEMP = [{ id: 'hot', pic: '🥵' }, { id: 'warm', pic: '🙂' }, { id: 'cold', pic: '🥶' }];
+    let sky = SKY.find(x => x.id === Store.kidsWeather) || null, temp = null, mine = null;
+    function pick() {
+      K.lessonBar(sky ? .4 : 0);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">📺</span> ${kt('wxr')}</p>
+          <p class="k-tip">${kt('wxrSky')}</p>
+          <div class="k-wxr-row">${SKY.map(x => `<button class="k-wxr-opt ${sky === x ? 'on' : ''}" data-s="${x.id}" aria-label="${x.id}"><span aria-hidden="true">${x.pic}</span><small class="en">${x.id}</small></button>`).join('')}</div>
+          <p class="k-tip">${kt('wxrTemp')}</p>
+          <div class="k-wxr-row three">${TEMP.map(x => `<button class="k-wxr-opt" data-t="${x.id}" aria-label="${x.id}"><span aria-hidden="true">${x.pic}</span><small class="en">${x.id}</small></button>`).join('')}</div>
+          ${owl(kt('wxrSky'), 'small')}
+        </div>`;
+      K.view.querySelectorAll('[data-s]').forEach(b => {
+        b.onclick = () => { sky = SKY.find(x => x.id === b.dataset.s); K.view.querySelectorAll('[data-s]').forEach(x => x.classList.toggle('on', x === b)); sayEn(sky.id, 0.9); if (temp) report(); };
+      });
+      K.view.querySelectorAll('[data-t]').forEach(b => {
+        b.onclick = () => { temp = TEMP.find(x => x.id === b.dataset.t); K.view.querySelectorAll('[data-t]').forEach(x => x.classList.toggle('on', x === b)); sayEn(temp.id, 0.9); if (sky) setTimeout(report, 500); };
+      });
+      setTimeout(() => sayEn('What is the weather today?', 0.85), 300);
+    }
+    function report() {
+      K.lessonBar(.7);
+      const hello = new Date().getHours() < 12 ? 'Good morning!' : new Date().getHours() < 18 ? 'Good afternoon!' : 'Good evening!';
+      const line = `Today it is ${sky.id} and ${temp.id}!`;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">📺</span> ${kt('wxr')}</p>
+          <div class="k-tv">
+            <div class="k-tv-screen">
+              <span class="k-tv-live">● LIVE</span>
+              <span class="k-tv-sky" aria-hidden="true">${sky.pic}${temp.pic}</span>
+              <span class="k-tv-owl" aria-hidden="true">🦉</span>
+              <p class="k-tv-text en" lang="en">${hello}<br><b>${line}</b></p>
+            </div>
+            <span class="k-tv-stand" aria-hidden="true"></span>
+          </div>
+          <p class="k-tip">${kt('wxrSay')}</p>
+          <div class="k-copy-row">
+            <button class="k-copy-btn" id="k-wxr-owl"><span aria-hidden="true">🦉</span><small>Owl</small></button>
+            ${canRecord() ? `<button class="k-mic" id="k-wxr-rec" aria-label="${kt('wxrSay')}"><span aria-hidden="true">🎤</span></button>` : ''}
+            <button class="k-copy-btn" id="k-wxr-me" disabled><span aria-hidden="true">🙂</span><small>${kt('wxrMine')}</small></button>
+          </div>
+          <button class="k-btn" id="k-wxr-done">✅ ${kt('wxrDone')}</button>
+          ${owl(canRecord() ? kt('wxrTip') : kt('wxrSay'), 'small')}
+        </div>`;
+      const owlSays = () => say([['en', hello], ['en', line]], 0.85);
+      $('#k-wxr-owl').onclick = owlSays;
+      setTimeout(owlSays, 300);
+      const rec = $('#k-wxr-rec'), me = $('#k-wxr-me');
+      if (rec) rec.onclick = () => recordClip(rec, url => {
+        if (!url) return;
+        if (mine) URL.revokeObjectURL(mine);
+        mine = url;
+        me.disabled = false;
+        $('.k-tv').classList.add('me');
+        $('.k-tv-owl').textContent = (Store.kidsProfiles.find(p => p.active) || {}).face || '🙂';
+        new Audio(mine).play().catch(() => {});
+      });
+      me.onclick = () => { if (mine) new Audio(mine).play().catch(() => {}); };
+      $('#k-wxr-done').onclick = end;
+    }
+    function end() {
+      if (mine) { URL.revokeObjectURL(mine); mine = null; }
+      K.endLesson(1);
+      Store.kidsFinish('wxr', 3, 15);
+      Store.kidsWeather = sky.id;   // the map's sky follows the report
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>📺 ${kt('done')}</h1>
+            ${starsHtml(3, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn("That's the weather! Back to you in the studio!", 0.9);
+      $('#k-again').onclick = wxrGame;
+    }
+    pick();
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -6078,6 +6176,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'wxr') wxrGame();
       else if (a === 'pizza') pizzaGame();
       else if (a === 'feelst') feelStoryGame();
       else if (a === 'cbw') cbwGame();
