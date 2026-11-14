@@ -2200,3 +2200,6 @@ body:has(#update):not(.in-lesson) .view { padding-bottom: 96px; }
 /* After a hard first practice at a higher level: a quiet offer of the level below */
 .lvl-hint { margin: 4px auto 12px; max-width: 32ch; font-size: .9rem; color: #c9cdf0; line-height: 1.5; }
 .lvl-hint a { color: #ffd27a; font-weight: 800; text-underline-offset: 3px; }
+
+/* the saved-rules filter shows only once a rule is saved (a "⭐ 0" button meant nothing) */
+.gsaved[hidden] { display: none !important; }

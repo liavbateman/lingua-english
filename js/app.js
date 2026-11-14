@@ -1613,7 +1613,7 @@
           <input id="gsearch" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
             placeholder="${t('gsearch.ph')}" aria-label="${t('gsearch.ph')}">
         </div>
-        <button class="gsaved" id="gsaved" aria-pressed="false" aria-label="${t('saved.chip')}">⭐ <b id="gsaved-n" class="en">${Store.savedRules().length}</b></button>
+        <button class="gsaved" id="gsaved" aria-pressed="false" aria-label="${t('saved.chip')}"${Store.savedRules().length ? '' : ' hidden'}>⭐ <b id="gsaved-n" class="en">${Store.savedRules().length}</b></button>
       </div>
       <div id="gresults" hidden></div>
       <div id="groad">${pathHtml(items)}</div>`;
