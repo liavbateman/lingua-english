@@ -129,7 +129,7 @@ for (const id of Object.keys(EXPLAIN)) if (!GRAMMAR.some(g => g.id === id)) erro
   const kf = 'js/kids-data.js';
   const kctx = vm.createContext({});
   try {
-    vm.runInContext(fs.readFileSync(path.join(root, kf), 'utf8') + ';this.K = { KIDS_THEMES, KIDS_WORDS, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE, KIDS_RIDDLES };', kctx, { filename: kf });
+    vm.runInContext(fs.readFileSync(path.join(root, kf), 'utf8') + ';this.K = { KIDS_THEMES, KIDS_WORDS, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE, KIDS_RIDDLES, KIDS_MOVES, KIDS_WORDS };', kctx, { filename: kf });
     loaded.push(kf);
     const { KIDS_THEMES, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE } = kctx.K;
     const ids = new Set(), stickers = new Set(KIDS_TREASURE);
@@ -159,6 +159,7 @@ for (const id of Object.keys(EXPLAIN)) if (!GRAMMAR.some(g => g.id === id)) erro
       if (st.ask[2].length !== 3) errors.push(`kids story "${st.id}": the question needs 3 pictures`);
     }
     for (const r of kctx.K.KIDS_RIDDLES) if (!r.w || !hasEn(r.en) || !hasHe(r.he)) errors.push(`kids riddle "${r.id}": unknown word or missing English / Hebrew clue`);
+    for (const id of Object.keys(kctx.K.KIDS_MOVES)) if (!kctx.K.KIDS_WORDS.some(w => w.id === id)) errors.push(`kids moving picture "${id}": no such word`);
     for (const sg of KIDS_SONGS) if (!sg.lines.length || sg.lines.some(l => !l.length)) errors.push(`kids song "${sg.id}": empty line`);
     console.log(`kids          ${String(KIDS_THEMES.length).padStart(2)} islands · ${String(ids.size).padStart(3)} words ·  ${KIDS_STORIES.length} stories ·  ${KIDS_SONGS.length} songs`);
   } catch (e) { errors.push(`${kf}: does not run: ${e.message}`); }

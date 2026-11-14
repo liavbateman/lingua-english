@@ -1254,7 +1254,7 @@ const Kids = (() => {
         <div class="k-wrap k-play">
           <p class="k-step"><span aria-hidden="true">👀</span> ${kt('meet')} · ${n + 1}/${words.length}</p>
           <button class="k-card k-meet" id="k-pic" aria-label="${w.en}">
-            <span class="k-pic" aria-hidden="true">${w.pic}</span>
+            <span class="k-pic ${w.move ? 'mv mv-' + w.move : ''}" aria-hidden="true">${w.pic}</span>
             <span class="k-word en ${w.en.length > 8 ? 'long' : ''}" lang="en">${w.en}</span>
             <span class="k-he he" lang="he">${w.he}</span>
             <span class="k-ear" aria-hidden="true">🔊</span>
@@ -1301,6 +1301,7 @@ const Kids = (() => {
           if (o === w) {
             K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; });
             b.classList.add('right');
+            if (w.move) b.querySelector('span').classList.add('mv', 'mv-' + w.move);
             K.Feel.right();
             if (!missed) { firstTry++; Store.kidsWordRight(w.id); }
             tapped++;

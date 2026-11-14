@@ -222,6 +222,20 @@ const KIDS_THEMES = [
 KIDS_THEMES.forEach(th => th.words.forEach(w => { w.id = th.id + '/' + w.en; w.theme = th.id; }));
 const KIDS_WORDS = KIDS_THEMES.flatMap(th => th.words);
 
+// Moving pictures: words that show an action move the way the word means (css/kids.css .mv-*)
+const KIDS_MOVES = {
+  'actions/run': 'run', 'actions/swim': 'swim', 'actions/dance': 'dance', 'actions/climb': 'climb', 'actions/sleep': 'sleep',
+  'actions/sing': 'sway', 'actions/write': 'wiggle', 'actions/read': 'nod',
+  'animals/bird': 'fly', 'animals/fish': 'swim', 'animals/monkey': 'bounce', 'animals/dog': 'wag', 'animals/lion': 'roar',
+  'go/plane': 'fly', 'go/car': 'drive', 'go/bus': 'drive', 'go/train': 'drive', 'go/truck': 'drive', 'go/bike': 'drive', 'go/boat': 'float',
+  'toys/ball': 'bounce', 'toys/balloon': 'float', 'toys/kite': 'float', 'toys/drum': 'nod',
+  'sky/rain': 'fall', 'sky/sun': 'spin', 'sky/star': 'twinkle', 'sky/cloud': 'float', 'sky/flower': 'sway', 'sky/tree': 'sway',
+  'opposites/up': 'up', 'opposites/down': 'down', 'opposites/fast': 'drive', 'opposites/slow': 'creep', 'opposites/hot': 'twinkle', 'opposites/cold': 'shiver',
+  'feelings/happy': 'bounce', 'feelings/scared': 'shiver', 'feelings/angry': 'shake', 'feelings/tired': 'sleep', 'feelings/surprised': 'roar',
+  'home/clock': 'wiggle', 'home/lamp': 'twinkle', 'phrases/good night': 'sleep', "phrases/let's play": 'bounce'
+};
+KIDS_WORDS.forEach(w => { if (KIDS_MOVES[w.id]) w.move = KIDS_MOVES[w.id]; });
+
 // The owl's wardrobe: items open as the child collects stars (nothing is spent, so nothing is lost)
 const KIDS_OWL_COLORS = [
   { id: 'blue', c: '#3f7bff', stars: 0 }, { id: 'pink', c: '#ff5d8f', stars: 2 }, { id: 'green', c: '#2fbf7f', stars: 4 },

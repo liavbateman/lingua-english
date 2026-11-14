@@ -135,7 +135,7 @@ body.kids .offline { color: var(--k-ink); }
 .k-word { font-size: 2.6rem; font-weight: 700; letter-spacing: .02em; }
 .k-he { font-size: 1.2rem; color: var(--k-muted); }
 .k-ear { position: absolute; top: 14px; inset-inline-end: 16px; font-size: 1.6rem; opacity: .7; }
-.k-meet.boing .k-pic { animation: k-boing .5s var(--ease-pop); }
+.k-meet.boing .k-pic:not(.mv) { animation: k-boing .5s var(--ease-pop); }
 @keyframes k-boing { 30% { transform: scale(1.18) rotate(-6deg); } 60% { transform: scale(.95) rotate(4deg); } }
 
 .k-btn {
@@ -694,3 +694,46 @@ body.kids.night .k-sub b { color: #ffe08a; }
 .k-rec.on { background: #ffe1ea; box-shadow: 0 6px 0 #f2477f; }
 .k-rec.on::after { content: ''; position: absolute; inset: -8px; border-radius: 50%; border: 4px solid rgba(242, 71, 127, .55); animation: k-ring 1.2s ease-out infinite; }
 .k-rec:disabled { opacity: .6; }
+
+/* moving pictures: action words act themselves out */
+.mv { display: inline-block; animation-duration: 1.6s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; }
+.mv-run { animation-name: mv-run; animation-duration: 1.2s; }
+.mv-drive { animation-name: mv-drive; animation-duration: 2s; }
+.mv-fly { animation-name: mv-fly; animation-duration: 2.2s; }
+.mv-swim { animation-name: mv-swim; animation-duration: 2s; }
+.mv-bounce { animation-name: mv-bounce; animation-duration: .9s; }
+.mv-float { animation-name: mv-float; animation-duration: 3s; }
+.mv-fall { animation-name: mv-fall; animation-duration: 1.4s; }
+.mv-dance, .mv-wiggle, .mv-wag { animation-name: mv-dance; animation-duration: .8s; }
+.mv-sway { animation-name: mv-sway; animation-duration: 2.4s; transform-origin: bottom center; }
+.mv-climb { animation-name: mv-climb; animation-duration: 1.8s; }
+.mv-sleep { animation-name: mv-sleep; animation-duration: 3s; }
+.mv-nod { animation-name: mv-nod; animation-duration: 1s; }
+.mv-roar { animation-name: mv-roar; animation-duration: 1.4s; }
+.mv-spin { animation-name: mv-spin; animation-duration: 8s; animation-timing-function: linear; }
+.mv-twinkle { animation-name: mv-twinkle; animation-duration: 1.4s; }
+.mv-up { animation-name: mv-up; animation-duration: 1.4s; }
+.mv-down { animation-name: mv-down; animation-duration: 1.4s; }
+.mv-creep { animation-name: mv-creep; animation-duration: 4s; }
+.mv-shiver, .mv-shake { animation-name: mv-shiver; animation-duration: .25s; }
+@keyframes mv-run { 0%, 100% { transform: translateX(14px); } 50% { transform: translateX(-14px) translateY(-8px); } }
+@keyframes mv-drive { 0% { transform: translateX(40px); opacity: 0; } 15%, 85% { opacity: 1; } 100% { transform: translateX(-40px); opacity: 0; } }
+@keyframes mv-fly { 0%, 100% { transform: translate(-12px, 8px) rotate(-6deg); } 50% { transform: translate(12px, -14px) rotate(6deg); } }
+@keyframes mv-swim { 0%, 100% { transform: translateX(-12px) rotate(-6deg); } 50% { transform: translateX(12px) rotate(6deg) translateY(6px); } }
+@keyframes mv-bounce { 0%, 100% { transform: translateY(0) scale(1.05, .95); } 50% { transform: translateY(-22px) scale(.97, 1.04); } }
+@keyframes mv-float { 0%, 100% { transform: translateY(6px) rotate(-3deg); } 50% { transform: translateY(-12px) rotate(3deg); } }
+@keyframes mv-fall { 0% { transform: translateY(-20px); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(20px); opacity: 0; } }
+@keyframes mv-dance { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(12deg) translateY(-6px); } }
+@keyframes mv-sway { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+@keyframes mv-climb { 0% { transform: translateY(20px); } 50% { transform: translateY(-10px) rotate(4deg); } 100% { transform: translateY(20px); } }
+@keyframes mv-sleep { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06) rotate(-3deg); } }
+@keyframes mv-nod { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(8deg); } }
+@keyframes mv-roar { 0%, 70%, 100% { transform: scale(1); } 80% { transform: scale(1.18); } }
+@keyframes mv-spin { to { transform: rotate(360deg); } }
+@keyframes mv-twinkle { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.12); filter: brightness(1.25); } }
+@keyframes mv-up { 0% { transform: translateY(20px); opacity: .3; } 100% { transform: translateY(-20px); opacity: 1; } }
+@keyframes mv-down { 0% { transform: translateY(-20px); opacity: .3; } 100% { transform: translateY(20px); opacity: 1; } }
+@keyframes mv-creep { 0% { transform: translateX(16px); } 100% { transform: translateX(-16px); } }
+@keyframes mv-shiver { 0%, 100% { transform: translateX(-2px); } 50% { transform: translateX(2px); } }
+.k-opt .mv { animation-iteration-count: 2; }
+@media (prefers-reduced-motion: reduce) { .mv { animation: none !important; } }
