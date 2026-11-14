@@ -1494,3 +1494,21 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-mo-slot.pop { animation: k-pop .45s var(--ease-pop) both; }
 .k-mo-last { margin: 12px 0 0; text-align: center; font: 700 1.25rem var(--k-font); color: #ffe9a6; }
 .k-morning-line.done { margin: 8px 0; }
+
+/* star of the week certificate */
+.k-badge { display: inline-block; margin-inline-start: 6px; padding: 2px 8px; border-radius: 999px; background: #ffd84d; color: #5a3d00; font-size: .75rem; font-weight: 700; }
+.k-cert-label { display: grid; gap: 6px; margin: 0 0 10px; color: #fff; font-weight: 700; }
+.k-cert-label input { padding: 10px 14px; border: 0; border-radius: 14px; font: 700 1.1rem var(--k-font); }
+.k-cert { position: relative; padding: 26px 18px 16px; text-align: center; border: 6px double #e0a800; background: radial-gradient(circle at 50% 0, #fff8db, #fff 60%); }
+.k-cert-ribbon { position: absolute; top: -6px; right: 14px; font-size: 2.6rem; }
+.k-cert-k { margin: 0; letter-spacing: .3em; text-transform: uppercase; font-size: .8rem; color: #a07800; }
+.k-cert h2 { margin: 4px 0 10px; font: 700 1.6rem var(--k-font); color: #1d2a5b; }
+.k-cert-for { margin: 0; color: #666; }
+.k-cert-name { margin: 6px auto 8px; padding-bottom: 4px; max-width: 80%; border-bottom: 2px solid #e0a800; font: 700 2rem var(--k-font); color: #e0457b; min-height: 1.3em; }
+.k-cert-text { margin: 0 0 10px; color: #333; }
+.k-cert-words { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.k-cert-words span { display: flex; flex-direction: column; align-items: center; min-width: 54px; padding: 4px; border-radius: 10px; background: #f6f8ff; font-size: .75rem; font-weight: 700; color: #1d2a5b; }
+.k-cert-words i { font-style: normal; font-size: 1.5rem; }
+.k-cert-stars { margin: 10px 0 4px; font-size: 1.6rem; }
+.k-cert footer { display: flex; justify-content: space-between; }
+@media print { .k-cert { border-width: 8px; padding: 40px 30px; } .k-cert h2 { font-size: 2.4rem; } .k-cert-name { font-size: 2.8rem; } .k-cert-words i { font-size: 2rem; } }

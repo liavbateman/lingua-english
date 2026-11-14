@@ -142,6 +142,8 @@ const Kids = (() => {
       copyNoRec: 'אמרו את המילה בקול באותו קול מצחיק, ואז לחצו "הבא"',
       seesaw: 'נדנדת ההפכים', seesawSub: 'גדול וקטן, חם וקר: שמים את ההפך בצד השני והנדנדה עפה!', seesawTip: 'מי ההפך? לחצו על התמונה כדי לשים אותה בצד השני של הנדנדה',
       morning: 'הבוקר שלי', morningSub: 'מתעוררים, מצחצחים, מתלבשים: מה בא אחר כך?', morningTip: 'מה עושים עכשיו? לחצו על התמונה הבאה',
+      certBtn: 'תעודת כוכב השבוע', certNew: 'חדש לסוף השבוע!', certTitle: 'תעודת כוכב השבוע', certSub: 'תעודה להדפסה עם המילים החדשות של השבוע. אפשר לתלות על המקרר!',
+      certName: 'שם הילד באנגלית (לא חובה)',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -277,6 +279,8 @@ const Kids = (() => {
       copyNoRec: 'Say the word out loud in the same funny voice, then tap "Next"',
       seesaw: 'Opposite see-saw', seesawSub: 'Big and small, hot and cold: put the opposite on the other side and the see-saw flies!', seesawTip: 'Which one is the opposite? Tap a picture to put it on the other seat',
       morning: 'My morning', morningSub: 'Wake up, brush, get dressed: what comes next?', morningTip: 'What do we do now? Tap the next picture',
+      certBtn: 'Star of the week certificate', certNew: 'New for the weekend!', certTitle: 'Star of the week certificate', certSub: "A certificate to print with this week's new words. Put it on the fridge!",
+      certName: "Child's name in English (optional)",
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -3511,6 +3515,48 @@ const Kids = (() => {
     round();
   }
 
+  // ---------- star of the week: a certificate to print (from the parents corner) ----------
+  // The week in one proud page: the child's name, this week's new words as pictures, play days and stars.
+  // Fridays and Saturdays the parents corner marks it as new, to close the week with a celebration.
+  function certPage() {
+    K.endLesson();
+    if (Date.now() >= gateUntil) { location.hash = '#/kids'; return; }
+    const me = Store.kidsProfiles.find(p => p.active) || {};
+    const wk = Store.kidsWeek();
+    const words = wk.words.filter(w => !/\s/.test(w.en)).slice(0, 10);
+    const days = wk.days.filter(d => d.sec > 0).length;
+    const start = wk.days[0].date, endD = wk.days[6].date;
+    const fmt = d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    let name = me.name && /^[A-Za-z][A-Za-z '-]*$/.test(me.name) ? me.name : '';
+    const draw = () => {
+      $('#k-cert-name').textContent = name || '________________';
+    };
+    K.view.innerHTML = `
+      <div class="k-wrap k-print">
+        <a class="k-back k-noprint" href="#/kids/parents"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('pcTitle')}</a>
+        <h1 class="k-title k-noprint">🏅 ${kt('certTitle')}</h1>
+        <p class="k-sub k-noprint">${kt('certSub')}</p>
+        <label class="k-noprint k-cert-label">${kt('certName')}
+          <input id="k-cert-input" dir="ltr" lang="en" maxlength="20" value="${esc(name)}" autocomplete="off">
+        </label>
+        <div class="k-noprint k-print-btns"><button class="k-btn" id="k-pr-go">🖨️ ${kt('prPrint')}</button></div>
+        <section class="k-print-sheet k-cert" dir="ltr" lang="en">
+          <div class="k-cert-ribbon" aria-hidden="true">🏅</div>
+          <p class="k-cert-k">Certificate</p>
+          <h2>English Star of the Week</h2>
+          <p class="k-cert-for">This certificate goes to</p>
+          <p class="k-cert-name" id="k-cert-name"></p>
+          <p class="k-cert-text">for learning ${wk.words.length ? `<b>${wk.words.length}</b> new English word${wk.words.length === 1 ? '' : 's'}` : 'English'} and playing on <b>${days}</b> day${days === 1 ? '' : 's'} this week!</p>
+          ${words.length ? `<div class="k-cert-words">${words.map(w => `<span><i aria-hidden="true">${w.pic}</i>${w.en}</span>`).join('')}</div>` : ''}
+          <p class="k-cert-stars" aria-hidden="true">⭐ ⭐ ⭐</p>
+          <footer><span>${fmt(start)} - ${fmt(endD)} ${endD.getFullYear()}</span><span>🦉 Lingua Kids</span></footer>
+        </section>
+      </div>`;
+    draw();
+    $('#k-cert-input').oninput = e => { name = e.target.value.replace(/[^A-Za-z '-]/g, '').slice(0, 20); e.target.value = name; draw(); };
+    $('#k-pr-go').onclick = () => window.print();
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -4010,6 +4056,7 @@ const Kids = (() => {
         </section>
         ${remindBox()}
         ${weekBox()}
+        <a class="k-btn ghost k-cert-btn" href="#/kids/cert">🏅 ${kt('certBtn')}${[5, 6].includes(new Date().getDay()) ? ` <span class="k-badge">${kt('certNew')}</span>` : ''}</a>
         <a class="k-btn ghost" href="#/kids/print">🖍️ ${kt('prBtn')}</a>
         <button class="k-btn ghost" id="k-card">🖼️ ${kt('cardBtn')}</button>
         ${voiceBox()}
@@ -5556,6 +5603,7 @@ const Kids = (() => {
       document.body.classList.toggle('kids-little', little());
       if (a === 'parents') return parents();
       if (a === 'print') return printPage();
+      if (a === 'cert') return certPage();
       if (overLimit()) return rest();   // checked between screens, never in the middle of a game
       if (a === 'play') play(b);
       else if (a === 'stickers') stickers();
