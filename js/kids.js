@@ -740,7 +740,7 @@ const Kids = (() => {
           ${Store.kidsHasSticker('fam') ? starsHtml(Store.kidsStars('fam'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-mon-card" href="#/kids/monster">
-          <span class="k-story-books" aria-hidden="true">👹</span>
+          <span class="k-story-books" aria-hidden="true">😋</span>
           <span class="grow"><b>${kt('mon')}</b><small>${kt('monSub')}</small></span>
           ${Store.kidsHasSticker('monster') ? starsHtml(Store.kidsStars('monster'), 'sm') : ''}
         </a>
@@ -2185,7 +2185,7 @@ const Kids = (() => {
       let missed = false, done = false;
       K.view.innerHTML = `
         <div class="k-wrap k-play">
-          <p class="k-step"><span aria-hidden="true">👹</span> ${kt('mon')} · ${at + 1}/${rounds.length}</p>
+          <p class="k-step"><span aria-hidden="true">😋</span> ${kt('mon')} · ${at + 1}/${rounds.length}</p>
           <button class="k-monster" id="k-mon" aria-label="${kt('listen')}: ${say1}">
             <span class="k-mon-eyes" aria-hidden="true"><i></i><i></i></span>
             <span class="k-mon-mouth" aria-hidden="true"></span>
@@ -2222,7 +2222,7 @@ const Kids = (() => {
           mon.classList.remove('nope'); void mon.offsetWidth; mon.classList.add('nope');
           K.Feel.wrong(b);
           owlMood('think');
-          $('.k-bubble').textContent = `${o.en}? ${kt('tryAgain')}`;
+          $('.k-bubble').innerHTML = `<bdi class="k-q" dir="ltr" lang="en">${o.en}?</bdi> ${kt('tryAgain')}`;
           say([['en', o.en === 'grapes' ? 'No, those are grapes.' : ['milk', 'bread'].includes(o.en) ? `No, that is ${o.en}.` : `No, that is ${/^[aeiou]/.test(o.en) ? 'an' : 'a'} ${o.en}.`], ['en', say1]], 0.85);
         }
       };
@@ -2263,7 +2263,7 @@ const Kids = (() => {
       K.view.innerHTML = `
         <div class="k-wrap k-play k-end">
           <div class="k-end-card">${endOwl()}
-            <h1>👹 ${kt('done')}</h1>
+            <h1>😋 ${kt('done')}</h1>
             ${starsHtml(stars, 'big pop')}
           </div>
           <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
