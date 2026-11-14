@@ -16,6 +16,8 @@
   --muted: #a6add0;
   --brand: #6a5cff;
   --brand-2: #8e7dff;
+  /* white text on buttons needs 4.5:1 across the whole gradient (#8e7dff gave only 3.2:1) */
+  --btn-grad: linear-gradient(135deg, #6d5df8, #5646f2);
   --brand-soft: rgba(106, 92, 255, .18);
   --good: #2fd093;
   --good-soft: rgba(47, 208, 147, .16);
@@ -150,7 +152,7 @@ a.card:active, .task:active { transform: scale(.985); }
   display: block; width: 100%; min-height: 52px;
   border: 0; border-radius: 16px; padding: 14px 16px;
   font: inherit; font-weight: 700; text-align: center; text-decoration: none;
-  background: linear-gradient(135deg, var(--brand-2), var(--brand)); color: #fff; cursor: pointer;
+  background: var(--btn-grad); color: #fff; cursor: pointer;
   -webkit-appearance: none; appearance: none;
   box-shadow: 0 8px 22px rgba(106, 92, 255, .35);
 }
@@ -740,7 +742,7 @@ body.in-lesson .view.has-check { padding-bottom: calc(132px + env(safe-area-inse
 .cont-emoji { font-size: 1.6rem; line-height: 1; }
 .cont-go {
   display: block; text-align: center; padding: 13px 16px; border-radius: 14px; font-weight: 800;
-  background: linear-gradient(135deg, var(--brand-2), var(--brand)); color: #fff; box-shadow: 0 4px 0 #463bc4;
+  background: var(--btn-grad); color: #fff; box-shadow: 0 4px 0 #463bc4;
 }
 @media (prefers-reduced-motion: reduce) { .continue { transition: none; } }
 
@@ -791,7 +793,7 @@ body.in-lesson .view.has-check { padding-bottom: calc(132px + env(safe-area-inse
 .pbadge.ok { background: var(--good); color: #08111f; }
 .pbubble {
   position: absolute; top: -42px; z-index: 2; padding: 7px 14px; border-radius: 12px; white-space: nowrap;
-  background: #fff; color: #e2553a; font-weight: 900; font-size: .9rem; box-shadow: 0 4px 0 #d9d9e8;
+  background: #fff; color: #c93f25; font-weight: 900; font-size: .9rem; box-shadow: 0 4px 0 #d9d9e8;
   animation: bob 1.6s ease-in-out infinite;
 }
 .pbubble::after {
@@ -835,7 +837,7 @@ body.in-lesson .view.has-check { padding-bottom: calc(132px + env(safe-area-inse
 }
 .pcard b { font-size: 1.1rem; position: relative; }
 .pcard p { margin: 0; opacity: .92; position: relative; }
-.pcard .btn { background: #fff; color: #e2553a; box-shadow: 0 4px 0 #f0c9bd; margin-top: 4px; }
+.pcard .btn { background: #fff; color: #c93f25; box-shadow: 0 4px 0 #f0c9bd; margin-top: 4px; }
 .pcard .btn:active { box-shadow: 0 0 0 #f0c9bd; }
 .pcard-link { text-align: center; color: inherit; opacity: .9; font-weight: 700; font-size: .9rem; padding: 6px; }
 .pcard.done { background: #ffc53d; color: #4a3200; box-shadow: 0 5px 0 #c9921a, 0 18px 40px rgba(0, 0, 0, .45); }
@@ -844,7 +846,7 @@ body.in-lesson .view.has-check { padding-bottom: calc(132px + env(safe-area-inse
 .pcard.open .btn { color: #5546e0; box-shadow: 0 4px 0 #d6d0ff; }
 .pcard.locked { background: #2b3160; color: var(--ink); box-shadow: 0 5px 0 #1b2046, 0 18px 40px rgba(0, 0, 0, .45); }
 .pcard.locked p { color: var(--muted); }
-.pcard.locked .btn { background: linear-gradient(135deg, var(--brand-2), var(--brand)); color: #fff; box-shadow: 0 4px 0 #463bc4; }
+.pcard.locked .btn { background: var(--btn-grad); color: #fff; box-shadow: 0 4px 0 #463bc4; }
 @media (prefers-reduced-motion: reduce) { .pcard { animation: none; } }
 /* while a lesson card is open, the jump button steps aside */
 body:has(.pcard) .path-jump { display: none; }
@@ -1045,8 +1047,8 @@ button.path-head:active span { background: rgba(142, 125, 255, .22); }
 }
 .td-main { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
 .td-ring { position: relative; flex: none; width: 72px; height: 72px; display: grid; place-items: center; }
-.td-ring svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
-[dir="rtl"] .td-ring svg { transform: rotate(-90deg) scaleY(-1); }
+.td-ring > svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+[dir="rtl"] .td-ring > svg { transform: rotate(-90deg) scaleY(-1); }
 .td-track { fill: none; stroke: rgba(255, 255, 255, .12); stroke-width: 7; }
 .td-fill { fill: none; stroke: var(--good); stroke-width: 7; stroke-linecap: round; transition: stroke-dasharray .6s ease; }
 .td-ring b { position: relative; font-size: 1.05rem; font-weight: 800; }
@@ -1104,7 +1106,7 @@ button.path-head:active span { background: rgba(142, 125, 255, .22); }
 .pgate-tag { flex: none; padding: 4px 10px; border-radius: 999px; background: var(--brand-soft); color: #d8d2ff; font-weight: 800; font-size: .78rem; }
 .pgate-go {
   flex: none; min-height: 44px; padding: 0 12px; border-radius: 14px; border: 0; cursor: pointer;
-  background: linear-gradient(135deg, var(--brand-2), var(--brand)); color: #fff; font-weight: 800; font-size: .85rem;
+  background: var(--btn-grad); color: #fff; font-weight: 800; font-size: .85rem;
   box-shadow: 0 3px 0 #463bc4;
 }
 .pgate-go:active { transform: translateY(3px); box-shadow: none; }
@@ -1783,7 +1785,7 @@ body.in-lesson .view.has-fb { padding-bottom: calc(var(--fb-h, 230px) + 24px + e
   background: color-mix(in srgb, var(--c) 28%, transparent); color: color-mix(in srgb, var(--c) 45%, #fff); }
 .ptile .tile { position: relative; }
 .pt-badge { position: absolute; top: -7px; inset-inline-end: -9px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px;
-  display: grid; place-items: center; font-size: .75rem; font-weight: 900; background: #ff6b7a; color: #fff; box-shadow: 0 0 0 2px #1a2052; }
+  display: grid; place-items: center; font-size: .75rem; font-weight: 900; background: #cc3346; color: #fff; box-shadow: 0 0 0 2px #1a2052; }
 
 /* ---------- Tab bar: each screen's own colour on its active pill, a dot when something waits (design round D29) ---------- */
 .tabbar a[data-tab="grammar"] { --tc: #ff9a6b; }
@@ -2063,3 +2065,166 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
    but the bar itself looks out of place in an app (and covers part of a tablet's edge). */
 * { scrollbar-width: none; }
 *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+/* the smallest phones (568px tall): without the owl the whole sheet, its last line of advice included, fits */
+@media (max-height: 600px) { .wl-owl { display: none; } .welcome { padding-top: 14px; gap: 4px; } .wl-restore { min-height: 36px; } }
+
+/* ---------- Today screen: one big next-lesson card and a short task list ---------- */
+.tabbar a[data-tab="home"] { --tc: #ffc53d; }
+.tabbar svg { width: 54px; }
+.continue { margin-bottom: 16px; }
+.continue .cont-row b { font-size: 1.15rem; }
+.tasks { display: grid; gap: 8px; }
+.task.is-done { opacity: .72; }
+.task.is-done b { text-decoration: line-through; text-decoration-color: rgba(255, 255, 255, .35); }
+
+/* ---------- Gradual reveal: extras hidden for a new learner, chests of stages not begun stay quiet ---------- */
+.minimap[hidden], .search[hidden], .gsearch-row[hidden], .tn-entry[hidden], .pgate-go[hidden] { display: none !important; }
+.pchest-wrap.is-quiet { visibility: hidden; }
+
+/* ---------- First-time tour: one lit spot at a time and a short bubble ---------- */
+.tour { position: fixed; inset: 0; z-index: 70; }
+.tour-spot {
+  position: fixed; border-radius: 20px; pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(4, 7, 22, .74), 0 0 0 3px rgba(255, 197, 61, .9) inset;
+  transition: top .3s ease, left .3s ease, width .3s ease, height .3s ease;
+}
+.tour-bubble {
+  position: fixed; left: 16px; right: 16px; max-width: 420px; margin: 0 auto; padding: 14px 16px 12px; border-radius: 18px;
+  background: #fff; color: #1a1f45; box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+}
+.tour-bubble p { margin: 0 0 10px; font-weight: 700; line-height: 1.5; }
+.tour-row { display: flex; align-items: center; gap: 8px; }
+.tour-dots { display: flex; gap: 5px; margin-inline-end: auto; }
+.tour-dots i { width: 8px; height: 8px; border-radius: 50%; background: #c9cdf0; }
+.tour-dots i.on { width: 20px; border-radius: 999px; background: #6a5cff; }
+.tour-skip { min-height: 44px; padding: 0 10px; border: 0; background: none; color: #5b628f; font: inherit; font-weight: 700; cursor: pointer; }
+.tour-next { width: auto; margin: 0; min-height: 44px; padding: 0 18px; }
+@media (prefers-reduced-motion: reduce) { .tour-spot { transition: none; } }
+
+/* ---------- End of a round: the two lesson steps, and what's next ---------- */
+.steps2 { list-style: none; margin: 4px 0 14px; padding: 0; display: grid; gap: 8px; text-align: start; }
+.steps2 li { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: rgba(255, 255, 255, .05); font-weight: 700; font-size: .92rem; }
+.steps2 li span { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 900; }
+.steps2 li.done { color: #c9cdf0; }
+.steps2 li.done span { background: var(--good); color: #06291a; }
+.steps2 li.now { background: rgba(142, 125, 255, .16); box-shadow: inset 0 0 0 2px rgba(142, 125, 255, .5); }
+.steps2 li.now span { background: #6a5cff; color: #fff; }
+.next-card {
+  display: flex; align-items: center; gap: 12px; margin: 2px 0 12px; padding: 10px 12px; border-radius: 16px; text-align: start;
+  background: rgba(255, 255, 255, .06); color: var(--ink); text-decoration: none; box-shadow: 0 3px 0 rgba(0, 0, 0, .3);
+}
+.next-card .tile { width: 42px; height: 42px; flex: none; }
+.next-card .grow { display: grid; gap: 2px; min-width: 0; }
+.next-card small { font-size: .74rem; font-weight: 800; color: #b9b0ff; }
+.next-card b { font-size: .95rem; line-height: 1.3; }
+.next-card:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0, 0, 0, .3); }
+
+/* ---------- Rule page: the practice button stays in reach while reading ---------- */
+.rule-go { position: sticky; bottom: 12px; z-index: 5; display: flex; align-items: center; justify-content: center; gap: 6px;
+  box-shadow: 0 4px 0 #463bc4, 0 10px 24px rgba(4, 7, 22, .6); }
+.rule-go-n { font-size: .82rem; font-weight: 700; opacity: .85; }
+
+/* Speaking: the rating buttons are the step after saying the word */
+.sp-rate { margin: 12px 0 8px; text-align: center; font-size: .85rem; font-weight: 700; color: #c9cdf0; }
+
+.rule-num[hidden] { display: none !important; }
+
+/* Progress before the first lesson: one line and the next lesson */
+.pg-empty p { margin: 0 0 12px; line-height: 1.55; font-weight: 600; }
+.pg-empty .next-card { margin: 0; }
+
+/* The translation under the answer sits on the answer's side, so the two read as one pair */
+.fb-sub.fb-sub-en { text-align: left; padding-inline: 4px; }
+.fb-sub.fb-sub-he { text-align: right; padding-inline: 4px; }
+
+/* Contrast (round 31): the path's 'start here' bubble and the practice count badge reach 4.5:1 with their text */
+
+/* Speaking on the smallest phones (568px tall): the rating buttons stay on screen without scrolling */
+@media (max-height: 620px) {
+  .speak-card { padding-block: 12px; }
+  .speak-card .prompt { font-size: 2rem; margin-block: 4px; }
+  .speak-row { margin-top: 4px; gap: 20px; }
+  .speak-row .speak.xl { width: 66px; height: 66px; }
+  .speak-row .speak.xl svg { width: 32px; height: 32px; }
+  .sp-rate { margin: 8px 0 6px; }
+}
+
+/* End screens on the smallest phones (568px tall): the next step and "Back to Today" stay above the fold */
+@media (max-height: 620px) {
+  .result { margin-top: 6px; padding: 14px 14px 14px; }
+  .result .big { width: 72px; height: 72px; font-size: 2.4rem; margin-bottom: 2px; }
+  .res-ring { width: 84px; height: 84px; margin-bottom: 4px; }
+  .res-ring .big { width: 66px; height: 66px; }
+  .result h1 { font-size: 1.4rem; margin: 2px 0; }
+  .result .sub { margin-bottom: 8px; }
+  .result .stats-row { margin: 2px 0 10px; }
+  .result .st { padding: 8px 6px; }
+  .result .steps2 { margin: 2px 0 10px; gap: 6px; }
+  .result .steps2 li { padding: 8px 10px; }
+}
+
+/* The task that the next-lesson card opens wears a small "Now" tag, so the card and the task read as one step */
+.task-now { display: inline-block; margin-inline-start: 6px; padding: 1px 8px; border-radius: 999px; vertical-align: 2px;
+  font-size: .72rem; font-weight: 800; background: rgba(142, 125, 255, .22); color: #d8d2ff; text-decoration: none; }
+
+/* The example sentence in "Why?" gets a line of its own: an English sentence wrapped inside a Hebrew line
+   splits into pieces that read out of order */
+.why-ex { display: block; margin-top: 3px; }
+html[dir="rtl"] .why-ex { text-align: right; }
+
+/* Path labels: the English part of a rule name ("should / must / have to / might") takes a line of its own
+   under the Hebrew, in reading order; a long one ends in an ellipsis instead of being cut at the edge
+   (the full name is on the rule's card and page), and the label stays two lines so it never meets the next node */
+.plabel bdi:only-of-type:last-child { display: block; font-size: .74rem; font-weight: 600; letter-spacing: -.01em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.plabel bdi.nw:not(:only-of-type) { white-space: normal; }   /* labels with several English parts wrap rather than run past the edge */
+
+/* Rule titles: the English part of "Hebrew: English" takes its own line and may wrap, so a long one
+   ("much / many / some / any") never runs off a 320px screen */
+.rule-hero h1 bdi:only-of-type:last-child { display: block; }
+.rule-hero h1 bdi.nw { white-space: normal; }
+
+/* The "new version" bar waits out a lesson (it would cover the lesson's buttons, and a reload there loses the
+   round); it shows again when the lesson ends. Elsewhere the page leaves room for it above the tab bar. */
+body.in-lesson .update { display: none; }
+body:has(#update):not(.in-lesson) .view { padding-bottom: 96px; }
+
+/* Welcome: restoring a backup on a new phone, one quiet link under the levels */
+.wl-restore { justify-self: center; min-height: 44px; padding: 0 12px; border: 0; background: none; color: #c9c2ff;
+  font: inherit; font-size: .85rem; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.wl-msg:empty { display: none; }
+.wl-msg { margin: 0; color: #ffb4a8; }
+/* A short message that leaves by itself */
+.toast { position: fixed; z-index: 80; left: 16px; right: 16px; bottom: calc(86px + env(safe-area-inset-bottom)); max-width: 420px; margin: 0 auto;
+  padding: 12px 16px; border-radius: 14px; background: #2fd093; color: #06291a; font-weight: 800; text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .45); }
+
+/* Today: a quiet backup reminder after the day's plan */
+.bk-nudge { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; align-items: center; margin-top: 14px; padding: 14px;
+  border-radius: 18px; background: rgba(255, 255, 255, .05); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); }
+.bk-nudge-ico { font-size: 1.6rem; }
+.bk-nudge .grow { display: grid; gap: 2px; }
+.bk-nudge .small { color: var(--muted); }
+.bk-nudge-btns { grid-column: 1 / -1; display: flex; gap: 8px; }
+.bk-nudge-btns .btn { flex: 1; margin: 0; min-height: 44px; padding: 10px 12px; }
+.backup.is-lit { box-shadow: 0 0 0 3px rgba(255, 197, 61, .8); transition: box-shadow .3s; }
+
+/* A lesson that completes its unit says so on its end screen */
+.unit-done { margin: 2px auto 10px; padding: 8px 12px; border-radius: 12px; max-width: 30ch;
+  background: rgba(47, 208, 147, .14); color: #a6f1d2; font-weight: 800; font-size: .9rem; line-height: 1.45; }
+
+/* After a hard first practice at a higher level: a quiet offer of the level below */
+.lvl-hint { margin: 4px auto 12px; max-width: 32ch; font-size: .9rem; color: #c9cdf0; line-height: 1.5; }
+.lvl-hint a { color: #ffd27a; font-weight: 800; text-underline-offset: 3px; }
+
+/* the saved-rules filter shows only once a rule is saved (a "⭐ 0" button meant nothing) */
+.gsaved[hidden] { display: none !important; }
+
+/* Tense map opened from a rule: that tense is marked */
+.tn-cell.is-here { outline: 3px solid #ffd27a; outline-offset: 2px; }
+
+.backup .btn[hidden], .bk-last[hidden] { display: none !important; }
+
+.path-head[hidden] { display: none !important; }
+.ph-go bdi { white-space: nowrap; }
