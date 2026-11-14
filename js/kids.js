@@ -714,7 +714,7 @@ const Kids = (() => {
         </a>
         <a class="k-abc-card k-speed-card" href="#/kids/speed">
           <span class="k-story-books" aria-hidden="true">⚡</span>
-          <span class="grow"><b>${kt('speed')}</b><small>${Store.kidsSpeedBest ? kt('speedBest', { n: Store.kidsSpeedBest }) : kt('speedSub')}</small></span>
+          <span class="grow"><b>${kt('speed')}</b><small>${Store.kidsSpeedBest ? kt('speedBest', { n: Math.round(Store.kidsSpeedBest * 10) }) : kt('speedSub')}</small></span>
         </a>`}
         <a class="k-abc-card k-together-card" href="#/kids/together">
           <span class="k-story-books" aria-hidden="true">👫</span>
@@ -1434,6 +1434,8 @@ const Kids = (() => {
   // 10 known words: hear one, tap its picture among 4 before a gentle 8-second bar runs out.
   // A right answer scores 1 point plus up to 1 for speed; when time runs out the answer is shown, no fuss.
   let speedTimer = null;
+  // points are shown as whole numbers (10 for a right answer + up to 10 for speed); the store keeps tenths
+  const speedPts = n => Math.round(n * 10);
   function speedGame() {
     document.body.classList.add('in-lesson');
     const known = KIDS_WORDS.filter(w => Store.kidsWordCount(w.id) > 0);
@@ -1449,7 +1451,7 @@ const Kids = (() => {
       let done = false;
       K.view.innerHTML = `
         <div class="k-wrap k-play">
-          <p class="k-step"><span aria-hidden="true">⚡</span> ${kt('speed')} · ${at + 1}/10 · <b>${kt('speedScore', { n: score.toFixed(1).replace('.0', '') })}</b></p>
+          <p class="k-step"><span aria-hidden="true">⚡</span> ${kt('speed')} · ${at + 1}/10 · <b>${kt('speedScore', { n: speedPts(score) })}</b></p>
           <div class="k-speed-bar" aria-hidden="true"><i id="k-speed-fill"></i></div>
           <div class="k-prompt">
             <button class="k-speaker" id="k-say" aria-label="${kt('listen')}: ${w.en}"><span aria-hidden="true">🔊</span></button>
@@ -1483,9 +1485,11 @@ const Kids = (() => {
             done = true;
             clearInterval(speedTimer);
             const left = Math.max(0, 1 - (Date.now() - start) / LIMIT);
-            score += 1 + Math.round(left * 10) / 10;
+            const gain = 1 + Math.round(left * 10) / 10;
+            score += gain;
             K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; });
             b.classList.add('right');
+            $('.k-bubble').textContent = `⚡ +${speedPts(gain)} · ${w.en.replace(/[!?.]$/, '')}!`;
             Sfx.star(Math.min(3, Math.floor(left * 4)));
             Store.kidsWordRight(w.id);
             owlMood('cheer');
@@ -1494,6 +1498,8 @@ const Kids = (() => {
             b.disabled = true;
             b.classList.add('nope');
             K.Feel.wrong(b);
+            $('.k-bubble').textContent = kt('tryAgain');
+            sayEn(opts[+b.dataset.i].en, 1);   // name what was tapped
           }
         };
       });
@@ -1507,9 +1513,9 @@ const Kids = (() => {
       K.view.innerHTML = `
         <div class="k-wrap k-play k-end">
           <div class="k-end-card">${endOwl()}
-            <h1>⚡ ${kt('speedScore', { n: pts })}</h1>
+            <h1>⚡ ${kt('speedScore', { n: speedPts(pts) })}</h1>
             ${starsHtml(stars, 'big pop')}
-            ${best ? `<b class="k-best">🏆 ${kt('speedNew')}</b>` : `<p class="k-unlock">${kt('speedBest', { n: Store.kidsSpeedBest })}</p>`}
+            ${best ? `<b class="k-best">🏆 ${kt('speedNew')}</b>` : `<p class="k-unlock">${kt('speedBest', { n: speedPts(Store.kidsSpeedBest) })}</p>`}
           </div>
           <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
           <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
