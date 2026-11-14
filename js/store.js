@@ -196,6 +196,12 @@ const Store = (() => {
     kidsTipSeen: kind => !!(state.kids && state.kids.tips && state.kids.tips[kind]),
     kidsTipDone(kind) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.tips = state.kids.tips || {}; state.kids.tips[kind] = true; save(); },
     // Bedtime look in the evening (on unless a grown-up turned it off)
+    // the English voice a parent picked in the kids parent corner ('' = the best one automatically)
+    get kidsVoice() { return (state.kids && state.kids.voice) || ''; },
+    set kidsVoice(v) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.voice = String(v || ''); save(); },
+    // speaking speed for the kids voice: 0.85 = slow, 1 = normal
+    get kidsVoiceRate() { const r = state.kids && state.kids.voiceRate; return r > 0 ? r : 1; },
+    set kidsVoiceRate(v) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.voiceRate = +v || 1; save(); },
     get kidsBedtime() { return !(state.kids && state.kids.bedtime === false); },
     set kidsBedtime(v) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.bedtime = !!v; save(); },
     // A gentle daily reminder for parents: on/off, the time, and the last day it was shown

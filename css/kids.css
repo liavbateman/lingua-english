@@ -1758,3 +1758,8 @@ button.k-ss-seat { border: 0; font-family: inherit; font-size: 2.6rem; cursor: p
 .k-feel-scene { font-size: clamp(2.2rem, 12vw, 3.4rem); white-space: nowrap; }
 .k-pizza-top.nope { opacity: .4; filter: grayscale(.8); }
 .k-shelf-item.nope { opacity: .4; filter: grayscale(.8); }
+/* parent corner: voice choice and speed */
+.k-vc-pick select { display: block; width: 100%; margin-top: 6px; padding: 8px 10px; border: 2px solid #dfe6f7; border-radius: 14px; background: #fff; font: inherit; color: var(--k-ink); }
+.k-vc-speed { display: flex; gap: 6px; }
+.k-vc-speed .k-btn { width: auto; margin: 0; padding: 6px 12px; font-size: .95rem; }
+.k-vc-speed .k-btn.on { background: #fff1c2; box-shadow: 0 4px 0 #f2c94c; }

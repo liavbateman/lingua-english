@@ -53,11 +53,21 @@
   // On iPhone the voice list loads late, and without an explicit English voice
   // Safari may read English words with the device's Hebrew voice.
   let enVoice = null;
+  // The most natural voice first (neural / "Natural" / Google / Samantha), never a joke voice like "Bubbles",
+  // and not a low-quality "compact" one - the same ranking the kids world uses.
+  function voiceScore(v) {
+    const n = v.name || '';
+    let s = 0;
+    if (/albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|junior|ralph|kathy|fred|deranged|hysterical|princess|grandma|grandpa|rocko|shelley|flo|eddy|reed|sandy/i.test(n)) s -= 1000;
+    if (/natural|neural|enhanced|premium|wavenet|studio/i.test(n)) s += 60;
+    if (/compact/i.test(n)) s -= 20;
+    if (/^en[-_]US/i.test(v.lang)) s += 10; else if (/^en[-_](GB|AU|IE|CA|NZ)/i.test(v.lang)) s += 4;
+    if (/jenny|aria|ava|samantha|allison|susan|zira|google us english|karen|moira|tessa|serena|emma|libby|sonia/i.test(n)) s += 15;
+    return s;
+  }
   function pickVoice() {
     const voices = speechSynthesis.getVoices().filter(v => /^en[-_]/i.test(v.lang));
-    enVoice = voices.find(v => /en[-_]US/i.test(v.lang) && /Samantha/i.test(v.name))
-      || voices.find(v => /en[-_]US/i.test(v.lang))
-      || voices[0] || null;
+    enVoice = voices.sort((a, b) => voiceScore(b) - voiceScore(a))[0] || null;
   }
   if ('speechSynthesis' in window) {
     pickVoice();

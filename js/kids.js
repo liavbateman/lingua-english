@@ -79,7 +79,7 @@ const Kids = (() => {
       tr_words: '50 מילים', tr_bloom: 'פרח פורח', tr_abc: 'משחק האותיות', tr_trace: '10 אותיות מצוירות', tr_traceAll: 'כל ה-ABC',
       tr_story: '3 סיפורים', tr_storyAll: 'כל הסיפורים', tr_riddle: 'בלש', tr_treasure: '7 ימי אוצר', tr_owl: 'ינשוף מגונדר',
       holidaySub: 'אי חג מיוחד, רק בימים אלה!', holidayStickers: 'מדבקות חג',
-      vcTitle: 'קולות', vcEn: 'קול באנגלית', vcHe: 'קול בעברית (הוראות)', vcOk: 'מותקן', vcMissing: 'חסר', vcTest: 'נסו',
+      vcTitle: 'קולות', vcPick: 'איזה קול', vcAuto: 'הכי טבעי (אוטומטי)', vcSpeed: 'מהירות דיבור', vcSlow: '🐢 לאט', vcNormal: '🙂 רגיל', vcEn: 'קול באנגלית', vcHe: 'קול בעברית (הוראות)', vcOk: 'מותקן', vcMissing: 'חסר', vcTest: 'נסו',
       vcNone: 'המכשיר לא מדבר בכלל. נסו דפדפן אחר (Safari באייפון, Chrome באנדרואיד).',
       vcHeTip: 'בלי קול עברי הילד ישמע רק את המילים באנגלית, בלי הוראות בעברית. להתקנה:',
       vcIos: 'אייפון / אייפד: הגדרות ← נגישות ← תוכן מדובר ← קולות ← עברית (כרמית)',
@@ -238,7 +238,7 @@ const Kids = (() => {
       tr_words: '50 words', tr_bloom: 'In full bloom', tr_abc: 'Letter game', tr_trace: '10 letters traced', tr_traceAll: 'The whole ABC',
       tr_story: '3 stories', tr_storyAll: 'Every story', tr_riddle: 'Detective', tr_treasure: '7 treasure days', tr_owl: 'Dressed-up owl',
       holidaySub: 'A special holiday island, only these days!', holidayStickers: 'Holiday stickers',
-      vcTitle: 'Voices', vcEn: 'English voice', vcHe: 'Hebrew voice (instructions)', vcOk: 'Installed', vcMissing: 'Missing', vcTest: 'Test',
+      vcTitle: 'Voices', vcPick: 'Which voice', vcAuto: 'Most natural (automatic)', vcSpeed: 'Speaking speed', vcSlow: '🐢 Slow', vcNormal: '🙂 Normal', vcEn: 'English voice', vcHe: 'Hebrew voice (instructions)', vcOk: 'Installed', vcMissing: 'Missing', vcTest: 'Test',
       vcNone: "This device doesn't speak at all. Try another browser (Safari on iPhone, Chrome on Android).",
       vcHeTip: 'Without a Hebrew voice your child hears only the English words, without Hebrew instructions. To install:',
       vcIos: 'iPhone / iPad: Settings → Accessibility → Spoken Content → Voices → Hebrew (Carmit)',
@@ -371,17 +371,49 @@ const Kids = (() => {
 
   // ---------- speech: English words, Hebrew instructions (when the device has a Hebrew voice) ----------
   let heVoice = null, enVoice = null;
+  // Which voice a child hears matters more than anything else in a listening app. Devices list many voices;
+  // the first one is often an adult male voice, a low-quality "compact" voice or (on Apple devices) a joke
+  // voice like "Bubbles". So every voice gets a score: natural / neural voices first (Edge "Jenny", "Aria",
+  // the child voice "Ana", Google, Samantha...), clear warm voices next, joke voices never.
+  const NOVELTY_VOICE = /albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|junior|ralph|kathy|\bfred\b|deranged|hysterical|princess|grandma|grandpa|rocko|shelley|flo\b|eddy|reed|sandy/i;
+  function voiceScore(v) {
+    const n = v.name || '';
+    let s = 0;
+    if (NOVELTY_VOICE.test(n)) s -= 1000;
+    if (/natural|neural|enhanced|premium|wavenet|studio/i.test(n)) s += 60;
+    if (/compact/i.test(n)) s -= 20;
+    if (/^en[-_]US/i.test(v.lang)) s += 10; else if (/^en[-_](GB|AU|IE|CA|NZ)/i.test(v.lang)) s += 4;
+    if (/\bana\b/i.test(n)) s += 25;   // Edge's child voice: the most natural for a children's app
+    if (/jenny|aria|ava|samantha|allison|susan|zira|google us english|google uk english female|karen|moira|tessa|serena|emma|libby|sonia|nicky/i.test(n)) s += 15;
+    if (/\b(david|mark|guy|alex|daniel|tom|aaron|arthur|fred|ryan|eric|christopher|male)\b/i.test(n)) s -= 8;
+    return s;
+  }
+  const bestOf = list => list.slice().sort((a, b) => voiceScore(b) - voiceScore(a))[0] || null;
   function voices() {
     if (!('speechSynthesis' in window)) return;
     const all = speechSynthesis.getVoices();
-    heVoice = all.find(v => /^(he|iw)[-_]/i.test(v.lang)) || null;
+    heVoice = bestOf(all.filter(v => /^(he|iw)[-_]/i.test(v.lang)));
     const en = all.filter(v => /^en[-_]/i.test(v.lang));
-    enOnline = en.find(v => /en[-_]US/i.test(v.lang) && /Samantha/i.test(v.name)) || en.find(v => /en[-_]US/i.test(v.lang)) || en[0] || null;
+    // a voice the parent picked wins; otherwise the best-scoring one
+    // (voices() also runs while this file loads, before store.js: no saved choice yet at that moment)
+    const want = typeof Store !== 'undefined' ? Store.kidsVoice : '';
+    const chosen = want && en.find(v => v.name === want);
+    enOnline = chosen || bestOf(en);
     // network voices (e.g. Chrome's "Google US English") go silent offline: keep an on-device voice ready
-    enLocal = en.find(v => v.localService && /en[-_]US/i.test(v.lang)) || en.find(v => v.localService) || null;
+    enLocal = (chosen && chosen.localService ? chosen : null) || bestOf(en.filter(v => v.localService));
     pickVoice();
     voicesKnown = true;
   }
+  // English voices in the order a parent would want to try them (for the parent corner)
+  const enVoiceList = () => ('speechSynthesis' in window ? speechSynthesis.getVoices() : [])
+    .filter(v => /^en[-_]/i.test(v.lang) && voiceScore(v) > -500).sort((a, b) => voiceScore(b) - voiceScore(a));
+  // What the voice actually reads: no emoji ("sleeping face"), no symbols, single spaces.
+  const spoken = t => String(t)
+    .replace(/[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}\u{FE0F}\u{200D}\u{20E3}]/gu, ' ')
+    .replace(/[•→←≠✓✔★☆·]/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+  // one speed knob for every voice line: the parent's choice, a little slower for the youngest
+  const voiceRate = () => Store.kidsVoiceRate * (Store.kidsAge === 'little' ? 0.92 : 1);
   let enOnline = null, enLocal = null, voicesKnown = false;
   function pickVoice() { enVoice = (navigator.onLine === false && enLocal) ? enLocal : (enOnline || enLocal); }
   window.addEventListener('online', () => { pickVoice(); netNote(); });
@@ -404,11 +436,11 @@ const Kids = (() => {
     speechSynthesis.cancel();
     parts.forEach(([lang, text]) => {
       if (lang === 'he' && !heVoice) return;
-      const u = new SpeechSynthesisUtterance(text);
+      const u = new SpeechSynthesisUtterance(lang === 'he' ? text : spoken(text));
       u.lang = lang === 'he' ? 'he-IL' : 'en-US';
       const v = lang === 'he' ? heVoice : enVoice;
       if (v) u.voice = v;
-      u.rate = (lang === 'he' ? 1 : rate) * (isNight() ? .85 : 1);
+      u.rate = (lang === 'he' ? 1 : rate * voiceRate()) * (isNight() ? .85 : 1);
       u.pitch = 1.1;   // a little brighter, friendlier for children
       speechSynthesis.speak(u);
     });
@@ -433,10 +465,10 @@ const Kids = (() => {
     if (!enVoice) voices();
     speechSynthesis.cancel();
     lines.forEach((text, i) => {
-      const u = new SpeechSynthesisUtterance(text);
+      const u = new SpeechSynthesisUtterance(spoken(text));
       u.lang = 'en-US';
       if (enVoice) u.voice = enVoice;
-      u.rate = rate * (isNight() ? .85 : 1);
+      u.rate = rate * voiceRate() * (isNight() ? .85 : 1);
       u.pitch = opts.pitch || 1.1;
       if (opts.volume != null) u.volume = opts.volume;
       u.onstart = () => step(i);
@@ -3545,7 +3577,7 @@ const Kids = (() => {
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-US';
     if (enVoice) u.voice = enVoice;
-    u.pitch = v.pitch; u.rate = v.rate; u.volume = v.vol;
+    u.pitch = v.pitch; u.rate = v.rate * voiceRate(); u.volume = v.vol;
     speechSynthesis.speak(u);
   }
   // record a short clip and hand back its address (kept so it can be played again)
@@ -5007,7 +5039,7 @@ const Kids = (() => {
         const u = new SpeechSynthesisUtterance(L.text);
         u.lang = 'en-US';
         if (enVoice) u.voice = enVoice;
-        u.rate = sg.id === 'abc' ? 0.85 : 0.8;
+        u.rate = (sg.id === 'abc' ? 0.85 : 0.8) * voiceRate();
         u.pitch = 1.25;
         u.volume = quiet ? 0.25 : 1;
         u.onboundary = e => {
@@ -5077,7 +5109,7 @@ const Kids = (() => {
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-US';
     if (enVoice) u.voice = enVoice;
-    u.rate = isNight() ? 0.65 : 0.75;
+    u.rate = (isNight() ? 0.65 : 0.75) * voiceRate();
     u.pitch = 1.1;
     const starts = [];
     text.replace(/[A-Za-z']+/g, (m, i) => { starts.push(i); return m; });
@@ -5467,7 +5499,23 @@ const Kids = (() => {
       share.textContent = '✓ ' + kt('wkCopied');
     };
     const vEn = $('#k-vc-en'), vHe = $('#k-vc-he');
-    if (vEn) vEn.onclick = () => sayEn('Hello! This is how the English words sound.', 0.9);
+    const sample = () => sayEn('Hello! I am the owl. Cat, dog, apple. Good job!', 0.85);
+    if (vEn) vEn.onclick = sample;
+    const vPick = $('#k-vc-pick');
+    if (vPick) vPick.onchange = () => {
+      Store.kidsVoice = vPick.value;
+      voices();
+      const small = vEn && vEn.parentElement.querySelector('small');
+      if (small && enVoice) small.innerHTML = `✅ ${kt('vcOk')} · <bdi dir="ltr">${esc(enVoice.name)}</bdi>`;
+      sample();   // hear the new voice straight away
+    };
+    K.view.querySelectorAll('.k-vc-speed [data-rate]').forEach(b => {
+      b.onclick = () => {
+        Store.kidsVoiceRate = +b.dataset.rate;
+        K.view.querySelectorAll('.k-vc-speed [data-rate]').forEach(x => x.classList.toggle('on', x === b));
+        sample();
+      };
+    });
     if (vHe) vHe.onclick = () => say([['he', kt('vcSampleHe')]]);
     $('#k-big').onchange = e => { Store.kidsBigPrint = e.target.checked; document.body.classList.toggle('kids-big', Store.kidsBigPrint); };
     $('#k-card').onclick = progressCard;
@@ -5622,8 +5670,22 @@ const Kids = (() => {
     voices();
     const row = (label, v, id) => `
       <div class="k-vc-row">
-        <span class="grow"><b>${label}</b><small>${v ? `✅ ${kt('vcOk')} · ${esc(v.name)}` : `⚠️ ${kt('vcMissing')}`}</small></span>
+        <span class="grow"><b>${label}</b><small>${v ? `✅ ${kt('vcOk')} · <bdi dir="ltr">${esc(v.name)}</bdi>` : `⚠️ ${kt('vcMissing')}`}</small></span>
         ${v ? `<button class="k-btn ghost k-vc-test" id="${id}">▶ ${kt('vcTest')}</button>` : ''}
+      </div>`;
+    const list = enVoiceList();
+    const pickRow = list.length > 1 ? `
+      <div class="k-vc-row k-vc-pick">
+        <label class="grow"><b>${kt('vcPick')}</b>
+          <select id="k-vc-pick" dir="ltr">
+            <option value="">${kt('vcAuto')}${enOnline && !Store.kidsVoice ? ` · ${esc(enOnline.name)}` : ''}</option>
+            ${list.map(v => `<option value="${esc(v.name)}" ${Store.kidsVoice === v.name ? 'selected' : ''}>${esc(v.name)}${v.localService ? '' : ' ☁️'}</option>`).join('')}
+          </select></label>
+      </div>` : '';
+    const speedRow = `
+      <div class="k-vc-row">
+        <span class="grow"><b>${kt('vcSpeed')}</b></span>
+        <span class="k-vc-speed">${[[0.85, 'vcSlow'], [1, 'vcNormal']].map(([r, k]) => `<button class="k-btn ghost ${Store.kidsVoiceRate === r ? 'on' : ''}" data-rate="${r}">${kt(k)}</button>`).join('')}</span>
       </div>`;
     const tips = [];
     if (!enVoice) tips.push(kt('vcEnTip'));
@@ -5632,6 +5694,8 @@ const Kids = (() => {
       <section class="k-pc-box">
         <h2>🔊 ${kt('vcTitle')}</h2>
         ${row(kt('vcEn'), enVoice, 'k-vc-en')}
+        ${pickRow}
+        ${speedRow}
         ${row(kt('vcHe'), heVoice, 'k-vc-he')}
         ${tips.length ? `<div class="k-vc-tip">${tips.map(x => `<p>${x}</p>`).join('')}<p>📱 ${kt('vcIos')}</p><p>🤖 ${kt('vcAndroid')}</p></div>` : ''}
       </section>`;
