@@ -1669,3 +1669,11 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-tip-box p { margin: 0 0 8px; color: var(--k-ink); }
 .k-tip-say { margin: 2px 0 8px; }
 .k-tip-words small { color: var(--k-muted); }
+
+/* a tablet on its side (wide landscape): use the width - a wider map with four tiles a row.
+   Play screens stay centred and focused at the phone-like width. */
+@media (min-width: 1000px) and (orientation: landscape) {
+  body.kids .view { max-width: 1120px; }
+  body.kids .k-tiles { grid-template-columns: repeat(4, 1fr); }
+  body.kids .k-play { max-width: 760px; }
+}
