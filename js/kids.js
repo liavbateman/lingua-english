@@ -3721,7 +3721,7 @@ const Kids = (() => {
       const opts = K.shuffle([want, ...others]);
       K.view.innerHTML = `
         <div class="k-wrap k-play">
-          <p class="k-step"><span aria-hidden="true">🌅</span> Good morning!</p>
+          <p class="k-step"><span aria-hidden="true">🌅</span> <bdi lang="en">Good morning!</bdi> · ${done.length + 1}/${steps.length}</p>
           <div class="k-morning-line" dir="ltr">${steps.map((s, i) => i < done.length
             ? `<span class="k-mo-slot done"><span aria-hidden="true">${s.pic}</span><small>${i + 1}</small></span>`
             : `<span class="k-mo-slot ${i === done.length ? 'now' : ''}"><span aria-hidden="true">${i === done.length ? '❔' : ''}</span><small>${i + 1}</small></span>`).join('')}</div>
@@ -3748,6 +3748,8 @@ const Kids = (() => {
             setTimeout(() => (done.length < steps.length ? round() : end()), 2200);
           } else {
             missesAll++;
+            btn.disabled = true;   // one mistake per picture
+            btn.classList.add('nope');
             K.Feel.wrong(btn);
             owlMood('think');
             const i = steps.indexOf(o);
