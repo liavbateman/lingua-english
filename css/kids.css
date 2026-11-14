@@ -1740,3 +1740,5 @@ bdi.k-q { white-space: nowrap; }
 .k-band-animal.on { background: #fff1c2; box-shadow: 0 4px 0 #f2c94c; }
 .k-leaf-spot.nope { opacity: .45; filter: grayscale(.7); transition: opacity .6s .4s, filter .6s .4s; }
 .k-sh-thing.nope { opacity: .4; filter: grayscale(.8); }
+/* copy the owl: how to say it (the voice), clearly not a translation of the word */
+.k-copy-how { display: inline-block; margin-top: 6px; padding: 4px 12px; border-radius: 999px; background: #fff1c2; color: var(--k-ink); font-weight: 700; }

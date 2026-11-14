@@ -3570,7 +3570,7 @@ const Kids = (() => {
             <span class="k-copy-voice" aria-hidden="true">${v.pic}</span>
             <span class="k-pic" aria-hidden="true">${w.pic}</span>
             <span class="k-word en" lang="en">${w.en}</span>
-            <span class="k-he he">${v.he}</span>
+            <span class="k-copy-how he">${v.pic} ${v.he}</span>
           </div>
           <div class="k-copy-row">
             <button class="k-copy-btn" id="k-copy-owl"><span aria-hidden="true">🦉</span><small>${kt('copyOwl')}</small></button>
