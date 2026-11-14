@@ -1240,8 +1240,11 @@ const Kids = (() => {
             b.disabled = true;
             b.classList.add('nope');
             K.Feel.wrong(b);
+            // name the picture that was tapped (under it and aloud), then the word again
+            const o = opts[+b.dataset.i];
+            b.insertAdjacentHTML('beforeend', `<small class="k-opt-name en" lang="en">${esc(o.en)}</small>`);
             $('.k-bubble').textContent = kt('tryAgain'); owlMood('think');
-            setTimeout(() => sayEn(w.en), 350);
+            setTimeout(() => say([['en', `${o.en}.`], ['en', `${w.en}!`]]), 350);
           }
         };
       });

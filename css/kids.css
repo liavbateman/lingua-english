@@ -1696,3 +1696,7 @@ bdi.k-q { white-space: nowrap; }
 .k-path-ends .now { background: #fff1c2; box-shadow: 0 0 0 3px #ffd84d; animation: k-pop .5s var(--ease-pop) both; }
 
 .k-riddle-hint { display: block; margin: 0 auto 8px; }
+
+/* practice: the name of a wrong pick, under its picture */
+.k-opt { position: relative; }
+.k-opt-name { position: absolute; inset-inline: 0; bottom: 6px; font-size: .85rem; font-weight: 700; color: var(--k-ink); opacity: .75; }
