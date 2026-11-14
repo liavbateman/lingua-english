@@ -2196,3 +2196,7 @@ body:has(#update):not(.in-lesson) .view { padding-bottom: 96px; }
 /* A lesson that completes its unit says so on its end screen */
 .unit-done { margin: 2px auto 10px; padding: 8px 12px; border-radius: 12px; max-width: 30ch;
   background: rgba(47, 208, 147, .14); color: #a6f1d2; font-weight: 800; font-size: .9rem; line-height: 1.45; }
+
+/* After a hard first practice at a higher level: a quiet offer of the level below */
+.lvl-hint { margin: 4px auto 12px; max-width: 32ch; font-size: .9rem; color: #c9cdf0; line-height: 1.5; }
+.lvl-hint a { color: #ffd27a; font-weight: 800; text-underline-offset: 3px; }

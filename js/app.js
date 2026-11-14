@@ -217,7 +217,7 @@
     const g = nextGrammar();
     // Review comes first: words due today are the ones about to be forgotten.
     // It stays on the list once done today, so the count doesn't jump back.
-    const due = Store.dueWords().length;
+    const due = dueHere().length;
     const review = due || Store.tasks.review
       ? [{ id: 'review', title: t('task.review'),
           sub: Store.tasks.review && !due ? t('task.review.done') : due === 1 ? t('task.review.one') : t('task.review.sub', { n: due }),
@@ -254,7 +254,7 @@
   // then the rest of today's plan, then free practice.
   function nextStep() {
     const done = Store.tasks;
-    const due = Store.dueWords().length;
+    const due = dueHere().length;
     if (due && !done.review) return { href: '#/quiz/choice/review', icon: 'repeat', color: 'coral',
       // a review round holds 8 words, so the card promises one round, and says how many wait in all
       title: t(due === 1 ? 'cont.review.one' : 'cont.review', { n: Math.min(due, 8) }),
@@ -755,6 +755,23 @@
   // A unit is done on the path (its node, its stage, its chest) once its lessons are done: every word met.
   // Today moves on to the next unit at that point, so the path must not still say "5 more lessons".
   // How well the words are known shows in the node's ring (mastery) and in Progress.
+  // A hard start at a higher level (a lesson practice under 50% while only a few words are met):
+  // a quiet offer of the level below, never forced and never once the learner is settled in
+  function easierHint(pct) {
+    const i = LEVELS.findIndex(l => l.id === Store.level);
+    const met = ALL_WORDS.filter(w => Store.isSeen(w.id)).length;
+    if (i <= 0 || pct >= 50 || met > 24 || !UNITS.some(u => u.id === location.hash.split('/')[3])) return '';
+    const prev = LEVELS[i - 1];
+    return `<p class="lvl-hint">${t('hint.easier')} <a href="#/levelup/${prev.id}">${t('hint.easier.go', { level: t('lv.' + prev.id) })}</a></p>`;
+  }
+
+  // Words due for review at the learner's level and below: after moving down a level (it was too hard),
+  // Today does not open with a review of the harder words
+  function dueHere() {
+    const top = LEVELS.findIndex(l => l.id === Store.level);
+    return Store.dueWords().filter(w => LEVELS.findIndex(l => l.id === w.level) <= top);
+  }
+
   function unitDone(u) { return u.words.length > 0 && u.words.every(w => Store.isSeen(w.id)); }
   const levelComplete = lv => UNITS.filter(u => u.level === lv).every(unitDone) && GRAMMAR.filter(g => g.level === lv).every(g => Store.isGrammarDone(g.id));
   let lastLesson = { unit: '', ids: [] };   // the words a lesson's cards just showed, practised first after it
@@ -2063,7 +2080,7 @@
 
   // ---------- Practice (third section of the Learn screen) ----------
   function practice() {
-    const due = Store.dueWords().length;
+    const due = dueHere().length;
     const modes = [
       ...(Store.trickyWords().length ? [{ title: t('tricky.title'), sub: t('tricky.some', { n: Store.trickyWords().length }), href: '#/quiz/choice/tricky', icon: 'target', color: 'rose', skill: 'memory' }] : []),
       { title: t('practice.review'), sub: due === 1 ? t('practice.review.one') : due ? t('practice.review.some', { n: due }) : t('practice.review.none'), href: '#/quiz/choice/review', icon: 'repeat', color: 'blue', skill: 'memory', badge: due },
@@ -2087,7 +2104,7 @@
 
   // Words for an exercise: a unit, the due words, or the current level
   function poolFor(source) {
-    if (source === 'review') return { pool: Store.dueWords(), title: t('quiz.review') };
+    if (source === 'review') return { pool: dueHere(), title: t('quiz.review') };
     if (source === 'missed') return { pool: lastMissed, title: t('quiz.missedTitle') };
     if (source === 'tricky') return { pool: Store.trickyWords(), title: t('tricky.title') };
     if (source === 'pathreview') return { pool: (pathItems && pathItems.review) || [], title: t('rstop.label') };
@@ -2409,7 +2426,7 @@
       done(pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '💪',
         t('quiz.score', { a: correct, b: total }),
         t(pct >= 80 ? 'quiz.great' : 'quiz.keep'),
-        roundStats({ correct, total, xp: correct * 10, ms: Date.now() - started }) + fix, !missed.length);
+        roundStats({ correct, total, xp: correct * 10, ms: Date.now() - started }) + easierHint(pct) + fix, !missed.length);
       countUp();
       view.querySelectorAll('.missed [data-say]').forEach(b => { b.onclick = () => speak(missed[b.dataset.say].en); });
       // with mistakes, "Practice these again" is the main button, so Home becomes the quiet one
