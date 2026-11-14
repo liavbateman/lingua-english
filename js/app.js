@@ -1782,9 +1782,11 @@
           <p class="sub">${t(passed ? 'grammar.done' : 'grammar.retry')}</p>
           ${roundStats({ correct, total: qs.length, ms: Date.now() - started })}
           ${passed
-            ? (next ? `<a class="btn" href="#/grammar/${next.id}">${t('grammar.next', { title: ruleTitle(next) })}</a>` : `<a class="btn" href="#/">${t('btn.home')}</a>`)
-            : `<a class="btn" href="#/grammar/${g.id}">${t('grammar.again')}</a>`}
-          <a class="btn ghost" href="#/grammar">${t('grammar.all')}</a>
+            // passed: the day's plan comes first (what's next, back to Today); the next rule is the extra step
+            ? `${nextCard()}<a class="btn" href="#/">${t('btn.home')}</a>
+               ${next ? `<a class="btn ghost" href="#/grammar/${next.id}">${t('grammar.next', { title: ruleTitle(next) })}</a>` : ''}`
+            : `<a class="btn" href="#/grammar/${g.id}">${t('grammar.again')}</a>
+               <a class="btn ghost" href="#/">${t('btn.home')}</a>`}
         </div>`;
       countUp();
     }
