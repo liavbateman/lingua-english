@@ -174,7 +174,8 @@
   // English phrases inside a Hebrew sentence: keep each one as a single left-to-right unit,
   // so commas, quotes and brackets around it stay where the Hebrew sentence puts them.
   // A colon inside the phrase stays with it ("to be: am / is / are"); one at its end stays with the Hebrew.
-  const heMix = text => text.replace(/[A-Za-z](?:[A-Za-z0-9 ,'’\/\-…?!:]*[A-Za-z0-9?!…])?/g,
+  // an English run may end in a hyphen ("every-") when no letter follows it, so the hyphen stays with its word
+  const heMix = text => text.replace(/[A-Za-z](?:[A-Za-z0-9 ,'’\/\-…?!:]*[A-Za-z0-9?!…])?(?:-(?![A-Za-z\u0590-\u05FF]))?/g,
     m => `<bdi dir="ltr"${m.length <= 30 ? ' class="nw"' : ''}>${m}</bdi>`);
 
   // Names shown in the current interface language
@@ -206,8 +207,9 @@
     document.getElementById('stat-streak').textContent = s;
     document.getElementById('stat-streak-label').textContent = t(s === 1 ? 'streak.one' : 'streak.many');
     document.querySelector('.streak').classList.toggle('lit', s > 0);   // a live streak glows, 0 stays quiet
-    // A small dot on a tab when something waits there: rules to review (Grammar), words due (Learn)
-    const waiting = { grammar: Store.weakRules().length ? t('tab.grev') : '', learn: Store.dueWords().length ? t('tab.review') : '' };
+    // A small dot on a tab when something waits there: rules to review (Grammar).
+    // Words due are not dotted on Learn: Today already leads with that review, and a second signal pulls away from it.
+    const waiting = { grammar: Store.weakRules().length ? t('tab.grev') : '' };
     document.querySelectorAll('.tabbar a').forEach(a => {
       a.classList.toggle('active', a.dataset.tab === tab);
       if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
@@ -225,18 +227,18 @@
     const g = nextGrammar();
     // Review comes first: words due today are the ones about to be forgotten.
     // It stays on the list once done today, so the count doesn't jump back.
-    const due = Store.dueWords().length;
+    const due = dueHere().length;
     const review = due || Store.tasks.review
       ? [{ id: 'review', title: t('task.review'),
-          sub: Store.tasks.review && !due ? t('task.review.done') : due === 1 ? t('task.review.one') : t('task.review.sub', { n: due }),
+          sub: Store.tasks.review && !due ? t('task.review.done') : Store.tasks.reviewTried && !Store.tasks.review ? t('cont.review.retry') : due === 1 ? t('task.review.one') : t('task.review.sub', { n: due }),
           href: '#/quiz/choice/review', icon: 'repeat', color: 'coral' }]
       : [];
     return [
       ...review,
-      { id: 'vocab', title: t('task.vocab'), sub: t('task.vocab.sub', { n: (u.words.length - Store.unitProgress(u).seen) || u.words.length }), href: `#/unit/${u.id}`, icon: 'book', color: 'blue' },
-      { id: 'speak', title: t('task.speak'), sub: t('task.speak.sub'), href: '#/speak', icon: 'mic', color: 'purple' },
-      { id: 'listen', title: t('task.listen'), sub: t('task.listen.sub'), href: '#/quiz/listen/level', icon: 'headphones', color: 'green' },
-      { id: 'grammar', title: t('task.grammar'), sub: t('task.grammar.sub', { title: ruleTitle(g) }), href: `#/grammar/${g.id}`, icon: 'pencil', color: 'gold' }
+      // a task done today says so, instead of already offering the next lesson's words or rule
+      { id: 'vocab', title: t('task.vocab'), sub: Store.tasks.vocab ? t('task.vocab.done') : t(lessonSize(u).again ? 'task.vocab.again' : 'task.vocab.sub', lessonSize(u)), href: `#/unit/${u.id}`, icon: 'book', color: 'blue' },
+      { id: 'speak', title: t('task.speak'), sub: Store.tasks.speak ? t('task.speak.done') : t('task.speak.sub'), href: '#/speak', icon: 'mic', color: 'purple' },
+      { id: 'grammar', title: t('task.grammar'), sub: Store.tasks.grammar ? t('task.grammar.done') : t('task.grammar.sub', { title: ruleTitle(g) }), href: `#/grammar/${g.id}`, icon: 'pencil', color: 'gold' }
     ];
   }
 
@@ -256,22 +258,37 @@
       </div>`;
   }
 
+  // A unit's progress line. Mastery takes days of reviews, so right after a lesson "0 of 15 learned" read as if
+  // the lesson was lost: until a word is mastered the line counts the words met, then it adds how many are learned
+  function unitLine(u, p = Store.unitProgress(u)) {
+    const phr = u.kind === 'phrases';
+    if (!p.mastered && p.seen) return t(phr ? 'learn.sentences.met' : 'learn.words.met', { a: p.seen, b: p.total });
+    if (p.mastered && p.seen > p.mastered) return t(phr ? 'learn.sentences.both' : 'learn.words.both', { a: p.seen, b: p.total, m: p.mastered });
+    return t(phr ? 'learn.sentences' : 'learn.words', { a: p.mastered, b: p.total });
+  }
+
   // ---------- Home ----------
   // The single best next step, shown as one big card at the top of Home (as Babbel's "Continue"
   // and Duolingo's "Start"): words about to be forgotten first, then new words, then grammar,
   // then the rest of today's plan, then free practice.
   function nextStep() {
     const done = Store.tasks;
-    const due = Store.dueWords().length;
+    const due = dueHere().length;
     if (due && !done.review) return { href: '#/quiz/choice/review', icon: 'repeat', color: 'coral',
-      title: t('cont.review', { n: due }), sub: t('cont.review.sub') };
+      // a review round holds 8 words, so the card promises one round, and says how many wait in all
+      title: t(due === 1 ? 'cont.review.one' : 'cont.review', { n: Math.min(due, 8) }),
+      // after a hard round the same card would look as if nothing happened: it says this is another round
+      sub: done.reviewTried ? t('cont.review.retry') : due > 8 ? t('cont.review.more', { n: due }) : t('cont.review.sub') };
+    // The whole level is done (every word met, every rule passed): the next step is the next level
+    const nextLv = LEVELS[LEVELS.findIndex(l => l.id === Store.level) + 1];
+    if (nextLv && levelComplete(Store.level)) return { href: `#/levelup/${nextLv.id}`, icon: 'levels', color: 'gold',
+      title: t('cont.levelup', { level: t('lv.' + Store.level) }), sub: t('cont.levelup.sub'), go: t('cont.levelup.go', { next: t('lv.' + nextLv.id) }) };
     const wordUnits = levelUnits().filter(x => x.kind !== 'phrases');
     const u = wordUnits.find(x => Store.unitProgress(x).seen < x.words.length);
     if (u && !done.vocab) {
       const fresh = u.words.length - Store.unitProgress(u).seen;
-      const unitDone = x => { const p = Store.unitProgress(x); return p.total > 0 && p.mastered / p.total >= 0.6; };
       return { href: `#/unit/${u.id}`, icon: 'book', color: 'blue', emoji: u.emoji,
-        title: t('cont.lesson', { title: unitTitle(u) }), sub: t('cont.lesson.sub', { n: fresh }),
+        title: t('cont.lesson', { title: unitTitle(u) }), sub: t('cont.lesson.sub', lessonSize(u)),
         spot: pathSpot(wordUnits.map(unitDone), wordUnits.indexOf(u), Store.unitProgress(u).pct, '#/learn') };
     }
     const rules = levelGrammar();
@@ -281,6 +298,9 @@
       spot: pathSpot(rules.map(x => Store.isGrammarDone(x.id)), rules.indexOf(g), 0, '#/grammar') };
     const left = planTasks().find(x => !done[x.id]);
     if (left) return { href: left.href, icon: left.icon, color: left.color, title: left.title, sub: left.sub };
+    // The plan is done: the real next lesson, as a bonus, is more inviting than a vague "free practice"
+    if (u) return { href: `#/unit/${u.id}`, icon: 'book', color: 'blue', emoji: u.emoji,
+      title: t('cont.lesson', { title: unitTitle(u) }), sub: t('cont.bonus', lessonSize(u)) };
     return { href: '#/practice', icon: 'levels', color: 'purple', title: t('cont.free'), sub: t('cont.free.sub') };
   }
 
@@ -292,19 +312,27 @@
     return { stage: s + 1, n: i - s * PATH_SECTION + 1, of: stage.length, done: stage, pct, path };
   }
 
+  // ---------- Today: the opening screen ----------
+  // One question answered at a glance: "what do I do now?" A greeting with today's ring, one big card
+  // for the next lesson (words and grammar in turn), and the few tasks that make today's plan.
+  // A backup reminder, only when there is something to lose (20+ words met), no backup in 30 days,
+  // and "Not now" was not tapped in the last 14 days. It shows once the day's plan is done, never mid-learning.
+  let scrollToBackup = false;
+  function backupDue() {
+    const DAY = 864e5, now = Date.now();
+    let last = 0, later = 0;
+    try { last = +localStorage.getItem('lingua-last-backup') || 0; later = +localStorage.getItem('lingua-nudge-later') || 0; } catch (e) {}
+    const met = ALL_WORDS.filter(w => Store.isSeen(w.id)).length;
+    return met >= 20 && now - last > 30 * DAY && now - later > 14 * DAY;
+  }
+
   function home() {
-    const lw = wordsOf(Store.level);
     const tasks = planTasks();
     const done = Store.tasks;
     const doneCount = tasks.filter(x => done[x.id]).length;
-    const single = lw.filter(w => !w.phrase);
-    // Count days on the local clock, so the word changes at midnight here and not at midnight UTC
-    const localDay = Math.floor((Date.now() - new Date().getTimezoneOffset() * 6e4) / 864e5);
-    const wotd = single[localDay % single.length];
-    const tricky = Store.trickyWords();
-
     const step = nextStep();
     view.innerHTML = `
+      ${celebration()}
       ${todayCard(tasks, doneCount)}
       <a class="continue" href="${step.href}">
         <span class="cont-top">
@@ -315,49 +343,34 @@
           <span class="cont-tile${step.spot ? ' ringed' : ''}" style="--pct:${step.spot ? step.spot.pct : 0}"><span class="tile ${step.color}">${step.emoji ? `<span class="cont-emoji">${step.emoji}</span>` : ICON[step.icon]}</span></span>
           <span class="grow"><b>${step.title}</b><span class="small">${step.sub}</span></span>
         </span>
-        ${step.spot ? `<span class="cont-dots" aria-hidden="true">${step.spot.done.map((d, k) =>
-          `<i class="${d ? 'on' : ''}${k === step.spot.n - 1 ? ' now' : ''}"></i>`).join('')}</span>` : ''}
-        <span class="cont-go">${t('cont.go')} ${fwd()}</span>
+        <span class="cont-go">${step.go || t(Store.xp > 0 ? 'cont.go' : 'cont.start')} ${fwd()}</span>
       </a>
-      ${step.spot ? `<a class="cont-path" href="${step.spot.path}">🗺️ ${t('cont.path')} ${fwd()}</a>` : ''}
-
 
       <div class="section">${ICON.calendar} ${t('home.plan')} <span class="end"><b class="en">${doneCount} / ${tasks.length}</b> ${t('home.completed')}</span></div>
       ${doneCount === tasks.length ? `<div class="plan-done">${ICON.check}<span><b>${t('goal.home')}</b> ${t('goal.home.sub')}</span></div>` : ''}
+      <div class="tasks">
       ${tasks.map(x => `
-        <a class="task" href="${x.href}">
+        <a class="task${done[x.id] ? ' is-done' : ''}" href="${x.href}">
           <span class="tile ${x.color}">${ICON[x.icon]}</span>
-          <span class="grow"><b>${x.title}</b><span class="small">${x.sub}</span></span>
-          <span class="check ${done[x.id] ? 'done' : ''}">${done[x.id] ? ICON.check : ''}</span>
+          <span class="grow"><b>${x.title}${!done[x.id] && x.href === step.href ? ` <span class="task-now">${t('task.now')}</span>` : ''}</b><span class="small">${x.sub}</span></span>
+          <span class="check ${done[x.id] ? 'done' : ''}" ${done[x.id] ? `aria-label="${t('path.state.done')}"` : 'aria-hidden="true"'}>${done[x.id] ? ICON.check : ''}</span>
         </a>`).join('')}
-
-      ${tricky.length ? `
-      <a class="task tricky-card" href="#/quiz/choice/tricky">
-        <span class="tile rose">${ICON.target}</span>
-        <span class="grow"><b>${t('tricky.title')}</b><span class="small">${t(tricky.length === 1 ? 'tricky.one' : 'tricky.some', { n: tricky.length })}</span></span>
-        <span class="go-chev" aria-hidden="true">${fwd()}</span>
-      </a>` : ''}
-
-      <section class="wotd">
-        <div class="wotd-head"><span>📖 ${t('home.wotd')}</span><span class="tag">${t('home.vocabTag')}</span></div>
-        <div class="wotd-main">
-          <div class="grow">
-            <div class="word en">${wotd.en}</div>
-            <div class="meaning he">${wotd.he}</div>
-          </div>
-          <button class="speak" id="wotd-speak" aria-label="${t('aria.listen')}">${ICON.speaker}</button>
-        </div>
-        <div class="quote en">“${wotd.ex}”</div>
-      </section>
-
-      <a class="cta" href="#/quiz/choice/level">
-        <span class="trophy">🏆</span>
-        <span class="grow"><b>${t('home.challenge')}</b><span class="small">${t('home.challenge.sub')}</span></span>
-        <span class="go">${t('home.start')} ${fwd()}</span>
-      </a>`;
-
-    $('#wotd-speak').onclick = () => speak(wotd.en);
+      </div>
+      ${doneCount === tasks.length && backupDue() ? `
+      <div class="bk-nudge" role="note">
+        <span class="bk-nudge-ico" aria-hidden="true">💾</span>
+        <span class="grow"><b>${t('nudge.title')}</b><span class="small">${t('nudge.sub')}</span></span>
+        <span class="bk-nudge-btns">
+          <a class="btn" href="#/progress" id="nudge-go">${t('nudge.go')}</a>
+          <button class="btn plain" id="nudge-later">${t('nudge.later')}</button>
+        </span>
+      </div>` : ''}`;
+    const later = $('#nudge-later');
+    if (later) later.onclick = () => { try { localStorage.setItem('lingua-nudge-later', String(Date.now())); } catch (e) {} $('.bk-nudge').remove(); };
+    const go = $('#nudge-go');
+    if (go) go.onclick = () => { scrollToBackup = true; };
     bindLevelSeg(home);
+    countUp();
   }
 
   // The top of Home is about today (as Duolingo's daily goal and Babbel's "Today"):
@@ -371,7 +384,9 @@
     const left = tasks.length - doneCount;
     const streak = Store.streak;
     const msg = !left ? t('today.done')
-      : !activeToday && streak ? t('today.risk', { n: streak })
+      : !activeToday && streak ? t(streak === 1 ? 'today.risk.one' : 'today.risk', { n: streak })
+      // back after a break (learned before, streak gone): a warm welcome instead of "starts a new streak"
+      : !activeToday && Store.xp > 0 ? t('today.back')
       : !activeToday ? t('today.start')
       : left === 1 ? t('today.left1') : t('today.left', { n: left });
     const C = 2 * Math.PI * 26;
@@ -381,7 +396,7 @@
       <section class="today${!left ? ' all' : ''}">
         <div class="td-top">
           <h1 class="td-hi">${hi}</h1>
-          <button class="td-level" id="levelbtn" data-part="vocab" aria-haspopup="dialog" aria-label="${t('lvl.change', { level: levelLabel() })}">${levelLabel()} ▾</button>
+          <button class="td-level" id="levelbtn" aria-haspopup="dialog" aria-label="${t('lvl.change', { level: levelLabel() })}">${levelLabel()} ▾</button>
         </div>
         <div class="td-main">
           <div class="td-ring" role="img" aria-label="${t('today.ring', { a: doneCount, b: tasks.length })}">
@@ -412,7 +427,7 @@
           <span class="tile dim">${u.emoji}</span>
           <div class="grow">
             <b>${unitTitle(u)}</b>
-            <div class="small">${t(u.kind === 'phrases' ? 'learn.sentences' : 'learn.words', { a: p.mastered, b: p.total })}</div>
+            <div class="small">${unitLine(u, p)}</div>
             ${bar(p.pct)}
           </div>
         </div>
@@ -530,8 +545,8 @@
       items = levelUnits().filter(u => (u.kind === 'phrases') === (part === 'phrases')).map(u => {
         const p = Store.unitProgress(u);
         return { href: `#/unit/${u.id}`, review: `#/quiz/choice/${u.id}`, face: u.emoji, label: unitTitle(u), plain: unitTitle(u), words: u.words,
-          done: p.total > 0 && p.mastered / p.total >= 0.6, started: p.seen > 0, pct: p.pct,
-          progress: t(u.kind === 'phrases' ? 'learn.sentences' : 'learn.words', { a: p.mastered, b: p.total }) };
+          done: unitDone(u), started: p.seen > 0, pct: p.pct,
+          progress: unitLine(u, p) };
       });
     }
     let cur = items.findIndex(x => !x.done);
@@ -625,7 +640,7 @@
               ${navigator.share ? `<button class="cert-share" data-lvl="${prev.id}" data-n="${list.length}">${t('cert.share')}</button>` : ''}
             </div>
             ${next ? `<div class="cert-next">${t('gate.title', { level: t('lv.' + next.id) })} <small class="en">${t('lvl.cefr.' + next.id)}</small>
-              ${at === n + 1 ? `<span class="pgate-tag">${t('gate.mine')}</span>` : !reached ? `<button class="pgate-go" data-lvl="${next.id}">${t('gate.jump')}</button>` : ''}</div>` : ''}
+              ${at === n + 1 ? `<span class="pgate-tag">${t('gate.mine')}</span>` : !reached ? `<button class="pgate-go" data-lvl="${next.id}"${freshHide()}>${t('gate.jump')}</button>` : ''}</div>` : ''}
           </div>
         </div>`;
       }
@@ -639,7 +654,7 @@
             ${complete ? `<a class="pgate-final" href="#/grammar/final-${prev.id}/quiz">🔁 ${t('gate.final')}</a>` : ''}
           </div>
           ${!next ? '' : at === n + 1 ? `<span class="pgate-tag">${t('gate.mine')}</span>`
-            : !reached ? `<button class="pgate-go" data-lvl="${next.id}">${t('gate.jump')}</button>` : ''}
+            : !reached ? `<button class="pgate-go" data-lvl="${next.id}"${freshHide()}>${t('gate.jump')}</button>` : ''}
         </div>`;
     }).join('');
   }
@@ -747,6 +762,46 @@
 
   // A slim map of all stages that stays at the top while the path scrolls: how full each stage is,
   // which one is current, which one is on screen; a tap jumps to that stage
+  // Gradual reveal: until a learner has started a few lessons, the extras (search, saved rules, the tenses
+  // map, the stage mini-map, level jumps, chests of stages not begun) stay out of sight. They stay in the page
+  // with the hidden attribute, so nothing that binds to them breaks.
+  const startedCount = () => GRAMMAR.filter(g => Store.isGrammarDone(g.id)).length + UNITS.filter(u => Store.unitProgress(u).seen > 0).length;
+  const isFresh = () => startedCount() < 3;
+  const freshHide = (extraShow = false) => (isFresh() && !extraShow ? ' hidden' : '');
+
+  // A lesson brings at most 8 new words at a time (a 15-word unit is two lessons: 8, then 7),
+  // so the promise on Today stays the same whatever was peeked at before
+  const LESSON_NEW = 8;
+  // A unit is done on the path (its node, its stage, its chest) once its lessons are done: every word met.
+  // Today moves on to the next unit at that point, so the path must not still say "5 more lessons".
+  // How well the words are known shows in the node's ring (mastery) and in Progress.
+  // A hard start at a higher level (a lesson practice under 50% while only a few words are met):
+  // a quiet offer of the level below, never forced and never once the learner is settled in
+  function easierHint(pct) {
+    const i = LEVELS.findIndex(l => l.id === Store.level);
+    const met = ALL_WORDS.filter(w => Store.isSeen(w.id)).length;
+    if (i <= 0 || pct >= 50 || met > 24 || !UNITS.some(u => u.id === location.hash.split('/')[3])) return '';
+    const prev = LEVELS[i - 1];
+    return `<p class="lvl-hint">${t('hint.easier')} <a href="#/levelup/${prev.id}">${t('hint.easier.go', { level: t('lv.' + prev.id) })}</a></p>`;
+  }
+
+  // Words due for review at the learner's level and below: after moving down a level (it was too hard),
+  // Today does not open with a review of the harder words
+  function dueHere() {
+    const top = LEVELS.findIndex(l => l.id === Store.level);
+    return Store.dueWords().filter(w => LEVELS.findIndex(l => l.id === w.level) <= top);
+  }
+
+  function unitDone(u) { return u.words.length > 0 && u.words.every(w => Store.isSeen(w.id)); }
+  const levelComplete = lv => UNITS.filter(u => u.level === lv).every(unitDone) && GRAMMAR.filter(g => g.level === lv).every(g => Store.isGrammarDone(g.id));
+  let lastLesson = { unit: '', ids: [] };   // the words a lesson's cards just showed, practised first after it
+  // How many cards the next lesson of a unit really shows, and about how long it takes
+  function lessonSize(u) {
+    const fresh = u.words.length - Store.unitProgress(u).seen;
+    const n = fresh ? Math.min(LESSON_NEW, fresh) : u.words.length;
+    return { n, m: Math.max(3, Math.round(n * 0.55)), again: !fresh };
+  }
+
   function miniMap(items, sections) {
     const curS = items.cur >= 0 ? stageAt(items, items.cur) : -1;
     const seg = s => {
@@ -758,14 +813,14 @@
       </button>`;
     };
     if (items.part !== 'gall') {
-      return `<nav class="minimap" id="minimap" aria-label="${t('mm.aria')}">${Array.from({ length: sections }, (_, s) => seg(s)).join('')}</nav>`;
+      return `<nav class="minimap" id="minimap" aria-label="${t('mm.aria')}"${freshHide()}>${Array.from({ length: sections }, (_, s) => seg(s)).join('')}</nav>`;
     }
     // The grammar road: stages grouped by level, each group with its name and how much of it is done;
     // the name jumps to that level's gate
     const stages = stagesOf(items);
     const curLvl = items.cur >= 0 ? items[items.cur].lvl : null;
     return `
-      <nav class="minimap grouped" id="minimap" aria-label="${t('mm.aria')}">
+      <nav class="minimap grouped" id="minimap" aria-label="${t('mm.aria')}"${freshHide()}>
         ${LEVELS.map(l => {
           const ss = stages.map((r, s) => s).filter(s => items[stages[s][0]].lvl === l.id);
           if (!ss.length) return '';
@@ -783,7 +838,7 @@
     const sections = stagesOf(items).length;
     return `
       ${sections > 1 ? miniMap(items, sections) : ''}
-      ${items.part === 'gall' ? `<div class="path-head"><span>${t('gr.head', { a: doneCount, b: items.length })}</span></div>` : `
+      ${items.part === 'gall' ? `<div class="path-head"${freshHide()}><span>${t('gr.head', { a: doneCount, b: items.length })}</span></div>` : `
       <button class="path-head" id="levelbtn" aria-haspopup="dialog" aria-label="${t('lvl.change', { level: levelLabel() })}">
         <span>${levelLabel()} <i class="lvl-caret" aria-hidden="true">▾</i></span>
       </button>`}
@@ -800,7 +855,8 @@
           </div>` : ''}
         ${Array.from({ length: sections }, (_, s) => {
           const st = chestState(items, s);
-          return `<div class="pchest-wrap${st === 'ready' ? ' is-ready' : ''}" data-s="${s}">
+          const begun = stageItems(items, s).some(x => x.done || x.started);
+          return `<div class="pchest-wrap${st === 'ready' ? ' is-ready' : ''}${st === 'locked' && !begun && isFresh() ? ' is-quiet' : ''}" data-s="${s}">
             ${st === 'ready' ? `<span class="pbubble chest-bubble" aria-hidden="true">${t('chest.openme')}</span>` : ''}
             <button class="pchest ${st}" data-s="${s}" aria-label="${t('chest.aria', { n: s + 1 })} · ${t('chest.state.' + st)}">
               <span aria-hidden="true">${st === 'opened' ? '✨' : '🎁'}</span>
@@ -977,7 +1033,10 @@
       setTimeout(() => {
         const f = card.querySelector('.btn, .pcard-link');
         if (f) f.focus({ preventScroll: true });
-        const over = card.getBoundingClientRect().bottom + 16 - view.getBoundingClientRect().bottom;
+        // the tab bar floats over the bottom of the view, so the card must clear its top edge
+        const bar = document.querySelector('.tabbar');
+        const floor = Math.min(view.getBoundingClientRect().bottom, bar && bar.offsetParent ? bar.getBoundingClientRect().top : Infinity);
+        const over = card.getBoundingClientRect().bottom + 16 - floor;
         if (over > 0) view.scrollBy({ top: over, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
       }, 30);
       return card;
@@ -1153,14 +1212,23 @@
     const toCurrent = smooth => curEl.scrollIntoView({ block: 'center', behavior: smooth ? 'smooth' : 'auto' });
     if (items.cur > 1) toCurrent(false);
     jump.onclick = () => toCurrent(true);
-    // The "back to my lesson" button shows only while the current lesson is off screen, pointing to it
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(([e]) => {
-        jump.hidden = e.isIntersecting;
-        jump.classList.toggle('down', !e.isIntersecting && e.boundingClientRect.top > 0);
-      }, { root: view }).observe(curEl.querySelector('.pnode'));
-    }
+    // The "back to my lesson" button shows only while the current lesson is off screen, pointing to it,
+    // and not while the learner is still above the path (the header's own button covers that)
+    jumpState = { jump, node: curEl.querySelector('.pnode'), path: document.getElementById('path') };
+    jumpEval();
   }
+  let jumpState = null;
+  function jumpEval() {
+    const st = jumpState;
+    if (!st || !document.contains(st.jump)) return;
+    const vr = view.getBoundingClientRect(), r = st.node.getBoundingClientRect();
+    const onScreen = r.bottom > vr.top && r.top < vr.bottom;
+    const below = r.top >= vr.bottom;
+    const abovePath = st.path.getBoundingClientRect().top > vr.top + vr.height * 0.55;
+    st.jump.hidden = onScreen || (below && abovePath);
+    st.jump.classList.toggle('down', below);
+  }
+  view.addEventListener('scroll', jumpEval, { passive: true });
   window.addEventListener('resize', () => layoutPath());
 
   // A header above the path (as in the reference app): the owl says what is next, with the streak,
@@ -1174,14 +1242,17 @@
     } else {
       const s = stageAt(items, items.cur);
       const left = stageItems(items, s).filter(x => !x.done).length;
+      // a new learner has not met the stage chests yet (they are revealed later), so the owl just counts to the stage's end
+      const f = isFresh() ? '.fresh' : '';
       say = !items.some(x => x.started) ? t('ph.hello')
-        : left === 1 ? t('ph.one', { n: s + 1 }) : t('ph.left', { n: left, s: s + 1 });
-      go = `<a class="ph-go" href="${cur.href}">▶ ${t(cur.started ? 'ph.continue' : 'ph.start', { title: cur.plain })}</a>`;
+        : left === 1 ? t('ph.one' + f, { n: s + 1 }) : t('ph.left' + f, { n: left, s: s + 1 });
+      // English inside the title stays one unit, so "a / an / the" never breaks into a reversed line
+      go = `<a class="ph-go" href="${cur.href}">▶ ${t(cur.started ? 'ph.continue' : 'ph.start', { title: isHe() ? heMix(cur.plain) : cur.plain })}</a>`;
     }
     // On the Learn paths the card wears the learner's level colour: a ring for how much of this part
     // of the level is done, the level's name, and today's plan (tasks done of the day's plan)
     const lv = items.part === 'gall' ? '' : Store.level;
-    const pct = lv ? Math.round(partDone(lv, items.part === 'phrases' ? 'phrases' : 'vocab') * 100) : 0;
+    const pct = lv ? Math.round(partDone(lv, 'all') * 100) : 0;   // one level number everywhere (Today, paths, Progress)
     const plan = lv ? planTasks() : [];
     const planDone = plan.filter(x => Store.tasks[x.id]).length;
     return `
@@ -1189,9 +1260,7 @@
         <img class="ph-owl" src="icons/owl-512.png" alt="" width="112" height="112">
         <div class="ph-side">
           <div class="ph-chips">
-            <span class="ph-chip">🔥 ${Store.streak}</span>
-            ${lv ? `<span class="ph-chip ph-lvchip"><span class="ph-ring" style="--p:${pct}" aria-hidden="true"></span>${levelLabel()} · <span class="en">${pct}%</span></span>
-              ${plan.length ? `<span class="ph-chip${planDone === plan.length ? ' ph-goal-done' : ''}"><span aria-hidden="true">🎯</span> <span class="sr-only">${t('today.goal')}:</span> <span class="en">${planDone}/${plan.length}</span></span>` : ''}`
+            ${lv ? `<span class="ph-chip ph-lvchip"><span class="ph-ring" style="--p:${pct}" aria-hidden="true"></span>${levelLabel()} · <span class="en">${pct}%</span></span>`
               : `<span class="ph-chip">${cur ? t('lv.' + cur.lvl) : '✓'}</span>`}
           </div>
           <p class="ph-say">${say}</p>
@@ -1204,19 +1273,26 @@
   // the three levels with what each covers and how far this part of the course is done
   function levelSeg() { return ''; }
   function partDone(level, part) {
+    // the whole level (the sheet opened from Today, and Progress): words met, sentences met and rules passed, averaged
+    if (part === 'all') {
+      const parts = ['vocab', 'phrases', 'grammar'].filter(p => p === 'grammar'
+        ? GRAMMAR.some(g => g.level === level)
+        : UNITS.some(u => u.level === level && (u.kind === 'phrases') === (p === 'phrases')));
+      return parts.length ? parts.reduce((n, p) => n + partDone(level, p), 0) / parts.length : 0;
+    }
     if (part === 'grammar') {
       const list = GRAMMAR.filter(g => g.level === level);
       return list.length ? list.filter(g => Store.isGrammarDone(g.id)).length / list.length : 0;
     }
-    const list = UNITS.filter(u => u.level === level && (u.kind === 'phrases') === (part === 'phrases'));
-    const done = list.filter(u => { const p = Store.unitProgress(u); return p.total && p.mastered / p.total >= 0.6; }).length;
-    return list.length ? done / list.length : 0;
+    // words met out of all the level's words: a first lesson already shows on the level, not 0% until a whole unit is done
+    const words = UNITS.filter(u => u.level === level && (u.kind === 'phrases') === (part === 'phrases')).flatMap(u => u.words);
+    return words.length ? words.filter(w => Store.isSeen(w.id)).length / words.length : 0;
   }
   function bindLevelSeg(redraw) {
     const btn = document.getElementById('levelbtn');
     if (!btn) return;
     btn.onclick = () => {
-      const part = btn.dataset.part || pathItems.part;
+      const part = 'all';
       const back = document.createElement('div');
       back.className = 'sheet-back';
       back.innerHTML = `
@@ -1257,6 +1333,8 @@
 
   // One word to know today, from the learner's level (the same word all day, a new one at midnight)
   function wordOfDay() {
+    // an extra like search and the map: kept out of a new learner's way, so the path's first lesson shows on screen
+    if (isFresh()) return '';
     const single = wordsOf(Store.level).filter(w => !w.phrase);
     if (!single.length) return '';
     const localDay = Math.floor((Date.now() - new Date().getTimezoneOffset() * 6e4) / 864e5);
@@ -1299,6 +1377,9 @@
             </span>
           </button>`).join('')}
         <p class="wl-note">${t('wl.note')}</p>
+        <button class="wl-restore" type="button">📂 ${t('wl.restore')}</button>
+        <input type="file" class="wl-file" accept=".json,application/json,text/plain" hidden>
+        <p class="wl-msg small" role="status"></p>
       </div>`;
     back.querySelectorAll('.wl-lvl').forEach(b => {
       b.onclick = () => {
@@ -1306,10 +1387,28 @@
         Store.markWelcomed();
         back.classList.add('out');
         setTimeout(() => back.remove(), 200);
-        location.hash = '#/grammar';
-        route();
+        if (location.hash && location.hash !== '#/') location.hash = '#/'; else route();
+        setTimeout(tour, 450);   // then a short tour of the Today screen
       };
     });
+    // Moving to a new phone: restore the backup right here, instead of picking a level and hunting for it in Progress
+    const file = back.querySelector('.wl-file');
+    back.querySelector('.wl-restore').onclick = () => file.click();
+    file.onchange = async e => {
+      const f = e.target.files[0];
+      e.target.value = '';
+      if (!f) return;
+      try {
+        const r = Store.importData(await f.text());
+        Store.markWelcomed(); Store.markToured();
+        back.classList.add('out');
+        setTimeout(() => back.remove(), 200);
+        if (location.hash && location.hash !== '#/') location.hash = '#/'; else route();
+        toast(t('backup.restored', { n: r.words }));
+      } catch (err) {
+        back.querySelector('.wl-msg').textContent = t('backup.bad');
+      }
+    };
     // A child goes straight to the kids world (Home); the owl says hello out loud
     back.querySelector('#wl-kid').onclick = () => {
       Store.level = 'beginner';
@@ -1325,6 +1424,70 @@
     back.querySelector('#wl-kid').focus({ preventScroll: true });
   }
 
+  // A short message at the bottom of the screen that leaves by itself (also read out by screen readers)
+  function toast(text) {
+    document.querySelectorAll('.toast').forEach(x => x.remove());
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.setAttribute('role', 'status');
+    el.textContent = text;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
+
+  // First-time tour of the Today screen: three spots lit one after another, each with a short bubble
+  function tour() {
+    if (Store.toured) return;
+    const steps = [
+      { sel: '.continue', text: t('tour.1') },
+      { sel: '.tasks', text: t('tour.2') },
+      { sel: '.tabbar', text: t('tour.3') }
+    ].filter(s => document.querySelector(s.sel));
+    if (!steps.length) return;
+    const layer = document.createElement('div');
+    layer.className = 'tour';
+    layer.innerHTML = `<div class="tour-spot" aria-hidden="true"></div>
+      <div class="tour-bubble" role="dialog" aria-modal="true" aria-live="polite" aria-labelledby="tour-text">
+        <p id="tour-text"></p>
+        <div class="tour-row">
+          <span class="tour-dots" aria-hidden="true">${steps.map(() => '<i></i>').join('')}</span>
+          <button class="tour-skip">${t('tour.skip')}</button>
+          <button class="btn tour-next"></button>
+        </div>
+      </div>`;
+    document.body.appendChild(layer);
+    const spot = layer.querySelector('.tour-spot'), bubble = layer.querySelector('.tour-bubble');
+    let k = 0;
+    // when the tour ends, focus lands on the next-lesson card it introduced, not on <body>
+    const end = () => {
+      Store.markToured(); layer.remove(); document.removeEventListener('keydown', key);
+      const card = document.querySelector('.continue');
+      if (card) { card.scrollIntoView({ block: 'center' }); card.focus({ preventScroll: true }); }
+    };
+    const key = e => { if (e.key === 'Escape') end(); };
+    const show = () => {
+      const el = document.querySelector(steps[k].sel);
+      if (!el) return end();
+      el.scrollIntoView({ block: 'center' });
+      const r = el.getBoundingClientRect(), pad = 6;
+      Object.assign(spot.style, { top: (r.top - pad) + 'px', left: (r.left - pad) + 'px', width: (r.width + pad * 2) + 'px', height: (r.height + pad * 2) + 'px' });
+      layer.querySelector('#tour-text').textContent = steps[k].text;
+      layer.querySelectorAll('.tour-dots i').forEach((d, n) => d.classList.toggle('on', n === k));
+      const next = layer.querySelector('.tour-next');
+      next.textContent = k === steps.length - 1 ? t('tour.done') : t('tour.next');
+      // the bubble goes below the spot when there is room, otherwise above it
+      const below = r.bottom + 16 + 150 < innerHeight;
+      bubble.style.top = below ? (r.bottom + 16) + 'px' : '';
+      bubble.style.bottom = below ? '' : (innerHeight - r.top + 16) + 'px';
+      bubble.classList.toggle('up', !below);
+      next.focus({ preventScroll: true });
+    };
+    layer.querySelector('.tour-next').onclick = () => { if (++k < steps.length) show(); else end(); };
+    layer.querySelector('.tour-skip').onclick = end;
+    document.addEventListener('keydown', key);
+    show();
+  }
+
   function learn() {
     const items = pathFor('vocab');
     view.innerHTML = `
@@ -1333,7 +1496,7 @@
       ${learnTabs('vocab')}
       ${wordOfDay()}
       ${levelSeg()}
-      <div class="search">
+      <div class="search"${freshHide()}>
         ${ICON.search}
         <input id="search" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
           placeholder="${t('search.ph')}" aria-label="${t('search.ph')}">
@@ -1402,8 +1565,10 @@
   const isTenseRule = id => TENSES.some(([, cells]) => cells.some(c => c[1] === id));
 
   function tenses() {
+    // arrived from a rule's page: the back link returns to that rule, and the map opens at its tense
+    const fromRule = tensesFrom && GRAMMAR.find(g => g.id === tensesFrom);
     view.innerHTML = `
-      <a class="back" href="#/grammar">${bwd()} ${t('grammar.back')}</a>
+      <a class="back" href="${fromRule ? '#/grammar/' + fromRule.id : '#/grammar'}">${bwd()} ${fromRule ? ruleTitle(fromRule) : t('grammar.back')}</a>
       <h1>⏱️ ${t('tn.title')}</h1>
       <p class="sub">${t('tn.sub')}</p>
       <div class="tn-key" aria-hidden="true">${['simple', 'prog', 'perf', 'pp'].map(a => `<span class="asp-${a}">${t('tn.' + a)}</span>`).join('')}</div>
@@ -1423,6 +1588,8 @@
             }).join('')}
           </div>
         </section>`).join('')}`;
+    const here = fromRule && view.querySelector(`.tn-cell[href="#/grammar/${fromRule.id}"]`);
+    if (here) { here.classList.add('is-here'); here.setAttribute('aria-current', 'page'); here.scrollIntoView({ block: 'center' }); }
   }
 
   // In a rule's example, the words the rule is about stand out: any of its quiz answers found in the sentence
@@ -1483,15 +1650,15 @@
     view.innerHTML = `
       <h1 class="sr-only">${t('gr.title')}</h1>
       ${pathHero(items)}
-      <a class="tn-entry" href="#/tenses"><span class="tn-entry-ico" aria-hidden="true">⏱️</span>
+      <a class="tn-entry" href="#/tenses"${freshHide()}><span class="tn-entry-ico" aria-hidden="true">⏱️</span>
         <span class="grow"><b>${t('tn.title')}</b><small>${t('tn.card')}</small></span><span class="go-chev" aria-hidden="true">${fwd()}</span></a>
-      <div class="gsearch-row">
+      <div class="gsearch-row"${freshHide(Store.savedRules().length > 0)}>
         <div class="search">
           ${ICON.search}
           <input id="gsearch" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
             placeholder="${t('gsearch.ph')}" aria-label="${t('gsearch.ph')}">
         </div>
-        <button class="gsaved" id="gsaved" aria-pressed="false" aria-label="${t('saved.chip')}">⭐ <b id="gsaved-n" class="en">${Store.savedRules().length}</b></button>
+        <button class="gsaved" id="gsaved" aria-pressed="false" aria-label="${t('saved.chip')}"${Store.savedRules().length ? '' : ' hidden'}>⭐ <b id="gsaved-n" class="en">${Store.savedRules().length}</b></button>
       </div>
       <div id="gresults" hidden></div>
       <div id="groad">${pathHtml(items)}</div>`;
@@ -1583,7 +1750,7 @@
     const lvlPct = Math.round(lvlRules.filter(x => Store.isGrammarDone(x.id)).length / lvlRules.length * 100);
     view.innerHTML = `
       <div class="rule-page lv-${g.level}">
-      <a class="back" href="#/grammar">${bwd()} ${t('grammar.back')}</a>
+      <a class="back" href="${ruleBack}">${bwd()} ${t(ruleBack === '#/' ? 'nav.home' : 'grammar.back')}</a>
       <header class="rule-hero">
         <div class="rule-ring lv-ring${done ? ' done' : ''}" style="--p:${lvlPct}" role="img"
           aria-label="${t('rule.num', { n: road.indexOf(g) + 1, m: road.length })} · ${t('lv.' + g.level)} ${lvlPct}%">
@@ -1591,7 +1758,7 @@
         </div>
         <div class="rule-meta">
           <span class="rule-lvl">${t('lv.' + g.level)} · <span class="en">${t('lvl.cefr.' + g.level)}</span></span>
-          <span class="rule-num">${t('rule.num', { n: road.indexOf(g) + 1, m: road.length })}</span>
+          <span class="rule-num"${freshHide()}>${t('rule.num', { n: road.indexOf(g) + 1, m: road.length })}</span>
         </div>
         <h1>${ruleTitle(g)}${done ? ' <span class="rule-crown" aria-label="' + t('path.state.done') + '">👑</span>' : ''}</h1>
         ${isTenseRule(g.id) ? `<a class="rule-tn" href="#/tenses">⏱️ ${t('tn.title')}</a>` : ''}
@@ -1627,7 +1794,7 @@
         <p class="he para">${heMix(g.tip)}</p>
       </section>
 
-      <a class="btn rule-go" href="#/grammar/${g.id}/quiz">${t('grammar.practice')}</a>
+      <a class="btn rule-go" href="#/grammar/${g.id}/quiz">✏️ ${t('grammar.practice')} <small class="rule-go-n">${t('grammar.qcount', { n: g.quiz.length })}</small></a>
       </div>`;
     view.querySelectorAll('[data-say]').forEach(b => { b.onclick = () => speak(g.ex[b.dataset.say][0]); });
   }
@@ -1784,9 +1951,11 @@
           <p class="sub">${t(passed ? 'grammar.done' : 'grammar.retry')}</p>
           ${roundStats({ correct, total: qs.length, ms: Date.now() - started })}
           ${passed
-            ? (next ? `<a class="btn" href="#/grammar/${next.id}">${t('grammar.next', { title: ruleTitle(next) })}</a>` : `<a class="btn" href="#/">${t('btn.home')}</a>`)
-            : `<a class="btn" href="#/grammar/${g.id}">${t('grammar.again')}</a>`}
-          <a class="btn ghost" href="#/grammar">${t('grammar.all')}</a>
+            // passed: the day's plan comes first (what's next, back to Today); the next rule is the extra step
+            ? `${nextCard()}<a class="btn" href="#/">${t('btn.home')}</a>
+               ${next ? `<a class="btn ghost" href="#/grammar/${next.id}">${t('grammar.next', { title: ruleTitle(next) })}</a>` : ''}`
+            : `<a class="btn" href="#/grammar/${g.id}">${t('grammar.again')}</a>
+               <a class="btn ghost" href="#/">${t('btn.home')}</a>`}
         </div>`;
       countUp();
     }
@@ -1800,18 +1969,32 @@
   function lesson(unitId) {
     const unit = UNITS.find(u => u.id === unitId);
     if (!unit) return notFound();
-    const words = unit.words;
+    // Up to 8 words not met yet; a unit already fully met is gone through whole again
+    const fresh = unit.words.filter(w => !Store.isSeen(w.id));
+    const words = fresh.length ? fresh.slice(0, LESSON_NEW) : unit.words;
+    // A word met for the first time can't be "known": its card asks "Got it" instead of "Knew it"
+    const metBefore = new Set(words.filter(w => Store.isSeen(w.id)).map(w => w.id));
+    const allNew = !metBefore.size;
     let i = 0, known = 0;
 
     function finish() {
       endLesson(1);
+      lastLesson = { unit: unit.id, ids: words.map(w => w.id) };   // its practice starts with these words
+      // this lesson brought the unit's last new words: say so, the unit is a milestone on the path
+      const completesUnit = fresh.length > 0 && unitDone(unit);
       view.innerHTML = `
         <div class="card center result">
-          <div class="big">🃏</div>
+          <div class="big">${completesUnit ? '🎉' : '🃏'}</div>
           <h1>${t('cards.done.title')}</h1>
-          <p class="sub">${t('cards.done', { a: known, b: words.length })}</p>
-          <a class="btn" href="#/quiz/choice/${unit.id}">${t('card.practice')}</a>
-          <button class="btn ghost" id="restart">${t('cards.restart')}</button>
+          ${completesUnit ? `<p class="unit-done">${t(unit.kind === 'phrases' ? 'unit.done.phr' : 'unit.done', { title: unitTitle(unit), n: unit.words.length })}</p>` : ''}
+          <p class="sub">${t(allNew ? 'cards.done.new' : 'cards.done', { a: known, b: words.length })}</p>
+          <ol class="steps2" aria-label="${t('steps.aria')}">
+            <li class="done"><span aria-hidden="true">✓</span>${t(unit.kind === 'phrases' ? 'steps.met.phr' : 'steps.met', { n: words.length })}</li>
+            <li class="now"><span aria-hidden="true">2</span>${t('steps.practice')}</li>
+          </ol>
+          <a class="btn" href="#/quiz/choice/${unit.id}">${t(unit.kind === 'phrases' ? 'card.practice.phr' : 'card.practice')}</a>
+          <a class="btn ghost" href="#/">${t('btn.home')}</a>
+          <button class="btn plain" id="restart">${t('cards.restart')}</button>
         </div>`;
       $('#restart').onclick = () => { i = 0; known = 0; document.body.classList.add('in-lesson'); draw(); };
     }
@@ -1858,11 +2041,12 @@
       speak(w.en);   // every new card starts with the sound of the word
 
       function buttons() {
+        const knowLabel = t(metBefore.has(w.id) ? 'cards.know' : 'cards.got');
         btns.innerHTML = flipped
           // "Knew it" sits on the right in both languages, the side a "knew it" swipe goes to
           ? (isHe()
-            ? `<button class="btn fc-know" id="know">${t('cards.know')} ✓</button><button class="btn fc-again" id="again">↺ ${t('cards.again')}</button>`
-            : `<button class="btn fc-again" id="again">↺ ${t('cards.again')}</button><button class="btn fc-know" id="know">${t('cards.know')} ✓</button>`)
+            ? `<button class="btn fc-know" id="know">${knowLabel} ✓</button><button class="btn fc-again" id="again">↺ ${t('cards.again')}</button>`
+            : `<button class="btn fc-again" id="again">↺ ${t('cards.again')}</button><button class="btn fc-know" id="know">${knowLabel} ✓</button>`)
           : `<button class="btn fc-show" id="show">${t('cards.show')}</button>`;
         if (flipped) {
           $('#again').onclick = () => fly(false);
@@ -1877,7 +2061,7 @@
         back.setAttribute('aria-hidden', String(!flipped));
         back.querySelector('[data-speak]').tabIndex = flipped ? 0 : -1;
         $('#flip').setAttribute('aria-expanded', String(flipped));
-        $('#fchelp').textContent = flipped ? t('cards.swipe') : '';
+        $('#fchelp').textContent = flipped ? t(metBefore.has(w.id) ? 'cards.swipe' : 'cards.swipe.new') : '';
         buttons();
         if (flipped) setTimeout(() => $('#know') && $('#know').focus({ preventScroll: true }), 50);
       }
@@ -1941,22 +2125,32 @@
 
   // ---------- Practice (third section of the Learn screen) ----------
   function practice() {
-    const due = Store.dueWords().length;
+    const due = dueHere().length;
+    const tricky = Store.trickyWords().length;
+    const review = { title: t('practice.review'), sub: due === 1 ? t('practice.review.one') : due ? t('practice.review.some', { n: due }) : t('practice.review.none'), href: '#/quiz/choice/review', icon: 'repeat', color: 'blue', skill: 'memory', badge: due };
+    // The wide first tile is the thing to do now: tricky words, or a review that is due. With nothing due,
+    // "nothing to review" would greet the learner as the top choice, so the review tile waits at the bottom
+    const top = tricky ? { title: t('tricky.title'), sub: t('tricky.some', { n: tricky }), href: '#/quiz/choice/tricky', icon: 'target', color: 'rose', skill: 'memory' } : due ? review : null;
     const modes = [
-      ...(Store.trickyWords().length ? [{ title: t('tricky.title'), sub: t('tricky.some', { n: Store.trickyWords().length }), href: '#/quiz/choice/tricky', icon: 'target', color: 'rose', skill: 'memory' }] : []),
-      { title: t('practice.review'), sub: due === 1 ? t('practice.review.one') : due ? t('practice.review.some', { n: due }) : t('practice.review.none'), href: '#/quiz/choice/review', icon: 'repeat', color: 'blue', skill: 'memory', badge: due },
+      ...(top ? [{ ...top, wide: true }] : []),
+      ...(tricky && due ? [review] : []),
       { title: t('task.speak'), sub: t('practice.speak.sub'), href: '#/speak', icon: 'mic', color: 'purple', skill: 'speak' },
       { title: t('task.listen'), sub: t('practice.listen.sub'), href: '#/quiz/listen/level', icon: 'headphones', color: 'green', skill: 'listen' },
       { title: t('practice.cloze'), sub: t('practice.cloze.sub'), href: '#/quiz/cloze/level', icon: 'pencil', color: 'gold', skill: 'context' },
-      { title: t('practice.type'), sub: t('practice.type.sub'), href: '#/quiz/type/level', icon: 'keyboard', color: 'coral', skill: 'spell' }
+      { title: t('practice.type'), sub: t('practice.type.sub'), href: '#/quiz/type/level', icon: 'keyboard', color: 'coral', skill: 'spell' },
+      ...(due ? [] : [{ ...review, wide: true }])
     ];
+    // before any lesson, a line saying where practice words come from
+    const first = startedCount() === 0
+      ? `<p class="lvl-hint">${t('practice.first')} <a href="#/unit/${nextUnit().id}">${t('type.first.go')}</a></p>` : '';
     view.innerHTML = `
       <h1>${t('learn.title')}</h1>
       <p class="sub">${t('practice.sub', { level: levelLabel() })}</p>
       ${learnTabs('practice')}
+      ${first}
       <div class="pgrid">
-        ${modes.map((m, i) => `
-          <a class="ptile c-${m.color}${i === 0 ? ' wide' : ''}" href="${m.href}">
+        ${modes.map(m => `
+          <a class="ptile c-${m.color}${m.wide ? ' wide' : ''}" href="${m.href}">
             <span class="tile ${m.color}">${ICON[m.icon]}${m.badge ? `<span class="pt-badge en" aria-hidden="true">${m.badge > 99 ? '99+' : m.badge}</span>` : ''}</span>
             <span class="grow"><span class="pt-skill">${t('skill.' + m.skill)}</span><b>${m.title}</b><span class="small">${m.sub}</span></span>
           </a>`).join('')}
@@ -1965,17 +2159,22 @@
 
   // Words for an exercise: a unit, the due words, or the current level
   function poolFor(source) {
-    if (source === 'review') return { pool: Store.dueWords(), title: t('quiz.review') };
+    if (source === 'review') return { pool: dueHere(), title: t('quiz.review') };
     if (source === 'missed') return { pool: lastMissed, title: t('quiz.missedTitle') };
     if (source === 'tricky') return { pool: Store.trickyWords(), title: t('tricky.title') };
     if (source === 'pathreview') return { pool: (pathItems && pathItems.review) || [], title: t('rstop.label') };
     const unit = UNITS.find(u => u.id === source);
-    if (unit) return { pool: unit.words, title: `${unit.emoji} ${unitTitle(unit)}` };
+    if (unit) {
+      const met = unit.words.filter(w => Store.isSeen(w.id));
+      return { pool: met.length >= 4 ? met : unit.words, title: `${unit.emoji} ${unitTitle(unit)}` };
+    }
     if (source === 'level') {
       const all = wordsOf(Store.level);
       const seen = all.filter(w => Store.isSeen(w.id));
-      // Prefer words that were already studied; fall back to the whole level
-      return { pool: seen.length >= 6 ? seen : all, title: levelLabel() };
+      // Words already studied; with only a few, topped up from the next lesson's words (what the learner
+      // is about to meet) rather than from the whole level, so a new learner is never tested on unknown words
+      const upNext = nextUnit().words.filter(w => !Store.isSeen(w.id) && !w.phrase);
+      return { pool: seen.length >= 6 ? seen : [...seen, ...upNext], title: levelLabel() };
     }
     return null;
   }
@@ -1983,7 +2182,7 @@
   // Words answered wrong (first try) in the last quiz round, for "Practice these again"
   let lastMissed = [];
 
-  function done(emoji, title, text, extra = '') {
+  function done(emoji, title, text, extra = '', showNext = true) {
     endLesson(1);
     view.innerHTML = `
       ${celebration()}
@@ -1992,10 +2191,21 @@
         <h1>${title}</h1>
         <p class="sub">${text}</p>
         ${extra}
+        ${showNext ? nextCard() : ''}
         <a class="btn" href="#/">${t('btn.home')}</a>
         <a class="btn ghost" href="#/practice">${t('btn.more')}</a>
       </div>`;
     refreshChrome('learn');
+  }
+
+  // At the end of a round: the step the app picked next, one tap away
+  function nextCard() {
+    const n = nextStep();
+    return `<a class="next-card" href="${n.href}">
+      <span class="tile ${n.color}">${n.emoji ? `<span class="cont-emoji">${n.emoji}</span>` : ICON[n.icon]}</span>
+      <span class="grow"><small>${t('next.kicker')}</small><b>${n.title}</b></span>
+      <span class="go-chev" aria-hidden="true">${fwd()}</span>
+    </a>`;
   }
 
   // ---------- Typing ----------
@@ -2037,11 +2247,30 @@
       return;
     }
 
+    // Typing a word from memory needs to have met it: a choice can be guessed, a spelling cannot. So the level's
+    // typing practice uses only words already learned, and before the first lesson it sends the learner there
+    if (mode === 'type' && source === 'level') {
+      src.pool = src.pool.filter(w => Store.isSeen(w.id));
+      if (!src.pool.some(w => !w.phrase)) {
+        endLesson();
+        view.innerHTML = emptyState(`<b class="empty-title">${t('type.first')}</b>${t('type.first.sub')}`,
+          `<a class="btn" href="#/unit/${nextUnit().id}">${t('type.first.go')}</a>`);
+        return;
+      }
+    }
     // "Complete the sentence" and typing use single words (sentences are too long to type on a phone)
     const usable = mode === 'cloze' || mode === 'type' ? src.pool.filter(w => !w.phrase) : src.pool;
-    // A lesson's own practice covers all of its words; mixed rounds (level, review…) stay at 8
+    // Every round is 8 questions. A lesson's practice starts with the words not practised yet (the ones just
+    // met on its cards), so after a second lesson of 7 new words the "short practice" is not 15 questions
     const isUnit = UNITS.some(u => u.id === source);
-    const queue = shuffle(usable.length ? usable : src.pool).slice(0, isUnit ? 15 : 8);
+    let mixed = shuffle(usable.length ? usable : src.pool);
+    // first the words the lesson's cards just showed, then words missed earlier, then the rest
+    if (isUnit) {
+      const justMet = lastLesson.unit === source ? lastLesson.ids : [];
+      const rank = w => justMet.includes(w.id) ? 0 : Store.box(w.id) <= 1 ? 1 : 2;
+      mixed = [0, 1, 2].flatMap(r => mixed.filter(w => rank(w) === r));
+    }
+    const queue = mixed.slice(0, 8);
     const total = queue.length;           // the score counts first tries only
     const tried = new Set();              // words already answered once this round
     const retries = new Map();            // how many times each word was sent back
@@ -2082,16 +2311,14 @@
                   <button class="speak" id="speak" style="margin:6px auto 0" aria-label="${t('aria.listen')}">${ICON.speaker}</button>`;
       } else if (kind === 'type') {
         prompt = `<div class="small">${t('quiz.type')}</div>
-                  <div class="prompt he">${w.he}</div>
-                  <button class="speak" id="speak" style="margin:6px auto 0" aria-label="${t('aria.listen')}">${ICON.speaker}</button>`;
+                  <div class="prompt he">${w.he}</div>`;
       } else if (toHebrew) {
         prompt = `<div class="small">${t('quiz.mean')}</div>
                   <div class="prompt en ${long}">${w.en}</div>
                   <button class="speak" id="speak" style="margin:6px auto 0" aria-label="${t('aria.listen')}">${ICON.speaker}</button>`;
       } else {
         prompt = `<div class="small">${t('quiz.say')}</div>
-                  <div class="prompt he ${long}">${w.he}</div>
-                  <button class="speak" id="speak" style="margin:6px auto 0" aria-label="${t('aria.listen')}">${ICON.speaker}</button>`;
+                  <div class="prompt he ${long}">${w.he}</div>`;
       }
 
       view.innerHTML = `
@@ -2115,7 +2342,10 @@
 
       const sp = $('#speak');
       if (sp) sp.onclick = () => speak(w.en);
-      speak(w.en);   // every new question starts with the sound of the word
+      // A question starts with the sound of the word, unless the answer is that English word itself
+      // (Hebrew → English, typing): then the sound comes only after answering
+      const asksEnglish = kind === 'type' || (kind === 'choice' && !toHebrew);
+      if (!asksEnglish) speak(w.en);
 
       // Why, from the word data: what the picked word really means, and what the answer means (with its example)
       function wordWhy(ok, picked, typed) {
@@ -2123,7 +2353,7 @@
         const means = x => x.phrase
           ? `<span class="why-line en" dir="ltr">${x.en}</span><span class="why-line" dir="rtl">"${x.he}"</span>`
           : t('v.means', { en: `<b class="en" dir="ltr">${x.en}</b>`, he: x.he });
-        const answerWhy = means(w) + (w.ex && kind !== 'cloze' ? ` ${t('v.ex', { ex: `<span class="en" dir="ltr">${w.ex}</span>` })}` : '');
+        const answerWhy = means(w) + (w.ex && kind !== 'cloze' ? ` ${t('v.ex', { ex: `<span class="en why-ex" dir="ltr">${w.ex}</span>` })}` : '');
         if (ok && typed === undefined) return whyHtml({ answer: kind === 'choice' && toHebrew ? w.he : w.en, answerWhy });
         let pickedWhy = '';
         if (typed !== undefined) {
@@ -2246,7 +2476,7 @@
         if (source === 'review') Store.completeTask('review');
         // Finishing a unit's practice (after its flashcards) completes the vocabulary task
         if (UNITS.some(u => u.id === source)) Store.completeTask('vocab');
-      }
+      } else if (source === 'review') Store.completeTask('reviewTried');   // Today then says "one more round", not "before you forget"
       // The words to fix, each with its sound and meaning, and one tap to practice just them
       lastMissed = missed.slice();
       const fix = missed.length ? `
@@ -2262,7 +2492,7 @@
       done(pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '💪',
         t('quiz.score', { a: correct, b: total }),
         t(pct >= 80 ? 'quiz.great' : 'quiz.keep'),
-        roundStats({ correct, total, xp: correct * 10, ms: Date.now() - started }) + fix);
+        roundStats({ correct, total, xp: correct * 10, ms: Date.now() - started }) + easierHint(pct) + fix, !missed.length);
       countUp();
       view.querySelectorAll('.missed [data-say]').forEach(b => { b.onclick = () => speak(missed[b.dataset.say].en); });
       // with mistakes, "Practice these again" is the main button, so Home becomes the quiet one
@@ -2293,8 +2523,14 @@
   // ---------- Speaking ----------
   // Listen, say it into the microphone and get feedback. Where the browser can't listen,
   // the learner rates themselves ("I said it" / "Still hard").
+  // Once the browser refuses the microphone, the next cards stop offering it (it would only fail again)
+  let micBlocked = false;
   function speaking() {
-    const queue = shuffle(poolFor('level').pool).slice(0, 6);
+    // Say words you already know: the ones met so far first, topped up from the next lesson's words,
+    // so a new learner says "hello" and "thank you", not a word never seen before
+    const lvlPool = poolFor('level').pool;
+    const met = shuffle(lvlPool.filter(w => Store.isSeen(w.id)));
+    const queue = met.length >= 6 ? met.slice(0, 6) : [...met, ...lvlPool.filter(w => !met.includes(w))].slice(0, 6);
     let i = 0, good = 0;
 
     function draw() {
@@ -2302,6 +2538,7 @@
       let heardOk = false;
       // The speaking round wears the colour of the learner's level, like the paths
       const lvl = Store.level;
+      const useMic = Recognition() && !micBlocked;
       document.body.dataset.lv = lvl;
       view.innerHTML = `
         <div class="gq-head lv-${lvl}">
@@ -2311,19 +2548,20 @@
         ${lessonBar(i / queue.length)}
         <div class="card flash speak-card lv-${lvl}">
           <span class="gq-lvl">${t('lv.' + lvl)} · <span class="en">${t('lvl.cefr.' + lvl)}</span></span>
-          <div class="small">${t(Recognition() ? 'speak.do.mic' : 'speak.do')}</div>
+          <div class="small" id="sp-do">${t(useMic ? 'speak.do.mic' : 'speak.do')}</div>
           <div class="word en ${w.phrase ? 'long' : ''}" style="margin-top:8px">${w.en}</div>
           <div class="speak-row">
             <span class="sp-btn"><button class="speak xl" id="speak" aria-label="${t('aria.listen')}">${ICON.speaker}</button><small aria-hidden="true">${t('aria.listen')}</small></span>
-            ${Recognition() ? `<span class="sp-btn sp-mic"><button class="speak xl mic" id="mic" aria-label="${t('speak.mic')}" aria-pressed="false">${ICON.mic}</button><small aria-hidden="true">${t('speak.mic')}</small></span>` : ''}
+            ${useMic ? `<span class="sp-btn sp-mic"><button class="speak xl mic" id="mic" aria-label="${t('speak.mic')}" aria-pressed="false">${ICON.mic}</button><small aria-hidden="true">${t('speak.mic')}</small></span>` : ''}
           </div>
           <div class="heard" id="heard" aria-live="polite"></div>
           <div class="he ${w.phrase ? 'long' : ''}">${w.he}</div>
           ${w.ex ? `<div class="example en">${w.ex}</div>` : ''}
         </div>
+        <p class="sp-rate">${t('speak.rate')}</p>
         <div class="pager fc-btns lv-${lvl}">
-          <button class="btn fc-again" id="hard">${t('speak.hard')}</button>
-          <button class="btn fc-know" id="said">${t('speak.said')}</button>
+          <button class="btn fc-again" id="hard">↺ ${t('speak.hard')}</button>
+          <button class="btn fc-know" id="said">✓ ${t('speak.said')}</button>
         </div>`;
       $('#speak').onclick = () => speak(w.en);
       speak(w.en);   // hear it first, then say it
@@ -2375,7 +2613,10 @@
           answered = true;
           if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
             show(t('speak.blocked'), 'bad');
-            mic.remove();                       // no microphone: self-rating only
+            micBlocked = true;                  // no microphone: self-rating only, from here on
+            mic.closest('.sp-mic').remove();
+            $('#sp-do').textContent = t('speak.do');
+            $('#speak').focus();
           } else if (e.error !== 'aborted') {
             show(t('speak.nothing'), 'bad');
           }
@@ -2402,15 +2643,17 @@
   // Numbers only. The lessons themselves live on the Learn screen and nowhere else.
   function progress() {
     const mastered = ALL_WORDS.filter(w => Store.isMastered(w.id)).length;
+    // the top tile counts every word met so far, so the first days show real progress (mastery is in the level cards)
+    const met = ALL_WORDS.filter(w => Store.isSeen(w.id)).length;
     const levelCard = l => {
       const words = wordsOf(l.id).filter(x => !x.phrase);
       const sentences = wordsOf(l.id).filter(x => x.phrase);
       const rules = GRAMMAR.filter(g => g.level === l.id);
-      const w = words.filter(x => Store.isMastered(x.id)).length;
-      const s = sentences.filter(x => Store.isMastered(x.id)).length;
+      // the same measure as the level sheet: words and sentences met, rules passed
+      const w = words.filter(x => Store.isSeen(x.id)).length;
+      const s = sentences.filter(x => Store.isSeen(x.id)).length;
       const r = rules.filter(g => Store.isGrammarDone(g.id)).length;
-      const parts = [[w, words.length], [s, sentences.length], [r, rules.length]].filter(p => p[1]);
-      const pct = Math.round(parts.reduce((n, [a, b]) => n + a / b, 0) / parts.length * 100);
+      const pct = Math.round(partDone(l.id, 'all') * 100);
       const row = (icon, label, a, b) => `
         <div class="lv-row"><span class="lv-ico" aria-hidden="true">${icon}</span>
           <span class="grow"><span class="lv-label">${label}</span><span class="lv-bar"><i style="width:${b ? Math.round(a / b * 100) : 0}%"></i></span></span>
@@ -2426,29 +2669,36 @@
           ${row('✏️', t('progress.rules', { a: r, b: rules.length }), r, rules.length)}
         </section>`;
     };
+    // Before the first lesson there is nothing to chart: one line on what will show here, and the way to start
+    const empty = !met && !Store.xp && !GRAMMAR.some(g => Store.isGrammarDone(g.id));
     view.innerHTML = `
       <h1>${t('progress.title')}</h1>
+      ${empty ? `<div class="card pg-empty">
+        <p>${t('progress.empty')}</p>
+        ${nextCard()}
+      </div>` : `
       <p class="sub">${t('progress.sub', { x: Store.xp })}</p>
       <div class="stats">
-        <div class="card stat st-words"><span class="st-ico" aria-hidden="true">📚</span><b>${mastered}</b><span class="small">${t('home.learned')}</span></div>
+        <div class="card stat st-words"><span class="st-ico" aria-hidden="true">📚</span><b>${met}</b><span class="small">${t('progress.met')}</span></div>
         <div class="card stat st-streak"><span class="st-ico" aria-hidden="true">🔥</span><b>${Store.streak}</b><span class="small">${t('progress.streak')}</span></div>
         <div class="card stat st-best"><span class="st-ico" aria-hidden="true">🏆</span><b>${Store.best}</b><span class="small">${t('progress.best')}</span></div>
       </div>
-      ${weekCard()}
-      ${monthCard()}
-      ${LEVELS.map(levelCard).join('')}
+      ${weekCard()}`}
+      ${Store.days(35).filter(d => d.count > 0).length >= 3 ? monthCard() : ''}
+      ${LEVELS.filter(l => !isFresh() || l.id === Store.level).map(levelCard).join('')}
       <div class="card backup">
         <div class="bk-head"><span class="bk-ico" aria-hidden="true">💾</span>
-          <div class="grow"><b>${t('backup.title')}</b><span class="bk-last" id="bk-last">${lastBackupText()}</span></div></div>
-        <p class="small">${t('backup.sub')}</p>
+          <div class="grow"><b>${t('backup.title')}</b><span class="bk-last" id="bk-last"${empty ? ' hidden' : ''}>${lastBackupText()}</span></div></div>
+        ${/* before the first lesson there is nothing to save yet; the card only offers to bring back a backup */ ''}
+        <p class="small">${t(empty ? 'backup.sub.empty' : 'backup.sub')}</p>
         <div class="pager">
           <button class="btn ghost" id="restore"><span aria-hidden="true">📂</span> ${t('backup.restore')}</button>
-          <button class="btn" id="save"><span aria-hidden="true">⬇️</span> ${t('backup.save')}</button>
+          <button class="btn" id="save"${empty ? ' hidden' : ''}><span aria-hidden="true">⬇️</span> ${t('backup.save')}</button>
         </div>
         <input type="file" id="backup-file" accept=".json,application/json,text/plain" hidden>
         <p class="small backup-msg" id="backup-msg" role="status"></p>
       </div>
-      <button class="btn plain" id="reset">${t('progress.reset')}</button>`;
+      <button class="btn plain" id="reset"${empty ? ' hidden' : ''}>${t('progress.reset')}</button>`;
     const msg = (text, ok) => { const m = $('#backup-msg'); m.textContent = text; m.className = 'small backup-msg ' + (ok ? 'ok' : 'bad'); };
 
     // On iPhone the share sheet offers "Save to Files", Notes, Mail…; elsewhere the file is downloaded
@@ -2511,7 +2761,7 @@
       <div class="card month">
         <div class="week-head">
           <b>${t('month.title')}</b>
-          <span class="small">${t('month.sub', { a: active, b: best })}</span>
+          <span class="small">${t(active === 1 ? 'month.sub.one' : 'month.sub', { a: active, b: best })}</span>
         </div>
         <div class="cal" role="list">
           ${Array.from({ length: 7 }, (_, k) => `<span class="cal-wd" aria-hidden="true">${narrow.format(new Date(sun.getTime() + k * 864e5))}</span>`).join('')}
@@ -2567,6 +2817,9 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   // a short option is repeated in the row's label; a whole sentence is not (the row itself shows it)
   const short = x => x && String(x).length <= 28 ? ` <span dir="auto">${esc(x)}</span>` : '';
+  // A row's tag names the choice ("You chose teacher"). A whole sentence is too long for the tag, and its body
+  // already shows it in full, so then the tag is a label of its own ("Your choice" / "The right answer")
+  const tagFor = (key, x, body) => short(x) && !String(body).includes(esc(x)) ? t(key) + short(x) : t(key + '.solo');
   function whyHtml({ picked, pickedWhy, answer, answerWhy, typed, rule }) {
     if (!pickedWhy && !answerWhy) return '';
     // a grammar answer can open a short reminder of its rule right here, without leaving the round
@@ -2577,8 +2830,8 @@
       </details>` : '';
     return `<div class="fb-why">
       <b class="fb-why-h"><img src="icons/owl-192.png" alt="" width="22" height="22"> ${t('why.title')}</b>
-      ${pickedWhy ? `<div class="why-row no"><span class="why-tag">✗ ${t(typed ? 'why.typed' : 'why.picked')}${short(picked)}</span><p>${pickedWhy}</p></div>` : ''}
-      ${answerWhy ? `<div class="why-row ok"><span class="why-tag">✓ ${t('why.answer')}${short(answer)}</span><p>${answerWhy}</p></div>` : ''}
+      ${pickedWhy ? `<div class="why-row no"><span class="why-tag">✗ ${tagFor(typed ? 'why.typed' : 'why.picked', picked, pickedWhy)}</span><p>${pickedWhy}</p></div>` : ''}
+      ${answerWhy ? `<div class="why-row ok"><span class="why-tag">✓ ${tagFor('why.answer', answer, answerWhy)}</span><p>${answerWhy}</p></div>` : ''}
       ${ruleBox}
     </div>`;
   }
@@ -2599,7 +2852,7 @@
         ${say ? `<button class="speak sm fb-say" aria-label="${t('aria.listen')}">${ICON.speaker}</button>` : ''}
       </div>
       ${answer ? `<div class="fb-answer ${lang}" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${answerHtml}</div>` : ''}
-      ${sub ? `<div class="fb-sub" dir="auto">${sub}</div>` : ''}
+      ${sub ? `<div class="fb-sub fb-sub-${lang}" dir="auto">${sub}</div>` : ''}
       ${why}`;
     next.hidden = false;
     fb.appendChild(next);
@@ -2765,8 +3018,21 @@
 
   // ---------- Router ----------
   let firstRoute = true;
+  // A rule page's back link goes where the learner came from: Today, or the grammar path
+  // (from the grammar path or the tense map: back to the path; from anywhere else, such as Today or a
+  // lesson's "What's next": back to Today; the rule's own quiz keeps whichever it was)
+  let lastName = '', ruleBack = '#/', lastRule = '', tensesFrom = '';
   function route() {
     const [name, a, b] = location.hash.replace(/^#\/?/, '').split('/');
+    // back from the tense map to the rule it was opened from: that rule keeps its own way back
+    if (name === 'grammar' && a && !b && lastName !== 'rule' && !(lastName === 'tenses' && a === tensesFrom)) {
+      ruleBack = lastName === 'grammar' || lastName === 'tenses' ? '#/grammar' : '#/';
+    }
+    // the rule's own quiz keeps the rule's way back; only the grammar list itself counts as "grammar"
+    // the tense map remembers the rule it was opened from (and keeps it on a way back from that rule)
+    if (name === 'tenses') tensesFrom = lastName === 'rule' ? lastRule : lastName === 'grammar' ? '' : tensesFrom;
+    if (name === 'grammar' && a) lastRule = a;
+    lastName = !name ? 'home' : name === 'grammar' && a ? 'rule' : name;
     if ('speechSynthesis' in window) speechSynthesis.cancel();
     if (recognition) recognition.abort();
     view.scrollTop = 0;
@@ -2775,13 +3041,14 @@
     view.onkeydown = null;
     view.onscroll = null;
     const inLesson = ['unit', 'quiz', 'speak'].includes(name) || (name === 'grammar' && b === 'quiz') || (name === 'kids' && ['play', 'abcgame', 'story', 'water', 'riddles', 'colour', 'practice', 'pairs', 'peek', 'speed', 'blend', 'together', 'shop', 'spell', 'path', 'hide', 'simon', 'fam', 'monster', 'rhyme', 'wear', 'call', 'zoo', 'teddy', 'safari', 'shunt', 'copy', 'seesaw', 'morning', 'peekaboo', 'cbw', 'feelst', 'pizza', 'wxr', 'bath', 'odd', 'slist'].includes(a));
-    if (name !== 'kids' && name !== 'home' && name) Kids.leave();
+    if (name !== 'kids') Kids.leave();   // Today (#/) and the grown-up tabs are outside the kids world
     document.body.classList.toggle('in-lesson', inLesson);
     if (inLesson) lessonBar(0);
     else if (name !== 'x' && !(name === 'kids' && a === 'today')) lessonExit = location.hash || '#/';   // a kids adventure step is left back to the map, not restarted
     switch (name || 'home') {
-      case 'home':
-      case 'kids': refreshChrome('kids'); Kids.show(name === 'kids' ? a : '', b); break;
+      case 'home': refreshChrome('home'); home(); break;
+      case 'levelup': if (LEVELS.some(l => l.id === a)) Store.level = a; location.replace('#/'); return;
+      case 'kids': refreshChrome('kids'); Kids.show(a, b); break;
       case 'learn': refreshChrome('learn'); learn(); break;
       case 'phrases': refreshChrome('learn'); phrases(); break;
       case 'unit': refreshChrome('learn'); lesson(a); break;
@@ -2792,19 +3059,43 @@
       case 'practice': refreshChrome('learn'); practice(); break;
       case 'quiz': refreshChrome('learn'); quiz(a, b); break;
       case 'speak': refreshChrome('learn'); speaking(); break;
-      case 'progress': refreshChrome('progress'); progress(); break;
+      case 'progress': refreshChrome('progress'); progress();
+        if (scrollToBackup) { scrollToBackup = false; const b = view.querySelector('.backup'); if (b) { b.scrollIntoView({ block: 'center' }); b.classList.add('is-lit'); } }
+        break;
       case 'tenses': refreshChrome('grammar'); tenses(); break;
       default: refreshChrome(''); notFound();
     }
     slideTabs();
     // After a screen change, put keyboard and screen-reader focus on its heading (not on the first load)
     if (!firstRoute) {
-      const head = view.querySelector('h1') || view.querySelector('.sub') || view;
+      const head = view.querySelector('h1') || view.querySelector('.gq-head') || view.querySelector('.sub') || view;
       head.setAttribute('tabindex', '-1');
       head.focus({ preventScroll: true });
     }
     firstRoute = false;
   }
+
+  // Inside a lesson the next question or card replaces the view without a route change. When that drops
+  // focus to <body>, keyboard and screen-reader users lose their place: put it on the new heading instead.
+  // Screens that focus something themselves (the typing field, Next) keep their own focus.
+  new MutationObserver(() => {
+    if (firstRoute) return;
+    const a = document.activeElement;
+    if (a && a !== document.body && document.contains(a)) return;
+    if (document.querySelector('.tour, .sheet-back')) return;
+    const head = view.querySelector('h1') || view.querySelector('.gq-head') || view.querySelector('.sub') || view;
+    head.setAttribute('tabindex', '-1');
+    head.focus({ preventScroll: true });
+  }).observe(view, { childList: true });
+
+  // Once there is progress worth keeping, ask the browser not to clear this site's storage on its own
+  // (Safari may evict sites not visited for a while). Silent: the browser decides, nothing is shown.
+  function askPersist() {
+    if (!navigator.storage || !navigator.storage.persist || Store.xp <= 0) return;
+    navigator.storage.persisted().then(p => { if (!p) navigator.storage.persist(); }).catch(() => {});
+  }
+  window.addEventListener('hashchange', askPersist);
+  askPersist();
 
   // Language switch in the header
   document.getElementById('lang').onclick = () => {

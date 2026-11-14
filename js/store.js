@@ -67,6 +67,8 @@ const Store = (() => {
       return !!state.welcomed || state.xp > 0 || Object.keys(state.words || {}).length > 0 || Object.keys(state.grammar || {}).length > 0;
     },
     markWelcomed() { state.welcomed = true; save(); },
+    get toured() { return !!state.toured; },
+    markToured() { state.toured = true; save(); },
 
     // Grammar rules whose practice was passed
     isGrammarDone: id => !!(state.grammar && state.grammar[id]),
@@ -371,8 +373,10 @@ const Store = (() => {
       save();
     },
 
+    // A word only shown on a card (not yet practised) comes up for review from tomorrow, not at once:
+    // otherwise opening a lesson and leaving after one card made Today lead with "Review 1 word"
     markSeen(id) {
-      if (!state.words[id]) { state.words[id] = { box: 1, due: Date.now() }; save(); }
+      if (!state.words[id]) { state.words[id] = { box: 1, due: Date.now() + DAY }; save(); }
     },
 
     answer(id, correct) {
