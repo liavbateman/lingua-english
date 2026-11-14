@@ -1438,7 +1438,8 @@ body.kids.night .k-band-line { color: #ffe9a6; }
 .k-mb-w b { font: 700 .85rem var(--k-font); }
 .k-mb-w.lit { background: #fff1c2; transform: scale(1.12); }
 .k-mb-line { margin: 14px 0 0; font: 700 1.15rem var(--k-font); direction: ltr; }
-.k-mb-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0; color: #fff; font-weight: 700; }
+.k-mb-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0; color: var(--k-ink); font-weight: 700; }
+body.kids.night .k-mb-nav { color: #fff; }
 .k-mb-nav .k-btn { width: 72px; margin: 0; }
 @media (prefers-reduced-motion: reduce) { .k-mb-page { animation: none; } .k-mb-w { transition: none; } }
 

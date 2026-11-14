@@ -3314,7 +3314,7 @@ const Kids = (() => {
         <div class="k-mb-page" style="--c:${p.th.color}">
           <p class="k-mb-title"><span aria-hidden="true">${p.th.pic}</span> <b class="en" lang="en">${p.th.title}</b></p>
           <div class="k-mb-words">${p.words.map((w, i) => `<button class="k-mb-w" data-i="${i}" aria-label="${w.en}"><span aria-hidden="true">${w.pic}</span><b class="en" lang="en">${w.en}</b></button>`).join('')}</div>
-          <p class="k-mb-line en" lang="en">I know ${list(p.words.map(w => w.en))}!</p>
+          <p class="k-mb-line en" lang="en">I can say ${list(p.words.map(w => w.en))}!</p>
         </div>`;
     }
     K.view.innerHTML = `
@@ -3337,7 +3337,8 @@ const Kids = (() => {
     const p = pages[page - 1], btns = [...K.view.querySelectorAll('.k-mb-w')];
     btns.forEach((b, i) => { b.onclick = () => { sayEn(p.words[i].en, 0.9); b.classList.remove('lit'); void b.offsetWidth; b.classList.add('lit'); }; });
     $('#k-mb-read').onclick = () => {
-      speakSeq(['I know', ...p.words.map(w => w.en)], 0.9, i => {
+      // "I can say ..." fits every page (feelings, numbers and actions too - "I know happy" did not)
+      speakSeq(['I can say', ...p.words.map(w => w.en)], 0.9, i => {
         btns.forEach(b => b.classList.remove('lit'));
         if (i > 0 && btns[i - 1] && btns[i - 1].isConnected) btns[i - 1].classList.add('lit');
       }, () => btns.forEach(b => b.classList.remove('lit')));
