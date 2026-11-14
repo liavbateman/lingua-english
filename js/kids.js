@@ -1552,17 +1552,21 @@ const Kids = (() => {
       const light = i => { tiles[i].classList.remove('lit'); void tiles[i].offsetWidth; tiles[i].classList.add('lit'); };
       const sayTile = i => { sayEn(soundOf(w.en[i]), 0.7); light(i); };
       tiles.forEach((t, i) => { t.onclick = () => sayTile(i); });
-      // sound by sound, then together - queued so the sounds never cut each other off
-      const blend = () => {
+      // sound by sound, then the sounds again closer together while the tiles slide in - and the child
+      // says the word. The owl only says the whole word as help after a miss (withWord) or as praise.
+      const sounds = tiles.map((t, i) => soundOf(w.en[i]));
+      const blend = withWord => {
         $('.k-blend').classList.remove('joined');
-        speakSeq([...tiles.map((t, i) => soundOf(w.en[i])), w.en], 0.7, i => {
+        const lines = [...sounds, sounds.join(' '), withWord ? w.en + '!' : 'What is it?'];
+        speakSeq(lines, 0.7, i => {
           if (!tiles[0].isConnected) return;
           if (i < tiles.length) light(i);
-          else { $('.k-blend').classList.add('joined'); blended = true; }
+          else if (i === tiles.length) $('.k-blend').classList.add('joined');
+          else if (withWord) blended = true;
         });
       };
-      $('#k-blend-go').onclick = blend;
-      setTimeout(blend, 400);
+      $('#k-blend-go').onclick = () => blend(blended);
+      setTimeout(() => blend(false), 400);
       K.view.querySelectorAll('.k-opt').forEach(b => {
         b.onclick = () => {
           if (opts[+b.dataset.i] === w) {
@@ -1572,7 +1576,7 @@ const Kids = (() => {
             if (!missed) firstTry++;
             $('.k-blend').classList.add('joined');
             owlMood('cheer');
-            $('.k-bubble').textContent = `${w.en.split('').join(' – ')} → ${w.en}!`;
+            $('.k-bubble').innerHTML = `<bdi class="k-q" dir="ltr" lang="en">${w.en.split('').join(' – ')} → ${w.en}!</bdi>`;
             sayEn(w.en, 0.8);
             setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 1600);
           } else {
@@ -1582,7 +1586,7 @@ const Kids = (() => {
             K.Feel.wrong(b);
             owlMood('think');
             $('.k-bubble').textContent = kt('tryAgain');
-            if (blended) setTimeout(() => sayEn(w.en, 0.7), 300); else blend();
+            if (blended) setTimeout(() => sayEn(w.en, 0.7), 300); else blend(true);
           }
         };
       });

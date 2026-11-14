@@ -481,7 +481,7 @@ const KIDS_TIPS = {
 
 // Blend it! (first reading): short words of three letter sounds, each with a picture
 const KIDS_CVC = [
-  ['cat', '🐱'], ['dog', '🐶'], ['sun', '☀️'], ['bus', '🚌'], ['hat', '🧢'], ['pig', '🐷'],
+  ['cat', '🐱'], ['dog', '🐶'], ['sun', '☀️'], ['bus', '🚌'], ['hat', '🎩'], ['pig', '🐷'],
   ['bed', '🛏️'], ['cup', '🥤'], ['fox', '🦊'], ['hen', '🐔'], ['pen', '🖊️'], ['bug', '🐛'], ['net', '🥅'], ['map', '🗺️']
 ].map(([en, pic]) => ({ en, pic }));
 
