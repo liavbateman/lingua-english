@@ -80,6 +80,7 @@ const Kids = (() => {
       isleSongs: 'שירי האיים', isleSongsSub: 'כל אי שסיימתם מקבל שיר משלו', singIsle: 'שירו את שיר האי',
       peek: 'מציצים!', peekSub: 'מה מסתתר מאחורי העננים?', peekTip: 'מה מסתתר שם? בחרו מילה. ככל שמוקדם יותר, יותר כוכבים!',
       tryHome: 'לנסות בבית', tryHomeAny: 'השתמשו במילים של היום בבית: הצביעו, שאלו "What is it?" ושבחו כל ניסיון.',
+      surprise: 'הפתעה!', surpriseTip: 'לחצו על הקובייה (או נערו את הטלפון) למשחק הפתעה',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -153,6 +154,7 @@ const Kids = (() => {
       isleSongs: 'Island songs', isleSongsSub: 'Every island you finish gets its own song', singIsle: 'Sing the island song',
       peek: 'Peek-a-boo!', peekSub: "What's hiding behind the clouds?", peekTip: "What's hiding there? Pick a word. The earlier, the more stars!",
       tryHome: 'Try at home', tryHomeAny: 'Use today\'s words at home: point, ask "What is it?" and praise every try.',
+      surprise: 'Surprise!', surpriseTip: 'Tap the dice (or shake the phone) for a surprise game',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -417,6 +419,7 @@ const Kids = (() => {
           </div>
           <div class="k-chips">
             <button class="k-chip k-face" id="k-face" aria-label="${kt('who')}">${me.face}${me.name ? ` <b>${esc(me.name)}</b>` : ''}</button>
+            <button class="k-chip k-dice" id="k-dice" aria-label="${kt('surpriseTip')}">🎲</button>
             <button class="k-chip k-sfx" id="k-sfx" aria-pressed="${Store.kidsSfx}" aria-label="${kt('sfx')}">${Store.kidsSfx ? '🔊' : '🔇'}</button>
             <span class="k-chip star"><b>★ ${Store.kidsTotalStars}</b> ${kt('stars')}</span>
             <a class="k-chip sticker" href="#/kids/stickers"><b>🎁 ${Store.kidsStickerCount}/${KIDS_THEMES.length}</b> ${kt('stickers')}</a>
@@ -506,6 +509,7 @@ const Kids = (() => {
       </div>`;
     $('#k-parents').onclick = () => gate(() => { location.hash = '#/kids/parents'; });
     $('#k-face').onclick = whoSheet;
+    $('#k-dice').onclick = () => { askMotion(); surprise(); };
     $('#k-owl-tap').onclick = () => { owlMood(pickOne(['giggle', 'love', 'cheer'])); sayEn(pickOne(['Hoo hoo!', 'Hello friend!', "Let's play!"])); };
     $('#k-sfx').onclick = () => {
       Store.kidsSfx = !Store.kidsSfx;
@@ -1601,6 +1605,56 @@ const Kids = (() => {
     celebrate();
     sayEn('Hooray! You did it!', 0.9);
   }
+
+  // ---------- surprise game: the dice (or a shake of the phone) picks a random activity ----------
+  function surpriseList() {
+    const list = KIDS_THEMES.filter((th, i) => isOpen(i)).map(th => ['#/kids/play/' + th.id, th.pic]);
+    list.push(['#/kids/abcgame', '🔤'], ['#/kids/riddles', '🕵️'], ['#/kids/peek', '☁️'], ['#/kids/pairs', '👂'], ['#/kids/colour', '🖍️'],
+      ['#/kids/song/' + pickOne(KIDS_SONGS).id, '🎵']);
+    KIDS_STORIES.filter(storyOpen).forEach(st => list.push(['#/kids/story/' + st.id, st.pic]));
+    return list;
+  }
+  let rolling = false;
+  function surprise() {
+    if (rolling) return;
+    rolling = true;
+    const list = surpriseList(), pick = pickOne(list);
+    const back = document.createElement('div');
+    back.className = 'k-reveal k-roll';
+    back.setAttribute('role', 'status');
+    back.innerHTML = `<div class="k-roll-box"><span class="k-roll-pic" aria-hidden="true">🎲</span><b>${kt('surprise')}</b></div>`;
+    document.body.appendChild(back);
+    const pic = back.querySelector('.k-roll-pic');
+    let n = 0;
+    const spin = setInterval(() => { pic.textContent = pickOne(list)[1]; Sfx.tap(); if (++n >= 9) stop(); }, 110);
+    function stop() {
+      clearInterval(spin);
+      pic.textContent = pick[1];
+      pic.classList.add('k-roll-done');
+      Sfx.jingle();
+      sayEn('Surprise!', 1);
+      setTimeout(() => { back.remove(); rolling = false; location.hash = pick[0]; }, 900);
+    }
+  }
+  // Shaking the phone on the map rolls the dice too. iPhone asks once for motion access (on the dice tap).
+  let motionOn = false, lastShake = 0, prev = null;
+  function onMotion(e) {
+    const a = e.accelerationIncludingGravity;
+    if (!a || !document.querySelector('.k-map')) return;
+    if (prev) {
+      const jolt = Math.abs(a.x - prev.x) + Math.abs(a.y - prev.y) + Math.abs(a.z - prev.z);
+      if (jolt > 28 && Date.now() - lastShake > 3000) { lastShake = Date.now(); surprise(); }
+    }
+    prev = { x: a.x || 0, y: a.y || 0, z: a.z || 0 };
+  }
+  function listenMotion() { if (!motionOn && 'DeviceMotionEvent' in window) { window.addEventListener('devicemotion', onMotion); motionOn = true; } }
+  function askMotion() {
+    if (motionOn || !('DeviceMotionEvent' in window)) return;
+    if (typeof DeviceMotionEvent.requestPermission === 'function') {
+      DeviceMotionEvent.requestPermission().then(r => { if (r === 'granted') listenMotion(); }).catch(() => {});
+    } else listenMotion();
+  }
+  if ('DeviceMotionEvent' in window && typeof DeviceMotionEvent.requestPermission !== 'function') listenMotion();   // Android: no question needed
 
   // ---------- daily treasure ----------
   function chestCard() {
