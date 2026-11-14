@@ -220,7 +220,7 @@
     const due = dueHere().length;
     const review = due || Store.tasks.review
       ? [{ id: 'review', title: t('task.review'),
-          sub: Store.tasks.review && !due ? t('task.review.done') : due === 1 ? t('task.review.one') : t('task.review.sub', { n: due }),
+          sub: Store.tasks.review && !due ? t('task.review.done') : Store.tasks.reviewTried && !Store.tasks.review ? t('cont.review.retry') : due === 1 ? t('task.review.one') : t('task.review.sub', { n: due }),
           href: '#/quiz/choice/review', icon: 'repeat', color: 'coral' }]
       : [];
     return [
@@ -258,7 +258,8 @@
     if (due && !done.review) return { href: '#/quiz/choice/review', icon: 'repeat', color: 'coral',
       // a review round holds 8 words, so the card promises one round, and says how many wait in all
       title: t(due === 1 ? 'cont.review.one' : 'cont.review', { n: Math.min(due, 8) }),
-      sub: due > 8 ? t('cont.review.more', { n: due }) : t('cont.review.sub') };
+      // after a hard round the same card would look as if nothing happened: it says this is another round
+      sub: done.reviewTried ? t('cont.review.retry') : due > 8 ? t('cont.review.more', { n: due }) : t('cont.review.sub') };
     // The whole level is done (every word met, every rule passed): the next step is the next level
     const nextLv = LEVELS[LEVELS.findIndex(l => l.id === Store.level) + 1];
     if (nextLv && levelComplete(Store.level)) return { href: `#/levelup/${nextLv.id}`, icon: 'levels', color: 'gold',
@@ -2440,7 +2441,7 @@
         if (source === 'review') Store.completeTask('review');
         // Finishing a unit's practice (after its flashcards) completes the vocabulary task
         if (UNITS.some(u => u.id === source)) Store.completeTask('vocab');
-      }
+      } else if (source === 'review') Store.completeTask('reviewTried');   // Today then says "one more round", not "before you forget"
       // The words to fix, each with its sound and meaning, and one tap to practice just them
       lastMissed = missed.slice();
       const fix = missed.length ? `
