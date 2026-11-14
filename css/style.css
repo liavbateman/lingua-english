@@ -2167,3 +2167,8 @@ html[dir="rtl"] .why-ex { text-align: right; }
    ("much / many / some / any") never runs off a 320px screen */
 .rule-hero h1 bdi:only-of-type:last-child { display: block; }
 .rule-hero h1 bdi.nw { white-space: normal; }
+
+/* The "new version" bar waits out a lesson (it would cover the lesson's buttons, and a reload there loses the
+   round); it shows again when the lesson ends. Elsewhere the page leaves room for it above the tab bar. */
+body.in-lesson .update { display: none; }
+body:has(#update):not(.in-lesson) .view { padding-bottom: 96px; }
