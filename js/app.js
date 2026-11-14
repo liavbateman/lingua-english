@@ -818,7 +818,7 @@
     const sections = stagesOf(items).length;
     return `
       ${sections > 1 ? miniMap(items, sections) : ''}
-      ${items.part === 'gall' ? `<div class="path-head"><span>${t('gr.head', { a: doneCount, b: items.length })}</span></div>` : `
+      ${items.part === 'gall' ? `<div class="path-head"${freshHide()}><span>${t('gr.head', { a: doneCount, b: items.length })}</span></div>` : `
       <button class="path-head" id="levelbtn" aria-haspopup="dialog" aria-label="${t('lvl.change', { level: levelLabel() })}">
         <span>${levelLabel()} <i class="lvl-caret" aria-hidden="true">▾</i></span>
       </button>`}
@@ -1222,9 +1222,12 @@
     } else {
       const s = stageAt(items, items.cur);
       const left = stageItems(items, s).filter(x => !x.done).length;
+      // a new learner has not met the stage chests yet (they are revealed later), so the owl just counts to the stage's end
+      const f = isFresh() ? '.fresh' : '';
       say = !items.some(x => x.started) ? t('ph.hello')
-        : left === 1 ? t('ph.one', { n: s + 1 }) : t('ph.left', { n: left, s: s + 1 });
-      go = `<a class="ph-go" href="${cur.href}">▶ ${t(cur.started ? 'ph.continue' : 'ph.start', { title: cur.plain })}</a>`;
+        : left === 1 ? t('ph.one' + f, { n: s + 1 }) : t('ph.left' + f, { n: left, s: s + 1 });
+      // English inside the title stays one unit, so "a / an / the" never breaks into a reversed line
+      go = `<a class="ph-go" href="${cur.href}">▶ ${t(cur.started ? 'ph.continue' : 'ph.start', { title: isHe() ? heMix(cur.plain) : cur.plain })}</a>`;
     }
     // On the Learn paths the card wears the learner's level colour: a ring for how much of this part
     // of the level is done, the level's name, and today's plan (tasks done of the day's plan)
