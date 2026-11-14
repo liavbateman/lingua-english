@@ -2898,12 +2898,13 @@
   // ---------- Router ----------
   let firstRoute = true;
   // A rule page's back link goes where the learner came from: Today, or the grammar path
-  let lastName = '', ruleBack = '#/grammar';
+  // (from the grammar path or the tense map: back to the path; from anywhere else, such as Today or a
+  // lesson's "What's next": back to Today; the rule's own quiz keeps whichever it was)
+  let lastName = '', ruleBack = '#/';
   function route() {
     const [name, a, b] = location.hash.replace(/^#\/?/, '').split('/');
-    if (name === 'grammar' && a && !b) {
-      if (lastName === '' || lastName === 'home') ruleBack = '#/';
-      else if (lastName === 'grammar' || lastName === 'tenses') ruleBack = '#/grammar';
+    if (name === 'grammar' && a && !b && lastName !== 'rule') {
+      ruleBack = lastName === 'grammar' || lastName === 'tenses' ? '#/grammar' : '#/';
     }
     // the rule's own quiz keeps the rule's way back; only the grammar list itself counts as "grammar"
     lastName = !name ? 'home' : name === 'grammar' && a ? 'rule' : name;
