@@ -117,6 +117,8 @@ const Kids = (() => {
       wear: 'מלבישים לפי מזג האוויר', wearSub: 'קר? שמש? גשם? מלבישים את הינשוף', wearTip: 'הקשיבו למזג האוויר ולחצו על מה שהינשוף צריך',
       call: 'הינשוף מתקשר', callSub: 'שיחת טלפון באנגלית: איך קוראים לך? בן כמה אתה?', callIn: 'הינשוף מתקשר אליכם!', callAnswer: 'לענות',
       callTip: 'בחרו תשובה, והינשוף ישמע אתכם', callEnd: 'שיחה ראשונה באנגלית!', callHint: 'אפשר גם להגיד בקול', callName: 'אמרו בקול: <bdi dir="ltr" lang="en">My name is…</bdi> ואת השם שלכם',
+      zoo: 'סופרים ביחד', zooSub: 'כמה תפוחים? תן לי שלושה! סופרים באנגלית', zooCount: 'סופרים איתי', zooDone: 'מוכן!',
+      zooTipHow: 'לחצו על כל אחד כדי לספור, ואז בחרו את המספר', zooTipGive: 'לחצו על הדברים כדי לשים אותם בסל. לחיצה בסל מחזירה',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -227,6 +229,8 @@ const Kids = (() => {
       wear: 'Dress for the weather', wearSub: 'Cold? Sunny? Rainy? Dress the owl', wearTip: 'Listen to the weather and tap what the owl needs',
       call: 'The owl calls', callSub: 'A phone call in English: what is your name? how old are you?', callIn: 'The owl is calling you!', callAnswer: 'Answer',
       callTip: 'Pick an answer and the owl will hear you', callEnd: 'Your first call in English!', callHint: 'You can say it out loud too', callName: 'Say it out loud: My name is... and your name',
+      zoo: 'Count with me', zooSub: 'How many apples? Give me three! Counting in English', zooCount: 'Count with me', zooDone: 'Done!',
+      zooTipHow: 'Tap each one to count, then pick the number', zooTipGive: 'Tap things to put them in the basket. Tap in the basket to take one out',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -605,6 +609,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">📞</span>
           <span class="grow"><b>${kt('call')}</b><small>${kt('callSub')}</small></span>
           ${Store.kidsHasSticker('call') ? starsHtml(Store.kidsStars('call'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-zoo-card" href="#/kids/zoo">
+          <span class="k-story-books" aria-hidden="true">🔢</span>
+          <span class="grow"><b>${kt('zoo')}</b><small>${kt('zooSub')}</small></span>
+          ${Store.kidsHasSticker('zoo') ? starsHtml(Store.kidsStars('zoo'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -2149,6 +2158,160 @@ const Kids = (() => {
       celebrate();
       $('#k-again').onclick = callGame;
     }
+  }
+
+  // ---------- count with me: "How many apples?" and "Give me three apples!" ----------
+  // Two kinds of rounds take turns: counting a group (tap each thing, it lights up with its number word,
+  // then pick the number) and making a group (tap things into a basket until there are N). The owl can
+  // always count along. A wrong answer is counted out loud together, then asked again.
+  function zooGame() {
+    document.body.classList.add('in-lesson');
+    const NUMS = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+    const THINGS = [['apple', 'apples', '🍎'], ['fish', 'fish', '🐟'], ['star', 'stars', '⭐'], ['balloon', 'balloons', '🎈'],
+      ['duck', 'ducks', '🦆'], ['car', 'cars', '🚗'], ['flower', 'flowers', '🌸'], ['ball', 'balls', '⚽']];
+    const max = little() ? 5 : 10;
+    const rounds = K.shuffle(THINGS).slice(0, 6).map((t, i) => ({ t, give: i % 2 === 1, n: 1 + Math.floor(Math.random() * max) }));
+    let at = 0, firstTry = 0;
+    const word = (n, t) => `${NUMS[n - 1]} ${n === 1 ? t[0] : t[1]}`;
+    function countAlong(els, then) {
+      els.forEach((el, i) => setTimeout(() => { el.classList.add('lit'); sayEn(NUMS[i], 1); setTimeout(() => el.classList.remove('lit'), 600); }, i * 750));
+      if (then) setTimeout(then, els.length * 750 + 200);
+    }
+    function round() {
+      K.lessonBar(at / rounds.length);
+      const r = rounds[at];
+      r.give ? giveRound(r) : howRound(r);
+    }
+    function next(ok) {
+      if (ok) firstTry++;
+      setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 1900);
+    }
+    // How many apples?
+    function howRound({ t, n }) {
+      const q = `How many ${t[1]}?`;
+      const pool = [...new Set([n, n + 1, n - 1, n + 2].filter(x => x >= 1 && x <= max))].slice(0, 3);
+      const opts = K.shuffle(pool.length >= 2 ? pool : [n, n + 1]);
+      let counted = 0, missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🔢</span> ${kt('zoo')} · ${at + 1}/${rounds.length}</p>
+          <div class="k-prompt">
+            <button class="k-speaker" id="k-say" aria-label="${kt('listen')}: ${q}"><span aria-hidden="true">🔊</span></button>
+            <span class="k-target en" lang="en">${q}</span>
+          </div>
+          <div class="k-card k-count-box">${Array.from({ length: n }, (_, i) => `<button class="k-count-thing" aria-label="${i + 1}"><span aria-hidden="true">${t[2]}</span><b></b></button>`).join('')}</div>
+          <div class="k-opts">${opts.map(o => `<button class="k-opt k-opt-num" data-n="${o}" aria-label="${NUMS[o - 1]}"><span aria-hidden="true">${o}</span><small class="en">${NUMS[o - 1]}</small></button>`).join('')}</div>
+          <button class="k-btn ghost" id="k-along">🦉 ${kt('zooCount')}</button>
+          ${owl(kt('zooTipHow'), 'small')}
+        </div>`;
+      const things = [...K.view.querySelectorAll('.k-count-thing')];
+      const ask = () => sayEn(q, 0.85);
+      $('#k-say').onclick = ask;
+      setTimeout(ask, 300);
+      $('#k-along').onclick = () => countAlong(things);
+      things.forEach(el => {
+        el.onclick = () => {
+          if (el.classList.contains('done')) return;
+          counted++;
+          el.classList.add('done');
+          el.querySelector('b').textContent = counted;
+          sayEn(NUMS[counted - 1], 1);
+        };
+      });
+      K.view.querySelectorAll('.k-opt').forEach(b => {
+        b.onclick = () => {
+          const o = +b.dataset.n;
+          if (o === n) {
+            K.view.querySelectorAll('.k-opt, .k-count-thing, #k-along').forEach(x => { x.disabled = true; });
+            b.classList.add('right');
+            K.Feel.right();
+            owlMood('cheer');
+            $('.k-bubble').textContent = `${word(n, t)}! ${t[2]}`;
+            say([['en', `Yes! ${word(n, t)}!`]], 0.9);
+            next(!missed);
+          } else {
+            missed = true;
+            K.Feel.wrong(b);
+            owlMood('think');
+            $('.k-bubble').textContent = kt('tryAgain');
+            countAlong(things, () => sayEn(q, 0.85));
+          }
+        };
+      });
+    }
+    // Give me three apples!
+    function giveRound({ t, n }) {
+      const q = `Give me ${word(n, t)}!`;
+      const total = Math.min(max + 2, Math.max(n + 3, 6));
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🧺</span> ${kt('zoo')} · ${at + 1}/${rounds.length}</p>
+          <div class="k-prompt">
+            <button class="k-speaker" id="k-say" aria-label="${kt('listen')}: ${q}"><span aria-hidden="true">🔊</span></button>
+            <span class="k-target en" lang="en">${q}</span>
+          </div>
+          <div class="k-card k-count-box" id="k-pile">${Array.from({ length: total }, () => `<button class="k-count-thing" aria-label="${t[0]}"><span aria-hidden="true">${t[2]}</span><b></b></button>`).join('')}</div>
+          <div class="k-zoo-basket" id="k-basket" aria-live="polite"><span class="k-fam-bk" aria-hidden="true">🧺</span><span id="k-in"></span><b id="k-n" class="k-zoo-n">0</b></div>
+          <button class="k-btn" id="k-done">✅ ${kt('zooDone')}</button>
+          ${owl(kt('zooTipGive'), 'small')}
+        </div>`;
+      const ask = () => sayEn(q, 0.85);
+      $('#k-say').onclick = ask;
+      setTimeout(ask, 300);
+      const inBasket = () => [...$('#k-in').children];
+      const refresh = () => { $('#k-n').textContent = inBasket().length; };
+      K.view.querySelectorAll('#k-pile .k-count-thing').forEach(el => {
+        el.onclick = () => {
+          if (el.classList.contains('gone')) return;
+          el.classList.add('gone');
+          const it = document.createElement('button');
+          it.className = 'k-zoo-in';
+          it.textContent = t[2];
+          it.setAttribute('aria-label', t[0]);
+          it.onclick = () => { it.remove(); el.classList.remove('gone'); refresh(); Sfx.tap(); };
+          $('#k-in').appendChild(it);
+          refresh();
+          sayEn(NUMS[inBasket().length - 1] || String(inBasket().length), 1);
+        };
+      });
+      $('#k-done').onclick = () => {
+        const got = inBasket().length;
+        if (got === n) {
+          K.view.querySelectorAll('button').forEach(x => { x.disabled = true; });
+          $('#k-basket').classList.add('right');
+          K.Feel.right();
+          owlMood('cheer');
+          $('.k-bubble').textContent = `${word(n, t)}! ${t[2]}`;
+          say([['en', `Thank you! ${word(n, t)}!`]], 0.9);
+          next(!missed);
+        } else {
+          missed = true;
+          K.Feel.wrong($('#k-basket'));
+          owlMood('think');
+          $('.k-bubble').textContent = got ? `${kt('tryAgain')} · 🧺 ${got}` : kt('tryAgain');
+          countAlong(inBasket(), () => say([['en', got ? `That is ${NUMS[got - 1]}. I want ${NUMS[n - 1]}!` : `I want ${NUMS[n - 1]}!`]], 0.85));
+        }
+      };
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = firstTry >= 6 ? 3 : firstTry >= 4 ? 2 : 1;
+      Store.kidsFinish('zoo', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🔢 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('You can count in English!', 0.9);
+      $('#k-again').onclick = zooGame;
+    }
+    round();
   }
 
   // ---------- songs & chants ----------
@@ -4151,6 +4314,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'zoo') zooGame();
       else if (a === 'call') callGame();
       else if (a === 'wear') wearGame();
       else if (a === 'rhyme') rhymeGame();

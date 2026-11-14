@@ -1218,3 +1218,14 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-call-opt small { font: 700 .95rem var(--k-font); }
 .k-call-opt.right { background: #d8fbe9; box-shadow: 0 5px 0 #2fd093; }
 @media (prefers-reduced-motion: reduce) { .k-call-ring, .k-call-btn { animation: none; } }
+
+/* count with me */
+.k-count-thing.gone { opacity: .15; transform: scale(.8); }
+.k-zoo-basket {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 4px; min-height: 64px; margin: 0 0 12px; padding: 6px 12px; border-radius: 22px;
+  background: #fff4dc; box-shadow: inset 0 -5px 0 #e5c48a; direction: ltr;
+}
+.k-zoo-basket.right { background: #d8fbe9; box-shadow: inset 0 -5px 0 #2fd093; }
+.k-zoo-in { border: 0; background: none; font-size: 1.9rem; padding: 0 2px; cursor: pointer; animation: k-pop .35s var(--ease-pop) both; }
+.k-zoo-n { margin-inline-start: auto; min-width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: #fff; color: var(--k-ink); font: 700 1.5rem var(--k-font); }
+#k-in { display: contents; }
