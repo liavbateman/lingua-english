@@ -61,6 +61,9 @@ const Kids = (() => {
       wkDays: '{n} ימי משחק · {m} דק׳', wkDay1: 'יום משחק אחד · {m} דק׳', wkShare: 'לשתף', wkCopied: 'הועתק! אפשר להדביק בוואטסאפ',
       wkMsg: '🦉 {name}השבוע ב-Lingua: {n} מילים חדשות באנגלית ({list}) ו-{d}. כל הכבוד!',
       recMe: 'שמעו את עצמכם', recGo: 'מקליט… תגידו!', recYou: 'זה אתם! ועכשיו הינשוף:', recNo: 'אין גישה למיקרופון. אפשר לבקש מהורה לאשר',
+      trophies: 'הגביעים שלי', tr_isle1: 'האי הראשון', tr_isle5: '5 איים', tr_isleAll: 'כל האיים', tr_stars: '30 כוכבים',
+      tr_words: '50 מילים', tr_bloom: 'פרח פורח', tr_abc: 'משחק האותיות', tr_trace: '10 אותיות מצוירות', tr_traceAll: 'כל ה-ABC',
+      tr_story: '3 סיפורים', tr_storyAll: 'כל הסיפורים', tr_riddle: 'בלש', tr_treasure: '7 ימי אוצר', tr_owl: 'ינשוף מגונדר',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -115,6 +118,9 @@ const Kids = (() => {
       wkDays: '{n} play days · {m} min', wkDay1: '1 play day · {m} min', wkShare: 'Share', wkCopied: 'Copied! Paste it into WhatsApp',
       wkMsg: '🦉 {name}This week in Lingua: {n} new English words ({list}) and {d}. Well done!',
       recMe: 'Hear yourself', recGo: 'Recording… say it!', recYou: "That's you! Now the owl:", recNo: 'No microphone access. Ask a grown-up to allow it',
+      trophies: 'My trophies', tr_isle1: 'First island', tr_isle5: '5 islands', tr_isleAll: 'All islands', tr_stars: '30 stars',
+      tr_words: '50 words', tr_bloom: 'In full bloom', tr_abc: 'Letter game', tr_trace: '10 letters traced', tr_traceAll: 'The whole ABC',
+      tr_story: '3 stories', tr_storyAll: 'Every story', tr_riddle: 'Detective', tr_treasure: '7 treasure days', tr_owl: 'Dressed-up owl',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -1889,6 +1895,35 @@ const Kids = (() => {
     round();
   }
 
+  // ---------- trophies: milestones for everything the child does, with progress toward the next ----------
+  function trophyList() {
+    const learned = KIDS_WORDS.filter(w => Store.kidsWordCount(w.id) > 0).length;
+    const traced = KIDS_ABC.filter(x => Store.kidsHasTraced(x.L)).length;
+    const read = KIDS_STORIES.filter(st => Store.kidsHasSticker('st-' + st.id)).length;
+    const isles = Store.kidsStickerCount, look = Store.kidsOwl;
+    const bloom = Store.kidsGarden().some(p => p.lvl >= 4) ? 1 : 0;
+    return [
+      ['🏝️', 'tr_isle1', isles, 1], ['🗺️', 'tr_isle5', isles, 5], ['👑', 'tr_isleAll', isles, KIDS_THEMES.length],
+      ['⭐', 'tr_stars', Store.kidsTotalStars, 30], ['💬', 'tr_words', learned, 50], ['🌻', 'tr_bloom', bloom, 1],
+      ['🔤', 'tr_abc', Store.kidsHasSticker('abc') ? 1 : 0, 1], ['✍️', 'tr_trace', traced, 10], ['🎓', 'tr_traceAll', traced, 26],
+      ['📚', 'tr_story', read, 3], ['📖', 'tr_storyAll', read, KIDS_STORIES.length], ['🕵️', 'tr_riddle', Store.kidsHasSticker('riddles') ? 1 : 0, 1],
+      ['☀️', 'tr_treasure', Store.kidsTreasure.days, 7], ['🎩', 'tr_owl', look.acc && look.color !== 'blue' ? 1 : 0, 1]
+    ].map(([pic, key, have, need]) => ({ pic, name: kt(key), have: Math.min(have, need), need, got: have >= need }));
+  }
+  function trophiesHtml() {
+    const list = trophyList(), got = list.filter(t => t.got).length;
+    return `
+      <h2 class="k-title k-h2">🏆 ${kt('trophies')} · ${got}/${list.length}</h2>
+      <div class="k-trophies">
+        ${list.map(t => `
+          <div class="k-trophy ${t.got ? 'got' : ''}">
+            <span class="k-trophy-pic" aria-hidden="true">${t.got ? t.pic : '🔒'}</span>
+            <span class="k-trophy-name">${t.name}</span>
+            ${t.got ? '' : `<span class="k-trophy-bar" aria-label="${t.have}/${t.need}"><i style="width:${Math.round(t.have / t.need * 100)}%"></i></span><small>${t.have}/${t.need}</small>`}
+          </div>`).join('')}
+      </div>`;
+  }
+
   // ---------- sticker album ----------
   function stickers() {
     K.endLesson();
@@ -1896,6 +1931,8 @@ const Kids = (() => {
       <div class="k-wrap">
         <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
         <h1 class="k-title">🎁 ${kt('album')}</h1>
+        ${trophiesHtml()}
+        <h2 class="k-title k-h2">🎁 ${kt('stickers')}</h2>
         <p class="k-sub">${kt('albumSub')} · ${Store.kidsStickerCount}/${KIDS_THEMES.length}</p>
         <div class="k-album">
           ${KIDS_THEMES.map(th => {

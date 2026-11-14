@@ -737,3 +737,18 @@ body.kids.night .k-sub b { color: #ffe08a; }
 @keyframes mv-shiver { 0%, 100% { transform: translateX(-2px); } 50% { transform: translateX(2px); } }
 .k-opt .mv { animation-iteration-count: 2; }
 @media (prefers-reduced-motion: reduce) { .mv { animation: none !important; } }
+
+/* trophies */
+.k-trophies { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+.k-trophy {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 6px 10px; border-radius: 20px; text-align: center;
+  background: rgba(255, 255, 255, .65); border: 3px dashed rgba(29, 42, 91, .15); color: var(--k-ink);
+}
+.k-trophy.got { background: linear-gradient(#fff8dc, #ffe9a6); border: 3px solid #f4b400; box-shadow: 0 5px 0 #d99a00; }
+.k-trophy-pic { font-size: 2.4rem; line-height: 1.1; }
+.k-trophy:not(.got) .k-trophy-pic { font-size: 1.6rem; opacity: .6; }
+.k-trophy-name { font-size: .9rem; line-height: 1.2; }
+.k-trophy-bar { width: 80%; height: 8px; border-radius: 999px; background: #dfe6f7; overflow: hidden; }
+.k-trophy-bar i { display: block; height: 100%; background: #2fd093; border-radius: inherit; }
+.k-trophy small { font-size: .75rem; color: var(--k-ink); }
+body.kids.night .k-trophy:not(.got) { background: rgba(255, 255, 255, .85); }
