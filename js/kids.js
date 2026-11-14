@@ -164,6 +164,7 @@ const Kids = (() => {
       calmTip: 'כשהבלון גדל שואפים אוויר, כשהוא קטן נושפים', calmEnd: 'כל הכבוד. הגוף רגוע יותר עכשיו', calmHint: 'מרגישים כועסים או עצובים? אפשר לנשום עם הינשוף',
       ftree: 'המשפחה שלי', ftreeSub: 'בוחרים פרצוף לאמא, לאבא, לסבתא... ושומעים: This is my mom!', ftreeTip: 'לחצו על עיגול ובחרו פרצוף. אפשר להשאיר ריק',
       ftreeRead: 'הינשוף מספר על המשפחה', ftreeNone: 'בלי', ftreeMe: 'אני',
+      tipTitle: 'הטיפ של השבוע', tipTry: 'לנסות להגיד', tipWords: 'המילים החדשות של השבוע', tipMore: 'עוד טיפ',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -321,6 +322,7 @@ const Kids = (() => {
       calmTip: 'When the balloon grows, breathe in. When it shrinks, breathe out', calmEnd: 'Well done. Your body feels calmer now', calmHint: 'Feeling angry or sad? You can breathe with the owl',
       ftree: 'My family', ftreeSub: 'Pick a face for mom, dad, grandma... and hear: This is my mom!', ftreeTip: 'Tap a circle and pick a face. You can leave it empty',
       ftreeRead: 'The owl tells about my family', ftreeNone: 'None', ftreeMe: 'Me',
+      tipTitle: 'Tip of the week', tipTry: 'Try saying', tipWords: "This week's new words", tipMore: 'Another tip',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -5110,6 +5112,7 @@ const Kids = (() => {
               <span class="k-pc-n">${n}/${th.words.length}</span></div>`;
           }).join('')}
         </section>
+        ${tipBox()}
         ${remindBox()}
         ${weekBox()}
         <a class="k-btn ghost k-cert-btn" href="#/kids/cert">🏅 ${kt('certBtn')}${[5, 6].includes(new Date().getDay()) ? ` <span class="k-badge">${kt('certNew')}</span>` : ''}</a>
@@ -5141,7 +5144,36 @@ const Kids = (() => {
     $('#k-big').onchange = e => { Store.kidsBigPrint = e.target.checked; document.body.classList.toggle('kids-big', Store.kidsBigPrint); };
     $('#k-card').onclick = progressCard;
     remindWire();
+    tipWire();
     $('#k-bed').onchange = e => { Store.kidsBedtime = e.target.checked; document.body.classList.toggle('night', isNight()); };
+  }
+
+  // ---------- parent tip of the week ----------
+  // One small idea a week for bringing English into home life, with a phrase to try and this week's
+  // new words, so parents can use exactly what the child is learning. "Another tip" browses the rest.
+  let tipShift = 0;
+  function tipIndex() {
+    const d = new Date(); d.setDate(d.getDate() - d.getDay());
+    const week = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / (7 * 864e5));
+    return (week + tipShift) % KIDS_PARENT_TIPS.length;
+  }
+  function tipBox() {
+    const [title, text, phrase] = KIDS_PARENT_TIPS[tipIndex()];
+    const words = Store.kidsWeek().words.filter(w => !/\s/.test(w.en)).slice(0, 8);
+    return `
+      <section class="k-pc-box k-tip-box" id="k-tip-box">
+        <h2>💡 ${kt('tipTitle')}: ${title}</h2>
+        <p>${text}</p>
+        <button class="k-chip k-tip-say" id="k-tip-say">🔊 ${kt('tipTry')}: <b class="en" lang="en" dir="ltr">${phrase}</b></button>
+        ${words.length ? `<p class="k-tip-words"><small>${kt('tipWords')}:</small> <span class="en" lang="en" dir="ltr">${words.map(w => `${w.pic} ${w.en}`).join(' · ')}</span></p>` : ''}
+        <button class="k-skip" id="k-tip-more">🔀 ${kt('tipMore')}</button>
+      </section>`;
+  }
+  function tipWire() {
+    const say1 = $('#k-tip-say'), more = $('#k-tip-more');
+    if (!say1) return;
+    say1.onclick = () => sayEn(KIDS_PARENT_TIPS[tipIndex()][2], 0.85);
+    more.onclick = () => { tipShift++; $('#k-tip-box').outerHTML = tipBox(); tipWire(); };
   }
 
   // ---------- a gentle daily reminder for parents ----------

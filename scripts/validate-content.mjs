@@ -129,7 +129,7 @@ for (const id of Object.keys(EXPLAIN)) if (!GRAMMAR.some(g => g.id === id)) erro
   const kf = 'js/kids-data.js';
   const kctx = vm.createContext({});
   try {
-    vm.runInContext(fs.readFileSync(path.join(root, kf), 'utf8') + ';this.K = { KIDS_THEMES, KIDS_WORDS, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE, KIDS_RIDDLES, KIDS_MOVES, KIDS_WORDS, KIDS_HOLIDAYS, KIDS_PAIRS, KIDS_TIPS, KIDS_CVC, KIDS_SAYS, KIDS_PATH, KIDS_SIMON, KIDS_TWINS, KIDS_RHYMES, KIDS_WEAR, KIDS_QOTD, KIDS_SHAPE_HUNT, KIDS_MORNING, KIDS_FEEL_STORIES };', kctx, { filename: kf });
+    vm.runInContext(fs.readFileSync(path.join(root, kf), 'utf8') + ';this.K = { KIDS_THEMES, KIDS_WORDS, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE, KIDS_RIDDLES, KIDS_MOVES, KIDS_WORDS, KIDS_HOLIDAYS, KIDS_PAIRS, KIDS_TIPS, KIDS_CVC, KIDS_SAYS, KIDS_PATH, KIDS_SIMON, KIDS_TWINS, KIDS_RHYMES, KIDS_WEAR, KIDS_QOTD, KIDS_SHAPE_HUNT, KIDS_MORNING, KIDS_FEEL_STORIES, KIDS_PARENT_TIPS };', kctx, { filename: kf });
     loaded.push(kf);
     const { KIDS_THEMES, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE } = kctx.K;
     const ids = new Set(), stickers = new Set(KIDS_TREASURE);
@@ -180,6 +180,7 @@ for (const id of Object.keys(EXPLAIN)) if (!GRAMMAR.some(g => g.id === id)) erro
     for (const m of kctx.K.KIDS_MORNING) if (!hasEn(m.en) || !hasHe(m.he) || !str(m.pic)) errors.push(`kids morning step "${m.en}": needs English, Hebrew and a picture`);
     const feelWords = (kctx.K.KIDS_THEMES.find(t => t.id === 'feelings') || { words: [] }).words.map(w => w.en);
     for (const f of kctx.K.KIDS_FEEL_STORIES) if (!hasEn(f.en) || !hasHe(f.he) || !feelWords.includes(f.feel) || !hasHe(f.kindHe)) errors.push(`kids feelings story "${f.en}": needs English, Hebrew and a feeling from the feelings island`);
+    for (const [t, x, p] of kctx.K.KIDS_PARENT_TIPS) if (!hasHe(t) || !hasHe(x) || !hasEn(p)) errors.push(`kids parent tip "${t}": needs a Hebrew title and text and an English phrase`);
     for (const sg of KIDS_SONGS) if (!sg.lines.length || sg.lines.some(l => !l.length)) errors.push(`kids song "${sg.id}": empty line`);
     console.log(`kids          ${String(KIDS_THEMES.length).padStart(2)} islands · ${String(ids.size).padStart(3)} words ·  ${KIDS_STORIES.length} stories ·  ${KIDS_SONGS.length} songs`);
   } catch (e) { errors.push(`${kf}: does not run: ${e.message}`); }

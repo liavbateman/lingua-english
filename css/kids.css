@@ -1662,3 +1662,10 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-ft-face-btn { aspect-ratio: 1; border: 0; border-radius: 16px; background: #f3f6ff; font-size: 2rem; cursor: pointer; }
 .k-ft-face-btn.none { font: 700 .9rem var(--k-font); color: var(--k-muted); }
 .k-ft-slot:not(.on) .k-ft-face { opacity: .35; font-size: 1.6rem; }
+
+/* parent tip of the week */
+.k-tip-box { background: linear-gradient(135deg, #fffbe8, #fff); }
+.k-tip-box h2 { margin: 0 0 6px; }
+.k-tip-box p { margin: 0 0 8px; color: var(--k-ink); }
+.k-tip-say { margin: 2px 0 8px; }
+.k-tip-words small { color: var(--k-muted); }

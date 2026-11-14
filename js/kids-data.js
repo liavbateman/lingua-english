@@ -582,3 +582,20 @@ const KIDS_FEEL_STORIES = [
   { scene: '🐨🏃‍♂️🌙', en: 'The koala played all day. Now it is night.', he: 'הקואלה שיחקה כל היום. עכשיו לילה.', feel: 'tired', face: '😴', kind: 'Good night, koala. Sleep well.', kindHe: 'לילה טוב, קואלה. שינה טובה.', kpic: '🛏️' },
   { scene: '🐸🎈🐘', en: 'The frog opens the door and sees... an elephant!', he: 'הצפרדע פותחת את הדלת ורואה... פיל!', feel: 'surprised', face: '😮', kind: 'Wow! Hello, elephant!', kindHe: 'וואו! שלום, פיל!', kpic: '👋' }
 ];
+
+// Parent tips of the week (Hebrew, for the parents corner): small ways to bring English into home life.
+// [title, text, an English phrase to try]
+const KIDS_PARENT_TIPS = [
+  ['סופרים מדרגות', 'כשעולים במדרגות או מסדרים צעצועים, סופרים יחד באנגלית.', 'One, two, three, four!'],
+  ['מה יש באמבטיה?', 'באמבטיה שואלים איפה הצעצוע ונותנים לילד להצביע או לענות.', 'Where is the duck?'],
+  ['מדבקות בבית', 'מדביקים פתק עם שם באנגלית על שלושה חפצים בבית ומקריאים אותם כשעוברים לידם.', 'door, chair, lamp'],
+  ['מבקשים באנגלית', 'בארוחה הילד מבקש מנה אחת באנגלית. גם מילה אחת זה מצוין.', 'I want bread, please!'],
+  ['אני רואה משהו...', 'משחק צבעים בדרך: אומרים צבע באנגלית והילד מחפש משהו בצבע הזה.', 'I spy something red!'],
+  ['לילה טוב לצעצועים', 'לפני השינה אומרים לילה טוב באנגלית לכל צעצוע בחדר.', 'Good night, teddy!'],
+  ['הילד מלמד אתכם', 'בקשו מהילד ללמד אתכם שלוש מילים שלמד השבוע. ילדים זוכרים יותר כשהם מלמדים.', 'Can you teach me?'],
+  ['מחמאה על מאמץ', 'משבחים את הניסיון ולא רק את התשובה הנכונה. טעויות הן חלק מהלמידה.', 'Good try!'],
+  ['מעט אבל כל יום', 'חמש דקות ביום עדיפות על שעה פעם בשבוע. התזכורת העדינה בפינת ההורים יכולה לעזור.', 'See you tomorrow!'],
+  ['הינשוף אומר בסלון', 'משחקים "הינשוף אומר" בבית עם הוראות קטנות באנגלית.', 'Touch your nose! Jump!'],
+  ['בסופר', 'בסופר מבקשים מהילד למצוא פרי או ירק ולהגיד את שמו באנגלית.', 'Can you find a banana?'],
+  ['שירים באוטו', 'שרים יחד שיר מהאפליקציה בדרך לגן. החזרה בשירים מחזקת את הזיכרון.', 'Hello, hello, how are you?']
+];
