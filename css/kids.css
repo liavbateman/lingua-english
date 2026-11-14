@@ -1679,3 +1679,6 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 }
 /* a quoted English phrase inside Hebrew never breaks across lines ("What is / it?") */
 bdi.k-q { white-space: nowrap; }
+
+/* the back link is a small pill, not a full-width bar, on play screens too (they stretch their children) */
+.k-play > .k-back { align-self: flex-start; }
