@@ -2049,6 +2049,8 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
   .welcome .wl-lvl { padding-block: 10px; }
   .welcome .wl-lvl .lvl-desc { font-size: .8rem; }
 }
+/* the smallest phones (568px tall): without the owl the whole sheet, its last line of advice included, fits */
+@media (max-height: 600px) { .wl-owl { display: none; } .welcome { padding-top: 14px; } }
 
 /* ---------- Today screen: one big next-lesson card and a short task list ---------- */
 .tabbar a[data-tab="home"] { --tc: #ffc53d; }
