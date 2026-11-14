@@ -134,6 +134,8 @@ const Kids = (() => {
       mybook: 'הספר הראשון שלי באנגלית', mybookSub: 'כל אי שמסיימים מוסיף עמוד עם המילים שלכם', mybookEmpty: 'סיימו אי ראשון וקבלו את העמוד הראשון בספר!',
       mybookRead: 'הקראה', mybookPage: 'עמוד {a} מתוך {b}',
       shunt: 'ציד צורות', shuntSub: 'איפה יש עיגול? שעון, כדור, עוגייה! מוצאים צורות בכל מקום', shuntTip: 'מצאו את כל הדברים בצורה הזאת', shuntLeft: 'עוד {n}',
+      brush: 'מצחצחים שיניים עם הינשוף', brushSub: '2 דקות של צחצוח עם הוראות באנגלית: top, bottom, left, right', brushGo: 'מתחילים לצחצח!',
+      brushStop: 'עצירה', brushTip: 'מצחצחים יחד עם הינשוף. החלק שמאיר הוא החלק לצחצח', brushDone: 'שיניים נקיות ונוצצות!',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -261,6 +263,8 @@ const Kids = (() => {
       mybook: 'My first English book', mybookSub: 'Every island you finish adds a page with your words', mybookEmpty: 'Finish your first island to get the first page of your book!',
       mybookRead: 'Read to me', mybookPage: 'Page {a} of {b}',
       shunt: 'Shape hunt', shuntSub: 'Where is a circle? A clock, a ball, a cookie! Shapes are everywhere', shuntTip: 'Find all the things with this shape', shuntLeft: '{n} more',
+      brush: 'Brush your teeth with the owl', brushSub: '2 minutes of brushing with English steps: top, bottom, left, right', brushGo: "Let's brush!",
+      brushStop: 'Stop', brushTip: 'Brush along with the owl. Brush the part that lights up', brushDone: 'Clean, shiny teeth!',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -680,6 +684,10 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🔍</span>
           <span class="grow"><b>${kt('shunt')}</b><small>${kt('shuntSub')}</small></span>
           ${Store.kidsHasSticker('shunt') ? starsHtml(Store.kidsStars('shunt'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-brush-card" href="#/kids/brush">
+          <span class="k-story-books" aria-hidden="true">🦷</span>
+          <span class="grow"><b>${kt('brush')}</b><small>${kt('brushSub')}</small></span>
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -3078,6 +3086,103 @@ const Kids = (() => {
     round();
   }
 
+  // ---------- brush your teeth with the owl: a 2-minute routine in English ----------
+  // Eight 15-second steps ("Brush the top teeth!", "Now the left side!") with a mouth picture that lights
+  // the part to brush, a soft beat and the owl counting "one, two, three...". A real daily routine in English.
+  let brushTimer = null;
+  const BRUSH = [
+    { say: 'Brush the top teeth!', he: 'השיניים העליונות', zone: 'top' },
+    { say: 'Brush the bottom teeth!', he: 'השיניים התחתונות', zone: 'bottom' },
+    { say: 'Brush the front teeth!', he: 'השיניים הקדמיות', zone: 'front' },
+    { say: 'Now the left side!', he: 'הצד השמאלי', zone: 'left' },
+    { say: 'Now the right side!', he: 'הצד הימני', zone: 'right' },
+    { say: 'Brush the back teeth!', he: 'השיניים האחוריות', zone: 'back' },
+    { say: 'Brush your tongue!', he: 'הלשון', zone: 'tongue' },
+    { say: 'Spit and rinse! All done!', he: 'יורקים ושוטפים', zone: 'all' }
+  ];
+  function mouthSvg() {
+    const tooth = (row, i) => `<rect class="k-tooth" data-row="${row}" data-x="${i}" x="${24 + i * 19.5}" y="${row === 'top' ? 34 : 74}" width="17" height="${row === 'top' ? 20 : 18}" rx="5"/>`;
+    return `<svg class="k-mouth" viewBox="0 0 200 130" aria-hidden="true">
+      <ellipse cx="100" cy="64" rx="96" ry="60" class="k-lips"/>
+      <ellipse cx="100" cy="64" rx="84" ry="48" class="k-mouth-in"/>
+      ${Array.from({ length: 8 }, (_, i) => tooth('top', i)).join('')}
+      ${Array.from({ length: 8 }, (_, i) => tooth('bottom', i)).join('')}
+      <ellipse cx="100" cy="68" rx="34" ry="10" class="k-tongue"/>
+    </svg>`;
+  }
+  function brushGame(fast) {
+    K.endLesson();
+    clearInterval(brushTimer);
+    const STEP = fast ? 1200 : 15000;
+    const NUMS = ['one', 'two', 'three', 'four', 'five'];
+    K.view.innerHTML = `
+      <div class="k-wrap k-brush">
+        <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
+        <h1 class="k-title">🦷 ${kt('brush')}</h1>
+        <div class="k-brush-stage">${mouthSvg()}<span class="k-brush-tool" aria-hidden="true"></span></div>
+        <p class="k-brush-line en" lang="en" aria-live="polite">&nbsp;</p>
+        <p class="k-brush-he he">&nbsp;</p>
+        <div class="k-brush-bar" aria-hidden="true"><i></i></div>
+        <button class="k-btn" id="k-brush-go">🦷 ${kt('brushGo')}</button>
+        ${owl(kt('brushTip'), 'small')}
+      </div>`;
+    const light = zone => {
+      K.view.querySelectorAll('.k-tooth').forEach(t => {
+        const x = +t.dataset.x, row = t.dataset.row;
+        const on = zone === 'all' || zone === row || (zone === 'front' && x >= 2 && x <= 5) || (zone === 'back' && (x <= 1 || x >= 6))
+          || (zone === 'left' && x <= 3) || (zone === 'right' && x >= 4);
+        t.classList.toggle('on', on);
+      });
+      $('.k-tongue').classList.toggle('on', zone === 'tongue');
+      $('.k-brush-stage').dataset.zone = zone;
+    };
+    let at = -1, t0 = 0, counted = -1, beat = -1;
+    function stop(done) {
+      clearInterval(brushTimer); brushTimer = null;
+      const go = $('#k-brush-go');
+      if (!go) return;
+      go.innerHTML = `🦷 ${kt('brushGo')}`;
+      $('.k-brush-stage').classList.remove('brushing');
+      if (done) {
+        light('all');
+        $('.k-brush-line').textContent = 'Clean, shiny teeth! ✨';
+        $('.k-brush-he').textContent = kt('brushDone');
+        Store.kidsFinish('brush', 3, 15);
+        celebrate();
+      }
+    }
+    function tick() {
+      if (!$('.k-brush')) return stop();
+      const el = Date.now() - t0, step = Math.floor(el / STEP), into = el - step * STEP;
+      $('.k-brush-bar i').style.width = `${Math.min(100, el / (STEP * BRUSH.length) * 100)}%`;
+      if (step >= BRUSH.length) return stop(true);
+      if (step !== at) {
+        at = step; counted = -1;
+        const b = BRUSH[at];
+        light(b.zone);
+        $('.k-brush-line').textContent = b.say;
+        $('.k-brush-he').textContent = b.he;
+        speechSynthesis.cancel();
+        sayEn(b.say, 0.85);
+        note(523 + at * 40, .3);
+      } else if (!fast) {
+        // count along: one..five, a number every two seconds after the step is said
+        const n = Math.floor((into - 3000) / 2000);
+        if (into > 3000 && n < 5 && n > counted) { counted = n; sayEn(NUMS[n], 1); }
+        const sec = Math.floor(el / 1000);
+        if (sec !== beat) { beat = sec; note(at % 2 ? 262 : 330, .08); }
+      }
+    }
+    $('#k-brush-go').onclick = () => {
+      if (brushTimer) return stop();
+      at = -1; t0 = Date.now();
+      $('.k-brush-stage').classList.add('brushing');
+      $('#k-brush-go').innerHTML = `⏹️ ${kt('brushStop')}`;
+      brushTimer = setInterval(tick, 250);
+      tick();
+    };
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -5112,6 +5217,7 @@ const Kids = (() => {
       clearInterval(speedTimer);
       clearInterval(callTimer);
       clearInterval(bandTimer);
+      clearInterval(brushTimer);
       stopRec();
       stopRecording();
       clearHands();
@@ -5133,6 +5239,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'brush') brushGame(b === 'fast');
       else if (a === 'shunt') shuntGame();
       else if (a === 'mybook') myBook();
       else if (a === 'safari') safariGame();

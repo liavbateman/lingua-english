@@ -1416,3 +1416,27 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-sh-thing.got.sh-triangle::after { border: 0; inset: 2px;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,6 95,92 5,92' fill='none' stroke='%23e0457b' stroke-width='6' stroke-linejoin='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
 .k-sh-thing.puff { animation: k-puff .5s ease-out; }
+
+/* brush your teeth */
+.k-brush { text-align: center; }
+.k-brush-stage { position: relative; padding: 14px; border-radius: 26px; background: #fff; box-shadow: 0 6px 0 var(--k-edge); }
+.k-mouth { width: 100%; max-width: 320px; height: auto; }
+.k-lips { fill: #ff8fab; }
+.k-mouth-in { fill: #7a1f3d; }
+.k-tooth { fill: #f4f4f4; stroke: #d0d0d0; stroke-width: 1.5; transition: fill .3s; }
+.k-tooth.on { fill: #fff; stroke: #2fd093; stroke-width: 3; }
+.k-tongue { fill: #e0607e; transition: fill .3s; }
+.k-tongue.on { fill: #ff9fb6; stroke: #2fd093; stroke-width: 3; }
+.k-brush-tool { position: absolute; left: 50%; top: 40%; width: 86px; height: 12px; border-radius: 8px; background: #3f7bff; opacity: 0;
+  transform: translate(-50%, -50%); pointer-events: none; box-shadow: 0 2px 4px rgba(0, 0, 0, .25); }
+.k-brush-tool::before { content: ''; position: absolute; left: 4px; top: -12px; width: 26px; height: 12px; border-radius: 3px 3px 0 0;
+  background: repeating-linear-gradient(90deg, #fff 0 3px, #cfe3ff 3px 5px); }
+.k-brush-stage.brushing .k-brush-tool { opacity: 1; animation: k-brush-scrub .5s ease-in-out infinite alternate; }
+@keyframes k-brush-scrub { from { transform: translate(-70%, -50%) rotate(-10deg); } to { transform: translate(-30%, -50%) rotate(10deg); } }
+.k-brush-stage[data-zone="top"] .k-brush-tool { top: 32%; } .k-brush-stage[data-zone="bottom"] .k-brush-tool { top: 66%; }
+.k-brush-stage[data-zone="left"] .k-brush-tool { left: 28%; } .k-brush-stage[data-zone="right"] .k-brush-tool { left: 72%; }
+.k-brush-line { min-height: 1.4em; margin: 14px 0 0; font: 700 1.5rem var(--k-font); color: #ffe9a6; }
+.k-brush-he { min-height: 1.2em; margin: 2px 0 10px; color: #fff; }
+.k-brush-bar { height: 12px; margin: 0 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, .25); overflow: hidden; }
+.k-brush-bar i { display: block; width: 0; height: 100%; background: #2fd093; border-radius: inherit; transition: width .25s linear; }
+@media (prefers-reduced-motion: reduce) { .k-brush-stage.brushing .k-brush-tool { animation: none; } }
