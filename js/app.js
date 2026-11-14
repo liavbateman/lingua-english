@@ -2750,6 +2750,9 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   // a short option is repeated in the row's label; a whole sentence is not (the row itself shows it)
   const short = x => x && String(x).length <= 28 ? ` <span dir="auto">${esc(x)}</span>` : '';
+  // A row's tag names the choice ("You chose teacher"). A whole sentence is too long for the tag, and its body
+  // already shows it in full, so then the tag is a label of its own ("Your choice" / "The right answer")
+  const tagFor = (key, x, body) => short(x) && !String(body).includes(esc(x)) ? t(key) + short(x) : t(key + '.solo');
   function whyHtml({ picked, pickedWhy, answer, answerWhy, typed, rule }) {
     if (!pickedWhy && !answerWhy) return '';
     // a grammar answer can open a short reminder of its rule right here, without leaving the round
@@ -2760,8 +2763,8 @@
       </details>` : '';
     return `<div class="fb-why">
       <b class="fb-why-h"><img src="icons/owl-192.png" alt="" width="22" height="22"> ${t('why.title')}</b>
-      ${pickedWhy ? `<div class="why-row no"><span class="why-tag">✗ ${t(typed ? 'why.typed' : 'why.picked')}${short(picked)}</span><p>${pickedWhy}</p></div>` : ''}
-      ${answerWhy ? `<div class="why-row ok"><span class="why-tag">✓ ${t('why.answer')}${short(answer)}</span><p>${answerWhy}</p></div>` : ''}
+      ${pickedWhy ? `<div class="why-row no"><span class="why-tag">✗ ${tagFor(typed ? 'why.typed' : 'why.picked', picked, pickedWhy)}</span><p>${pickedWhy}</p></div>` : ''}
+      ${answerWhy ? `<div class="why-row ok"><span class="why-tag">✓ ${tagFor('why.answer', answer, answerWhy)}</span><p>${answerWhy}</p></div>` : ''}
       ${ruleBox}
     </div>`;
   }
