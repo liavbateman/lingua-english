@@ -1737,3 +1737,4 @@ bdi.k-q { white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { .k-pulse-once { animation: none; } }
 .k-band-animal.on { background: #fff1c2; box-shadow: 0 4px 0 #f2c94c; }
 .k-leaf-spot.nope { opacity: .45; filter: grayscale(.7); transition: opacity .6s .4s, filter .6s .4s; }
+.k-sh-thing.nope { opacity: .4; filter: grayscale(.8); }

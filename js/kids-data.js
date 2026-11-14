@@ -565,7 +565,7 @@ const KIDS_QOTD = [
 const KIDS_SHAPE_HUNT = {
   circle: { he: 'עיגול', mark: '⚪', things: [['clock', '🕐'], ['ball', '⚽'], ['cookie', '🍪'], ['donut', '🍩'], ['orange', '🍊'], ['button', '🔘']] },
   square: { he: 'ריבוע', mark: '🟧', things: [['present', '🎁'], ['picture', '🖼️'], ['waffle', '🧇'], ['box', '📦'], ['window', '🪟']] },
-  triangle: { he: 'משולש', mark: '🔺', things: [['pizza', '🍕'], ['tent', '⛺'], ['tree', '🎄'], ['cheese', '🧀'], ['ruler', '📐']] }
+  triangle: { he: 'משולש', mark: '🔺', things: [['pizza slice', '🍕'], ['tent', '⛺'], ['tree', '🎄'], ['piece of cheese', '🧀'], ['ruler', '📐']] }
 };
 
 // Morning routine: daily-life actions in order

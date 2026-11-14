@@ -3378,6 +3378,8 @@ const Kids = (() => {
             }
           } else {
             misses++;
+            b.disabled = true;           // one mistake per thing; it stays visible (greyed) with its own shape named
+            b.classList.add('nope');
             b.classList.remove('puff'); void b.offsetWidth; b.classList.add('puff');
             K.Feel.wrong(b);
             owlMood('think');
