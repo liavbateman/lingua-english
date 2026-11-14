@@ -127,6 +127,8 @@ const Kids = (() => {
       bandPlay: 'לנגן', bandStop: 'עצור',
       prBtn: 'דף עבודה להדפסה', prTitle: 'דף ציור ועקיבה', prSub: 'המילים של השבוע: מציירים את התמונה בריבוע ועוברים בעיפרון על המילה',
       prPrint: 'הדפסה', prNew: 'מילים אחרות', prName: 'Name', prDraw: 'Draw it!',
+      tmap: 'מפת האוצר של השבוע', tmapSub: '5 תחנות עם המילים של השבוע, ובסוף תיבת אוצר', tmapTip: 'לחצו על התחנה הבאה במפה',
+      tmapDone: 'מצאתם את האוצר! מפה חדשה מחכה ביום ראשון', tmapStop: 'תחנה {n}', tmapIs: 'זה',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -247,6 +249,8 @@ const Kids = (() => {
       bandPlay: 'Play', bandStop: 'Stop',
       prBtn: 'Practice page to print', prTitle: 'Draw and trace page', prSub: "This week's words: draw the picture in the box and trace the word with a pencil",
       prPrint: 'Print', prNew: 'Other words', prName: 'Name', prDraw: 'Draw it!',
+      tmap: "This week's treasure map", tmapSub: "5 stops with this week's words and a treasure chest at the end", tmapTip: 'Tap the next stop on the map',
+      tmapDone: 'You found the treasure! A new map is waiting on Sunday', tmapStop: 'Stop {n}', tmapIs: 'Is it',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -650,6 +654,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🥁</span>
           <span class="grow"><b>${kt('band')}</b><small>${bidiEn(kt('bandSub'))}</small></span>
           ${Store.kidsHasSticker('band') ? starsHtml(Store.kidsStars('band'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-tmap-card" href="#/kids/tmap">
+          <span class="k-story-books" aria-hidden="true">🗺️</span>
+          <span class="grow"><b>${kt('tmap')}</b><small>${kt('tmapSub')}</small></span>
+          <span class="k-story-count">${Store.kidsTmap().done}/5</span>
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -2728,6 +2737,116 @@ const Kids = (() => {
     $('#k-pr-new').onclick = () => printPage(true);
   }
 
+  // ---------- the weekly treasure map ----------
+  // Five stops along a path; each stop is three quick questions with this week's words, mixing
+  // "hear it, tap the picture", "which word is this?" and "is this a cat? yes/no". The fifth stop opens
+  // a treasure chest. Progress stays all week; a new map starts on Sunday.
+  const TMAP_STOPS = ['🌴', '🌉', '⛰️', '🌋', '🏝️'];
+  function tmapWords() {
+    const DRAW = ['animals', 'food', 'family', 'body', 'toys', 'go', 'clothes', 'sky', 'home', 'shapes', 'school'];
+    const ok = w => DRAW.includes(String(w.id).split('/')[0]) && !/\s/.test(w.en);
+    const week = Store.kidsWeek().words.filter(ok);
+    const known = KIDS_WORDS.filter(w => Store.kidsWordCount(w.id) > 0).filter(ok);
+    let pool = [...week, ...known.filter(w => !week.includes(w))];
+    if (pool.length < 6) pool = [...pool, ...KIDS_WORDS.filter(ok).filter(w => !pool.includes(w))].slice(0, 8);
+    return pool.slice(0, 12);
+  }
+  function tmapScreen() {
+    K.endLesson();
+    const t = Store.kidsTmap();
+    K.view.innerHTML = `
+      <div class="k-wrap">
+        <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
+        <h1 class="k-title">🗺️ ${kt('tmap')}</h1>
+        <div class="k-tmap">
+          <svg class="k-tmap-path" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M50 92 C 36 86, 24 80, 28 72 S 66 61, 62 55 S 25 44, 30 37 S 70 26, 66 20 S 52 11, 50 7"/></svg>
+          ${TMAP_STOPS.map((pic, i) => {
+            const state = i < t.done ? 'done' : i === t.done ? 'next' : 'lock';
+            return `<button class="k-tmap-stop ${state} s${i}" data-i="${i}" ${state === 'next' ? '' : 'disabled'} aria-label="${kt('tmapStop', { n: i + 1 })}">
+              <span aria-hidden="true">${state === 'done' ? '✅' : pic}</span><small>${i + 1}</small></button>`;
+          }).join('')}
+          <div class="k-tmap-chest ${t.done >= 5 ? 'open' : ''}" aria-hidden="true">${t.done >= 5 ? '💰' : '🧰'}</div>
+        </div>
+        ${owl(t.done >= 5 ? kt('tmapDone') : kt('tmapTip'), 'small')}
+      </div>`;
+    const next = K.view.querySelector('.k-tmap-stop.next');
+    if (next) next.onclick = () => tmapStop(t.done);
+  }
+  function tmapStop(n) {
+    document.body.classList.add('in-lesson');
+    const words = tmapWords();
+    const kinds = little() ? ['hear', 'yesno', 'hear'] : K.shuffle(['hear', 'read', 'yesno']);
+    const qs = K.shuffle(words).slice(0, 3).map((w, i) => ({ w, kind: kinds[i] }));
+    let at = 0;
+    function q() {
+      K.lessonBar(at / qs.length);
+      const { w, kind } = qs[at];
+      const others = K.shuffle(words.filter(x => x !== w && x.pic !== w.pic)).slice(0, 2);
+      const head = `<p class="k-step"><span aria-hidden="true">${TMAP_STOPS[n]}</span> ${kt('tmapStop', { n: n + 1 })} · ${at + 1}/3</p>`;
+      const good = () => {
+        K.Feel.right();
+        Store.kidsWordRight(w.id);
+        owlMood('cheer');
+        sayEn(`Yes! ${w.en}!`, 0.9);
+        setTimeout(() => { at++; at < qs.length ? q() : done(); }, 1300);
+      };
+      const bad = b => { K.Feel.wrong(b); owlMood('think'); $('.k-bubble').textContent = kt('tryAgain'); };
+      if (kind === 'hear') {
+        const opts = K.shuffle([w, ...others]);
+        K.view.innerHTML = `<div class="k-wrap k-play">${head}
+          <div class="k-prompt"><button class="k-speaker" id="k-say" aria-label="${kt('listen')}"><span aria-hidden="true">🔊</span></button></div>
+          <div class="k-opts">${opts.map((o, i) => `<button class="k-opt" data-i="${i}" aria-label="${o.en}"><span aria-hidden="true">${o.pic}</span></button>`).join('')}</div>
+          ${owl(kt('listen'), 'small')}</div>`;
+        const ask = () => sayEn(w.en, 0.85);
+        $('#k-say').onclick = ask; setTimeout(ask, 300);
+        K.view.querySelectorAll('.k-opt').forEach(b => { b.onclick = () => { if (opts[+b.dataset.i] === w) { K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; }); b.classList.add('right'); good(); } else bad(b); }; });
+      } else if (kind === 'read') {
+        const opts = K.shuffle([w, ...others]);
+        K.view.innerHTML = `<div class="k-wrap k-play">${head}
+          <div class="k-card k-meet"><span class="k-pic" aria-hidden="true">${w.pic}</span></div>
+          <div class="k-tmap-words">${opts.map((o, i) => `<button class="k-btn ghost en" data-i="${i}" lang="en">${o.en}</button>`).join('')}</div>
+          ${owl(kt('tmapIs') + '…?', 'small')}</div>`;
+        K.view.querySelectorAll('.k-tmap-words button').forEach(b => { b.onclick = () => { const o = opts[+b.dataset.i]; sayEn(o.en, 0.9); if (o === w) { K.view.querySelectorAll('.k-tmap-words button').forEach(x => { x.disabled = true; }); b.classList.add('right'); good(); } else bad(b); }; });
+      } else {
+        const truth = Math.random() < .5, shown = truth ? w : others[0];
+        const line = `Is it ${/^[aeiou]/.test(w.en) ? 'an' : 'a'} ${w.en}?`;
+        K.view.innerHTML = `<div class="k-wrap k-play">${head}
+          <div class="k-card k-meet"><span class="k-pic" aria-hidden="true">${shown.pic}</span><span class="k-word en" lang="en">${line}</span></div>
+          <div class="k-tmap-yn"><button class="k-btn" data-a="yes">👍 Yes</button><button class="k-btn ghost" data-a="no">👎 No</button></div>
+          ${owl(kt('tmapIs') + '…?', 'small')}</div>`;
+        setTimeout(() => sayEn(line, 0.85), 300);
+        K.view.querySelectorAll('.k-tmap-yn button').forEach(b => {
+          b.onclick = () => {
+            if ((b.dataset.a === 'yes') === truth) {
+              K.view.querySelectorAll('.k-tmap-yn button').forEach(x => { x.disabled = true; });
+              b.classList.add('right');
+              if (!truth) { $('.k-bubble').textContent = `${shown.en}! · ${shown.he}`; sayEn(`No! It is ${/^[aeiou]/.test(shown.en) ? 'an' : 'a'} ${shown.en}!`, 0.9); setTimeout(() => { at++; at < qs.length ? q() : done(); }, 1700); K.Feel.right(); owlMood('cheer'); }
+              else good();
+            } else bad(b);
+          };
+        });
+      }
+    }
+    function done() {
+      K.endLesson(1);
+      const d = Store.kidsTmapStep();
+      if (d >= 5) {
+        Store.kidsFinish('tmap', 3, 30);
+        K.view.innerHTML = `<div class="k-wrap k-play k-end"><div class="k-end-card">
+            <div class="k-tmap-open" aria-hidden="true">💰</div><h1>🏆 ${kt('tmapDone')}</h1>${starsHtml(3, 'big pop')}</div>
+          <button class="k-btn" id="k-tmap-back">🗺️ ${kt('tmap')}</button><a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a></div>`;
+        $('#k-tmap-back').onclick = tmapScreen;
+        celebrate();
+        sayEn('You found the treasure! Hooray!', 0.9);
+      } else {
+        Sfx.star(d);
+        tmapScreen();   // the stop runs on the map's own address, so redraw the map directly
+        setTimeout(() => sayEn(`Stop ${d}! Well done!`, 0.9), 300);
+      }
+    }
+    q();
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -4736,6 +4855,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'tmap') tmapScreen();
       else if (a === 'band') bandGame();
       else if (a === 'talk') talkGame();
       else if (a === 'teddy') teddyGame();

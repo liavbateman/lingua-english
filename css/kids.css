@@ -1334,3 +1334,24 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
   .k-print-word { font-size: 3rem; }
   .k-print-pic { filter: grayscale(1); }
 }
+
+/* weekly treasure map */
+.k-tmap { position: relative; height: 470px; border-radius: 28px; overflow: hidden; direction: ltr;
+  background: radial-gradient(circle at 20% 80%, #ffe2a8 0 18%, transparent 19%), linear-gradient(#bfe9ff, #9fdc8c 30%, #f6d98f); box-shadow: 0 6px 0 var(--k-edge); }
+.k-tmap-path { position: absolute; inset: 0; width: 100%; height: 100%; }
+.k-tmap-path path { fill: none; stroke: #8a5a2b; stroke-width: 3; stroke-dasharray: 6 6; vector-effect: non-scaling-stroke; }
+.k-tmap-stop { position: absolute; width: 72px; height: 72px; margin: -36px 0 0 -36px; border: 0; border-radius: 50%; background: #fff; font-size: 2.2rem;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, .2); display: grid; place-items: center; }
+.k-tmap-stop small { position: absolute; bottom: -6px; right: -4px; width: 24px; height: 24px; border-radius: 50%; background: #1d2a5b; color: #fff; font: 700 .8rem/24px var(--k-font); }
+.k-tmap-stop.lock { opacity: .55; filter: grayscale(.7); }
+.k-tmap-stop.done { background: #d8fbe9; }
+.k-tmap-stop.next { cursor: pointer; animation: k-boing 1.2s ease-in-out infinite; box-shadow: 0 0 0 6px rgba(255, 216, 77, .8), 0 5px 0 rgba(0, 0, 0, .2); }
+.k-tmap-stop.s0 { left: 50%; top: 92%; } .k-tmap-stop.s1 { left: 28%; top: 72%; } .k-tmap-stop.s2 { left: 62%; top: 55%; }
+.k-tmap-stop.s3 { left: 30%; top: 37%; } .k-tmap-stop.s4 { left: 66%; top: 20%; }
+.k-tmap-chest { position: absolute; left: 50%; top: 2%; transform: translateX(-50%); font-size: 3rem; }
+.k-tmap-chest.open { animation: k-boing 1s ease-in-out infinite; filter: drop-shadow(0 0 12px #ffd84d); }
+.k-tmap-words { display: grid; gap: 8px; margin: 14px 0; }
+.k-tmap-words .right, .k-tmap-yn .right { background: #2fd093; color: #fff; }
+.k-tmap-yn { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+.k-tmap-open { font-size: 5rem; animation: k-pop .6s var(--ease-pop) both; }
+@media (prefers-reduced-motion: reduce) { .k-tmap-stop.next, .k-tmap-chest.open { animation: none; } }

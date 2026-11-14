@@ -191,6 +191,19 @@ const Store = (() => {
     get kidsRemind() { const r = (state.kids && state.kids.remind) || {}; return { on: !!r.on, time: r.time || '17:00', last: r.last || '' }; },
     set kidsRemind(v) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.remind = { ...this.kidsRemind, ...v }; save(); },
     // The last 7 days for the weekly note: words first got right, and play time per day (oldest first)
+    // The weekly treasure map: how many of its 5 stops are done this week (Sunday starts a new map)
+    kidsTmap() {
+      const d = new Date(); d.setDate(d.getDate() - d.getDay());
+      const week = dayKey(d), t = (state.kids && state.kids.tmap) || {};
+      return t.week === week ? { week, done: t.done || 0 } : { week, done: 0 };
+    },
+    kidsTmapStep() {
+      state.kids = state.kids || { stars: {}, stickers: {}, words: {} };
+      const t = this.kidsTmap();
+      state.kids.tmap = { week: t.week, done: Math.min(5, t.done + 1) };
+      save();
+      return state.kids.tmap.done;
+    },
     // Words first got right on one day (for the bedtime lullaby: "today's new words")
     kidsWordsOn(key) { const first = (state.kids && state.kids.first) || {}; return KIDS_WORDS.filter(w => first[w.id] === key); },
     kidsWeek() {
