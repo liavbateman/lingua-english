@@ -1735,3 +1735,4 @@ bdi.k-q { white-space: nowrap; }
 .k-pair-opt.say { opacity: 1; filter: none; box-shadow: 0 7px 0 var(--k-edge), 0 0 0 6px #fde68a; transform: scale(1.04); transition: transform .2s; }
 .k-pulse-once { animation: k-pulse .6s ease-in-out 2; }
 @media (prefers-reduced-motion: reduce) { .k-pulse-once { animation: none; } }
+.k-band-animal.on { background: #fff1c2; box-shadow: 0 4px 0 #f2c94c; }

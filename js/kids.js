@@ -2987,6 +2987,8 @@ const Kids = (() => {
         ${owl(kt('bandTip'), 'small')}
       </div>`;
     const drawStage = () => {
+      // the picker shows who is already on stage
+      K.view.querySelectorAll('.k-band-animal').forEach(b => b.classList.toggle('on', stage.includes(animals[+b.dataset.i])));
       $('#k-stage').innerHTML = [0, 1, 2, 3].map(i => stage[i]
         ? `<button class="k-band-seat on" data-s="${i}" aria-label="${stage[i].en}"><span aria-hidden="true">${stage[i].pic}</span></button>`
         : `<span class="k-band-seat" aria-hidden="true">🎤</span>`).join('');
@@ -2996,7 +2998,6 @@ const Kids = (() => {
     };
     const tick = () => {
       if (!$('#k-stage')) return stop();
-      note(beat % 2 ? 196 : 131, .18);
       if (!stage.length) return;
       const i = beat % stage.length, a = stage[i];
       const seat = K.view.querySelector(`.k-band-seat[data-s="${i}"]`);
@@ -3006,13 +3007,20 @@ const Kids = (() => {
       sayEn(`${a.says}!`, 1.1);
       beat++;
     };
-    const play = () => { clearInterval(bandTimer); bandTimer = setInterval(tick, 1300); tick(); $('#k-band-go').innerHTML = `⏸️ ${kt('bandStop')}`; };
-    function stop() { clearInterval(bandTimer); bandTimer = null; const g = $('#k-band-go'); if (g) g.innerHTML = `▶️ ${kt('bandPlay')}`; }
+    // the songs' backing band (soft chords + beat) plays under the animals, one animal per bar
+    // one animal every 1304 ms = two beats at 92 bpm
+    const play = () => { clearInterval(bandTimer); bandTimer = setInterval(tick, 1304); songBand.start(92); tick(); $('#k-band-go').innerHTML = `⏸️ ${kt('bandStop')}`; };
+    function stop() { clearInterval(bandTimer); bandTimer = null; songBand.stop(true); const g = $('#k-band-go'); if (g) g.innerHTML = `▶️ ${kt('bandPlay')}`; }
     $('#k-band-go').onclick = () => (bandTimer ? stop() : play());
     K.view.querySelectorAll('.k-band-animal').forEach(b => {
       b.onclick = () => {
         const a = animals[+b.dataset.i];
-        if (stage.includes(a)) return;
+        if (stage.includes(a)) {   // already playing: it says hello again
+          speechSynthesis.cancel();
+          sayEn(`The ${a.en} says ${a.says}!`, 0.9);
+          $('.k-band-line').textContent = `The ${a.en} says ${a.says}!`;
+          return;
+        }
         if (stage.length >= 4) stage.shift();
         stage.push(a);
         drawStage();
