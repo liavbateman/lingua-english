@@ -499,3 +499,11 @@ const KIDS_PATH = {
     swim: { scene: '🏊🐟💦', en: 'We swim with the fish. The water is cold!', he: 'שוחים עם הדג. המים קרים!', end: true }
   }
 };
+
+// Simon says: little body commands the child acts out (TPR - learning by moving)
+const KIDS_SIMON = [
+  ['Touch your nose!', 'געו באף', '👃'], ['Clap your hands!', 'מחאו כפיים', '👏'], ['Jump!', 'קפצו', '🦘'],
+  ['Wave your hand!', 'נופפו ביד', '👋'], ['Touch your ears!', 'געו באוזניים', '👂'], ['Stamp your feet!', 'רקעו ברגליים', '🦶'],
+  ['Turn around!', 'הסתובבו', '🔄'], ['Sit down!', 'שבו', '🪑'], ['Stand up!', 'קומו', '🧍'], ['Open your mouth!', 'פתחו את הפה', '👄'],
+  ['Touch your head!', 'געו בראש', '🙆'], ['Be a cat! Meow!', 'תהיו חתול! מיאו!', '🐱']
+].map(([en, he, pic]) => ({ en, he, pic }));

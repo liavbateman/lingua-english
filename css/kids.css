@@ -1073,3 +1073,10 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 /* progress card preview */
 .k-card-preview img { width: 100%; border-radius: 18px; box-shadow: 0 4px 12px rgba(20, 40, 110, .25); }
 .k-card-preview .k-btn { margin-top: 6px; }
+
+/* owl says */
+.k-simon .k-pic { animation: k-boing 1.2s ease-in-out infinite; }
+.k-simon-ring { height: 12px; margin: 16px 6px 4px; border-radius: 999px; background: rgba(255, 255, 255, .5); overflow: hidden; }
+.k-simon-ring i { display: block; height: 100%; width: 0; border-radius: inherit; background: #2fd093; animation: k-fill 2.6s linear forwards; }
+@keyframes k-fill { to { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .k-simon .k-pic { animation: none; } .k-simon-ring i { animation-duration: .01s; } }

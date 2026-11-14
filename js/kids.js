@@ -105,6 +105,7 @@ const Kids = (() => {
       calTitle: 'לוח המדבקות שלי', calSub: 'כל יום שמשחקים מקבל מדבקה', calCount: '{n} ימי משחק החודש',
       hide: 'מחבואים', hideSub: 'איפה הינשוף? מתחת, על, בתוך, מאחורי', hideTip: 'הקשיבו איפה הינשוף התחבא ולחצו שם',
       cardBtn: 'כרטיס התקדמות לשיתוף', cardTitle: 'כרטיס התקדמות', cardShare: 'שיתוף', cardSave: 'שמירת תמונה', cardClose: 'סגירה',
+      simon: 'הינשוף אומר', simonSub: 'עושים מה שהינשוף אומר: לגעת באף, לקפוץ, למחוא כפיים', simonDid: 'עשיתי!', simonTip: 'עשו את התנועה ואז לחצו "עשיתי!"',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -203,6 +204,7 @@ const Kids = (() => {
       calTitle: 'My sticker calendar', calSub: 'Every day you play gets a sticker', calCount: '{n} play days this month',
       hide: 'Hide and seek', hideSub: 'Where is the owl? under, on, in, behind', hideTip: 'Listen where the owl is hiding and tap there',
       cardBtn: 'Share a progress card', cardTitle: 'Progress card', cardShare: 'Share', cardSave: 'Save image', cardClose: 'Close',
+      simon: 'Owl says', simonSub: 'Do what the owl says: touch your nose, jump, clap', simonDid: 'I did it!', simonTip: 'Do the move, then tap "I did it!"',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -552,6 +554,10 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🙈</span>
           <span class="grow"><b>${kt('hide')}</b><small>${kt('hideSub')}</small></span>
           ${Store.kidsHasSticker('hide') ? starsHtml(Store.kidsStars('hide'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-simon-card" href="#/kids/simon">
+          <span class="k-story-books" aria-hidden="true">🤸</span>
+          <span class="grow"><b>${kt('simon')}</b><small>${kt('simonSub')}</small></span>
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -1600,6 +1606,61 @@ const Kids = (() => {
       celebrate();
       sayEn('You found me every time!', 0.9);
       $('#k-again').onclick = hideGame;
+    }
+    round();
+  }
+
+  // ---------- Owl says: act it out (learning by moving) ----------
+  // The owl gives a body command with a picture ("Touch your nose!"); a 3-second ring fills while the
+  // child does it, then "I did it!". Nothing to get wrong: moving while hearing the words is the point.
+  function simonGame() {
+    document.body.classList.add('in-lesson');
+    const cmds = K.shuffle(KIDS_SIMON).slice(0, 8);
+    let at = 0, timer = null;
+    function round() {
+      clearTimeout(timer);
+      K.lessonBar(at / cmds.length);
+      const c = cmds[at];
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🤸</span> ${kt('simon')} · ${at + 1}/${cmds.length}</p>
+          <button class="k-card k-meet k-simon" id="k-say" aria-label="${c.en}">
+            <span class="k-pic" aria-hidden="true">${c.pic}</span>
+            <span class="k-word en long">${c.en}</span>
+            <span class="k-he he">${c.he}</span>
+          </button>
+          <div class="k-simon-ring" aria-hidden="true"><i></i></div>
+          <button class="k-btn" id="k-did" disabled>✅ ${kt('simonDid')}</button>
+          ${owl(kt('simonTip'), 'small')}
+        </div>`;
+      const say1 = () => say([['en', 'The owl says:'], ['en', c.en]], 0.85);
+      $('#k-say').onclick = say1;
+      setTimeout(say1, 250);
+      owlMood('giggle');
+      timer = setTimeout(() => { const d = $('#k-did'); if (d) d.disabled = false; }, 2600);
+      $('#k-did').onclick = () => {
+        K.Feel.right();
+        owlMood('cheer');
+        sayEn(pickOne(['Great!', 'Super!', 'Well done!', 'Yes!']), 1);
+        at++;
+        setTimeout(() => (at < cmds.length ? round() : end()), 700);
+      };
+    }
+    function end() {
+      K.endLesson(1);
+      Store.kidsFinish('simon', 3, 15);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🤸 ${kt('done')}</h1>
+            ${starsHtml(3, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('What a great mover!', 0.9);
+      $('#k-again').onclick = simonGame;
     }
     round();
   }
@@ -3488,6 +3549,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'simon') simonGame();
       else if (a === 'hide') hideGame();
       else if (a === 'spell') spellGame();
       else if (a === 'shop') shopGame();
