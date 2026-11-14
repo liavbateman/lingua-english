@@ -1726,3 +1726,5 @@ bdi.k-q { white-space: nowrap; }
 .k-opt-name { position: absolute; inset-inline: 0; bottom: 6px; font-size: .85rem; font-weight: 700; color: var(--k-ink); opacity: .75; }
 /* sharp ears: the card whose word is being said */
 .k-pair-opt.say { opacity: 1; filter: none; box-shadow: 0 7px 0 var(--k-edge), 0 0 0 6px #fde68a; transform: scale(1.04); transition: transform .2s; }
+.k-pulse-once { animation: k-pulse .6s ease-in-out 2; }
+@media (prefers-reduced-motion: reduce) { .k-pulse-once { animation: none; } }

@@ -2048,8 +2048,13 @@ const Kids = (() => {
       $('#k-say').onclick = say1;
       setTimeout(say1, 250);
       owlMood('giggle');
-      timer = setTimeout(() => { const d = $('#k-did'); if (d) d.disabled = false; }, 2600);
+      // the button wakes up (and bounces) once there was time to do the move
+      timer = setTimeout(() => { const d = $('#k-did'); if (d) { d.disabled = false; d.classList.add('k-pulse-once'); } }, 2600);
+      let done = false;   // one tap = one move (a double tap must not skip the next command)
       $('#k-did').onclick = () => {
+        if (done) return;
+        done = true;
+        $('#k-did').disabled = true;
         K.Feel.right();
         owlMood('cheer');
         sayEn(pickOne(['Great!', 'Super!', 'Well done!', 'Yes!']), 1);
