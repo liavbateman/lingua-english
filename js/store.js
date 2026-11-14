@@ -118,8 +118,10 @@ const Store = (() => {
       save();
     },
 
+    // A word only shown on a card (not yet practised) comes up for review from tomorrow, not at once:
+    // otherwise opening a lesson and leaving after one card made Today lead with "Review 1 word"
     markSeen(id) {
-      if (!state.words[id]) { state.words[id] = { box: 1, due: Date.now() }; save(); }
+      if (!state.words[id]) { state.words[id] = { box: 1, due: Date.now() + DAY }; save(); }
     },
 
     answer(id, correct) {

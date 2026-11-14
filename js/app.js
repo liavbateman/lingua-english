@@ -746,12 +746,13 @@
   const isFresh = () => startedCount() < 3;
   const freshHide = (extraShow = false) => (isFresh() && !extraShow ? ' hidden' : '');
 
-  // How many cards the next lesson of a unit really shows, and about how long it takes:
-  // the very first lesson is 8 cards, a unit already begun shows only the words not met yet
+  // A lesson brings at most 8 new words at a time (a 15-word unit is two lessons: 8, then 7),
+  // so the promise on Today stays the same whatever was peeked at before
+  const LESSON_NEW = 8;
+  // How many cards the next lesson of a unit really shows, and about how long it takes
   function lessonSize(u) {
-    const firstEver = !ALL_WORDS.some(w => Store.isSeen(w.id));
     const fresh = u.words.length - Store.unitProgress(u).seen;
-    const n = firstEver ? Math.min(8, u.words.length) : fresh || u.words.length;
+    const n = fresh ? Math.min(LESSON_NEW, fresh) : u.words.length;
     return { n, m: Math.max(3, Math.round(n * 0.55)) };
   }
 
@@ -1890,11 +1891,9 @@
   function lesson(unitId) {
     const unit = UNITS.find(u => u.id === unitId);
     if (!unit) return notFound();
-    // The very first lesson is a short one: 8 cards, then a short practice of just those words
-    const firstEver = !ALL_WORDS.some(w => Store.isSeen(w.id));
-    // Coming back to a unit begun earlier: the cards show the words not met yet, not the whole unit again
+    // Up to 8 words not met yet; a unit already fully met is gone through whole again
     const fresh = unit.words.filter(w => !Store.isSeen(w.id));
-    const words = firstEver ? unit.words.slice(0, 8) : fresh.length && fresh.length < unit.words.length ? fresh : unit.words;
+    const words = fresh.length ? fresh.slice(0, LESSON_NEW) : unit.words;
     // A word met for the first time can't be "known": its card asks "Got it" instead of "Knew it"
     const metBefore = new Set(words.filter(w => Store.isSeen(w.id)).map(w => w.id));
     const allNew = !metBefore.size;
