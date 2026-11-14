@@ -292,6 +292,17 @@
   // ---------- Today: the opening screen ----------
   // One question answered at a glance: "what do I do now?" A greeting with today's ring, one big card
   // for the next lesson (words and grammar in turn), and the few tasks that make today's plan.
+  // A backup reminder, only when there is something to lose (20+ words met), no backup in 30 days,
+  // and "Not now" was not tapped in the last 14 days. It shows once the day's plan is done, never mid-learning.
+  let scrollToBackup = false;
+  function backupDue() {
+    const DAY = 864e5, now = Date.now();
+    let last = 0, later = 0;
+    try { last = +localStorage.getItem('lingua-last-backup') || 0; later = +localStorage.getItem('lingua-nudge-later') || 0; } catch (e) {}
+    const met = ALL_WORDS.filter(w => Store.isSeen(w.id)).length;
+    return met >= 20 && now - last > 30 * DAY && now - later > 14 * DAY;
+  }
+
   function home() {
     const tasks = planTasks();
     const done = Store.tasks;
@@ -321,7 +332,20 @@
           <span class="grow"><b>${x.title}${!done[x.id] && x.href === step.href ? ` <span class="task-now">${t('task.now')}</span>` : ''}</b><span class="small">${x.sub}</span></span>
           <span class="check ${done[x.id] ? 'done' : ''}" ${done[x.id] ? `aria-label="${t('path.state.done')}"` : 'aria-hidden="true"'}>${done[x.id] ? ICON.check : ''}</span>
         </a>`).join('')}
-      </div>`;
+      </div>
+      ${doneCount === tasks.length && backupDue() ? `
+      <div class="bk-nudge" role="note">
+        <span class="bk-nudge-ico" aria-hidden="true">💾</span>
+        <span class="grow"><b>${t('nudge.title')}</b><span class="small">${t('nudge.sub')}</span></span>
+        <span class="bk-nudge-btns">
+          <a class="btn" href="#/progress" id="nudge-go">${t('nudge.go')}</a>
+          <button class="btn plain" id="nudge-later">${t('nudge.later')}</button>
+        </span>
+      </div>` : ''}`;
+    const later = $('#nudge-later');
+    if (later) later.onclick = () => { try { localStorage.setItem('lingua-nudge-later', String(Date.now())); } catch (e) {} $('.bk-nudge').remove(); };
+    const go = $('#nudge-go');
+    if (go) go.onclick = () => { scrollToBackup = true; };
     bindLevelSeg(home);
     countUp();
   }
@@ -2906,7 +2930,9 @@
       case 'practice': refreshChrome('learn'); practice(); break;
       case 'quiz': refreshChrome('learn'); quiz(a, b); break;
       case 'speak': refreshChrome('learn'); speaking(); break;
-      case 'progress': refreshChrome('progress'); progress(); break;
+      case 'progress': refreshChrome('progress'); progress();
+        if (scrollToBackup) { scrollToBackup = false; const b = view.querySelector('.backup'); if (b) { b.scrollIntoView({ block: 'center' }); b.classList.add('is-lit'); } }
+        break;
       case 'tenses': refreshChrome('grammar'); tenses(); break;
       default: refreshChrome(''); notFound();
     }
@@ -2932,6 +2958,15 @@
     head.setAttribute('tabindex', '-1');
     head.focus({ preventScroll: true });
   }).observe(view, { childList: true });
+
+  // Once there is progress worth keeping, ask the browser not to clear this site's storage on its own
+  // (Safari may evict sites not visited for a while). Silent: the browser decides, nothing is shown.
+  function askPersist() {
+    if (!navigator.storage || !navigator.storage.persist || Store.xp <= 0) return;
+    navigator.storage.persisted().then(p => { if (!p) navigator.storage.persist(); }).catch(() => {});
+  }
+  window.addEventListener('hashchange', askPersist);
+  askPersist();
 
   // Language switch in the header
   document.getElementById('lang').onclick = () => {
