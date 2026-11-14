@@ -2125,16 +2125,14 @@
                   <button class="speak" id="speak" style="margin:6px auto 0" aria-label="${t('aria.listen')}">${ICON.speaker}</button>`;
       } else if (kind === 'type') {
         prompt = `<div class="small">${t('quiz.type')}</div>
-                  <div class="prompt he">${w.he}</div>
-                  <button class="speak" id="speak" style="margin:6px auto 0" aria-label="${t('aria.listen')}">${ICON.speaker}</button>`;
+                  <div class="prompt he">${w.he}</div>`;
       } else if (toHebrew) {
         prompt = `<div class="small">${t('quiz.mean')}</div>
                   <div class="prompt en ${long}">${w.en}</div>
                   <button class="speak" id="speak" style="margin:6px auto 0" aria-label="${t('aria.listen')}">${ICON.speaker}</button>`;
       } else {
         prompt = `<div class="small">${t('quiz.say')}</div>
-                  <div class="prompt he ${long}">${w.he}</div>
-                  <button class="speak" id="speak" style="margin:6px auto 0" aria-label="${t('aria.listen')}">${ICON.speaker}</button>`;
+                  <div class="prompt he ${long}">${w.he}</div>`;
       }
 
       view.innerHTML = `
@@ -2158,7 +2156,10 @@
 
       const sp = $('#speak');
       if (sp) sp.onclick = () => speak(w.en);
-      speak(w.en);   // every new question starts with the sound of the word
+      // A question starts with the sound of the word, unless the answer is that English word itself
+      // (Hebrew → English, typing): then the sound comes only after answering
+      const asksEnglish = kind === 'type' || (kind === 'choice' && !toHebrew);
+      if (!asksEnglish) speak(w.en);
 
       // Why, from the word data: what the picked word really means, and what the answer means (with its example)
       function wordWhy(ok, picked, typed) {
