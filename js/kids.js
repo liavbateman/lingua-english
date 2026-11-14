@@ -153,6 +153,8 @@ const Kids = (() => {
       pizza: 'מכינים פיצה', pizzaSub: 'הינשוף מזמין: גבינה ועגבנייה! שמים את התוספות ואופים', pizzaTip: 'הקשיבו מה הינשוף רוצה על הפיצה ולחצו על התוספות',
       wxr: 'חזאי מזג האוויר', wxrSub: 'מגישים את התחזית בטלוויזיה: Today it is sunny and hot!', wxrSky: 'איך מזג האוויר היום?', wxrTemp: 'חם או קר?',
       wxrSay: 'עכשיו אתם! אמרו את התחזית', wxrMine: 'השמעה', wxrDone: 'סיימתי', wxrTip: 'לחצו על המיקרופון ותגידו את התחזית כמו בטלוויזיה',
+      lotw: 'האות של השבוע', lotwSub: 'כל שבוע אות אחת: הצליל שלה, מילים שמתחילות בה ושיר קטן', lotwChant: 'שיר האות', lotwTrace: 'לכתוב את האות',
+      lotwTip: 'לחצו על מילה כדי לשמוע אותה. האות הראשונה מסומנת',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -299,6 +301,8 @@ const Kids = (() => {
       pizza: 'Pizza maker', pizzaSub: 'The owl orders: cheese and tomato! Add the toppings and bake', pizzaTip: 'Listen to what the owl wants on the pizza and tap the toppings',
       wxr: 'Weather reporter', wxrSub: 'Present the weather on TV: Today it is sunny and hot!', wxrSky: 'What is the weather today?', wxrTemp: 'Hot or cold?',
       wxrSay: 'Your turn! Say the report', wxrMine: 'Play', wxrDone: "I'm done", wxrTip: 'Tap the mic and say the report like on TV',
+      lotw: 'Letter of the week', lotwSub: 'One letter each week: its sound, words that start with it and a little chant', lotwChant: 'Letter chant', lotwTrace: 'Write the letter',
+      lotwTip: 'Tap a word to hear it. The first letter is marked',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -598,6 +602,7 @@ const Kids = (() => {
         ${chestCard()}
         ${wotdCard()}
         ${qotdCard()}
+        ${lotwCard()}
         <div class="k-tiles">
         ${(() => {
           const g = Store.kidsGarden(), dry = g.filter(p => p.thirsty).length;
@@ -4104,6 +4109,63 @@ const Kids = (() => {
     pick();
   }
 
+  // ---------- letter of the week ----------
+  // A new letter every week (A, B, C... in order, Sunday to Saturday): its sound, a few picture words that
+  // start with it, a chant ("B, B, buh, buh! Ball, bird, bus!") and the tracing page. Small, steady phonics.
+  function lotwLetter() {
+    const d = new Date(); d.setDate(d.getDate() - d.getDay());
+    const week = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / (7 * 864e5));
+    return KIDS_ABC[week % KIDS_ABC.length];
+  }
+  function lotwWords(x) {
+    const l = x.L.toLowerCase();
+    const list = KIDS_WORDS.filter(w => w.en.startsWith(l) && !/\s/.test(w.en) && w.pic);
+    const uniq = [];
+    if (x.word.startsWith(l) && !/\s/.test(x.word)) uniq.push({ en: x.word, pic: x.pic, he: x.he });
+    list.forEach(w => { if (!uniq.some(u => u.en === w.en)) uniq.push(w); });
+    if (!uniq.length) uniq.push({ en: x.word, pic: x.pic, he: x.he });   // X: fox - the letter is inside the word
+    return uniq.slice(0, 4);
+  }
+  function lotwCard() {
+    const x = lotwLetter(), words = lotwWords(x);
+    return `
+      <a class="k-lotw-card" href="#/kids/lotw">
+        <span class="k-lotw-L en" aria-hidden="true">${x.L}${x.L.toLowerCase()}</span>
+        <span class="grow"><b>🔤 ${kt('lotw')}</b><small class="en" lang="en">${words.map(w => `${w.pic} ${w.en}`).join(' · ')}</small></span>
+        <span class="k-today-arrow" aria-hidden="true">${isHe() ? '‹' : '›'}</span>
+      </a>`;
+  }
+  function lotwScreen() {
+    K.endLesson();
+    const x = lotwLetter(), words = lotwWords(x), l = x.L.toLowerCase();
+    const mark = en => { const i = Math.max(0, en.indexOf(l)); return `${en.slice(0, i)}<mark>${en[i]}</mark>${en.slice(i + 1)}`; };
+    K.view.innerHTML = `
+      <div class="k-wrap k-play">
+        <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
+        <h1 class="k-title">🔤 ${kt('lotw')}</h1>
+        <button class="k-card k-letter-big" id="k-lotw-big" aria-label="${x.L}">
+          <span class="k-letter-glyph en" aria-hidden="true">${x.L}<small>${l}</small></span>
+          <span class="k-he en" lang="en">/${x.sound}/</span>
+        </button>
+        <div class="k-lotw-words">${words.map((w, i) => `<button class="k-lotw-w" data-i="${i}" aria-label="${w.en}"><span aria-hidden="true">${w.pic}</span><b class="en" lang="en">${mark(w.en)}</b></button>`).join('')}</div>
+        <div class="k-letter-tools">
+          <button class="k-btn" id="k-lotw-chant">🎵 ${kt('lotwChant')}</button>
+          <a class="k-btn ghost" href="#/kids/trace/${x.L}">✍️ ${kt('lotwTrace')}</a>
+        </div>
+        ${owl(kt('lotwTip'), 'small')}
+      </div>`;
+    const btns = [...K.view.querySelectorAll('.k-lotw-w')];
+    $('#k-lotw-big').onclick = () => say([['en', `${x.name}. ${x.sound}, ${x.sound}.`]], 0.8);
+    btns.forEach((b, i) => { b.onclick = () => { sayEn(words[i].en, 0.85); b.classList.remove('lit'); void b.offsetWidth; b.classList.add('lit'); }; });
+    // the chant: letter name twice, its sound twice, then the words, each lighting up in turn
+    $('#k-lotw-chant').onclick = () => {
+      say([['en', `${x.name}! ${x.name}! ${x.sound}, ${x.sound}!`]], 0.85);
+      btns.forEach((b, i) => setTimeout(() => { if (!b.isConnected) return; b.classList.add('lit'); sayEn(words[i].en, 0.9); setTimeout(() => b.classList.remove('lit'), 700); }, 2600 + i * 1100));
+      setTimeout(() => { if ($('#k-lotw-chant')) { Store.kidsFinish('lotw', 3, 10); owlMood('cheer'); } }, 2600 + words.length * 1100);
+    };
+    setTimeout(() => say([['en', `The letter of the week is ${x.name}!`]], 0.85), 300);
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -6176,6 +6238,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'lotw') lotwScreen();
       else if (a === 'wxr') wxrGame();
       else if (a === 'pizza') pizzaGame();
       else if (a === 'feelst') feelStoryGame();
