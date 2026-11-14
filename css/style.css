@@ -2112,3 +2112,7 @@ body.in-lesson .offline { margin-top: calc(8px + env(safe-area-inset-top)); }
 /* Progress before the first lesson: one line and the next lesson */
 .pg-empty p { margin: 0 0 12px; line-height: 1.55; font-weight: 600; }
 .pg-empty .next-card { margin: 0; }
+
+/* The translation under the answer sits on the answer's side, so the two read as one pair */
+.fb-sub.fb-sub-en { text-align: left; padding-inline: 4px; }
+.fb-sub.fb-sub-he { text-align: right; padding-inline: 4px; }

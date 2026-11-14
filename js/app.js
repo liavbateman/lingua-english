@@ -2658,7 +2658,7 @@
         ${say ? `<button class="speak sm fb-say" aria-label="${t('aria.listen')}">${ICON.speaker}</button>` : ''}
       </div>
       ${answer ? `<div class="fb-answer ${lang}" dir="${lang === 'he' ? 'rtl' : 'ltr'}">${answerHtml}</div>` : ''}
-      ${sub ? `<div class="fb-sub" dir="auto">${sub}</div>` : ''}
+      ${sub ? `<div class="fb-sub fb-sub-${lang}" dir="auto">${sub}</div>` : ''}
       ${why}`;
     next.hidden = false;
     fb.appendChild(next);
