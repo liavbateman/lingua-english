@@ -155,6 +155,7 @@ const Kids = (() => {
       wxrSay: 'עכשיו אתם! אמרו את התחזית', wxrMine: 'השמעה', wxrDone: 'סיימתי', wxrTip: 'לחצו על המיקרופון ותגידו את התחזית כמו בטלוויזיה',
       lotw: 'האות של השבוע', lotwSub: 'כל שבוע אות אחת: הצליל שלה, מילים שמתחילות בה ושיר קטן', lotwChant: 'שיר האות', lotwTrace: 'לכתוב את האות',
       lotwTip: 'לחצו על מילה כדי לשמוע אותה. האות הראשונה מסומנת',
+      netOff: 'אין אינטרנט כרגע. הכול עובד גם בלי!', netNoVoice: 'אין קול באנגלית במכשיר הזה. אפשר לשחק עם התמונות והמילים, ומבוגר יכול להקריא',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -303,6 +304,7 @@ const Kids = (() => {
       wxrSay: 'Your turn! Say the report', wxrMine: 'Play', wxrDone: "I'm done", wxrTip: 'Tap the mic and say the report like on TV',
       lotw: 'Letter of the week', lotwSub: 'One letter each week: its sound, words that start with it and a little chant', lotwChant: 'Letter chant', lotwTrace: 'Write the letter',
       lotwTip: 'Tap a word to hear it. The first letter is marked',
+      netOff: 'No internet right now. Everything still works!', netNoVoice: 'There is no English voice on this device. You can play with the pictures and words, and a grown-up can read aloud',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -343,7 +345,24 @@ const Kids = (() => {
     const all = speechSynthesis.getVoices();
     heVoice = all.find(v => /^(he|iw)[-_]/i.test(v.lang)) || null;
     const en = all.filter(v => /^en[-_]/i.test(v.lang));
-    enVoice = en.find(v => /en[-_]US/i.test(v.lang) && /Samantha/i.test(v.name)) || en.find(v => /en[-_]US/i.test(v.lang)) || en[0] || null;
+    enOnline = en.find(v => /en[-_]US/i.test(v.lang) && /Samantha/i.test(v.name)) || en.find(v => /en[-_]US/i.test(v.lang)) || en[0] || null;
+    // network voices (e.g. Chrome's "Google US English") go silent offline: keep an on-device voice ready
+    enLocal = en.find(v => v.localService && /en[-_]US/i.test(v.lang)) || en.find(v => v.localService) || null;
+    pickVoice();
+    voicesKnown = true;
+  }
+  let enOnline = null, enLocal = null, voicesKnown = false;
+  function pickVoice() { enVoice = (navigator.onLine === false && enLocal) ? enLocal : (enOnline || enLocal); }
+  window.addEventListener('online', () => { pickVoice(); netNote(); });
+  window.addEventListener('offline', () => { pickVoice(); netNote(); });
+  // a calm line on the map: no internet (everything still works), or no English voice on this device
+  function netNote() {
+    const el = document.getElementById('k-net');
+    if (!el) return;
+    const noSpeech = !('speechSynthesis' in window) || (voicesKnown && !enOnline && !enLocal);
+    const off = navigator.onLine === false;
+    el.hidden = !(noSpeech || off);
+    el.innerHTML = noSpeech ? `🔇 ${kt('netNoVoice')}` : off ? `📴 ${kt('netOff')}` : '';
   }
   if ('speechSynthesis' in window) { voices(); speechSynthesis.addEventListener('voiceschanged', voices); }
   // parts: [['he', 'איפה'], ['en', 'cat']]; Hebrew parts are skipped when there is no Hebrew voice
@@ -566,6 +585,7 @@ const Kids = (() => {
               <a class="k-owl-edit" href="#/kids/owl" aria-label="${kt('wardrobe')}">👕</a></span>
             <div class="k-bubble" role="status">${isNight() ? kt('nightHi') : Store.kidsStickerCount ? kt('pick') : kt('hi')}</div>
           </div>
+          <p class="k-net" id="k-net" role="status" hidden></p>
           <div class="k-chips">
             <button class="k-chip k-face" id="k-face" aria-label="${kt('who')}">${me.face}${me.name ? ` <b>${esc(me.name)}</b>` : ''}</button>
             <button class="k-chip k-dice" id="k-dice" aria-label="${kt('surpriseTip')}">🎲</button>
@@ -803,6 +823,8 @@ const Kids = (() => {
     bindCheckin();
     applyWeather();
     qotdWire();
+    netNote();
+    setTimeout(netNote, 1500);
     const wotdBtn = $('#k-wotd');
     if (wotdBtn) wotdBtn.onclick = () => {
       const w = KIDS_WORDS.find(x => x.id === wotdBtn.dataset.id);

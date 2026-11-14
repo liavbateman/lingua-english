@@ -1594,3 +1594,6 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-lotw-w b { font: 700 .95rem var(--k-font); }
 .k-lotw-w mark { background: none; color: #e0457b; font-size: 1.15em; }
 .k-lotw-w.lit { background: #fff1c2; transform: scale(1.1); }
+
+/* offline / no-voice note on the map */
+.k-net { margin: 8px 0 0; padding: 8px 14px; border-radius: 16px; background: rgba(255, 255, 255, .9); color: var(--k-ink); font-size: .9rem; font-weight: 700; text-align: center; }
