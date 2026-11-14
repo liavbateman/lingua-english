@@ -144,6 +144,7 @@ const Kids = (() => {
       morning: 'הבוקר שלי', morningSub: 'מתעוררים, מצחצחים, מתלבשים: מה בא אחר כך?', morningTip: 'מה עושים עכשיו? לחצו על התמונה הבאה',
       certBtn: 'תעודת כוכב השבוע', certNew: 'חדש לסוף השבוע!', certTitle: 'תעודת כוכב השבוע', certSub: 'תעודה להדפסה עם המילים החדשות של השבוע. אפשר לתלות על המקרר!',
       certName: 'שם הילד באנגלית (לא חובה)',
+      peekaboo: 'קוקו!', peekabooSub: 'לקטנטנים: לוחצים בכל מקום ומגלים מי מתחבא', peekabooTip: 'לחצו בכל מקום על המסך',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -281,6 +282,7 @@ const Kids = (() => {
       morning: 'My morning', morningSub: 'Wake up, brush, get dressed: what comes next?', morningTip: 'What do we do now? Tap the next picture',
       certBtn: 'Star of the week certificate', certNew: 'New for the weekend!', certTitle: 'Star of the week certificate', certSub: "A certificate to print with this week's new words. Put it on the fridge!",
       certName: "Child's name in English (optional)",
+      peekaboo: 'Peekaboo!', peekabooSub: 'For the littlest: tap anywhere and see who is hiding', peekabooTip: 'Tap anywhere on the screen',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -719,6 +721,10 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🌅</span>
           <span class="grow"><b>${kt('morning')}</b><small>${kt('morningSub')}</small></span>
           ${Store.kidsHasSticker('morning') ? starsHtml(Store.kidsStars('morning'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-peekaboo-card ${little() ? 'k-first' : ''}" href="#/kids/peekaboo">
+          <span class="k-story-books" aria-hidden="true">🙈</span>
+          <span class="grow"><b>${kt('peekaboo')}</b><small>${kt('peekabooSub')}</small></span>
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -3557,6 +3563,75 @@ const Kids = (() => {
     $('#k-pr-go').onclick = () => window.print();
   }
 
+  // ---------- peekaboo for the littlest (2-3) ----------
+  // One huge picture behind two hands. A tap anywhere opens the hands: "Peekaboo! A cat!" Another tap
+  // hides the next one. Nothing to choose, nothing to get wrong: just cause, effect and a word.
+  function peekabooGame() {
+    document.body.classList.add('in-lesson');
+    const ids = ['animals', 'toys', 'food', 'family'];
+    const pool = KIDS_WORDS.filter(w => ids.includes(String(w.id).split('/')[0]) && !/\s/.test(w.en));
+    const words = K.shuffle(pool).slice(0, 8);
+    let at = 0, open = false, busy = false;
+    K.view.innerHTML = `
+      <div class="k-wrap k-play k-pkb" id="k-pkb" role="button" tabindex="0" aria-label="${kt('peekabooTip')}">
+        <div class="k-pkb-stage">
+          <span class="k-pkb-pic" id="k-pkb-pic" aria-hidden="true"></span>
+          <span class="k-pkb-hand l" aria-hidden="true">🤚</span><span class="k-pkb-hand r" aria-hidden="true">🤚</span>
+        </div>
+        <p class="k-pkb-word en" id="k-pkb-word" lang="en" aria-live="polite">&nbsp;</p>
+        ${owl(kt('peekabooTip'), 'small')}
+      </div>`;
+    const box = $('#k-pkb'), stage = $('.k-pkb-stage');
+    const hide = () => {
+      const w = words[at];
+      K.lessonBar(at / words.length);
+      stage.classList.remove('open');
+      $('#k-pkb-word').innerHTML = '&nbsp;';
+      setTimeout(() => { $('#k-pkb-pic').textContent = w.pic; }, 350);   // swap the picture while the hands are closed
+      open = false;
+      sayEn('Where is it?', 0.85);
+    };
+    const reveal = () => {
+      const w = words[at];
+      stage.classList.add('open');
+      open = true;
+      const art = w.id && w.id.startsWith('family/') ? '' : (/^[aeiou]/.test(w.en) ? 'an ' : 'a ');
+      $('#k-pkb-word').textContent = `Peekaboo! ${w.en[0].toUpperCase() + w.en.slice(1)}!`;
+      popSound();
+      owlMood('giggle');
+      say([['en', `Peekaboo! ${art}${w.en}!`]], 0.8);
+      Store.kidsWordRight && w.id && Store.kidsWordRight(w.id);
+    };
+    const tap = () => {
+      if (busy) return;
+      busy = true; setTimeout(() => { busy = false; }, 900);
+      if (!open) return reveal();
+      at++;
+      if (at >= words.length) return end();
+      hide();
+    };
+    box.addEventListener('click', tap);
+    box.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tap(); } });
+    $('#k-pkb-pic').textContent = words[0].pic;
+    setTimeout(() => sayEn('Where is it?', 0.85), 300);
+    function end() {
+      K.endLesson(1);
+      Store.kidsFinish('peekaboo', 3, 10);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🙈 ${kt('done')}</h1>
+            ${starsHtml(3, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('Bye bye! Peekaboo!', 0.85);
+      $('#k-again').onclick = peekabooGame;
+    }
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -5615,6 +5690,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'peekaboo') peekabooGame();
       else if (a === 'morning') morningGame();
       else if (a === 'seesaw') seesawGame();
       else if (a === 'copy') copyGame();
