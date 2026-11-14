@@ -223,6 +223,11 @@ const KIDS_ABC = [
   ['Y', 'why', 'yo-yo', 'יו-יו', '🪀'], ['Z', 'zee', 'zebra', 'זברה', '🦓']
 ].map(([L, name, word, he, pic]) => ({ L, name, word, he, pic }));
 
+// Letter sounds (phonics), spelled so a speech voice says something close: "B says buh, buh, ball"
+const KIDS_SOUNDS = { A: 'ah', B: 'buh', C: 'kuh', D: 'duh', E: 'eh', F: 'fuh', G: 'guh', H: 'huh', I: 'ih', J: 'juh', K: 'kuh', L: 'luh', M: 'muh',
+  N: 'nuh', O: 'aw', P: 'puh', Q: 'kwuh', R: 'ruh', S: 'suh', T: 'tuh', U: 'uh', V: 'vuh', W: 'wuh', X: 'ks', Y: 'yuh', Z: 'zuh' };
+KIDS_ABC.forEach(x => { x.sound = KIDS_SOUNDS[x.L]; });
+
 // Picture stories: 4–5 short pages built from island words, read aloud word by word,
 // then one picture question. A story opens once its island is finished (the first is always open).
 // page: [scene pictures, English sentence, Hebrew]; ask: [question, Hebrew, [right picture, other, other]]

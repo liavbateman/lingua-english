@@ -512,3 +512,17 @@ body.kids :focus-visible { outline: 4px solid #1d2a5b; outline-offset: 3px; bord
 .k-abc-letters b:nth-child(1) { background: #d42e66; }
 .k-abc-letters b:nth-child(2) { background: #1f6fd1; }
 .k-abc-letters b:nth-child(3) { color: #1d2a5b; }
+
+/* letter sound and tracing */
+.k-letter-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 4px; }
+.k-letter-tools .k-btn { margin-top: 0; font-size: 1.05rem; padding: 12px 8px; }
+.k-letter { position: relative; }
+.k-traced { position: absolute; top: 2px; inset-inline-end: 4px; font-size: .8rem; font-style: normal; }
+.k-trace-box { position: relative; display: grid; place-items: center; padding: 10px; border-radius: 32px; background: #fff; box-shadow: 0 8px 0 var(--k-edge); }
+.k-trace { display: block; touch-action: none; border-radius: 24px; background: #fbfcff; cursor: crosshair; }
+.k-trace.k-trace-done { animation: k-boing .6s var(--ease-pop); }
+.k-trace-dots { position: absolute; top: 12px; inset-inline-end: 14px; display: flex; gap: 6px; }
+.k-trace-dots i { width: 12px; height: 12px; border-radius: 50%; background: #dbe4f7; }
+.k-trace-dots i.cur { background: #9fb0d2; }
+.k-trace-dots i.on { background: #2fd093; }
+.k-trace-box + .k-story-nav { margin-top: 14px; }

@@ -44,6 +44,8 @@ const Kids = (() => {
       songs: 'שירים', songsSub: 'שרים ומדקלמים יחד עם הינשוף', listenSong: 'הקשיבו', singAlong: 'שירו איתי', singTip: 'עכשיו אתם! הינשוף שר בשקט',
       stop: 'עצור',
       sfx: 'צלילי משחק',
+      trace: 'ציירו את האות', traceTip: 'עברו עם האצבע על האות', traceSmall: 'עכשיו האות הקטנה!', clear: 'מחק',
+      sound: 'הצליל', traceBtn: 'לצייר',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -81,6 +83,8 @@ const Kids = (() => {
       songs: 'Songs', songsSub: 'Sing and chant with the owl', listenSong: 'Listen', singAlong: 'Sing along', singTip: 'Your turn! The owl sings quietly',
       stop: 'Stop',
       sfx: 'Game sounds',
+      trace: 'Trace the letter', traceTip: 'Trace over the letter with your finger', traceSmall: 'Now the small letter!', clear: 'Clear',
+      sound: 'Sound', traceBtn: 'Trace',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -1205,7 +1209,7 @@ const Kids = (() => {
         <p class="k-sub">${kt('abcTip')}</p>
         <a class="k-btn" href="#/kids/abcgame"><span aria-hidden="true">🎮</span> ${kt('abcGame')}</a>
         <div class="k-letters">
-          ${KIDS_ABC.map((x, i) => `<a class="k-letter" href="#/kids/abc/${x.L}" style="--c:${BALLOONS[i % BALLOONS.length]}" aria-label="${x.L}"><b>${x.L}</b><small>${x.L.toLowerCase()}</small></a>`).join('')}
+          ${KIDS_ABC.map((x, i) => `<a class="k-letter" href="#/kids/abc/${x.L}" style="--c:${BALLOONS[i % BALLOONS.length]}" aria-label="${x.L}"><b>${x.L}</b><small>${x.L.toLowerCase()}</small>${Store.kidsHasTraced(x.L) ? '<i class="k-traced" aria-hidden="true">✍️</i>' : ''}</a>`).join('')}
         </div>
       </div>`;
   }
@@ -1227,7 +1231,10 @@ const Kids = (() => {
           <span class="k-word en" aria-hidden="true">${wordHtml}</span>
           <span class="k-he he">${x.he}</span>
         </button>
-        <p class="k-tip">${kt('meetTip')}</p>
+        <div class="k-letter-tools">
+          <button class="k-btn ghost" id="k-sound">🔉 ${kt('sound')}: <span class="en">${x.sound}</span></button>
+          <a class="k-btn ghost" href="#/kids/trace/${x.L}">✍️ ${kt('traceBtn')}</a>
+        </div>
         <div class="k-letter-nav">
           ${prev ? `<a class="k-btn ghost" href="#/kids/abc/${prev.L}" aria-label="${prev.L}">← ${prev.L}</a>` : '<span></span>'}
           ${next ? `<a class="k-btn" href="#/kids/abc/${next.L}" aria-label="${next.L}">${next.L} →</a>` : `<a class="k-btn" href="#/kids/abcgame" aria-label="${kt('abcGame')}">🎮</a>`}
@@ -1236,7 +1243,106 @@ const Kids = (() => {
     const card = $('#k-letter');
     const hear = () => { sayLetter(x); card.classList.remove('boing'); void card.offsetWidth; card.classList.add('boing'); };
     card.onclick = hear;
+    $('#k-sound').onclick = () => say([['en', `${x.sound}. ${x.sound}. ${x.word}.`]], 0.7);
     setTimeout(hear, 150);
+  }
+
+  // Trace: the big letter as a faint guide; the child paints over it with a finger. When most of the
+  // letter is covered it sparkles, then the small letter. Painting outside the lines never counts against.
+  function trace(L) {
+    const i = Math.max(0, KIDS_ABC.findIndex(x => x.L === L)), x = KIDS_ABC[i];
+    const col = BALLOONS[i % BALLOONS.length];
+    let stage = 0;   // 0 = capital, 1 = small letter
+    function draw() {
+      K.endLesson();
+      const glyph = stage ? x.L.toLowerCase() : x.L;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <a class="k-back" href="#/kids/abc/${x.L}"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${x.L}${x.L.toLowerCase()}</a>
+          <p class="k-step">✍️ ${kt('trace')} <span class="en">${glyph}</span></p>
+          <div class="k-trace-box"><canvas class="k-trace" id="k-trace" aria-label="${kt('traceTip')}: ${glyph}"></canvas>
+            <div class="k-trace-dots" aria-hidden="true">${[0, 1].map(n => `<i class="${n < stage ? 'on' : n === stage ? 'cur' : ''}"></i>`).join('')}</div>
+          </div>
+          <div class="k-story-nav">
+            <button class="k-btn ghost" id="k-clear">🧽 ${kt('clear')}</button>
+            <button class="k-btn ghost" id="k-hear">🔊 ${x.L}</button>
+          </div>
+          ${owl(stage ? kt('traceSmall') : kt('traceTip'), 'small')}
+        </div>`;
+      const cv = $('#k-trace'), box = cv.parentElement;
+      const size = Math.min(box.clientWidth, 340), dpr = window.devicePixelRatio || 1;
+      cv.style.width = cv.style.height = size + 'px';
+      cv.width = cv.height = Math.round(size * dpr);
+      const ctx = cv.getContext('2d');
+      ctx.scale(dpr, dpr);
+      const font = `700 ${Math.round(size * (stage ? .78 : .82))}px "Varela Round", "Heebo", sans-serif`;
+      // the letter's shape, on a hidden canvas, to know which spots belong to it
+      const mask = document.createElement('canvas');
+      mask.width = mask.height = size;
+      const m = mask.getContext('2d');
+      const place = c => { c.font = font; c.textAlign = 'center'; c.textBaseline = 'middle'; };
+      place(m);
+      m.fillText(glyph, size / 2, size * (stage ? .46 : .54));
+      const md = m.getImageData(0, 0, size, size).data;
+      const GRID = 8, cells = [];
+      for (let y = GRID / 2; y < size; y += GRID) for (let xx = GRID / 2; xx < size; xx += GRID)
+        if (md[(Math.floor(y) * size + Math.floor(xx)) * 4 + 3] > 128) cells.push([xx, y]);
+      const painted = new Set();
+      function guide() {
+        ctx.clearRect(0, 0, size, size);
+        place(ctx);
+        ctx.fillStyle = '#e8eefc';
+        ctx.fillText(glyph, size / 2, size * (stage ? .46 : .54));
+        ctx.setLineDash([8, 10]);
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#9fb0d2';
+        ctx.strokeText(glyph, size / 2, size * (stage ? .46 : .54));
+        ctx.setLineDash([]);
+      }
+      guide();
+      const brush = Math.max(22, size * .085);
+      let last = null, done = false;
+      const pos = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * size / r.width, (e.clientY - r.top) * size / r.height]; };
+      function paintAt(p) {
+        ctx.lineCap = ctx.lineJoin = 'round';
+        ctx.strokeStyle = col;
+        ctx.lineWidth = brush;
+        ctx.beginPath();
+        ctx.moveTo(...(last || p));
+        ctx.lineTo(...p);
+        ctx.stroke();
+        // count every spot along the stroke, not just where the finger was sampled (fast strokes skip far)
+        const from = last || p, steps = Math.max(1, Math.ceil(Math.hypot(p[0] - from[0], p[1] - from[1]) / (brush / 3)));
+        for (let t = 0; t <= steps; t++) {
+          const qx = from[0] + (p[0] - from[0]) * t / steps, qy = from[1] + (p[1] - from[1]) * t / steps;
+          cells.forEach(([cx, cy], k) => { if (Math.hypot(cx - qx, cy - qy) < brush * .65) painted.add(k); });
+        }
+        last = p;
+        if (!done && painted.size / cells.length >= .62) success();
+      }
+      cv.onpointerdown = e => { if (done) return; cv.setPointerCapture(e.pointerId); last = null; paintAt(pos(e)); };
+      cv.onpointermove = e => { if (done || !cv.hasPointerCapture(e.pointerId)) return; paintAt(pos(e)); };
+      cv.onpointerup = cv.onpointercancel = () => { last = null; };
+      $('#k-clear').onclick = () => { painted.clear(); done = false; guide(); };
+      $('#k-hear').onclick = () => say([['en', x.name + '.']]);
+      function success() {
+        done = true;
+        K.Feel.right();
+        Sfx.star(stage + 1);
+        $('.k-bubble').textContent = pickOne(kt('great'));
+        $('.k-owl').classList.add('happy');
+        cv.classList.add('k-trace-done');
+        say([['en', x.name + '.'], ['en', enFor(x)]]);
+        setTimeout(() => {
+          if (stage === 0) { stage = 1; draw(); return; }
+          K.confetti('kids'); Sfx.jingle();
+          Store.kidsTraced(x.L);
+          location.hash = '#/kids/abc/' + x.L;
+        }, 1800);
+      }
+      say(stage ? [['he', kt('traceSmall')]] : [['en', x.name + '.']]);
+    }
+    draw();
   }
 
   // Letter game: hear a letter's name, tap it among 3; the right one turns into its picture
@@ -1365,6 +1471,7 @@ const Kids = (() => {
       else if (a === 'stickers') stickers();
       else if (a === 'abc') b ? letter(b) : abc();
       else if (a === 'abcgame') abcGame();
+      else if (a === 'trace') trace(b);
       else if (a === 'owl') wardrobe();
       else if (a === 'stories') stories();
       else if (a === 'songs') songs();

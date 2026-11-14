@@ -158,6 +158,15 @@ const Store = (() => {
     // Game sounds in the kids world (taps, pops, jingles); the spoken words are never muted
     get kidsSfx() { return !(state.kids && state.kids.sfx === false); },
     set kidsSfx(v) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.sfx = !!v; save(); },
+    // Letters the child traced (capital and small)
+    kidsHasTraced: L => !!(state.kids && state.kids.traced && state.kids.traced[L]),
+    kidsTraced(L) {
+      state.kids = state.kids || { stars: {}, stickers: {}, words: {} };
+      state.kids.traced = state.kids.traced || {};
+      state.kids.traced[L] = true;
+      touchDay();
+      save();
+    },
     // The owl buddy's look: a colour and an accessory, chosen in the wardrobe
     get kidsOwl() { const o = state.kids && state.kids.owl; return { color: (o && o.color) || 'blue', acc: (o && o.acc) || '' }; },
     setKidsOwl(part, id) {
