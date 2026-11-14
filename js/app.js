@@ -1598,7 +1598,7 @@
     const lvlPct = Math.round(lvlRules.filter(x => Store.isGrammarDone(x.id)).length / lvlRules.length * 100);
     view.innerHTML = `
       <div class="rule-page lv-${g.level}">
-      <a class="back" href="#/grammar">${bwd()} ${t('grammar.back')}</a>
+      <a class="back" href="${ruleBack}">${bwd()} ${t(ruleBack === '#/' ? 'nav.home' : 'grammar.back')}</a>
       <header class="rule-hero">
         <div class="rule-ring lv-ring${done ? ' done' : ''}" style="--p:${lvlPct}" role="img"
           aria-label="${t('rule.num', { n: road.indexOf(g) + 1, m: road.length })} · ${t('lv.' + g.level)} ${lvlPct}%">
@@ -1606,7 +1606,7 @@
         </div>
         <div class="rule-meta">
           <span class="rule-lvl">${t('lv.' + g.level)} · <span class="en">${t('lvl.cefr.' + g.level)}</span></span>
-          <span class="rule-num">${t('rule.num', { n: road.indexOf(g) + 1, m: road.length })}</span>
+          <span class="rule-num"${freshHide()}>${t('rule.num', { n: road.indexOf(g) + 1, m: road.length })}</span>
         </div>
         <h1>${ruleTitle(g)}${done ? ' <span class="rule-crown" aria-label="' + t('path.state.done') + '">👑</span>' : ''}</h1>
         ${isTenseRule(g.id) ? `<a class="rule-tn" href="#/tenses">⏱️ ${t('tn.title')}</a>` : ''}
@@ -2807,8 +2807,16 @@
 
   // ---------- Router ----------
   let firstRoute = true;
+  // A rule page's back link goes where the learner came from: Today, or the grammar path
+  let lastName = '', ruleBack = '#/grammar';
   function route() {
     const [name, a, b] = location.hash.replace(/^#\/?/, '').split('/');
+    if (name === 'grammar' && a && !b) {
+      if (lastName === '' || lastName === 'home') ruleBack = '#/';
+      else if (lastName === 'grammar' || lastName === 'tenses') ruleBack = '#/grammar';
+    }
+    // the rule's own quiz keeps the rule's way back; only the grammar list itself counts as "grammar"
+    lastName = !name ? 'home' : name === 'grammar' && a ? 'rule' : name;
     if ('speechSynthesis' in window) speechSynthesis.cancel();
     if (recognition) recognition.abort();
     view.scrollTop = 0;
