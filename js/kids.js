@@ -130,6 +130,7 @@ const Kids = (() => {
       tmap: 'מפת האוצר של השבוע', tmapSub: '5 תחנות עם המילים של השבוע, ובסוף תיבת אוצר', tmapTip: 'לחצו על התחנה הבאה במפה',
       tmapDone: 'מצאתם את האוצר! מפה חדשה מחכה ביום ראשון', tmapStop: 'תחנה {n}', tmapIs: 'זה',
       qotd: 'השאלה של הינשוף', qotdDone: 'עניתם היום! שאלה חדשה מחר', qotdCount: '{n} שאלות נענו',
+      safari: 'ספארי של קולות', safariSub: 'מי אומר moo? מוצאים את החיה שמתחבאת מאחורי העלים', safariTip: 'הקשיבו לקול ולחצו על העלה שהחיה מציצה ממנו',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -253,6 +254,7 @@ const Kids = (() => {
       tmap: "This week's treasure map", tmapSub: "5 stops with this week's words and a treasure chest at the end", tmapTip: 'Tap the next stop on the map',
       tmapDone: 'You found the treasure! A new map is waiting on Sunday', tmapStop: 'Stop {n}', tmapIs: 'Is it',
       qotd: "The owl's question", qotdDone: 'You answered today! A new question tomorrow', qotdCount: '{n} questions answered',
+      safari: 'Sound safari', safariSub: 'Who says moo? Find the animal hiding behind the leaves', safariTip: 'Listen to the sound and tap the leaf the animal is peeking from',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -662,6 +664,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🗺️</span>
           <span class="grow"><b>${kt('tmap')}</b><small>${kt('tmapSub')}</small></span>
           <span class="k-story-count">${Store.kidsTmap().done}/5</span>
+        </a>
+        <a class="k-abc-card k-safari-card" href="#/kids/safari">
+          <span class="k-story-books" aria-hidden="true">🌿</span>
+          <span class="grow"><b>${kt('safari')}</b><small>${bidiEn(kt('safariSub'))}</small></span>
+          ${Store.kidsHasSticker('safari') ? starsHtml(Store.kidsStars('safari'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -2851,6 +2858,82 @@ const Kids = (() => {
     q();
   }
 
+  // ---------- sound safari: who says moo? ----------
+  // A jungle with big leaves; an animal peeks over each leaf. The owl plays a sound ("moo! moo!") and the
+  // child taps the leaf of the animal that makes it. The leaf swings away: "The cow says moo!".
+  function safariGame() {
+    document.body.classList.add('in-lesson');
+    const extra = [['duck', '🦆', 'quack'], ['sheep', '🐑', 'baa'], ['frog', '🐸', 'ribbit'], ['pig', '🐷', 'oink']];
+    const animals = [...KIDS_WORDS.filter(w => w.says && w.en !== 'fish').map(w => ({ en: w.en, pic: w.pic, says: w.says, id: w.id })),
+      ...extra.map(([en, pic, says]) => ({ en, pic, says }))];
+    const rounds = K.shuffle(animals).slice(0, 5);
+    const n = little() ? 3 : 4;
+    let at = 0, firstTry = 0;
+    function round() {
+      K.lessonBar(at / rounds.length);
+      const a = rounds[at];
+      const opts = K.shuffle([a, ...K.shuffle(animals.filter(x => x !== a)).slice(0, n - 1)]);
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🌿</span> ${kt('safari')} · ${at + 1}/${rounds.length}</p>
+          <div class="k-prompt">
+            <button class="k-speaker" id="k-say" aria-label="${kt('listen')}"><span aria-hidden="true">🔊</span></button>
+            <span class="k-target en" lang="en">${a.says}! ${a.says}!</span>
+          </div>
+          <div class="k-jungle ${n === 3 ? 'three' : ''}">${opts.map((o, i) => `
+            <button class="k-leaf-spot" data-i="${i}" aria-label="${o.en}">
+              <span class="k-peek-animal" aria-hidden="true">${o.pic}</span>
+              <span class="k-leaf" aria-hidden="true">🌿</span>
+            </button>`).join('')}</div>
+          ${owl(bidiEn(kt('safariTip')), 'small')}
+        </div>`;
+      const ask = () => say([['en', `${a.says}! ${a.says}!`], ['en', `Who says ${a.says}?`]], 0.85);
+      $('#k-say').onclick = ask;
+      setTimeout(ask, 300);
+      K.view.querySelectorAll('.k-leaf-spot').forEach(b => {
+        b.onclick = () => {
+          const o = opts[+b.dataset.i];
+          if (o === a) {
+            K.view.querySelectorAll('.k-leaf-spot').forEach(x => { x.disabled = true; });
+            b.classList.add('found');
+            K.Feel.right();
+            if (!missed) { firstTry++; if (a.id) Store.kidsWordRight(a.id); }
+            owlMood('cheer');
+            $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">The ${a.en} says ${a.says}!</bdi>`;
+            say([['en', `Yes! The ${a.en} says ${a.says}!`]], 0.9);
+            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 2200);
+          } else {
+            missed = true;
+            b.classList.remove('rustle'); void b.offsetWidth; b.classList.add('rustle');
+            K.Feel.wrong(b);
+            owlMood('think');
+            $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">The ${o.en} says ${o.says}.</bdi> ${kt('tryAgain')}`;
+            say([['en', `The ${o.en} says ${o.says}.`], ['en', `Who says ${a.says}?`]], 0.9);
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = firstTry >= 5 ? 3 : firstTry >= 3 ? 2 : 1;
+      Store.kidsFinish('safari', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🌿 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('What a great safari!', 0.9);
+      $('#k-again').onclick = safariGame;
+    }
+    round();
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -4905,6 +4988,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'safari') safariGame();
       else if (a === 'tmap') tmapScreen();
       else if (a === 'band') bandGame();
       else if (a === 'talk') talkGame();
