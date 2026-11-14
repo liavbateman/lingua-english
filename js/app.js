@@ -274,6 +274,9 @@
       spot: pathSpot(rules.map(x => Store.isGrammarDone(x.id)), rules.indexOf(g), 0, '#/grammar') };
     const left = planTasks().find(x => !done[x.id]);
     if (left) return { href: left.href, icon: left.icon, color: left.color, title: left.title, sub: left.sub };
+    // The plan is done: the real next lesson, as a bonus, is more inviting than a vague "free practice"
+    if (u) return { href: `#/unit/${u.id}`, icon: 'book', color: 'blue', emoji: u.emoji,
+      title: t('cont.lesson', { title: unitTitle(u) }), sub: t('cont.bonus', lessonSize(u)) };
     return { href: '#/practice', icon: 'levels', color: 'purple', title: t('cont.free'), sub: t('cont.free.sub') };
   }
 
