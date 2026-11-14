@@ -160,6 +160,8 @@ const Kids = (() => {
       odd: 'מי לא שייך?', oddSub: 'שלושה דברים מאותה משפחה ואחד אחר. מי לא שייך?', oddTip: 'מצאו את התמונה שלא שייכת לשאר',
       slist: 'רשימת קניות', slistSub: 'הינשוף מקריא רשימה: חלב, ביצים, לחם! זוכרים וממלאים את הסל', slistTip: 'הקשיבו לרשימה, ואז מצאו את הדברים על המדפים. אפשר לשמוע שוב',
       slistAgain: 'לשמוע שוב את הרשימה',
+      calm: 'פינת הרוגע', calmSub: 'נושמים עם הינשוף והבלון: שואפים... נושפים...', calmGo: 'מתחילים לנשום', calmStop: 'עצירה',
+      calmTip: 'כשהבלון גדל שואפים אוויר, כשהוא קטן נושפים', calmEnd: 'כל הכבוד. הגוף רגוע יותר עכשיו', calmHint: 'מרגישים כועסים או עצובים? אפשר לנשום עם הינשוף',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -313,6 +315,8 @@ const Kids = (() => {
       odd: 'Odd one out', oddSub: 'Three things from one family and one that is different. Which one?', oddTip: 'Find the picture that does not belong',
       slist: 'Shopping list', slistSub: 'The owl reads a list: milk, eggs, bread! Remember it and fill the basket', slistTip: 'Listen to the list, then find the things on the shelves. You can listen again',
       slistAgain: 'Hear the list again',
+      calm: 'Calm corner', calmSub: 'Breathe with the owl and the balloon: in... and out...', calmGo: "Let's breathe", calmStop: 'Stop',
+      calmTip: 'When the balloon grows, breathe in. When it shrinks, breathe out', calmEnd: 'Well done. Your body feels calmer now', calmHint: 'Feeling angry or sad? You can breathe with the owl',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -809,6 +813,10 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">📝</span>
           <span class="grow"><b>${kt('slist')}</b><small>${kt('slistSub')}</small></span>
           ${Store.kidsHasSticker('slist') ? starsHtml(Store.kidsStars('slist'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-calm-card ${['feelings/sad', 'feelings/angry', 'feelings/scared', 'feelings/tired'].includes(Store.kidsMoodToday) ? 'k-first k-calm-now' : ''}" href="#/kids/calm">
+          <span class="k-story-books" aria-hidden="true">🎈</span>
+          <span class="grow"><b>${kt('calm')}</b><small>${['feelings/sad', 'feelings/angry', 'feelings/scared'].includes(Store.kidsMoodToday) ? kt('calmHint') : kt('calmSub')}</small></span>
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -4461,6 +4469,69 @@ const Kids = (() => {
     round();
   }
 
+  // ---------- calm corner: a breathing buddy for big feelings ----------
+  // A balloon slowly grows (breathe in, 4 counts) and shrinks (breathe out, 4 counts) while the owl
+  // counts softly in English. Five breaths, no score, no hurry. Shown first on days the child felt sad or angry.
+  let calmTimer = null;
+  function calmScreen() {
+    K.endLesson();
+    clearTimeout(calmTimer);
+    const BREATHS = 5, IN = 4000, OUT = 4000;
+    let n = 0, running = false;
+    K.view.innerHTML = `
+      <div class="k-wrap k-calm">
+        <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
+        <h1 class="k-title">🎈 ${kt('calm')}</h1>
+        <div class="k-calm-stage"><div class="k-calm-balloon" id="k-balloon"><span aria-hidden="true">🦉</span></div></div>
+        <p class="k-calm-word en" id="k-calm-word" lang="en" aria-live="polite">&nbsp;</p>
+        <div class="k-calm-dots" aria-hidden="true">${'<i></i>'.repeat(BREATHS)}</div>
+        <button class="k-btn" id="k-calm-go">🎈 ${kt('calmGo')}</button>
+        ${owl(kt('calmTip'), 'small')}
+      </div>`;
+    const balloon = $('#k-balloon'), word = $('#k-calm-word'), go = $('#k-calm-go');
+    const soft = (t, rate = 0.7) => { if ('speechSynthesis' in window) speechSynthesis.cancel(); sayEn(t, rate); };
+    function stop(finished) {
+      clearTimeout(calmTimer); calmTimer = null; running = false;
+      balloon.className = 'k-calm-balloon';
+      go.innerHTML = `🎈 ${kt('calmGo')}`;
+      if (finished) {
+        word.textContent = 'Well done. You feel calm.';
+        $('.k-bubble').textContent = kt('calmEnd');
+        soft('Well done. You feel calm.', 0.75);
+        Store.kidsFinish('calm', 3, 5);
+        owlMood('love');
+      }
+    }
+    function breathe() {
+      if (!$('.k-calm')) return stop();
+      if (n >= BREATHS) return stop(true);
+      // in: the balloon grows
+      balloon.className = 'k-calm-balloon in';
+      word.textContent = 'Breathe in...';
+      soft('Breathe in... two... three... four.', 0.6);
+      calmTimer = setTimeout(() => {
+        // out: the balloon shrinks
+        balloon.className = 'k-calm-balloon out';
+        word.textContent = 'Breathe out...';
+        soft('And breathe out... two... three... four.', 0.6);
+        calmTimer = setTimeout(() => {
+          const dots = K.view.querySelectorAll('.k-calm-dots i');
+          if (dots[n]) dots[n].classList.add('on');
+          n++;
+          breathe();
+        }, OUT);
+      }, IN);
+    }
+    go.onclick = () => {
+      if (running) return stop();
+      running = true; n = 0;
+      K.view.querySelectorAll('.k-calm-dots i').forEach(d => d.classList.remove('on'));
+      go.innerHTML = `⏹️ ${kt('calmStop')}`;
+      breathe();
+    };
+    setTimeout(() => soft("Let's breathe together.", 0.75), 300);
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -6508,6 +6579,7 @@ const Kids = (() => {
       clearInterval(callTimer);
       clearInterval(bandTimer);
       clearInterval(brushTimer);
+      clearTimeout(calmTimer);
       stopParent();
       if (rsRecorder && rsRecorder.state === 'recording') rsRecorder.stop();
       stopRec();
@@ -6533,6 +6605,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'calm') calmScreen();
       else if (a === 'slist') slistGame();
       else if (a === 'odd') oddGame();
       else if (a === 'bath') bathGame();
