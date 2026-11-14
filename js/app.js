@@ -253,7 +253,7 @@
     const done = Store.tasks;
     const due = Store.dueWords().length;
     if (due && !done.review) return { href: '#/quiz/choice/review', icon: 'repeat', color: 'coral',
-      title: t('cont.review', { n: due }), sub: t('cont.review.sub') };
+      title: t(due === 1 ? 'cont.review.one' : 'cont.review', { n: due }), sub: t('cont.review.sub') };
     const wordUnits = levelUnits().filter(x => x.kind !== 'phrases');
     const u = wordUnits.find(x => Store.unitProgress(x).seen < x.words.length);
     if (u && !done.vocab) {
@@ -2011,7 +2011,7 @@
   // Words answered wrong (first try) in the last quiz round, for "Practice these again"
   let lastMissed = [];
 
-  function done(emoji, title, text, extra = '') {
+  function done(emoji, title, text, extra = '', showNext = true) {
     endLesson(1);
     view.innerHTML = `
       ${celebration()}
@@ -2020,7 +2020,7 @@
         <h1>${title}</h1>
         <p class="sub">${text}</p>
         ${extra}
-        ${nextCard()}
+        ${showNext ? nextCard() : ''}
         <a class="btn" href="#/">${t('btn.home')}</a>
         <a class="btn ghost" href="#/practice">${t('btn.more')}</a>
       </div>`;
@@ -2301,7 +2301,7 @@
       done(pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '💪',
         t('quiz.score', { a: correct, b: total }),
         t(pct >= 80 ? 'quiz.great' : 'quiz.keep'),
-        roundStats({ correct, total, xp: correct * 10, ms: Date.now() - started }) + fix);
+        roundStats({ correct, total, xp: correct * 10, ms: Date.now() - started }) + fix, !missed.length);
       countUp();
       view.querySelectorAll('.missed [data-say]').forEach(b => { b.onclick = () => speak(missed[b.dataset.say].en); });
       // with mistakes, "Practice these again" is the main button, so Home becomes the quiet one
