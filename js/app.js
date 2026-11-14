@@ -1838,6 +1838,9 @@
     // Coming back to a unit begun earlier: the cards show the words not met yet, not the whole unit again
     const fresh = unit.words.filter(w => !Store.isSeen(w.id));
     const words = firstEver ? unit.words.slice(0, 8) : fresh.length && fresh.length < unit.words.length ? fresh : unit.words;
+    // A word met for the first time can't be "known": its card asks "Got it" instead of "Knew it"
+    const metBefore = new Set(words.filter(w => Store.isSeen(w.id)).map(w => w.id));
+    const allNew = !metBefore.size;
     let i = 0, known = 0;
 
     function finish() {
@@ -1846,7 +1849,7 @@
         <div class="card center result">
           <div class="big">🃏</div>
           <h1>${t('cards.done.title')}</h1>
-          <p class="sub">${t('cards.done', { a: known, b: words.length })}</p>
+          <p class="sub">${t(allNew ? 'cards.done.new' : 'cards.done', { a: known, b: words.length })}</p>
           <ol class="steps2" aria-label="${t('steps.aria')}">
             <li class="done"><span aria-hidden="true">✓</span>${t(unit.kind === 'phrases' ? 'steps.met.phr' : 'steps.met', { n: words.length })}</li>
             <li class="now"><span aria-hidden="true">2</span>${t('steps.practice')}</li>
@@ -1900,11 +1903,12 @@
       speak(w.en);   // every new card starts with the sound of the word
 
       function buttons() {
+        const knowLabel = t(metBefore.has(w.id) ? 'cards.know' : 'cards.got');
         btns.innerHTML = flipped
           // "Knew it" sits on the right in both languages, the side a "knew it" swipe goes to
           ? (isHe()
-            ? `<button class="btn fc-know" id="know">${t('cards.know')} ✓</button><button class="btn fc-again" id="again">↺ ${t('cards.again')}</button>`
-            : `<button class="btn fc-again" id="again">↺ ${t('cards.again')}</button><button class="btn fc-know" id="know">${t('cards.know')} ✓</button>`)
+            ? `<button class="btn fc-know" id="know">${knowLabel} ✓</button><button class="btn fc-again" id="again">↺ ${t('cards.again')}</button>`
+            : `<button class="btn fc-again" id="again">↺ ${t('cards.again')}</button><button class="btn fc-know" id="know">${knowLabel} ✓</button>`)
           : `<button class="btn fc-show" id="show">${t('cards.show')}</button>`;
         if (flipped) {
           $('#again').onclick = () => fly(false);
@@ -1919,7 +1923,7 @@
         back.setAttribute('aria-hidden', String(!flipped));
         back.querySelector('[data-speak]').tabIndex = flipped ? 0 : -1;
         $('#flip').setAttribute('aria-expanded', String(flipped));
-        $('#fchelp').textContent = flipped ? t('cards.swipe') : '';
+        $('#fchelp').textContent = flipped ? t(metBefore.has(w.id) ? 'cards.swipe' : 'cards.swipe.new') : '';
         buttons();
         if (flipped) setTimeout(() => $('#know') && $('#know').focus({ preventScroll: true }), 50);
       }
