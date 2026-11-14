@@ -752,3 +752,8 @@ body.kids.night .k-sub b { color: #ffe08a; }
 .k-trophy-bar i { display: block; height: 100%; background: #2fd093; border-radius: inherit; }
 .k-trophy small { font-size: .75rem; color: var(--k-ink); }
 body.kids.night .k-trophy:not(.got) { background: rgba(255, 255, 255, .85); }
+
+/* holiday island card */
+.k-holiday-card { background: linear-gradient(135deg, var(--c), color-mix(in srgb, var(--c) 60%, #ff5d8f)); box-shadow: 0 7px 0 color-mix(in srgb, var(--c) 55%, #13235a), 0 14px 26px rgba(20, 40, 110, .3); }
+.k-holiday-card:active { box-shadow: 0 1px 0 color-mix(in srgb, var(--c) 55%, #13235a); }
+.k-holiday-card .k-stars i:not(.on) { color: rgba(255, 255, 255, .45); }

@@ -393,3 +393,44 @@ const KIDS_RIDDLES = [
   ['go/plane', 'I fly in the sky. People sit in me.', 'אני עף בשמיים. אנשים יושבים בתוכי.'],
   ['home/clock', 'I say tick tock. I tell you the time.', 'אני עושה טיק טק. אני אומר מה השעה.']
 ].map(([id, en, he]) => ({ id, w: KIDS_WORDS.find(x => x.id === id), en, he }));
+
+// Holiday islands: they appear on the map only around their holiday (Hebrew calendar, or summer months)
+// when: [hebrew month, from day, to month, to day] or { months: [gregorian months] }
+const KIDS_HOLIDAYS = [
+  {
+    id: 'hanukkah', title: 'Hanukkah', he: 'חנוכה', pic: '🕎', color: '#3b82f6', sticker: '🕯️', when: ['Kislev', 20, 'Tevet', 5],
+    words: [
+      { en: 'candle', he: 'נר', pic: '🕯️' }, { en: 'menorah', he: 'חנוכייה', pic: '🕎' }, { en: 'donut', he: 'סופגנייה', pic: '🍩' },
+      { en: 'gift', he: 'מתנה', pic: '🎁' }, { en: 'light', he: 'אור', pic: '💡' }, { en: 'oil', he: 'שמן', pic: '🫒' }
+    ]
+  },
+  {
+    id: 'purim', title: 'Purim', he: 'פורים', pic: '🎭', color: '#a855f7', sticker: '🤡', when: ['Adar', 1, 'Adar', 20],
+    words: [
+      { en: 'mask', he: 'מסכה', pic: '🎭' }, { en: 'costume', he: 'תחפושת', pic: '🦸' }, { en: 'crown', he: 'כתר', pic: '👑' },
+      { en: 'clown', he: 'ליצן', pic: '🤡' }, { en: 'party', he: 'מסיבה', pic: '🎉' }, { en: 'cookie', he: 'עוגייה', pic: '🍪' }
+    ]
+  },
+  {
+    id: 'passover', title: 'Passover', he: 'פסח', pic: '🌷', color: '#10b981', sticker: '🐸', when: ['Nisan', 1, 'Nisan', 25],
+    words: [
+      { en: 'spring', he: 'אביב', pic: '🌷' }, { en: 'frog', he: 'צפרדע', pic: '🐸' }, { en: 'sea', he: 'ים', pic: '🌊' },
+      { en: 'plate', he: 'צלחת', pic: '🍽️' }, { en: 'question', he: 'שאלה', pic: '❓' }, { en: 'flatbread', he: 'מצה', pic: '🫓' }
+    ]
+  },
+  {
+    id: 'newyear', title: 'New Year & Sukkot', he: 'ראש השנה וסוכות', pic: '🍯', color: '#eab308', sticker: '🍎', when: ['Tishri', 1, 'Tishri', 25],
+    words: [
+      { en: 'honey', he: 'דבש', pic: '🍯' }, { en: 'apple', he: 'תפוח', pic: '🍎' }, { en: 'horn', he: 'שופר', pic: '📯' },
+      { en: 'hut', he: 'סוכה', pic: '🛖' }, { en: 'lemon', he: 'לימון', pic: '🍋' }, { en: 'leaf', he: 'עלה', pic: '🍂' }
+    ]
+  },
+  {
+    id: 'summer', title: 'Summer fun', he: 'כיף של קיץ', pic: '🏖️', color: '#06b6d4', sticker: '🐚', when: { months: [7, 8] },
+    words: [
+      { en: 'beach', he: 'חוף', pic: '🏖️' }, { en: 'ice cream', he: 'גלידה', pic: '🍦' }, { en: 'sunglasses', he: 'משקפי שמש', pic: '🕶️' },
+      { en: 'shell', he: 'צדף', pic: '🐚' }, { en: 'wave', he: 'גל', pic: '🌊' }, { en: 'sandcastle', he: 'ארמון חול', pic: '🏰' }
+    ]
+  }
+];
+KIDS_HOLIDAYS.forEach(th => th.words.forEach(w => { w.id = th.id + '/' + w.en; w.theme = th.id; }));

@@ -129,12 +129,12 @@ for (const id of Object.keys(EXPLAIN)) if (!GRAMMAR.some(g => g.id === id)) erro
   const kf = 'js/kids-data.js';
   const kctx = vm.createContext({});
   try {
-    vm.runInContext(fs.readFileSync(path.join(root, kf), 'utf8') + ';this.K = { KIDS_THEMES, KIDS_WORDS, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE, KIDS_RIDDLES, KIDS_MOVES, KIDS_WORDS };', kctx, { filename: kf });
+    vm.runInContext(fs.readFileSync(path.join(root, kf), 'utf8') + ';this.K = { KIDS_THEMES, KIDS_WORDS, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE, KIDS_RIDDLES, KIDS_MOVES, KIDS_WORDS, KIDS_HOLIDAYS };', kctx, { filename: kf });
     loaded.push(kf);
     const { KIDS_THEMES, KIDS_ABC, KIDS_STORIES, KIDS_SONGS, KIDS_TREASURE } = kctx.K;
     const ids = new Set(), stickers = new Set(KIDS_TREASURE);
     if (stickers.size !== KIDS_TREASURE.length) errors.push('kids: duplicate treasure sticker');
-    for (const th of KIDS_THEMES) {
+    for (const th of [...KIDS_THEMES, ...kctx.K.KIDS_HOLIDAYS]) {
       const at = `kids island "${th.id}"`;
       if (!str(th.title) || !hasHe(th.he) || !str(th.pic) || !/^#[0-9a-f]{6}$/i.test(th.color)) errors.push(`${at}: needs title, Hebrew name, picture and a #rrggbb colour`);
       if (!str(th.sticker) || stickers.has(th.sticker)) errors.push(`${at}: sticker missing or used twice`);

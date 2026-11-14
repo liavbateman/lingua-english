@@ -64,6 +64,7 @@ const Kids = (() => {
       trophies: 'הגביעים שלי', tr_isle1: 'האי הראשון', tr_isle5: '5 איים', tr_isleAll: 'כל האיים', tr_stars: '30 כוכבים',
       tr_words: '50 מילים', tr_bloom: 'פרח פורח', tr_abc: 'משחק האותיות', tr_trace: '10 אותיות מצוירות', tr_traceAll: 'כל ה-ABC',
       tr_story: '3 סיפורים', tr_storyAll: 'כל הסיפורים', tr_riddle: 'בלש', tr_treasure: '7 ימי אוצר', tr_owl: 'ינשוף מגונדר',
+      holidaySub: 'אי חג מיוחד, רק בימים אלה!', holidayStickers: 'מדבקות חג',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -121,6 +122,7 @@ const Kids = (() => {
       trophies: 'My trophies', tr_isle1: 'First island', tr_isle5: '5 islands', tr_isleAll: 'All islands', tr_stars: '30 stars',
       tr_words: '50 words', tr_bloom: 'In full bloom', tr_abc: 'Letter game', tr_trace: '10 letters traced', tr_traceAll: 'The whole ABC',
       tr_story: '3 stories', tr_storyAll: 'Every story', tr_riddle: 'Detective', tr_treasure: '7 treasure days', tr_owl: 'Dressed-up owl',
+      holidaySub: 'A special holiday island, only these days!', holidayStickers: 'Holiday stickers',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -130,7 +132,29 @@ const Kids = (() => {
   };
   const pickOne = arr => arr[Math.floor(Math.random() * arr.length)];
   const themeName = th => (isHe() ? th.he : th.title);
-  const theme = id => KIDS_THEMES.find(th => th.id === id);
+  const theme = id => KIDS_THEMES.find(th => th.id === id) || KIDS_HOLIDAYS.find(th => th.id === id && holidayOn(th));
+
+  // Holiday islands: on the map only around their holiday. The Hebrew date comes from the
+  // browser's Hebrew calendar (Intl), so the dates move with the calendar every year.
+  const HMONTHS = ['Tishri', 'Heshvan', 'Kislev', 'Tevet', 'Shevat', 'Adar I', 'Adar', 'Adar II', 'Nisan', 'Iyar', 'Sivan', 'Tamuz', 'Av', 'Elul'];
+  function hebrewDate(d) {
+    try {
+      const parts = new Intl.DateTimeFormat('en-u-ca-hebrew', { month: 'long', day: 'numeric' }).formatToParts(d);
+      const m = parts.find(p => p.type === 'month').value, day = +parts.find(p => p.type === 'day').value;
+      return { m: m === 'Adar II' ? 'Adar' : m, day };   // in a leap year Purim is in Adar II
+    } catch (e) { return null; }
+  }
+  let forcedHoliday = null;   // for checking a holiday island out of season
+  function holidayOn(th, d = new Date()) {
+    if (forcedHoliday) return forcedHoliday === th.id;
+    if (th.when.months) return th.when.months.includes(d.getMonth() + 1);
+    const h = hebrewDate(d);
+    if (!h) return false;
+    const [m1, d1, m2, d2] = th.when, i = HMONTHS.indexOf(h.m), i1 = HMONTHS.indexOf(m1), i2 = HMONTHS.indexOf(m2);
+    const pos = i * 100 + h.day, from = i1 * 100 + d1, to = i2 * 100 + d2;
+    return from <= to ? pos >= from && pos <= to : pos >= from || pos <= to;
+  }
+  const holidayNow = () => KIDS_HOLIDAYS.filter(th => holidayOn(th));
 
   // ---------- speech: English words, Hebrew instructions (when the device has a Hebrew voice) ----------
   let heVoice = null, enVoice = null;
@@ -365,6 +389,11 @@ const Kids = (() => {
           </div>
         </div>
         <h1 class="sr-only">${kt('title')}</h1>
+        ${holidayNow().map(th => `<a class="k-today k-holiday-card" href="#/kids/play/${th.id}" style="--c:${th.color}">
+            <span class="k-today-go" aria-hidden="true">${th.pic}</span>
+            <span class="grow"><b>${themeName(th)}</b><small>${kt('holidaySub')}</small></span>
+            ${Store.kidsHasSticker(th.id) ? starsHtml(Store.kidsStars(th.id), 'sm') : `<span class="k-today-arrow" aria-hidden="true">${isHe() ? '‹' : '›'}</span>`}
+          </a>`).join('')}
         ${isNight() ? `<a class="k-today k-night-card" href="#/kids/story/goodnight">
             <span class="k-today-go" aria-hidden="true">🌙</span>
             <span class="grow"><b>${kt('night')}</b><small>${kt('nightSub')}</small></span>
@@ -1221,7 +1250,7 @@ const Kids = (() => {
     const th = theme(id);
     if (!th) return map();
     const idx = KIDS_THEMES.indexOf(th);
-    if (!isOpen(idx)) { location.hash = '#/kids'; return; }
+    if (idx >= 0 && !isOpen(idx)) { location.hash = '#/kids'; return; }
     document.body.style.setProperty('--kc', th.color);
     document.body.classList.add('in-lesson');   // also when "Play again" restarts without a route change
     const words = th.words;
@@ -1950,6 +1979,10 @@ const Kids = (() => {
             ${Store.kidsHasSticker('abc') ? starsHtml(Store.kidsStars('abc'), 'sm') : ''}
           </div>
         </div>
+        ${KIDS_HOLIDAYS.some(th => Store.kidsHasSticker(th.id)) ? `
+        <h2 class="k-title k-h2">🎉 ${kt('holidayStickers')}</h2>
+        <div class="k-album k-album-small">${KIDS_HOLIDAYS.filter(th => Store.kidsHasSticker(th.id)).map(th =>
+          `<div class="k-slot got" style="--c:${th.color}"><span class="k-sticker" aria-hidden="true">${th.sticker}</span><span class="k-slot-name">${themeName(th)}</span></div>`).join('')}</div>` : ''}
         <h2 class="k-title k-h2">🎁 ${kt('treasure')} · ${new Set(Store.kidsTreasure.items).size}/${KIDS_TREASURE.length}</h2>
         <div class="k-album k-album-small">
           ${KIDS_TREASURE.map(x => {
@@ -1961,6 +1994,7 @@ const Kids = (() => {
   }
 
   return {
+    forceHoliday(id) { forcedHoliday = id || null; },
     init(helpers) {
       K = helpers;
       // a soft tap on the kids world's buttons and cards (answers have their own sounds)
