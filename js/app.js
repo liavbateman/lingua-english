@@ -1310,6 +1310,8 @@
 
   // One word to know today, from the learner's level (the same word all day, a new one at midnight)
   function wordOfDay() {
+    // an extra like search and the map: kept out of a new learner's way, so the path's first lesson shows on screen
+    if (isFresh()) return '';
     const single = wordsOf(Store.level).filter(w => !w.phrase);
     if (!single.length) return '';
     const localDay = Math.floor((Date.now() - new Date().getTimezoneOffset() * 6e4) / 864e5);
