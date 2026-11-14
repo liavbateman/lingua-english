@@ -372,7 +372,7 @@
       <section class="today${!left ? ' all' : ''}">
         <div class="td-top">
           <h1 class="td-hi">${hi}</h1>
-          <button class="td-level" id="levelbtn" data-part="vocab" aria-haspopup="dialog" aria-label="${t('lvl.change', { level: levelLabel() })}">${levelLabel()} ▾</button>
+          <button class="td-level" id="levelbtn" aria-haspopup="dialog" aria-label="${t('lvl.change', { level: levelLabel() })}">${levelLabel()} ▾</button>
         </div>
         <div class="td-main">
           <div class="td-ring" role="img" aria-label="${t('today.ring', { a: doneCount, b: tasks.length })}">
@@ -1207,7 +1207,7 @@
     // On the Learn paths the card wears the learner's level colour: a ring for how much of this part
     // of the level is done, the level's name, and today's plan (tasks done of the day's plan)
     const lv = items.part === 'gall' ? '' : Store.level;
-    const pct = lv ? Math.round(partDone(lv, items.part === 'phrases' ? 'phrases' : 'vocab') * 100) : 0;
+    const pct = lv ? Math.round(partDone(lv, 'all') * 100) : 0;   // one level number everywhere (Today, paths, Progress)
     const plan = lv ? planTasks() : [];
     const planDone = plan.filter(x => Store.tasks[x.id]).length;
     return `
@@ -1228,6 +1228,13 @@
   // the three levels with what each covers and how far this part of the course is done
   function levelSeg() { return ''; }
   function partDone(level, part) {
+    // the whole level (the sheet opened from Today, and Progress): words met, sentences met and rules passed, averaged
+    if (part === 'all') {
+      const parts = ['vocab', 'phrases', 'grammar'].filter(p => p === 'grammar'
+        ? GRAMMAR.some(g => g.level === level)
+        : UNITS.some(u => u.level === level && (u.kind === 'phrases') === (p === 'phrases')));
+      return parts.length ? parts.reduce((n, p) => n + partDone(level, p), 0) / parts.length : 0;
+    }
     if (part === 'grammar') {
       const list = GRAMMAR.filter(g => g.level === level);
       return list.length ? list.filter(g => Store.isGrammarDone(g.id)).length / list.length : 0;
@@ -1240,7 +1247,7 @@
     const btn = document.getElementById('levelbtn');
     if (!btn) return;
     btn.onclick = () => {
-      const part = btn.dataset.part || pathItems.part;
+      const part = 'all';
       const back = document.createElement('div');
       back.className = 'sheet-back';
       back.innerHTML = `
@@ -2548,11 +2555,11 @@
       const words = wordsOf(l.id).filter(x => !x.phrase);
       const sentences = wordsOf(l.id).filter(x => x.phrase);
       const rules = GRAMMAR.filter(g => g.level === l.id);
-      const w = words.filter(x => Store.isMastered(x.id)).length;
-      const s = sentences.filter(x => Store.isMastered(x.id)).length;
+      // the same measure as the level sheet: words and sentences met, rules passed
+      const w = words.filter(x => Store.isSeen(x.id)).length;
+      const s = sentences.filter(x => Store.isSeen(x.id)).length;
       const r = rules.filter(g => Store.isGrammarDone(g.id)).length;
-      const parts = [[w, words.length], [s, sentences.length], [r, rules.length]].filter(p => p[1]);
-      const pct = Math.round(parts.reduce((n, [a, b]) => n + a / b, 0) / parts.length * 100);
+      const pct = Math.round(partDone(l.id, 'all') * 100);
       const row = (icon, label, a, b) => `
         <div class="lv-row"><span class="lv-ico" aria-hidden="true">${icon}</span>
           <span class="grow"><span class="lv-label">${label}</span><span class="lv-bar"><i style="width:${b ? Math.round(a / b * 100) : 0}%"></i></span></span>
