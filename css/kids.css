@@ -1160,3 +1160,10 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 }
 .k-mon-dish.dragging { cursor: grabbing; z-index: 5; position: relative; box-shadow: 0 12px 20px rgba(0, 0, 0, .25); }
 @media (prefers-reduced-motion: reduce) { .k-monster { animation: none; } }
+
+/* rhyme time */
+.k-rh-opt { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.k-rh-opt small { font: 700 1rem var(--k-font); color: var(--k-ink); }
+.k-rh-end { color: #e0457b; }
+.k-rh-main.rhymed { box-shadow: 0 8px 0 #2fd093; }
+.k-rh-main .k-word { direction: ltr; }

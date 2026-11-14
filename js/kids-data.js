@@ -512,3 +512,14 @@ const KIDS_SIMON = [
 const KIDS_TWINS = {
   banana: 'בננה', pizza: 'פיצה', balloon: 'בלון', robot: 'רובוט', bus: 'אוטובוס', mom: 'אמא'
 };
+
+// Rhyme time: picture pairs whose endings sound the same (early phonological awareness)
+const KIDS_RHYMES = [
+  [['cat', 'חתול', '🐱'], ['hat', 'כובע', '🎩']], [['dog', 'כלב', '🐶'], ['frog', 'צפרדע', '🐸']],
+  [['bee', 'דבורה', '🐝'], ['tree', 'עץ', '🌳']], [['car', 'מכונית', '🚗'], ['star', 'כוכב', '⭐']],
+  [['moon', 'ירח', '🌙'], ['spoon', 'כפית', '🥄']], [['cake', 'עוגה', '🎂'], ['snake', 'נחש', '🐍']],
+  [['fish', 'דג', '🐟'], ['dish', 'צלחת', '🍽️']], [['bear', 'דוב', '🐻'], ['chair', 'כיסא', '🪑']],
+  [['mouse', 'עכבר', '🐭'], ['house', 'בית', '🏠']], [['boat', 'סירה', '⛵'], ['goat', 'עז', '🐐']],
+  [['sock', 'גרב', '🧦'], ['clock', 'שעון', '🕰️']], [['king', 'מלך', '🤴'], ['ring', 'טבעת', '💍']],
+  [['bed', 'מיטה', '🛏️'], ['sled', 'מזחלת', '🛷']], [['snail', 'חילזון', '🐌'], ['whale', 'לווייתן', '🐋']]
+].map(p => p.map(([en, he, pic]) => ({ en, he, pic })));

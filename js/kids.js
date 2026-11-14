@@ -113,6 +113,7 @@ const Kids = (() => {
       famLeft: 'עוד {n}',
       twin: 'כמעט כמו בעברית!', twinSay: 'כמעט כמו בעברית!', twinsTitle: 'מילים תאומות', twinsSub: 'מילים באנגלית שנשמעות כמו בעברית · פגשתם {n} מתוך {all}',
       mon: 'מאכילים את המפלצת', monSub: 'המפלצת רעבה! מה היא רוצה לאכול?', monTip: 'הקשיבו מה המפלצת רוצה, וגררו את האוכל לפה שלה (או לחצו עליו)',
+      rhyme: 'מילים מתחרזות', rhymeSub: 'cat - hat! מוצאים מילים שנגמרות באותו צליל', rhymeTip: 'הקשיבו לסוף של המילה. איזו תמונה נשמעת אותו דבר בסוף?',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -219,6 +220,7 @@ const Kids = (() => {
       famLeft: '{n} more',
       twin: 'Almost like in Hebrew!', twinSay: 'Almost like in Hebrew!', twinsTitle: 'Twin words', twinsSub: 'English words that sound like Hebrew · you met {n} of {all}',
       mon: 'Feed the monster', monSub: 'The monster is hungry! What does it want?', monTip: 'Listen to what the monster wants, then drag the food to its mouth (or tap it)',
+      rhyme: 'Rhyme time', rhymeSub: 'cat - hat! Find words that end with the same sound', rhymeTip: 'Listen to the end of the word. Which picture sounds the same at the end?',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -583,6 +585,11 @@ const Kids = (() => {
           <span class="grow"><b>${kt('mon')}</b><small>${kt('monSub')}</small></span>
           ${Store.kidsHasSticker('monster') ? starsHtml(Store.kidsStars('monster'), 'sm') : ''}
         </a>
+        ${little() ? '' : `<a class="k-abc-card k-rhyme-card" href="#/kids/rhyme">
+          <span class="k-story-books" aria-hidden="true">🎶</span>
+          <span class="grow"><b>${kt('rhyme')}</b><small>${bidiEn(kt('rhymeSub'))}</small></span>
+          ${Store.kidsHasSticker('rhyme') ? starsHtml(Store.kidsStars('rhyme'), 'sm') : ''}
+        </a>`}
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
           <span class="grow"><b>${kt('songs')}</b><small>${kt('songsSub')}</small></span>
@@ -1880,6 +1887,82 @@ const Kids = (() => {
       celebrate();
       sayEn('I am so full! Thank you!', 0.9);
       $('#k-again').onclick = monsterGame;
+    }
+    round();
+  }
+
+  // ---------- rhyme time: which picture ends with the same sound? ----------
+  // The owl says "cat"; three pictures, one rhymes. The right one lights up with its partner and the shared
+  // ending glows ("c-at, h-at!"). A wrong pick just hears both words, so the difference can be heard.
+  function rhymeGame() {
+    document.body.classList.add('in-lesson');
+    const rounds = K.shuffle(KIDS_RHYMES).slice(0, 6).map(p => K.shuffle(p));
+    let at = 0, firstTry = 0;
+    // the rhyming part: from the last vowel group to the end ("cat" -> "at", "spoon" -> "oon", "snail" -> "ail")
+    const tail = en => (en.match(/[aeiou]+[^aeiou]*e?$/) || [en])[0];
+    const split = en => { const t = tail(en); return `${en.slice(0, en.length - t.length)}<b class="k-rh-end">${t}</b>`; };
+    function round() {
+      K.lessonBar(at / rounds.length);
+      const [a, b] = rounds[at];
+      const others = K.shuffle(KIDS_RHYMES.filter(p => !p.includes(a)).flat()).slice(0, 2);
+      const opts = K.shuffle([b, ...others]);
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🎶</span> ${kt('rhyme')} · ${at + 1}/${rounds.length}</p>
+          <button class="k-card k-meet k-rh-main" id="k-say" aria-label="${a.en}">
+            <span class="k-pic" aria-hidden="true">${a.pic}</span>
+            <span class="k-word en" lang="en" dir="ltr">${a.en}</span>
+            <span class="k-he he">${a.he}</span>
+          </button>
+          <p class="k-tip en" lang="en">What rhymes with <b>${a.en}</b>?</p>
+          <div class="k-opts">${opts.map((o, i) => `<button class="k-opt k-rh-opt" data-i="${i}" aria-label="${o.en}"><span aria-hidden="true">${o.pic}</span><small class="en" dir="ltr">${o.en}</small></button>`).join('')}</div>
+          ${owl(kt('rhymeTip'), 'small')}
+        </div>`;
+      const ask = () => say([['en', a.en], ['en', `What rhymes with ${a.en}?`]], 0.8);
+      $('#k-say').onclick = ask;
+      setTimeout(ask, 300);
+      K.view.querySelectorAll('.k-rh-opt').forEach(btn => {
+        btn.onclick = () => {
+          const o = opts[+btn.dataset.i];
+          if (o === b) {
+            K.view.querySelectorAll('.k-rh-opt').forEach(x => { x.disabled = true; });
+            btn.classList.add('right');
+            K.Feel.right();
+            if (!missed) firstTry++;
+            owlMood('cheer');
+            $('.k-rh-main .k-word').innerHTML = split(a.en);
+            btn.querySelector('small').innerHTML = split(b.en);
+            $('.k-rh-main').classList.add('rhymed');
+            $('.k-bubble').innerHTML = `<bdi dir="ltr">${a.en} - ${b.en}!</bdi> 🎶`;
+            say([['en', `${a.en}, ${b.en}! They rhyme!`]], 0.8);
+            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 2600);
+          } else {
+            missed = true;
+            K.Feel.wrong(btn);
+            owlMood('think');
+            $('.k-bubble').innerHTML = `<bdi dir="ltr">${a.en} - ${o.en}?</bdi> ${kt('tryAgain')}`;
+            say([['en', `${a.en}, ${o.en}. No rhyme. Listen: ${a.en}.`]], 0.8);
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = firstTry >= 6 ? 3 : firstTry >= 4 ? 2 : 1;
+      Store.kidsFinish('rhyme', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🎶 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('Rhyme time is fun time!', 0.9);
+      $('#k-again').onclick = rhymeGame;
     }
     round();
   }
@@ -3883,6 +3966,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'rhyme') rhymeGame();
       else if (a === 'monster') monsterGame();
       else if (a === 'fam') famGame();
       else if (a === 'simon') simonGame();
