@@ -375,7 +375,7 @@ const KIDS_SONGS = [
     id: 'hello', title: 'Hello song', he: 'שיר השלום', pic: '👋', color: '#2fd093',
     lines: [
       [['Hello,', '👋'], ['hello,', '👋']],
-      [['how', '🙂'], ['are', '❓'], ['you?', '🫵']],
+      [['how', '🙂'], ['are', '❓'], ['you?', '👉']],
       [["I'm", '😀'], ['fine,', '👍'], ['thank', '🙏'], ['you!', '💖']]
     ]
   }

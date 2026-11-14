@@ -4989,7 +4989,7 @@ const Kids = (() => {
         if (run !== songRun) return;
         notes.forEach(n => n.classList.remove('lit'));
         songBand.stop(true);
-        if (document.body.contains(notes[0])) { owlMood('cheer'); K.Feel.right(); }
+        if (document.body.contains(notes[0])) { owlMood('cheer'); K.Feel.right(); $('.k-bubble').textContent = `🎶 ${pickOne(kt('great'))}`; }
       };
       let r = 0;
       const sing = () => {
