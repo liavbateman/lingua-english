@@ -1527,3 +1527,17 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-pkb-word { min-height: 1.4em; margin: 18px 0 6px; font: 700 2rem var(--k-font); color: #ffe9a6; }
 .k-first { order: -1; }
 @media (prefers-reduced-motion: reduce) { .k-pkb-hand, .k-pkb-pic { transition: none; } }
+
+/* parent story recordings */
+.k-rs-list { display: grid; gap: 10px; }
+.k-rs-story { width: 100%; border: 0; font: inherit; text-align: start; cursor: pointer; }
+.k-rs-pages { display: grid; gap: 10px; }
+.k-rs-page { padding: 12px; border-radius: 20px; background: #fff; color: var(--k-ink); box-shadow: 0 4px 0 var(--k-edge); }
+.k-rs-page.has { box-shadow: 0 4px 0 #2fd093; }
+.k-rs-scene { font-size: 2rem; }
+.k-rs-page p { margin: 4px 0 8px; font-weight: 700; direction: ltr; text-align: left; }
+.k-rs-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.k-rs-btns .k-chip:disabled { opacity: .4; }
+.k-rs-rec.on { background: #ffd6de; animation: k-boing 1s ease-in-out infinite; }
+.k-rs-voices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.k-rs-voices .k-btn { margin: 0; font-size: .95rem; }

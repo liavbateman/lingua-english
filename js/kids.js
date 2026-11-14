@@ -145,6 +145,9 @@ const Kids = (() => {
       certBtn: 'תעודת כוכב השבוע', certNew: 'חדש לסוף השבוע!', certTitle: 'תעודת כוכב השבוע', certSub: 'תעודה להדפסה עם המילים החדשות של השבוע. אפשר לתלות על המקרר!',
       certName: 'שם הילד באנגלית (לא חובה)',
       peekaboo: 'קוקו!', peekabooSub: 'לקטנטנים: לוחצים בכל מקום ומגלים מי מתחבא', peekabooTip: 'לחצו בכל מקום על המסך',
+      rsBtn: 'להקליט סיפור בקול שלכם', rsTitle: 'סיפור בקול של אמא ואבא', rsSub: 'מקליטים את עצמכם קוראים כל עמוד באנגלית. הילד ישמע את הקול שלכם בסיפור',
+      rsRec: 'הקלטה', rsStop: 'עצירה', rsPlay: 'השמעה', rsDel: 'מחיקה', rsCount: '{n} מתוך {m} עמודים', rsNoMic: 'אין גישה למיקרופון בדפדפן הזה',
+      rsVoice: 'הקול של אמא ואבא', rsRobot: 'קול הינשוף',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -283,6 +286,9 @@ const Kids = (() => {
       certBtn: 'Star of the week certificate', certNew: 'New for the weekend!', certTitle: 'Star of the week certificate', certSub: "A certificate to print with this week's new words. Put it on the fridge!",
       certName: "Child's name in English (optional)",
       peekaboo: 'Peekaboo!', peekabooSub: 'For the littlest: tap anywhere and see who is hiding', peekabooTip: 'Tap anywhere on the screen',
+      rsBtn: 'Record a story in your voice', rsTitle: "Mum's and dad's story voice", rsSub: 'Record yourself reading each page in English. Your child will hear your voice in the story',
+      rsRec: 'Record', rsStop: 'Stop', rsPlay: 'Play', rsDel: 'Delete', rsCount: '{n} of {m} pages', rsNoMic: 'No microphone access in this browser',
+      rsVoice: "Mum and dad's voice", rsRobot: "Owl's voice",
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -3632,6 +3638,109 @@ const Kids = (() => {
     }
   }
 
+  // ---------- parent story recordings ----------
+  // Parents record themselves reading each story page; the recordings stay on this device (IndexedDB)
+  // and play in the story instead of the synthetic voice. A familiar voice reading English is powerful.
+  const ParentVoice = (() => {
+    let dbp = null;
+    const db = () => dbp || (dbp = new Promise((res, rej) => {
+      if (!('indexedDB' in window)) return rej(new Error('no idb'));
+      const r = indexedDB.open('lingua-kids-voices', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('rec');
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    }));
+    const tx = (mode, fn) => db().then(d => new Promise((res, rej) => {
+      const t = d.transaction('rec', mode), st = t.objectStore('rec'), out = fn(st);
+      t.oncomplete = () => res(out && out.result);
+      t.onerror = () => rej(t.error);
+    }));
+    return {
+      get: key => tx('readonly', st => st.get(key)).catch(() => null),
+      put: (key, blob) => tx('readwrite', st => st.put(blob, key)),
+      del: key => tx('readwrite', st => st.delete(key)),
+      keys: () => tx('readonly', st => st.getAllKeys()).catch(() => [])
+    };
+  })();
+  let parentAudio = null;
+  function stopParent() { if (parentAudio) { parentAudio.pause(); URL.revokeObjectURL(parentAudio.src); parentAudio = null; } }
+  function playParent(blob) {
+    stopParent();
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    parentAudio = new Audio(URL.createObjectURL(blob));
+    parentAudio.play().catch(() => {});
+  }
+  let rsRecorder = null;
+  function recStoryScreen(storyId) {
+    K.endLesson();
+    stopParent();
+    if (Date.now() >= gateUntil) { location.hash = '#/kids'; return; }
+    ParentVoice.keys().then(keys => {
+      keys = keys || [];
+      if (!storyId) {
+        K.view.innerHTML = `
+          <div class="k-wrap">
+            <a class="k-back" href="#/kids/parents"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('pcTitle')}</a>
+            <h1 class="k-title">🎙️ ${kt('rsTitle')}</h1>
+            <p class="k-sub">${kt('rsSub')}</p>
+            <div class="k-rs-list">${KIDS_STORIES.map(st => {
+              const n = st.pages.filter((_, i) => keys.includes(`${st.id}:${i}`)).length;
+              return `<button class="k-abc-card k-rs-story" data-id="${st.id}"><span class="k-story-books" aria-hidden="true">${st.pic}</span>
+                <span class="grow"><b class="en">${st.title}</b><small>${kt('rsCount', { n, m: st.pages.length })}</small></span>${n === st.pages.length ? '✅' : ''}</button>`;
+            }).join('')}</div>
+          </div>`;
+        K.view.querySelectorAll('.k-rs-story').forEach(b => { b.onclick = () => recStoryScreen(b.dataset.id); });
+        return;
+      }
+      const st = KIDS_STORIES.find(x => x.id === storyId);
+      K.view.innerHTML = `
+        <div class="k-wrap">
+          <button class="k-back" id="k-rs-back"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('rsTitle')}</button>
+          <h1 class="k-title en">${st.pic} ${st.title}</h1>
+          ${canRecord() ? '' : `<p class="k-pc-tip">⚠️ ${kt('rsNoMic')}</p>`}
+          <div class="k-rs-pages">${st.pages.map(([scene, en], i) => {
+            const has = keys.includes(`${st.id}:${i}`);
+            return `<div class="k-rs-page ${has ? 'has' : ''}" data-i="${i}">
+              <span class="k-rs-scene" aria-hidden="true">${scene}</span>
+              <p class="en" lang="en">${en}</p>
+              <div class="k-rs-btns">
+                ${canRecord() ? `<button class="k-chip k-rs-rec">🔴 ${kt('rsRec')}</button>` : ''}
+                <button class="k-chip k-rs-play" ${has ? '' : 'disabled'}>▶️ ${kt('rsPlay')}</button>
+                <button class="k-chip k-rs-del" ${has ? '' : 'disabled'}>🗑️ ${kt('rsDel')}</button>
+              </div>
+            </div>`;
+          }).join('')}</div>
+        </div>`;
+      $('#k-rs-back').onclick = () => recStoryScreen();
+      K.view.querySelectorAll('.k-rs-page').forEach(row => {
+        const key = `${st.id}:${row.dataset.i}`;
+        const rec = row.querySelector('.k-rs-rec'), play = row.querySelector('.k-rs-play'), del = row.querySelector('.k-rs-del');
+        play.onclick = () => ParentVoice.get(key).then(b => b && playParent(b));
+        del.onclick = () => ParentVoice.del(key).then(() => recStoryScreen(st.id));
+        if (rec) rec.onclick = async () => {
+          if (rsRecorder) { if (rsRecorder.state === 'recording') rsRecorder.stop(); return; }   // second tap stops
+          stopParent();
+          let stream;
+          try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+          catch (e) { row.querySelector('p').insertAdjacentHTML('afterend', `<small class="k-pc-tip">⚠️ ${kt('rsNoMic')}</small>`); return; }
+          const chunks = [], mr = new MediaRecorder(stream);
+          rsRecorder = mr;
+          mr.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+          mr.onstop = () => {
+            stream.getTracks().forEach(t => t.stop());
+            rsRecorder = null;
+            const blob = new Blob(chunks, { type: mr.mimeType || 'audio/mp4' });
+            ParentVoice.put(key, blob).then(() => recStoryScreen(st.id));
+          };
+          rec.innerHTML = `⏹️ ${kt('rsStop')}`;
+          rec.classList.add('on');
+          mr.start();
+          setTimeout(() => { if (mr.state === 'recording') mr.stop(); }, 15000);   // a page is short: 15 s at most
+        };
+      });
+    });
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -3830,8 +3939,18 @@ const Kids = (() => {
       const words = [...K.view.querySelectorAll('.k-w')];
       words.forEach(w => { w.onclick = () => { const t = w.textContent.replace(/[^A-Za-z']/g, ''); sayEn(t); w.classList.add('lit'); setTimeout(() => w.classList.remove('lit'), 600); }; });
       $('#k-again').onclick = () => readAlong(en, words);
-      $('#k-next').onclick = () => { at++; at < st.pages.length ? page() : question(); };
-      setTimeout(() => readAlong(en, words), 250);
+      $('#k-next').onclick = () => { stopParent(); at++; at < st.pages.length ? page() : question(); };
+      const here = at;
+      ParentVoice.get(`${id}:${here}`).then(blob => {
+        if (here !== at || !$('.k-story-nav')) return;
+        if (!blob) { readAlong(en, words); return; }
+        // a parent recorded this page: their voice reads it, the owl's voice is one tap away
+        $('.k-story-nav').insertAdjacentHTML('beforebegin', `<div class="k-rs-voices"><button class="k-btn" id="k-rs-parent">👩‍👦 ${kt('rsVoice')}</button><button class="k-btn ghost" id="k-rs-owl">🦉 ${kt('rsRobot')}</button></div>`);
+        const play = () => playParent(blob);
+        $('#k-rs-parent').onclick = play;
+        $('#k-rs-owl').onclick = () => { stopParent(); readAlong(en, words); };
+        play();
+      });
     }
     function question() {
       K.lessonBar(st.pages.length / total);
@@ -4132,6 +4251,7 @@ const Kids = (() => {
         ${remindBox()}
         ${weekBox()}
         <a class="k-btn ghost k-cert-btn" href="#/kids/cert">🏅 ${kt('certBtn')}${[5, 6].includes(new Date().getDay()) ? ` <span class="k-badge">${kt('certNew')}</span>` : ''}</a>
+        <a class="k-btn ghost" href="#/kids/recstory">🎙️ ${kt('rsBtn')}</a>
         <a class="k-btn ghost" href="#/kids/print">🖍️ ${kt('prBtn')}</a>
         <button class="k-btn ghost" id="k-card">🖼️ ${kt('cardBtn')}</button>
         ${voiceBox()}
@@ -5668,6 +5788,8 @@ const Kids = (() => {
       clearInterval(callTimer);
       clearInterval(bandTimer);
       clearInterval(brushTimer);
+      stopParent();
+      if (rsRecorder && rsRecorder.state === 'recording') rsRecorder.stop();
       stopRec();
       stopRecording();
       clearHands();
@@ -5679,6 +5801,7 @@ const Kids = (() => {
       if (a === 'parents') return parents();
       if (a === 'print') return printPage();
       if (a === 'cert') return certPage();
+      if (a === 'recstory') return recStoryScreen();
       if (overLimit()) return rest();   // checked between screens, never in the middle of a game
       if (a === 'play') play(b);
       else if (a === 'stickers') stickers();
