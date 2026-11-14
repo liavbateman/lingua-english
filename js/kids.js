@@ -4702,6 +4702,7 @@ const Kids = (() => {
       clearTimeout(calmTimer); calmTimer = null; running = false;
       balloon.className = 'k-calm-balloon';
       go.innerHTML = `🎈 ${kt('calmGo')}`;
+      if (!finished) word.innerHTML = '&nbsp;';   // stopped half-way: no frozen count
       if (finished) {
         word.textContent = 'Well done. You feel calm.';
         $('.k-bubble').textContent = kt('calmEnd');
@@ -4710,17 +4711,22 @@ const Kids = (() => {
         owlMood('love');
       }
     }
+    // a visible count 1-2-3-4, one number a second, so the pace follows the balloon even when a voice
+    // speaks faster or slower than four seconds
+    const count = label => [1, 2, 3, 4].forEach((k, i) => setTimeout(() => {
+      if (running && $('.k-calm')) word.textContent = `${label} ${'•'.repeat(k)} ${k}`;
+    }, i * 1000));
     function breathe() {
       if (!$('.k-calm')) return stop();
       if (n >= BREATHS) return stop(true);
       // in: the balloon grows
       balloon.className = 'k-calm-balloon in';
-      word.textContent = 'Breathe in...';
+      count('Breathe in');
       soft('Breathe in... two... three... four.', 0.6);
       calmTimer = setTimeout(() => {
         // out: the balloon shrinks
         balloon.className = 'k-calm-balloon out';
-        word.textContent = 'Breathe out...';
+        count('Breathe out');
         soft('And breathe out... two... three... four.', 0.6);
         calmTimer = setTimeout(() => {
           const dots = K.view.querySelectorAll('.k-calm-dots i');
