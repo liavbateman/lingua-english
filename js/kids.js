@@ -4199,6 +4199,8 @@ const Kids = (() => {
           if (on.has(t)) return;
           if (!order.includes(t)) {
             misses++;
+            b.disabled = true;   // one giggle per topping, then it is out of the way
+            b.classList.add('nope');
             K.Feel.wrong(b);
             owlMood('giggle');
             $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${t.en}? 😄</bdi> ${t.he}`;
