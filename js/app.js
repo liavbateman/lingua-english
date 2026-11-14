@@ -1289,6 +1289,9 @@
             </span>
           </button>`).join('')}
         <p class="wl-note">${t('wl.note')}</p>
+        <button class="wl-restore" type="button">📂 ${t('wl.restore')}</button>
+        <input type="file" class="wl-file" accept=".json,application/json,text/plain" hidden>
+        <p class="wl-msg small" role="status"></p>
       </div>`;
     back.querySelectorAll('.wl-lvl').forEach(b => {
       b.onclick = () => {
@@ -1300,8 +1303,37 @@
         setTimeout(tour, 450);   // then a short tour of the Today screen
       };
     });
+    // Moving to a new phone: restore the backup right here, instead of picking a level and hunting for it in Progress
+    const file = back.querySelector('.wl-file');
+    back.querySelector('.wl-restore').onclick = () => file.click();
+    file.onchange = async e => {
+      const f = e.target.files[0];
+      e.target.value = '';
+      if (!f) return;
+      try {
+        const r = Store.importData(await f.text());
+        Store.markWelcomed(); Store.markToured();
+        back.classList.add('out');
+        setTimeout(() => back.remove(), 200);
+        if (location.hash && location.hash !== '#/') location.hash = '#/'; else route();
+        toast(t('backup.restored', { n: r.words }));
+      } catch (err) {
+        back.querySelector('.wl-msg').textContent = t('backup.bad');
+      }
+    };
     document.body.appendChild(back);
     back.querySelector('.wl-lvl').focus({ preventScroll: true });
+  }
+
+  // A short message at the bottom of the screen that leaves by itself (also read out by screen readers)
+  function toast(text) {
+    document.querySelectorAll('.toast').forEach(x => x.remove());
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.setAttribute('role', 'status');
+    el.textContent = text;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
   }
 
   // First-time tour of the Today screen: three spots lit one after another, each with a short bubble
