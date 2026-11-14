@@ -58,8 +58,9 @@ const Kids = (() => {
       night: 'לילה טוב! 🌙', nightSub: 'סיפור קטן לפני השינה', nightHi: 'כבר ערב… בוא נקרא סיפור לפני השינה 🌙',
       pcBed: 'מראה לילה בערב', pcBedText: 'מ-19:00 השמיים נעשים לילה, הצבעים רגועים והקול איטי יותר',
       wkTitle: 'השבוע של {name}', wkTitleAnon: 'השבוע', wkWords: '{n} מילים חדשות', wkNone: 'עוד אין מילים חדשות השבוע. אולי משחק קצר היום?',
-      wkDays: '{n} ימי משחק · {m} דק׳', wkShare: 'לשתף', wkCopied: 'הועתק! אפשר להדביק בוואטסאפ',
-      wkMsg: '🦉 {name}השבוע ב-Lingua: {n} מילים חדשות באנגלית ({list}) ו-{d} ימי משחק. כל הכבוד!',
+      wkDays: '{n} ימי משחק · {m} דק׳', wkDay1: 'יום משחק אחד · {m} דק׳', wkShare: 'לשתף', wkCopied: 'הועתק! אפשר להדביק בוואטסאפ',
+      wkMsg: '🦉 {name}השבוע ב-Lingua: {n} מילים חדשות באנגלית ({list}) ו-{d}. כל הכבוד!',
+      recMe: 'שמעו את עצמכם', recGo: 'מקליט… תגידו!', recYou: 'זה אתם! ועכשיו הינשוף:', recNo: 'אין גישה למיקרופון. אפשר לבקש מהורה לאשר',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -111,8 +112,9 @@ const Kids = (() => {
       night: 'Good night! 🌙', nightSub: 'A little story before bed', nightHi: "It's evening… let's read a bedtime story 🌙",
       pcBed: 'Bedtime look in the evening', pcBedText: 'From 7pm the sky turns to night, colours calm down and the voice slows',
       wkTitle: "{name}'s week", wkTitleAnon: 'This week', wkWords: '{n} new words', wkNone: 'No new words this week yet. Maybe a short game today?',
-      wkDays: '{n} play days · {m} min', wkShare: 'Share', wkCopied: 'Copied! Paste it into WhatsApp',
-      wkMsg: '🦉 {name}This week in Lingua: {n} new English words ({list}) and {d} play days. Well done!',
+      wkDays: '{n} play days · {m} min', wkDay1: '1 play day · {m} min', wkShare: 'Share', wkCopied: 'Copied! Paste it into WhatsApp',
+      wkMsg: '🦉 {name}This week in Lingua: {n} new English words ({list}) and {d}. Well done!',
+      recMe: 'Hear yourself', recGo: 'Recording… say it!', recYou: "That's you! Now the owl:", recNo: 'No microphone access. Ask a grown-up to allow it',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -182,6 +184,36 @@ const Kids = (() => {
   const Rec = () => window.SpeechRecognition || window.webkitSpeechRecognition;
   let rec = null;
   function stopRec() { if (rec) { try { rec.abort(); } catch (e) {} rec = null; } }
+  // Hear yourself: record about 2.5 seconds, play it back, then the owl says the word, so the child can compare
+  const canRecord = () => !!(window.MediaRecorder && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  let recStream = null;
+  function stopRecording() { if (recStream) { recStream.getTracks().forEach(t => t.stop()); recStream = null; } }
+  async function recordMe(w, btn, bub, after) {
+    if (btn.classList.contains('on')) return;
+    stopRec();
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    K.Feel.prime();
+    let stream;
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+    catch (e) { bub().textContent = kt('recNo'); return; }
+    recStream = stream;
+    const chunks = [], mr = new MediaRecorder(stream);
+    mr.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+    mr.onstop = () => {
+      stopRecording();
+      btn.classList.remove('on');
+      const url = URL.createObjectURL(new Blob(chunks, { type: mr.mimeType || 'audio/mp4' }));
+      const audio = new Audio(url);
+      bub().textContent = kt('recYou');
+      const owlTurn = () => { URL.revokeObjectURL(url); setTimeout(() => { sayEn(w.en); owlMood('love'); if (after) setTimeout(after, 900); }, 250); };
+      audio.onended = owlTurn;
+      audio.play().catch(owlTurn);
+    };
+    btn.classList.add('on');
+    bub().textContent = kt('recGo');
+    mr.start();
+    setTimeout(() => { if (mr.state === 'recording') mr.stop(); }, 2500);
+  }
   // Children's speech is often recognised as a similar word, so be generous:
   // the word itself, or a word at most 1 letter off (2 for long words), or the same start
   const clean = x => x.toLowerCase().replace(/[^a-z ]/g, '').trim();
@@ -1030,14 +1062,15 @@ const Kids = (() => {
     const name = me && me.name ? esc(me.name) : '';
     const dayName = d => d.date.toLocaleDateString(isHe() ? 'he-IL' : 'en-US', { weekday: 'narrow' });
     const text = kt('wkMsg', { name: me && me.name ? me.name + ' · ' : '', n: wk.words.length,
-      list: wk.words.slice(0, 10).map(w => w.en).join(', ') + (wk.words.length > 10 ? '…' : ''), d: played });
+      list: wk.words.slice(0, 10).map(w => w.en).join(', ') + (wk.words.length > 10 ? '…' : ''),
+      d: isHe() ? (played === 1 ? 'יום משחק אחד' : played + ' ימי משחק') : (played === 1 ? '1 play day' : played + ' play days') });
     return `
       <section class="k-pc-box">
         <h2>📅 ${name ? kt('wkTitle', { name }) : kt('wkTitleAnon')}</h2>
         <div class="k-wk-days" aria-label="${kt('wkDays', { n: played, m: mins })}">
           ${wk.days.map(d => `<span class="${d.sec ? 'on' : ''}"><i></i><small>${dayName(d)}</small></span>`).join('')}
         </div>
-        <p class="k-wk-line">${kt('wkDays', { n: played, m: mins })}</p>
+        <p class="k-wk-line">${kt(played === 1 ? 'wkDay1' : 'wkDays', { n: played, m: mins })}</p>
         ${wk.words.length ? `
           <p class="k-wk-line"><b>${kt('wkWords', { n: wk.words.length })}</b></p>
           <div class="k-wk-words">${wk.words.slice(0, 18).map(w => `<span class="en"><i aria-hidden="true">${w.pic}</i>${w.en}</span>`).join('')}</div>
@@ -1195,7 +1228,7 @@ const Kids = (() => {
       ...order.slice(half).map(w => ({ kind: 'pop', w })),
       { kind: 'drag' },
       ...(th.pairs ? K.shuffle(words).slice(0, 3).map(w => ({ kind: 'opp', w })) : []),
-      ...(Rec() ? K.shuffle(words).slice(0, 2).map(w => ({ kind: 'say', w })) : []),
+      ...(Rec() || canRecord() ? K.shuffle(words).slice(0, 2).map(w => ({ kind: 'say', w })) : []),
       { kind: 'match' }
     ];
     let at = 0, firstTry = 0, tapped = 0;
@@ -1357,7 +1390,8 @@ const Kids = (() => {
             <span class="k-ear" aria-hidden="true">🔊</span>
           </button>
           <div class="k-mic-row">
-            <button class="k-mic" id="k-mic" aria-label="${kt('sayTip')}"><span aria-hidden="true">🎤</span></button>
+            ${Rec() ? `<button class="k-mic" id="k-mic" aria-label="${kt('sayTip')}"><span aria-hidden="true">🎤</span></button>` : ''}
+            ${canRecord() ? `<button class="k-rec ${Rec() ? '' : 'big'}" id="k-rec" aria-label="${kt('recMe')}"><span aria-hidden="true">🎧</span><small>${kt('recMe')}</small></button>` : ''}
           </div>
           <button class="k-skip" id="k-skip">${kt('skip')} <span aria-hidden="true">${isHe() ? '←' : '→'}</span></button>
           ${owl(kt('sayTip'), 'small')}
@@ -1367,15 +1401,18 @@ const Kids = (() => {
       pic.onclick = hear;
       $('#k-skip').onclick = () => { stopRec(); nextStep(); };
       setTimeout(() => say(saysShown === 1 ? [['he', kt('sayHe')], ['en', w.en]] : [['en', w.en]]), 200);
-      setTimeout(() => coach('say', '#k-mic'), 500);
+      setTimeout(() => coach('say', Rec() ? '#k-mic' : '#k-rec'), 500);
+      const recBtn = $('#k-rec');
+      if (recBtn) recBtn.onclick = () => recordMe(w, recBtn, bub, () => { if (!Rec()) { Store.kidsWordRight(w.id); done(pickOne(kt('sayGood'))); } });
       const done = text => {
-        mic.disabled = true;
+        if (mic) mic.disabled = true;
+        if (recBtn) recBtn.disabled = true;
         bub().textContent = text;
         owlMood('cheer');
         K.announce(text);
         setTimeout(nextStep, 1600);
       };
-      mic.onclick = () => {
+      if (mic) mic.onclick = () => {
         if (rec) { stopRec(); return; }   // a second tap stops listening
         K.Feel.prime();
         speechSynthesis.cancel();
@@ -1899,6 +1936,7 @@ const Kids = (() => {
     hello() { say([['he', 'היי! אני הינשוף. בואו נלמד אנגלית ביחד!'], ['en', "Hello! Let's play!"]]); },
     show(a, b) {
       stopRec();
+      stopRecording();
       clearHands();
       songRun++;   // a song still playing stops
       document.body.classList.add('kids');
