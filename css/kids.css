@@ -1193,3 +1193,28 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .s-feet { bottom: -6px; left: 50%; translate: -50% 0; font-size: 2.6rem; }
 .s-up { top: -18px; left: -34px; font-size: 4rem; }
 @media (prefers-reduced-motion: reduce) { .k-wear-scene::after { animation: none; } }
+
+/* the owl calls */
+.k-call { text-align: center; }
+.k-call-ring { margin: 40px auto 10px; width: 150px; height: 150px; display: grid; place-items: center; border-radius: 50%; font-size: 6rem;
+  background: #fff; box-shadow: 0 0 0 0 rgba(47, 208, 147, .6); animation: k-call-pulse 1.4s ease-out infinite; }
+@keyframes k-call-pulse { 0% { box-shadow: 0 0 0 0 rgba(47, 208, 147, .6); transform: rotate(-4deg); } 10% { transform: rotate(4deg); } 20% { transform: rotate(-4deg); } 30% { transform: rotate(0); } 100% { box-shadow: 0 0 0 36px rgba(47, 208, 147, 0); } }
+.k-call-who { font: 700 1.5rem var(--k-font); color: #fff; margin: 18px 0 30px; }
+.k-call-btn { display: block; margin: 0 auto; width: 96px; height: 96px; border: 0; border-radius: 50%; background: #2fd093; font-size: 2.8rem; cursor: pointer;
+  box-shadow: 0 6px 0 #1f9d6d; animation: k-boing 1s ease-in-out infinite; }
+.k-call-label { display: block; margin-top: 8px; color: #fff; font-weight: 700; }
+.k-call-top { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 22px; background: rgba(255, 255, 255, .92); color: var(--k-ink); }
+.k-call-av { font-size: 2rem; }
+.k-call-top b { flex: 1; text-align: start; font-size: 1.2rem; }
+.k-call-time { font-variant-numeric: tabular-nums; color: #1f9d6d; font-weight: 700; direction: ltr; }
+.k-chat { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; min-height: 170px; direction: ltr; }
+.k-msg { max-width: 82%; margin: 0; padding: 10px 14px; border-radius: 20px; font: 700 1.15rem var(--k-font); text-align: start; animation: k-pop .4s var(--ease-pop) both; }
+.k-msg.owl { align-self: flex-start; background: #fff; color: var(--k-ink); border-bottom-left-radius: 6px; }
+.k-msg.me { align-self: flex-end; background: #2fd093; color: #fff; border-bottom-right-radius: 6px; }
+.k-call-opts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.k-call-opt { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 78px; padding: 10px 8px; border: 0; border-radius: 22px;
+  background: #fff; color: var(--k-ink); font-size: 2.2rem; cursor: pointer; box-shadow: 0 5px 0 var(--k-edge); }
+.k-call-opts.many .k-call-opt { min-width: 64px; font-size: 1.8rem; font-weight: 700; }
+.k-call-opt small { font: 700 .95rem var(--k-font); }
+.k-call-opt.right { background: #d8fbe9; box-shadow: 0 5px 0 #2fd093; }
+@media (prefers-reduced-motion: reduce) { .k-call-ring, .k-call-btn { animation: none; } }

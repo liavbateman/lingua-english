@@ -115,6 +115,8 @@ const Kids = (() => {
       mon: 'מאכילים את המפלצת', monSub: 'המפלצת רעבה! מה היא רוצה לאכול?', monTip: 'הקשיבו מה המפלצת רוצה, וגררו את האוכל לפה שלה (או לחצו עליו)',
       rhyme: 'מילים מתחרזות', rhymeSub: 'cat - hat! מוצאים מילים שנגמרות באותו צליל', rhymeTip: 'הקשיבו לסוף של המילה. איזו תמונה נשמעת אותו דבר בסוף?',
       wear: 'מלבישים לפי מזג האוויר', wearSub: 'קר? שמש? גשם? מלבישים את הינשוף', wearTip: 'הקשיבו למזג האוויר ולחצו על מה שהינשוף צריך',
+      call: 'הינשוף מתקשר', callSub: 'שיחת טלפון באנגלית: איך קוראים לך? בן כמה אתה?', callIn: 'הינשוף מתקשר אליכם!', callAnswer: 'לענות',
+      callTip: 'בחרו תשובה, והינשוף ישמע אתכם', callEnd: 'שיחה ראשונה באנגלית!', callHint: 'אפשר גם להגיד בקול', callName: 'אמרו בקול: <bdi dir="ltr" lang="en">My name is…</bdi> ואת השם שלכם',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -223,6 +225,8 @@ const Kids = (() => {
       mon: 'Feed the monster', monSub: 'The monster is hungry! What does it want?', monTip: 'Listen to what the monster wants, then drag the food to its mouth (or tap it)',
       rhyme: 'Rhyme time', rhymeSub: 'cat - hat! Find words that end with the same sound', rhymeTip: 'Listen to the end of the word. Which picture sounds the same at the end?',
       wear: 'Dress for the weather', wearSub: 'Cold? Sunny? Rainy? Dress the owl', wearTip: 'Listen to the weather and tap what the owl needs',
+      call: 'The owl calls', callSub: 'A phone call in English: what is your name? how old are you?', callIn: 'The owl is calling you!', callAnswer: 'Answer',
+      callTip: 'Pick an answer and the owl will hear you', callEnd: 'Your first call in English!', callHint: 'You can say it out loud too', callName: 'Say it out loud: My name is... and your name',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -596,6 +600,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🧣</span>
           <span class="grow"><b>${kt('wear')}</b><small>${kt('wearSub')}</small></span>
           ${Store.kidsHasSticker('wear') ? starsHtml(Store.kidsStars('wear'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-call-card" href="#/kids/call">
+          <span class="k-story-books" aria-hidden="true">📞</span>
+          <span class="grow"><b>${kt('call')}</b><small>${kt('callSub')}</small></span>
+          ${Store.kidsHasSticker('call') ? starsHtml(Store.kidsStars('call'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -2048,6 +2057,98 @@ const Kids = (() => {
       $('#k-again').onclick = wearGame;
     }
     round();
+  }
+
+  // ---------- the owl calls: a first little dialogue ----------
+  // A pretend phone call. The owl asks simple questions; the child answers by tapping a picture, hears the
+  // whole answer sentence ("I am five."), and the owl reacts. Every answer is right: it is a conversation.
+  let callTimer = null;
+  function callGame() {
+    document.body.classList.add('in-lesson');
+    clearInterval(callTimer);
+    const me = Store.kidsProfiles.find(p => p.active) || {};
+    const name = /^[A-Za-z][A-Za-z '-]*$/.test(me.name || '') ? me.name : '';
+    const NUM = ['three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+    const turns = [
+      { q: 'Hello! This is the owl. What is your name?',
+        opts: [{ pic: me.face || '🙂', label: name || 'My name is…', say: name ? `My name is ${name}.` : 'My name is…' }],
+        react: a => name ? `Hello, ${name}! Nice to meet you!` : 'What a lovely name! Nice to meet you!' },
+      { q: 'How old are you?', opts: NUM.map((n, i) => ({ pic: String(i + 3), label: n, say: `I am ${n}.` })), react: a => `${a.label[0].toUpperCase() + a.label.slice(1)}! Wow, so big!` },
+      { q: 'What colour do you like?', opts: [['red', '🔴'], ['blue', '🔵'], ['green', '🟢'], ['yellow', '🟡'], ['pink', '💗']].map(([c, p]) => ({ pic: p, label: c, say: `I like ${c}.` })),
+        react: a => `${a.label[0].toUpperCase() + a.label.slice(1)}! I like ${a.label} too!` },
+      { q: 'What animal do you like?', opts: [['cats', '🐱'], ['dogs', '🐶'], ['fish', '🐟'], ['lions', '🦁']].map(([c, p]) => ({ pic: p, label: c, say: `I like ${c}.` })),
+        react: a => `${a.label[0].toUpperCase() + a.label.slice(1)}? Me too!` },
+      { q: 'I have to go now. Bye bye!', opts: [{ pic: '👋', label: 'Bye!', say: 'Bye bye, owl!' }], react: () => 'See you soon!' }
+    ];
+    let at = 0, secs = 0;
+    // 1. the phone rings
+    K.view.innerHTML = `
+      <div class="k-wrap k-play k-call">
+        <div class="k-call-ring" aria-hidden="true">🦉</div>
+        <p class="k-call-who">${kt('callIn')}</p>
+        <button class="k-call-btn" id="k-call-go" aria-label="${kt('callAnswer')}"><span aria-hidden="true">📞</span></button>
+        <small class="k-call-label">${kt('callAnswer')}</small>
+      </div>`;
+    let rings = 0;
+    const ring = () => { if (!$('.k-call-ring')) return clearInterval(ringT); note(988, .12); setTimeout(() => note(784, .12), 150); if (++rings > 8) clearInterval(ringT); };
+    const ringT = setInterval(ring, 1400);
+    ring();
+    say([['he', kt('callIn')]]);
+    $('#k-call-go').onclick = () => {
+      clearInterval(ringT);
+      K.Feel.right();
+      callTimer = setInterval(() => { secs++; const t = $('#k-call-time'); if (t) t.textContent = `0:${String(secs).padStart(2, '0')}`; else clearInterval(callTimer); }, 1000);
+      turn();
+    };
+    // 2. the conversation
+    function turn() {
+      K.lessonBar(at / turns.length);
+      const t = turns[at];
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-call">
+          <div class="k-call-top"><span class="k-call-av" aria-hidden="true">🦉</span><b>Owl</b><span id="k-call-time" class="k-call-time">0:${String(secs).padStart(2, '0')}</span></div>
+          <div class="k-chat" aria-live="polite">
+            <p class="k-msg owl en" lang="en">${t.q}</p>
+          </div>
+          <div class="k-call-opts ${t.opts.length > 4 ? 'many' : ''}">${t.opts.map((o, i) => `<button class="k-call-opt" data-i="${i}" aria-label="${o.say}"><span aria-hidden="true">${o.pic}</span><small class="en">${o.label}</small></button>`).join('')}</div>
+          ${owl(at === 0 && !name ? kt('callName') : kt('callTip'), 'small')}
+        </div>`;
+      setTimeout(() => sayEn(t.q, 0.85), 250);
+      K.view.querySelectorAll('.k-call-opt').forEach(b => {
+        b.onclick = () => {
+          const o = t.opts[+b.dataset.i];
+          K.view.querySelectorAll('.k-call-opt').forEach(x => { x.disabled = true; });
+          b.classList.add('right');
+          Sfx.tap();
+          const chat = $('.k-chat');
+          chat.insertAdjacentHTML('beforeend', `<p class="k-msg me en" lang="en">${o.say}</p>`);
+          const react = t.react(o);
+          say([['en', o.say]], 0.85);
+          setTimeout(() => {
+            chat.insertAdjacentHTML('beforeend', `<p class="k-msg owl en" lang="en">${react}</p>`);
+            owlMood('cheer');
+            sayEn(react, 0.9);
+          }, 1600);
+          setTimeout(() => { at++; at < turns.length ? turn() : end(); }, 3800);
+        };
+      });
+    }
+    function end() {
+      clearInterval(callTimer);
+      K.endLesson(1);
+      Store.kidsFinish('call', 3, 15);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>📞 ${kt('callEnd')}</h1>
+            ${starsHtml(3, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      $('#k-again').onclick = callGame;
+    }
   }
 
   // ---------- songs & chants ----------
@@ -4029,6 +4130,7 @@ const Kids = (() => {
     show(a, b) {
       clearInterval(peekTimer);
       clearInterval(speedTimer);
+      clearInterval(callTimer);
       stopRec();
       stopRecording();
       clearHands();
@@ -4049,6 +4151,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'call') callGame();
       else if (a === 'wear') wearGame();
       else if (a === 'rhyme') rhymeGame();
       else if (a === 'monster') monsterGame();
