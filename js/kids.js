@@ -136,6 +136,7 @@ const Kids = (() => {
       shunt: 'ציד צורות', shuntSub: 'איפה יש עיגול? שעון, כדור, עוגייה! מוצאים צורות בכל מקום', shuntTip: 'מצאו את כל הדברים בצורה הזאת', shuntLeft: 'עוד {n}',
       brush: 'מצחצחים שיניים עם הינשוף', brushSub: '2 דקות של צחצוח עם הוראות באנגלית: top, bottom, left, right', brushGo: 'מתחילים לצחצח!',
       brushStop: 'עצירה', brushTip: 'מצחצחים יחד עם הינשוף. החלק שמאיר הוא החלק לצחצח', brushDone: 'שיניים נקיות ונוצצות!',
+      whoPlays: 'מי משחק?', whoPick: 'בחרו 2 או 3 ילדים', whoGo: 'מתחילים!', passTo: 'עכשיו התור של {name}!',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -265,6 +266,7 @@ const Kids = (() => {
       shunt: 'Shape hunt', shuntSub: 'Where is a circle? A clock, a ball, a cookie! Shapes are everywhere', shuntTip: 'Find all the things with this shape', shuntLeft: '{n} more',
       brush: 'Brush your teeth with the owl', brushSub: '2 minutes of brushing with English steps: top, bottom, left, right', brushGo: "Let's brush!",
       brushStop: 'Stop', brushTip: 'Brush along with the owl. Brush the part that lights up', brushDone: 'Clean, shiny teeth!',
+      whoPlays: "Who's playing?", whoPick: 'Pick 2 or 3 children', whoGo: "Let's play!", passTo: 'Pass it to {name}!',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -1394,23 +1396,37 @@ const Kids = (() => {
   // ---------- play together: two children take turns on one phone ----------
   // A team game, not a race: each turn one child hears a word and finds its picture,
   // every right answer fills the shared jar, and the end screen celebrates them together.
-  function togetherGame() {
+  function togetherGame(chosen) {
     document.body.classList.add('in-lesson');
-    const profs = Store.kidsProfiles;
-    const players = profs.length >= 2 ? profs.slice(0, 2).map((p, i) => ({ face: p.face, name: p.name || kt('player') + ' ' + (i + 1) }))
-      : [{ face: '🦊', name: kt('player') + ' 1' }, { face: '🐼', name: kt('player') + ' 2' }];
+    const profs = Store.kidsProfiles.map((p, i) => ({ face: p.face, name: p.name || kt('player') + ' ' + (i + 1) }));
+    // more than two children in the family: ask who is playing (2 or 3 of them)
+    if (!chosen && profs.length > 2) return pickPlayers(profs);
+    const players = (chosen || (profs.length >= 2 ? profs.slice(0, 2)
+      : [{ face: '🦊', name: kt('player') + ' 1' }, { face: '🐼', name: kt('player') + ' 2' }])).map(p => ({ ...p, stars: 0 }));
+    const N = players.length;
     const pool = KIDS_WORDS.filter(w => isOpen(KIDS_THEMES.findIndex(th => th.id === w.theme)));
-    const rounds = K.shuffle(pool).slice(0, 10);
+    const rounds = K.shuffle(pool).slice(0, N * 4);
     let at = 0, team = 0;
+    // between turns: a big "pass it to ..." card, so the phone really changes hands
+    function pass(then) {
+      const p = players[at % N];
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-pass">
+          <div class="k-pass-face" aria-hidden="true">${p.face}</div>
+          <p class="k-pass-text">${kt('passTo', { name: esc(p.name) })}</p>
+        </div>`;
+      Sfx.whoosh && Sfx.whoosh();
+      setTimeout(then, 1300);
+    }
     function round() {
       K.lessonBar(at / rounds.length);
-      const p = players[at % 2], w = rounds[at];
+      const p = players[at % N], w = rounds[at];
       const opts = K.shuffle([w, ...K.shuffle(pool.filter(x => x !== w && x.pic !== w.pic)).slice(0, 2)]);
       let missed = false;
       K.view.innerHTML = `
         <div class="k-wrap k-play">
           <div class="k-turn" aria-live="polite">
-            ${players.map((q, i) => `<span class="k-turn-p ${i === at % 2 ? 'on' : ''}"><i aria-hidden="true">${q.face}</i>${esc(q.name)}</span>`).join('')}
+            ${players.map((q, i) => `<span class="k-turn-p ${i === at % N ? 'on' : ''}"><i aria-hidden="true">${q.face}</i>${esc(q.name)} <b class="k-turn-stars">⭐${q.stars}</b></span>`).join('')}
           </div>
           <p class="k-step"><span aria-hidden="true">${p.face}</span> ${kt('turnOf', { name: esc(p.name) })}</p>
           <div class="k-jar" aria-label="${team}/${rounds.length}">${rounds.map((_, i) => `<i class="${i < team ? 'on' : ''}"></i>`).join('')}</div>
@@ -1429,13 +1445,13 @@ const Kids = (() => {
             K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; });
             b.classList.add('right');
             K.Feel.right();
-            if (!missed) team++;
+            if (!missed) { team++; p.stars++; const st = K.view.querySelector('.k-turn-p.on .k-turn-stars'); if (st) { st.textContent = `⭐${p.stars}`; st.classList.add('k-pop-in'); } }
             const jar = K.view.querySelectorAll('.k-jar i');
             if (!missed && jar[team - 1]) jar[team - 1].classList.add('on', 'k-pop-in');
             owlMood('cheer');
             $('.k-bubble').textContent = `${p.face} ${pickOne(kt('great'))}`;
             sayEn(w.en);
-            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 1400);
+            setTimeout(() => { at++; at < rounds.length ? pass(round) : end(); }, 1400);
           } else {
             missed = true;
             b.disabled = true;
@@ -1454,6 +1470,7 @@ const Kids = (() => {
         <div class="k-wrap k-play k-end">
           <div class="k-end-card">${endOwl()}
             <h1>${players.map(q => q.face).join(' 🤝 ')}</h1>
+            <div class="k-team-scores">${players.map(q => `<span><i aria-hidden="true">${q.face}</i>${esc(q.name)}<b>⭐ ${q.stars}</b></span>`).join('')}</div>
             <p class="k-unlock"><b>${kt('teamScore', { n: team, m: rounds.length })}</b></p>
             <div class="k-jar big">${rounds.map((_, i) => `<i class="${i < team ? 'on' : ''}"></i>`).join('')}</div>
           </div>
@@ -1462,9 +1479,31 @@ const Kids = (() => {
         </div>`;
       celebrate();
       sayEn('Great teamwork!', 0.9);
-      $('#k-again').onclick = togetherGame;
+      $('#k-again').onclick = () => togetherGame(chosen);
     }
-    round();
+    pass(round);
+  }
+  // Who's playing? Tap 2 or 3 of the family's children, then start
+  function pickPlayers(profs) {
+    const sel = new Set();
+    K.view.innerHTML = `
+      <div class="k-wrap k-play">
+        <h1 class="k-title">👫 ${kt('whoPlays')}</h1>
+        <p class="k-sub">${kt('whoPick')}</p>
+        <div class="k-who">${profs.map((p, i) => `<button class="k-who-p" data-i="${i}" aria-pressed="false"><span aria-hidden="true">${p.face}</span><b>${esc(p.name)}</b></button>`).join('')}</div>
+        <button class="k-btn" id="k-who-go" disabled>▶️ ${kt('whoGo')}</button>
+      </div>`;
+    const go = $('#k-who-go');
+    K.view.querySelectorAll('.k-who-p').forEach(b => {
+      b.onclick = () => {
+        const i = +b.dataset.i;
+        if (sel.has(i)) sel.delete(i); else if (sel.size < 3) sel.add(i);
+        K.view.querySelectorAll('.k-who-p').forEach(x => { const on = sel.has(+x.dataset.i); x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
+        go.disabled = sel.size < 2;
+        Sfx.tap();
+      };
+    });
+    go.onclick = () => togetherGame([...sel].sort().map(i => profs[i]));
   }
 
   // ---------- the shop: role-play with whole phrases ----------

@@ -1440,3 +1440,19 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-brush-bar { height: 12px; margin: 0 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, .25); overflow: hidden; }
 .k-brush-bar i { display: block; width: 0; height: 100%; background: #2fd093; border-radius: inherit; transition: width .25s linear; }
 @media (prefers-reduced-motion: reduce) { .k-brush-stage.brushing .k-brush-tool { animation: none; } }
+
+/* sibling mode: pass the phone, who is playing, each child's stars */
+.k-pass { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; }
+.k-pass-face { font-size: 7rem; animation: k-pass-in .6s var(--ease-pop) both; }
+@keyframes k-pass-in { from { transform: translateX(-120px) rotate(-20deg); opacity: 0; } }
+.k-pass-text { font: 700 1.8rem var(--k-font); color: #fff; }
+.k-turn-stars { margin-inline-start: 4px; font-size: .85em; }
+.k-who { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
+.k-who-p { display: flex; flex-direction: column; align-items: center; padding: 12px 4px; border: 0; border-radius: 22px; background: #fff; color: var(--k-ink);
+  font-size: 2.8rem; cursor: pointer; box-shadow: 0 5px 0 var(--k-edge); }
+.k-who-p b { font: 700 .95rem var(--k-font); }
+.k-who-p.on { background: #d8fbe9; box-shadow: 0 5px 0 #2fd093; transform: translateY(-3px); }
+.k-team-scores { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin: 8px 0; }
+.k-team-scores span { display: flex; flex-direction: column; align-items: center; font-weight: 700; }
+.k-team-scores i { font-style: normal; font-size: 2.4rem; }
+@media (prefers-reduced-motion: reduce) { .k-pass-face { animation: none; } }
