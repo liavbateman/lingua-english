@@ -1355,3 +1355,17 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-tmap-yn { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
 .k-tmap-open { font-size: 5rem; animation: k-pop .6s var(--ease-pop) both; }
 @media (prefers-reduced-motion: reduce) { .k-tmap-stop.next, .k-tmap-chest.open { animation: none; } }
+
+/* the owl's question of the day */
+.k-qotd { margin: 12px 0 0; padding: 12px 14px; border-radius: 24px; background: linear-gradient(135deg, #fff, #eaf3ff); color: var(--k-ink); box-shadow: 0 6px 0 var(--k-edge); text-align: center; }
+.k-qotd-k { margin: 0; font-size: .85rem; font-weight: 700; color: var(--k-muted); text-align: start; }
+.k-qotd-q { display: block; width: 100%; margin: 4px 0 0; border: 0; background: none; color: var(--k-ink); font: 700 1.25rem var(--k-font); cursor: pointer; }
+.k-qotd small.he { display: block; color: var(--k-muted); font-size: .85rem; }
+.k-qotd-opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; direction: ltr; }
+.k-qotd-opt { display: flex; flex-direction: column; align-items: center; padding: 8px 2px; border: 0; border-radius: 18px; background: #fff; color: var(--k-ink);
+  font-size: 2.2rem; cursor: pointer; box-shadow: 0 4px 0 var(--k-edge); }
+.k-qotd-opt small { font: 700 .8rem var(--k-font); }
+.k-qotd-opt.right { background: #d8fbe9; box-shadow: 0 4px 0 #2fd093; }
+.k-qotd-a { margin: 8px 0 0; font-weight: 700; }
+.k-qotd-a span { font-size: 1.6rem; vertical-align: middle; }
+.k-qotd.done { background: linear-gradient(135deg, #fff, #e6fbef); }

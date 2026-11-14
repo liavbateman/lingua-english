@@ -179,6 +179,9 @@ const Store = (() => {
       save();
     },
     // Picture of the day: the word picked today stays the same all day
+    // The question of the day: answered today?
+    get kidsQotdDone() { return !!(state.kids && state.kids.qotd === dayKey()); },
+    kidsQotdAnswer() { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.qotd = dayKey(); state.kids.qotdN = (state.kids.qotdN || 0) + 1; save(); return state.kids.qotdN; },
     get kidsWotd() { const w = state.kids && state.kids.wotd; return w && w.day === dayKey() ? w.id : null; },
     set kidsWotd(id) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.wotd = { day: dayKey(), id }; save(); },
     // Game tutorials already shown (the pointing hand appears once per game type)

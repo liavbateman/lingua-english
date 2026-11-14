@@ -533,3 +533,28 @@ const KIDS_WEAR = [
   { id: 'cold', en: 'It is cold!', he: 'קר!', sky: '❄️', items: [
     { en: 'scarf', he: 'צעיף', pic: '🧣', slot: 'neck', verb: 'Put on your' }, { en: 'gloves', he: 'כפפות', pic: '🧤', slot: 'hand', verb: 'Put on your' }] }
 ];
+
+// The owl's question of the day: one tiny question, three picture answers (the first is right)
+const KIDS_QOTD = [
+  ['What colour is the sun?', 'באיזה צבע השמש?', [['☀️', 'yellow'], ['🌿', 'green'], ['🫐', 'blue']]],
+  ['What says "moo"?', 'מי אומרת "מו"?', [['🐮', 'a cow'], ['🐱', 'a cat'], ['🐟', 'a fish']]],
+  ['What do you wear on your feet?', 'מה שמים על הרגליים?', [['👟', 'shoes'], ['🎩', 'a hat'], ['🧤', 'gloves']]],
+  ['What can fly?', 'מי יכול לעוף?', [['🐦', 'a bird'], ['🐶', 'a dog'], ['🐢', 'a turtle']]],
+  ['What is cold?', 'מה קר?', [['🍦', 'ice cream'], ['☕', 'tea'], ['🔥', 'fire']]],
+  ['How many legs does a dog have?', 'כמה רגליים יש לכלב?', [['4️⃣', 'four'], ['2️⃣', 'two'], ['6️⃣', 'six']]],
+  ['What do you eat?', 'מה אוכלים?', [['🍌', 'a banana'], ['🚗', 'a car'], ['👟', 'a shoe']]],
+  ['Where do fish live?', 'איפה גרים דגים?', [['🌊', 'in the sea'], ['🌳', 'in a tree'], ['🛏️', 'in a bed']]],
+  ['What do you see at night?', 'מה רואים בלילה?', [['🌙', 'the moon'], ['🌈', 'a rainbow'], ['☀️', 'the sun']]],
+  ['What is big?', 'מה גדול?', [['🐘', 'an elephant'], ['🐭', 'a mouse'], ['🐜', 'an ant']]],
+  ['What do you read?', 'מה קוראים?', [['📖', 'a book'], ['🍎', 'an apple'], ['⚽', 'a ball']]],
+  ['What colour is grass?', 'באיזה צבע הדשא?', [['🟢', 'green'], ['🔴', 'red'], ['🟣', 'purple']]],
+  ['Who is a baby cat?', 'מי זה גור של חתול?', [['🐱', 'a kitten'], ['🐶', 'a puppy'], ['🐥', 'a chick']]],
+  ['What goes on the road?', 'מה נוסע על הכביש?', [['🚌', 'a bus'], ['⛵', 'a boat'], ['✈️', 'a plane']]],
+  ['What do you use to see?', 'במה רואים?', [['👀', 'eyes'], ['👂', 'ears'], ['👃', 'a nose']]],
+  ['What is hot?', 'מה חם?', [['🔥', 'fire'], ['❄️', 'snow'], ['🧊', 'ice']]],
+  ['What do you wear when it rains?', 'מה לובשים כשיורד גשם?', [['🧥', 'a raincoat'], ['🩱', 'a swimsuit'], ['🕶️', 'sunglasses']]],
+  ['What says "woof"?', 'מי אומר "הב"?', [['🐶', 'a dog'], ['🐮', 'a cow'], ['🐸', 'a frog']]],
+  ['What grows on a tree?', 'מה גדל על עץ?', [['🍎', 'an apple'], ['🥚', 'an egg'], ['🍞', 'bread']]],
+  ['What has wheels?', 'למה יש גלגלים?', [['🚲', 'a bike'], ['🐟', 'a fish'], ['🪑', 'a chair']]],
+  ['What do you brush?', 'את מה מצחצחים?', [['🦷', 'teeth'], ['👂', 'ears'], ['🦶', 'feet']]]
+].map(([en, he, a]) => ({ en, he, answers: a.map(([pic, word]) => ({ pic, en: word })) }));

@@ -129,6 +129,7 @@ const Kids = (() => {
       prPrint: 'הדפסה', prNew: 'מילים אחרות', prName: 'Name', prDraw: 'Draw it!',
       tmap: 'מפת האוצר של השבוע', tmapSub: '5 תחנות עם המילים של השבוע, ובסוף תיבת אוצר', tmapTip: 'לחצו על התחנה הבאה במפה',
       tmapDone: 'מצאתם את האוצר! מפה חדשה מחכה ביום ראשון', tmapStop: 'תחנה {n}', tmapIs: 'זה',
+      qotd: 'השאלה של הינשוף', qotdDone: 'עניתם היום! שאלה חדשה מחר', qotdCount: '{n} שאלות נענו',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -251,6 +252,7 @@ const Kids = (() => {
       prPrint: 'Print', prNew: 'Other words', prName: 'Name', prDraw: 'Draw it!',
       tmap: "This week's treasure map", tmapSub: "5 stops with this week's words and a treasure chest at the end", tmapTip: 'Tap the next stop on the map',
       tmapDone: 'You found the treasure! A new map is waiting on Sunday', tmapStop: 'Stop {n}', tmapIs: 'Is it',
+      qotd: "The owl's question", qotdDone: 'You answered today! A new question tomorrow', qotdCount: '{n} questions answered',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -549,6 +551,7 @@ const Kids = (() => {
         ${checkinCard()}
         ${chestCard()}
         ${wotdCard()}
+        ${qotdCard()}
         <div class="k-tiles">
         ${(() => {
           const g = Store.kidsGarden(), dry = g.filter(p => p.thirsty).length;
@@ -695,6 +698,7 @@ const Kids = (() => {
     checkVoice();
     bindCheckin();
     applyWeather();
+    qotdWire();
     const wotdBtn = $('#k-wotd');
     if (wotdBtn) wotdBtn.onclick = () => {
       const w = KIDS_WORDS.find(x => x.id === wotdBtn.dataset.id);
@@ -3620,6 +3624,52 @@ const Kids = (() => {
         <span class="grow"><span class="k-wotd-k">☀️ ${kt('wotd')}</span><b class="en">${w.en}</b><small>${known ? kt('wotdPlanted') : kt('wotdTap')}</small></span>
         <span class="k-wotd-he he">${w.he}</span>
       </button>`;
+  }
+
+  // ---------- the owl's question of the day ----------
+  // One tiny question a day on the map, three picture answers. A wrong pick just wiggles; the right one
+  // gives a little star and the card shows the answer until tomorrow.
+  function qotdToday() {
+    const d = new Date(), n = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5);
+    return KIDS_QOTD[n % KIDS_QOTD.length];
+  }
+  function qotdCard() {
+    const q = qotdToday(), done = Store.kidsQotdDone;
+    const order = done ? q.answers : K.shuffle(q.answers);
+    return `
+      <div class="k-qotd ${done ? 'done' : ''}" id="k-qotd">
+        <p class="k-qotd-k">🦉 ${kt('qotd')}</p>
+        <button class="k-qotd-q en" id="k-qotd-say" lang="en" aria-label="${kt('listen')}: ${esc(q.en)}">🔊 ${esc(q.en)}</button>
+        <small class="he">${q.he}</small>
+        ${done
+          ? `<p class="k-qotd-a"><span aria-hidden="true">${q.answers[0].pic}</span> <b class="en">${q.answers[0].en}</b> ✓ · ${kt('qotdDone')}</p>`
+          : `<div class="k-qotd-opts">${order.map(a => `<button class="k-qotd-opt" data-en="${a.en}" aria-label="${a.en}"><span aria-hidden="true">${a.pic}</span><small class="en">${a.en}</small></button>`).join('')}</div>`}
+      </div>`;
+  }
+  function qotdWire() {
+    const box = $('#k-qotd');
+    if (!box) return;
+    const q = qotdToday();
+    $('#k-qotd-say').onclick = () => sayEn(q.en, 0.85);
+    box.querySelectorAll('.k-qotd-opt').forEach(b => {
+      b.onclick = () => {
+        if (b.dataset.en === q.answers[0].en) {
+          box.querySelectorAll('.k-qotd-opt').forEach(x => { x.disabled = true; });
+          b.classList.add('right');
+          K.Feel.right();
+          const n = Store.kidsQotdAnswer();
+          Sfx.star(2);
+          sayEn(`Yes! ${q.answers[0].en}!`, 0.9);
+          setTimeout(() => {
+            box.classList.add('done');
+            box.querySelector('.k-qotd-opts').outerHTML = `<p class="k-qotd-a"><span aria-hidden="true">${q.answers[0].pic}</span> <b class="en">${q.answers[0].en}</b> ✓ · ${n > 1 ? kt('qotdCount', { n }) : kt('qotdDone')}</p>`;
+          }, 1200);
+        } else {
+          K.Feel.wrong(b);
+          sayEn(b.dataset.en, 0.9);
+        }
+      };
+    });
   }
 
   // ---------- today's adventure ----------
