@@ -4007,7 +4007,7 @@ const Kids = (() => {
     { id: 'fish', col: 'orange', shape: '<ellipse cx="140" cy="120" rx="62" ry="38"/>', tx: 136, ty: 128 },
     { id: 'tail', col: 'red', shape: '<path d="M198 120 L250 88 L250 152 Z"/>', tx: 232, ty: 125 },
     { id: 'plant', col: 'green', shape: '<path d="M250 230 C230 190 270 175 250 140 C280 170 262 200 276 230 Z"/>', tx: 262, ty: 205 },
-    { id: 'star', col: 'pink', shape: '<path d="M200 248 L207 262 L222 263 L211 273 L215 288 L200 280 L185 288 L189 273 L178 263 L193 262 Z"/>', tx: 200, ty: 300 }
+    { id: 'star', col: 'pink', shape: '<path d="M200 248 L207 262 L222 263 L211 273 L215 288 L200 280 L185 288 L189 273 L178 263 L193 262 Z"/>', tx: 252, ty: 280 }
   ];
   function cbwGame() {
     document.body.classList.add('in-lesson');
@@ -4038,7 +4038,12 @@ const Kids = (() => {
     const paint = g => {
       const p = CBW.find(x => x.id === g.dataset.part);
       if (g.classList.contains('done')) return;
-      if (!brush) { $('.k-bubble').textContent = kt('cbwTip'); return; }
+      if (!brush) {   // like the colouring game: say it, and the pots bounce
+        $('.k-bubble').textContent = kt('cbwTip');
+        sayEn('Pick a colour first!', 0.9);
+        K.view.querySelectorAll('.k-cbw-pot').forEach(x => { x.classList.remove('nudge'); void x.offsetWidth; x.classList.add('nudge'); });
+        return;
+      }
       if (brush === p.col) {
         g.classList.add('done');
         g.querySelector('path, rect, ellipse').setAttribute('fill', PAINT[p.col]);
