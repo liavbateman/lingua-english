@@ -333,3 +333,25 @@ const KIDS_SONGS = [
     ]
   }
 ];
+
+// "Who am I?" riddles: short spoken clues about a picture word (id = island/word)
+const KIDS_RIDDLES = [
+  ['food/banana', 'I am yellow. I am long. Monkeys love me!', 'אני צהוב. אני ארוך. קופים אוהבים אותי!'],
+  ['animals/cat', 'I say meow. I like milk.', 'אני אומר מיאו. אני אוהב חלב.'],
+  ['sky/sun', 'I am hot. I am in the sky in the day.', 'אני חם. אני בשמיים ביום.'],
+  ['animals/fish', 'I live in the water. I can swim.', 'אני גר במים. אני יודע לשחות.'],
+  ['animals/elephant', 'I am big and grey. I have a very long nose.', 'אני גדול ואפור. יש לי אף ארוך מאוד.'],
+  ['sky/moon', 'I come out at night. I am in the sky.', 'אני יוצא בלילה. אני בשמיים.'],
+  ['food/apple', 'I am red. I grow on a tree. You can eat me.', 'אני אדום. אני גדל על עץ. אפשר לאכול אותי.'],
+  ['toys/ball', 'I am round. You can kick me.', 'אני עגול. אפשר לבעוט בי.'],
+  ['home/bed', 'You sleep on me at night.', 'ישנים עליי בלילה.'],
+  ['animals/cow', 'I say moo. I give you milk.', 'אני אומרת מו. אני נותנת לכם חלב.'],
+  ['sky/rain', 'I fall from the clouds. I am wet.', 'אני נופל מהעננים. אני רטוב.'],
+  ['go/car', 'I have four wheels. I go beep beep!', 'יש לי ארבעה גלגלים. אני עושה ביפ ביפ!'],
+  ['clothes/shoes', 'You wear me on your feet.', 'נועלים אותי על הרגליים.'],
+  ['body/tooth', 'I am white. I am in your mouth.', 'אני לבן. אני בפה שלכם.'],
+  ['animals/bird', 'I have wings. I can fly and sing.', 'יש לי כנפיים. אני יודעת לעוף ולשיר.'],
+  ['animals/lion', 'I am the king of the animals. I say roar!', 'אני מלך החיות. אני אומר רוארר!'],
+  ['go/plane', 'I fly in the sky. People sit in me.', 'אני עף בשמיים. אנשים יושבים בתוכי.'],
+  ['home/clock', 'I say tick tock. I tell you the time.', 'אני עושה טיק טק. אני אומר מה השעה.']
+].map(([id, en, he]) => ({ id, w: KIDS_WORDS.find(x => x.id === id), en, he }));

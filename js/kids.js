@@ -53,6 +53,7 @@ const Kids = (() => {
       addGate: 'הוספת ילד היא להורים', player: 'שחקן',
       owlHi: 'הינשוף',
       wotd: 'התמונה של היום', wotdTap: 'לחצו לשמוע', wotdPlanted: 'נשתלה בגינה שלכם 🌱',
+      riddles: 'מי אני?', riddlesSub: 'חידות קטנות: הקשיבו ונחשו', riddleQ: 'מי אני?', riddleTip: 'הקשיבו לרמזים ובחרו תמונה',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -99,6 +100,7 @@ const Kids = (() => {
       addGate: 'Adding a child is for grown-ups', player: 'Player',
       owlHi: 'The owl',
       wotd: 'Picture of the day', wotdTap: 'Tap to hear it', wotdPlanted: 'Planted in your garden 🌱',
+      riddles: 'Who am I?', riddlesSub: 'Little riddles: listen and guess', riddleQ: 'Who am I?', riddleTip: 'Listen to the clues and pick a picture',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -340,6 +342,11 @@ const Kids = (() => {
           <span class="grow"><b>${kt('abc')}</b><small>${kt('abcSub')}</small></span>
           ${Store.kidsHasSticker('abc') ? starsHtml(Store.kidsStars('abc'), 'sm') : ''}
         </a>
+        <a class="k-abc-card k-riddle-card" href="#/kids/riddles">
+          <span class="k-story-books" aria-hidden="true">🕵️</span>
+          <span class="grow"><b>${kt('riddles')}</b><small>${kt('riddlesSub')}</small></span>
+          ${Store.kidsHasSticker('riddles') ? starsHtml(Store.kidsStars('riddles'), 'sm') : ''}
+        </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
           <span class="grow"><b>${kt('songs')}</b><small>${kt('songsSub')}</small></span>
@@ -490,6 +497,78 @@ const Kids = (() => {
         celebrate();
         sayEn('Your garden is happy!', 0.9);
       }, 30);
+    }
+    round();
+  }
+
+  // ---------- "Who am I?" riddles ----------
+  // 5 riddles: the clues are read aloud with the words lit up, then the child picks 1 of 3 pictures.
+  function riddles() {
+    document.body.classList.add('in-lesson');
+    const set = K.shuffle(KIDS_RIDDLES.filter(r => r.w)).slice(0, 5);
+    let at = 0, firstTry = 0;
+    function round() {
+      K.lessonBar(at / set.length);
+      const r = set[at];
+      const opts = K.shuffle([r.w, ...K.shuffle(KIDS_WORDS.filter(x => x !== r.w && x.pic !== r.w.pic)).slice(0, 2)]);
+      let missed = false;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🕵️</span> ${kt('riddleQ')} · ${at + 1}/${set.length}</p>
+          <div class="k-card k-page k-riddle">
+            <span class="k-riddle-q" aria-hidden="true">❓</span>
+            <p class="k-sentence en" lang="en">${r.en.split(' ').map(w => `<button class="k-w">${w}</button>`).join(' ')}</p>
+            <p class="k-he he" lang="he">${r.he}</p>
+            <button class="k-speaker sm" id="k-say" aria-label="${kt('listen')}"><span aria-hidden="true">🔊</span></button>
+          </div>
+          <div class="k-opts">${opts.map((o, i) => `<button class="k-opt" data-i="${i}" aria-label="${o.en}"><span aria-hidden="true">${o.pic}</span></button>`).join('')}</div>
+          ${owl(kt('riddleTip'), 'small')}
+        </div>`;
+      const words = [...K.view.querySelectorAll('.k-w')];
+      words.forEach(w => { w.onclick = () => sayEn(w.textContent.replace(/[^A-Za-z']/g, '')); });
+      const read = () => readAlong(r.en + ' Who am I?', words);
+      $('#k-say').onclick = read;
+      setTimeout(read, 300);
+      K.view.querySelectorAll('.k-opt').forEach(b => {
+        b.onclick = () => {
+          if (opts[+b.dataset.i] === r.w) {
+            K.view.querySelectorAll('.k-opt').forEach(x => { x.disabled = true; });
+            b.classList.add('right');
+            K.Feel.right();
+            if (!missed) firstTry++;
+            Store.kidsWordRight(r.w.id);
+            $('.k-bubble').textContent = `${r.w.pic} ${r.w.en}!`;
+            owlMood('cheer');
+            sayEn(`Yes! ${r.w.en}!`);   // not "I am a…": that breaks for apple, shoes, rain
+            $('.k-riddle-q').textContent = r.w.pic;
+            setTimeout(() => { at++; at < set.length ? round() : end(); }, 2200);
+          } else {
+            missed = true;
+            b.disabled = true;
+            b.classList.add('nope');
+            K.Feel.wrong(b);
+            $('.k-bubble').textContent = kt('tryAgain'); owlMood('think');
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = firstTry >= 5 ? 3 : firstTry >= 3 ? 2 : 1;
+      const res = Store.kidsFinish('riddles', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+            ${res.better && !res.firstSticker ? `<b class="k-best">${kt('best')}</b>` : ''}
+          </div>
+          <a class="k-btn" href="#/kids">${kt('backToMap')}</a>
+          <button class="k-btn ghost" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+        </div>`;
+      celebrate();
+      sayEn('You are a great detective!', 0.9);
+      $('#k-again').onclick = riddles;
     }
     round();
   }
@@ -1728,6 +1807,7 @@ const Kids = (() => {
       else if (a === 'trace') trace(b);
       else if (a === 'owl') wardrobe();
       else if (a === 'stories') stories();
+      else if (a === 'riddles') riddles();
       else if (a === 'today') today(b);
       else if (a === 'songs') songs();
       else if (a === 'song') song(b);

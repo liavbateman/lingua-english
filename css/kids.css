@@ -623,3 +623,12 @@ body.kids :focus-visible { outline: 4px solid #1d2a5b; outline-offset: 3px; bord
   100% { transform: translate(var(--dx), calc(var(--dy) + 18px)); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .k-hand { animation: none !important; transform: translateY(14px); } }
+
+/* who am I? riddles */
+.k-riddle { position: relative; }
+.k-riddle-q { font-size: 3.6rem; line-height: 1.1; animation: k-pop .45s var(--ease-pop) both; }
+.k-riddle .k-sentence { font-size: 1.45rem; }
+.k-speaker.sm { width: 56px; height: 56px; font-size: 1.6rem; animation: none; }
+.k-riddle + .k-opts { margin-top: 16px; }
+/* five tiles: the last one spans the row */
+.k-tiles > :last-child:nth-child(odd) { grid-column: 1 / -1; flex-direction: row; gap: 12px; }
