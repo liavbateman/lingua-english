@@ -2192,3 +2192,7 @@ body:has(#update):not(.in-lesson) .view { padding-bottom: 96px; }
 .bk-nudge-btns { grid-column: 1 / -1; display: flex; gap: 8px; }
 .bk-nudge-btns .btn { flex: 1; margin: 0; min-height: 44px; padding: 10px 12px; }
 .backup.is-lit { box-shadow: 0 0 0 3px rgba(255, 197, 61, .8); transition: box-shadow .3s; }
+
+/* A lesson that completes its unit says so on its end screen */
+.unit-done { margin: 2px auto 10px; padding: 8px 12px; border-radius: 12px; max-width: 30ch;
+  background: rgba(47, 208, 147, .14); color: #a6f1d2; font-weight: 800; font-size: .9rem; line-height: 1.45; }

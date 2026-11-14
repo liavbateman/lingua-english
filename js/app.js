@@ -1903,10 +1903,13 @@
     function finish() {
       endLesson(1);
       lastLesson = { unit: unit.id, ids: words.map(w => w.id) };   // its practice starts with these words
+      // this lesson brought the unit's last new words: say so, the unit is a milestone on the path
+      const unitDone = fresh.length > 0 && unit.words.every(w => Store.isSeen(w.id));
       view.innerHTML = `
         <div class="card center result">
-          <div class="big">🃏</div>
+          <div class="big">${unitDone ? '🎉' : '🃏'}</div>
           <h1>${t('cards.done.title')}</h1>
+          ${unitDone ? `<p class="unit-done">${t(unit.kind === 'phrases' ? 'unit.done.phr' : 'unit.done', { title: unitTitle(unit), n: unit.words.length })}</p>` : ''}
           <p class="sub">${t(allNew ? 'cards.done.new' : 'cards.done', { a: known, b: words.length })}</p>
           <ol class="steps2" aria-label="${t('steps.aria')}">
             <li class="done"><span aria-hidden="true">✓</span>${t(unit.kind === 'phrases' ? 'steps.met.phr' : 'steps.met', { n: words.length })}</li>
