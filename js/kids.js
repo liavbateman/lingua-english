@@ -3470,15 +3470,20 @@ const Kids = (() => {
         light('all');
         $('.k-brush-line').textContent = 'Clean, shiny teeth! ✨';
         $('.k-brush-he').textContent = kt('brushDone');
+        speechSynthesis.cancel();
+        sayEn('Clean, shiny teeth! Great job!', 0.9);
+        owlMood('cheer');
         Store.kidsFinish('brush', 3, 15);
         celebrate();
       }
     }
     function tick() {
       if (!$('.k-brush')) return stop();
-      const el = Date.now() - t0, step = Math.floor(el / STEP), into = el - step * STEP;
-      $('.k-brush-bar i').style.width = `${Math.min(100, el / (STEP * BRUSH.length) * 100)}%`;
-      if (step >= BRUSH.length) return stop(true);
+      // the last step (spit and rinse) is short: 4 seconds, no counting
+      const LAST = Math.min(STEP, 4000), total = STEP * (BRUSH.length - 1) + LAST;
+      const el = Date.now() - t0, step = Math.min(BRUSH.length, Math.floor(el / STEP)), into = el - step * STEP;
+      $('.k-brush-bar i').style.width = `${Math.min(100, el / total * 100)}%`;
+      if (el >= total) return stop(true);
       if (step !== at) {
         at = step; counted = -1;
         const b = BRUSH[at];
@@ -3488,7 +3493,7 @@ const Kids = (() => {
         speechSynthesis.cancel();
         sayEn(b.say, 0.85);
         note(523 + at * 40, .3);
-      } else if (!fast) {
+      } else if (!fast && at < BRUSH.length - 1) {
         // count along: one..five, a number every two seconds after the step is said
         const n = Math.floor((into - 3000) / 2000);
         if (into > 3000 && n < 5 && n > counted) { counted = n; sayEn(NUMS[n], 1); }

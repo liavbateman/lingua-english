@@ -1465,8 +1465,10 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 @keyframes k-brush-scrub { from { transform: translate(-70%, -50%) rotate(-10deg); } to { transform: translate(-30%, -50%) rotate(10deg); } }
 .k-brush-stage[data-zone="top"] .k-brush-tool { top: 32%; } .k-brush-stage[data-zone="bottom"] .k-brush-tool { top: 66%; }
 .k-brush-stage[data-zone="left"] .k-brush-tool { left: 28%; } .k-brush-stage[data-zone="right"] .k-brush-tool { left: 72%; }
-.k-brush-line { min-height: 1.4em; margin: 14px 0 0; font: 700 1.5rem var(--k-font); color: #ffe9a6; }
-.k-brush-he { min-height: 1.2em; margin: 2px 0 10px; color: #fff; }
+.k-brush-line { min-height: 1.4em; margin: 14px 0 0; font: 700 1.5rem var(--k-font); color: var(--k-ink); }
+body.kids.night .k-brush-line { color: #ffe9a6; }   /* the light colours only on the dark night sky */
+.k-brush-he { min-height: 1.2em; margin: 2px 0 10px; color: var(--k-ink); opacity: .8; }
+body.kids.night .k-brush-he { color: #fff; }
 .k-brush-bar { height: 12px; margin: 0 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, .25); overflow: hidden; }
 .k-brush-bar i { display: block; width: 0; height: 100%; background: #2fd093; border-radius: inherit; transition: width .25s linear; }
 @media (prefers-reduced-motion: reduce) { .k-brush-stage.brushing .k-brush-tool { animation: none; } }
