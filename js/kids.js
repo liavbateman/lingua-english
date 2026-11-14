@@ -91,6 +91,8 @@ const Kids = (() => {
       says: 'מה החיה אומרת?', saysTip: 'בחרו את הקול של החיה',
       pcAge: 'גיל', pcAgeLittle: '3–5 · בלי קריאה', pcAgeBig: '6–9 · עם מילים כתובות',
       pcAgeText: 'בגיל 3–5 המשחקים בנויים רק על תמונות וצלילים: בלי מילים כתובות במשימות, בלי גרירת מילים ובלי משחקי קריאה',
+      scene: 'העולם שלי', sceneTip: 'גררו תמונה לתוך הציור (או לחצו עליה ואז על הציור). כל תמונה אומרת את המילה שלה!',
+      sceneClear: 'לנקות', sceneEmpty: 'עוד אין תמונות. שחקו באיים כדי לאסוף מילים!',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -175,6 +177,8 @@ const Kids = (() => {
       says: 'What does it say?', saysTip: 'Pick the sound the animal makes',
       pcAge: 'Age', pcAgeLittle: '3–5 · no reading', pcAgeBig: '6–9 · with written words',
       pcAgeText: 'At 3–5 the games use only pictures and sounds: no written words in the tasks, no word dragging and no reading games',
+      scene: 'My world', sceneTip: 'Drag a picture into the scene (or tap it, then the scene). Every picture says its word!',
+      sceneClear: 'Clear', sceneEmpty: 'No pictures yet. Play the islands to collect words!',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -2745,6 +2749,87 @@ const Kids = (() => {
       </div>`;
   }
 
+  // ---------- my world: a playground scene to fill with the pictures of learned words ----------
+  function sceneScreen() {
+    K.endLesson();
+    const known = KIDS_WORDS.filter(w => Store.kidsWordCount(w.id) > 0);
+    const decor = KIDS_THEMES.filter(th => Store.kidsHasSticker(th.id)).map(th => ({ pic: th.sticker }));
+    const tray = [...known.map(w => ({ pic: w.pic, w })), ...decor];
+    let picked = null;
+    K.view.innerHTML = `
+      <div class="k-wrap">
+        <a class="k-back" href="#/kids/stickers"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('album')}</a>
+        <h1 class="k-title">🎨 ${kt('scene')}</h1>
+        <p class="k-sub">${kt('sceneTip')}</p>
+        <div class="k-scene-box" id="k-scene" role="application" aria-label="${kt('scene')}">
+          <span class="k-scene-sun" aria-hidden="true">☀️</span>
+          ${Store.kidsScene.map((it, i) => placed(it, i)).join('')}
+        </div>
+        <div class="k-scene-tray">
+          ${tray.length ? tray.map((t, i) => `<button class="k-tray-item" data-i="${i}" aria-label="${t.w ? t.w.en : 'sticker'}">${t.pic}</button>`).join('') : `<p class="k-sub">${kt('sceneEmpty')}</p>`}
+        </div>
+        <button class="k-skip" id="k-scene-clear">🧽 ${kt('sceneClear')}</button>
+      </div>`;
+    const box = $('#k-scene');
+    const sayItem = it => { const w = it.w && KIDS_WORDS.find(x => x.id === it.w); if (w) sayEn(w.en); };
+    function placed(it, i) {
+      return `<button class="k-placed" data-i="${i}" style="left:${it.x}%;top:${it.y}%" aria-label="${it.w ? (KIDS_WORDS.find(x => x.id === it.w) || {}).en : 'sticker'}">${it.p}</button>`;
+    }
+    function drop(t, cx, cy) {
+      const r = box.getBoundingClientRect();
+      if (cx < r.left || cx > r.right || cy < r.top || cy > r.bottom) return;
+      const it = { p: t.pic, w: t.w ? t.w.id : '', x: Math.round((cx - r.left) / r.width * 1000) / 10, y: Math.round((cy - r.top) / r.height * 1000) / 10 };
+      const list = Store.kidsScene.concat([it]);
+      Store.kidsScene = list;
+      box.insertAdjacentHTML('beforeend', placed(it, list.length - 1));
+      const el = box.lastElementChild;
+      el.classList.add('k-pop-in');
+      el.onclick = () => sayItem(it);
+      Sfx.tap();
+      if (it.w) sayItem(it); else sayEn('Wow!');
+    }
+    box.querySelectorAll('.k-placed').forEach(el => { el.onclick = () => sayItem(Store.kidsScene[+el.dataset.i]); });
+    box.addEventListener('click', e => {
+      if (!picked || e.target.closest('.k-placed')) return;
+      drop(picked, e.clientX, e.clientY);
+      K.view.querySelectorAll('.k-tray-item').forEach(x => x.classList.remove('picked'));
+      picked = null;
+    });
+    K.view.querySelectorAll('.k-tray-item').forEach(b => {
+      const t = tray[+b.dataset.i];
+      b.onclick = () => {
+        if (b.dataset.dragged) { delete b.dataset.dragged; return; }
+        K.view.querySelectorAll('.k-tray-item').forEach(x => x.classList.toggle('picked', x === b));
+        picked = t;
+        if (t.w) sayEn(t.w.en);
+      };
+      // drag a copy out of the tray
+      b.onpointerdown = e => {
+        const sx = e.clientX, sy = e.clientY;
+        let ghost = null;
+        const move = ev => {
+          if (!ghost && Math.hypot(ev.clientX - sx, ev.clientY - sy) < 8) return;
+          if (!ghost) { ghost = document.createElement('div'); ghost.className = 'k-ghost'; ghost.textContent = t.pic; document.body.appendChild(ghost); }
+          ghost.style.left = ev.clientX + 'px';
+          ghost.style.top = ev.clientY + 'px';
+        };
+        const up = ev => {
+          document.removeEventListener('pointermove', move);
+          document.removeEventListener('pointerup', up);
+          document.removeEventListener('pointercancel', up);
+          if (!ghost) return;
+          ghost.remove();
+          b.dataset.dragged = '1';
+          drop(t, ev.clientX, ev.clientY);
+        };
+        document.addEventListener('pointermove', move);
+        document.addEventListener('pointerup', up);
+        document.addEventListener('pointercancel', up);
+      };
+    });
+    $('#k-scene-clear').onclick = () => { Store.kidsScene = []; sceneScreen(); };
+  }
+
   // ---------- sticker album ----------
   function stickers() {
     K.endLesson();
@@ -2752,6 +2837,7 @@ const Kids = (() => {
       <div class="k-wrap">
         <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
         <h1 class="k-title">🎁 ${kt('album')}</h1>
+        <a class="k-btn" href="#/kids/scene">🎨 ${kt('scene')}</a>
         ${trophiesHtml()}
         <h2 class="k-title k-h2">🎁 ${kt('stickers')}</h2>
         <p class="k-sub">${kt('albumSub')} · ${Store.kidsStickerCount}/${KIDS_THEMES.length}</p>
@@ -2813,6 +2899,7 @@ const Kids = (() => {
       if (overLimit()) return rest();   // checked between screens, never in the middle of a game
       if (a === 'play') play(b);
       else if (a === 'stickers') stickers();
+      else if (a === 'scene') sceneScreen();
       else if (a === 'abc') b ? letter(b) : abc();
       else if (a === 'abcgame') abcGame();
       else if (a === 'trace') trace(b);

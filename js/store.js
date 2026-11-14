@@ -213,6 +213,9 @@ const Store = (() => {
     // Age group: 'little' (3–5, pictures and sounds only) or 'big' (6–9, words shown and reading games)
     get kidsAge() { return (state.kids && state.kids.age) || 'big'; },
     set kidsAge(v) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.age = v === 'little' ? 'little' : 'big'; save(); },
+    // My scene: pictures the child placed on the playground ({ p: picture, w: word id or '', x, y } in %)
+    get kidsScene() { return (state.kids && state.kids.scene) || []; },
+    set kidsScene(v) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.scene = v.slice(-40); save(); },
     // The owl buddy's look: a colour and an accessory, chosen in the wardrobe
     get kidsOwl() { const o = state.kids && state.kids.owl; return { color: (o && o.color) || 'blue', acc: (o && o.acc) || '' }; },
     setKidsOwl(part, id) {
