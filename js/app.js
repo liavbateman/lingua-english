@@ -961,7 +961,10 @@
       setTimeout(() => {
         const f = card.querySelector('.btn, .pcard-link');
         if (f) f.focus({ preventScroll: true });
-        const over = card.getBoundingClientRect().bottom + 16 - view.getBoundingClientRect().bottom;
+        // the tab bar floats over the bottom of the view, so the card must clear its top edge
+        const bar = document.querySelector('.tabbar');
+        const floor = Math.min(view.getBoundingClientRect().bottom, bar && bar.offsetParent ? bar.getBoundingClientRect().top : Infinity);
+        const over = card.getBoundingClientRect().bottom + 16 - floor;
         if (over > 0) view.scrollBy({ top: over, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
       }, 30);
       return card;
