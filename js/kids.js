@@ -6,6 +6,17 @@
 const Kids = (() => {
   let K = null;            // helpers shared by app.js (speak, Feel, confetti, view…), set in init()
   const $ = sel => K.view.querySelector(sel);
+  // Every delayed step a screen schedules ("next round in 2 s") is tracked, and show() cancels them all when
+  // the screen changes. Without this, a child who answers and leaves at once is pulled back: the old game's
+  // next round draws itself over the map. (Shadows the global setTimeout / clearTimeout inside Kids only.)
+  const screenTimers = new Set();
+  const setTimeout = (fn, ms, ...args) => {
+    const id = window.setTimeout(() => { screenTimers.delete(id); fn(...args); }, ms);
+    screenTimers.add(id);
+    return id;
+  };
+  const clearTimeout = id => { screenTimers.delete(id); window.clearTimeout(id); };
+  const clearScreenTimers = () => { screenTimers.forEach(id => window.clearTimeout(id)); screenTimers.clear(); };
 
   // ---------- texts ----------
   const STR = {
@@ -4435,13 +4446,15 @@ const Kids = (() => {
       $('#k-mat').innerHTML = toys.filter(t => !t.inside).map(btn).join('');
       K.view.querySelectorAll('.k-bath-toy').forEach(b => { b.onclick = () => tap(toys.find(t => t.en === b.dataset.en), b); });
     };
-    let cmd = null, missed = false;
+    let cmd = null, cmd0 = null, missed = false;
     function next() {
       K.lessonBar(done / N);
       if (done >= N) return bubbles();
-      const ins = toys.filter(t => t.inside), outs = toys.filter(t => !t.inside);
+      // never the toy that just moved (in and straight back out feels like a trick)
+      const last = cmd0, ins = toys.filter(t => t.inside && t !== last), outs = toys.filter(t => !t.inside && t !== last);
       const goIn = !ins.length || (outs.length && Math.random() < .6);
       const t = pickOne(goIn ? outs : ins);
+      cmd0 = t;
       cmd = { t, goIn };
       missed = false;
       const line = goIn ? `Put the ${t.en} in the water!` : `Take the ${t.en} out!`;
@@ -6975,6 +6988,7 @@ const Kids = (() => {
     // First meeting: the owl greets the child (Hebrew when there is a Hebrew voice, then English)
     hello() { say([['he', 'היי! אני הינשוף. בואו נלמד אנגלית ביחד!'], ['en', "Hello! Let's play!"]]); },
     show(a, b) {
+      clearScreenTimers();
       clearInterval(peekTimer);
       clearInterval(speedTimer);
       clearInterval(callTimer);
