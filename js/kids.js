@@ -133,6 +133,7 @@ const Kids = (() => {
       safari: 'ספארי של קולות', safariSub: 'מי אומר moo? מוצאים את החיה שמתחבאת מאחורי העלים', safariTip: 'הקשיבו לקול ולחצו על העלה שהחיה מציצה ממנו',
       mybook: 'הספר הראשון שלי באנגלית', mybookSub: 'כל אי שמסיימים מוסיף עמוד עם המילים שלכם', mybookEmpty: 'סיימו אי ראשון וקבלו את העמוד הראשון בספר!',
       mybookRead: 'הקראה', mybookPage: 'עמוד {a} מתוך {b}',
+      shunt: 'ציד צורות', shuntSub: 'איפה יש עיגול? שעון, כדור, עוגייה! מוצאים צורות בכל מקום', shuntTip: 'מצאו את כל הדברים בצורה הזאת', shuntLeft: 'עוד {n}',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -259,6 +260,7 @@ const Kids = (() => {
       safari: 'Sound safari', safariSub: 'Who says moo? Find the animal hiding behind the leaves', safariTip: 'Listen to the sound and tap the leaf the animal is peeking from',
       mybook: 'My first English book', mybookSub: 'Every island you finish adds a page with your words', mybookEmpty: 'Finish your first island to get the first page of your book!',
       mybookRead: 'Read to me', mybookPage: 'Page {a} of {b}',
+      shunt: 'Shape hunt', shuntSub: 'Where is a circle? A clock, a ball, a cookie! Shapes are everywhere', shuntTip: 'Find all the things with this shape', shuntLeft: '{n} more',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -673,6 +675,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🌿</span>
           <span class="grow"><b>${kt('safari')}</b><small>${bidiEn(kt('safariSub'))}</small></span>
           ${Store.kidsHasSticker('safari') ? starsHtml(Store.kidsStars('safari'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-shunt-card" href="#/kids/shunt">
+          <span class="k-story-books" aria-hidden="true">🔍</span>
+          <span class="grow"><b>${kt('shunt')}</b><small>${kt('shuntSub')}</small></span>
+          ${Store.kidsHasSticker('shunt') ? starsHtml(Store.kidsStars('shunt'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -2993,6 +3000,84 @@ const Kids = (() => {
     };
   }
 
+  // ---------- shape hunt: shapes in everyday things ----------
+  // "Find all the circles!" in a box of 6 things; each right tap draws the shape around the thing and says
+  // "A clock is a circle!". A thing of another shape names its own shape ("A pizza is a triangle.").
+  function shuntGame() {
+    document.body.classList.add('in-lesson');
+    const S = KIDS_SHAPE_HUNT;
+    const order = K.shuffle(['circle', 'square', 'triangle']);
+    let at = 0, misses = 0;
+    const article = en => (/^[aeiou]/.test(en) ? 'an' : 'a');
+    function round() {
+      K.lessonBar(at / order.length);
+      const shape = order[at], need = little() ? 2 : 3;
+      const right = K.shuffle(S[shape].things).slice(0, need).map(([en, pic]) => ({ en, pic, shape }));
+      const others = K.shuffle(Object.keys(S).filter(k => k !== shape).flatMap(k => S[k].things.map(([en, pic]) => ({ en, pic, shape: k })))).slice(0, 6 - need);
+      const box = K.shuffle([...right, ...others]);
+      let found = 0;
+      const line = `Find all the ${shape}s!`;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">🔍</span> ${kt('shunt')} · ${at + 1}/${order.length}</p>
+          <div class="k-prompt">
+            <button class="k-speaker" id="k-say" aria-label="${kt('listen')}: ${line}"><span aria-hidden="true">🔊</span></button>
+            <span class="k-target en" lang="en">${S[shape].mark} ${line}</span>
+          </div>
+          <p class="k-sub he">${S[shape].he} · <b id="k-sh-left">${kt('shuntLeft', { n: need })}</b></p>
+          <div class="k-fam-box k-shunt-box">${box.map((x, i) => `<button class="k-fam-pic k-sh-thing sh-${x.shape}" data-i="${i}" aria-label="${x.en}"><span aria-hidden="true">${x.pic}</span></button>`).join('')}</div>
+          ${owl(kt('shuntTip'), 'small')}
+        </div>`;
+      const ask = () => sayEn(line, 0.85);
+      $('#k-say').onclick = ask;
+      setTimeout(ask, 300);
+      K.view.querySelectorAll('.k-sh-thing').forEach(b => {
+        b.onclick = () => {
+          const x = box[+b.dataset.i];
+          if (x.shape === shape) {
+            b.disabled = true;
+            b.classList.add('got');
+            found++;
+            K.Feel.right();
+            $('#k-sh-left').textContent = kt('shuntLeft', { n: need - found });
+            $('.k-bubble').innerHTML = `${S[shape].mark} <bdi dir="ltr" lang="en">${x.en}: ${shape}!</bdi> · ${S[shape].he}`;
+            sayEn(`${article(x.en)[0].toUpperCase() + article(x.en).slice(1)} ${x.en} is ${article(shape)} ${shape}!`, 0.9);
+            if (found === need) {
+              K.view.querySelectorAll('.k-sh-thing').forEach(y => { y.disabled = true; });
+              owlMood('cheer');
+              setTimeout(() => { at++; at < order.length ? round() : end(); }, 2200);
+            }
+          } else {
+            misses++;
+            b.classList.remove('puff'); void b.offsetWidth; b.classList.add('puff');
+            K.Feel.wrong(b);
+            owlMood('think');
+            $('.k-bubble').innerHTML = `${S[x.shape].mark} <bdi dir="ltr" lang="en">${x.en}: ${x.shape}</bdi> · ${S[x.shape].he}`;
+            sayEn(`${article(x.en)[0].toUpperCase() + article(x.en).slice(1)} ${x.en} is ${article(x.shape)} ${x.shape}.`, 0.9);
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = misses <= 1 ? 3 : misses <= 3 ? 2 : 1;
+      Store.kidsFinish('shunt', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>🔍 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('You are a shape detective!', 0.9);
+      $('#k-again').onclick = shuntGame;
+    }
+    round();
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -5048,6 +5133,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'shunt') shuntGame();
       else if (a === 'mybook') myBook();
       else if (a === 'safari') safariGame();
       else if (a === 'tmap') tmapScreen();

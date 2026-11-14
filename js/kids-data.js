@@ -558,3 +558,10 @@ const KIDS_QOTD = [
   ['What has wheels?', 'למה יש גלגלים?', [['🚲', 'a bike'], ['🐟', 'a fish'], ['🪑', 'a chair']]],
   ['What do you brush?', 'את מה מצחצחים?', [['🦷', 'teeth'], ['👂', 'ears'], ['🦶', 'feet']]]
 ].map(([en, he, a]) => ({ en, he, answers: a.map(([pic, word]) => ({ pic, en: word })) }));
+
+// Shape hunt: everyday things and the shape they are
+const KIDS_SHAPE_HUNT = {
+  circle: { he: 'עיגול', mark: '⚪', things: [['clock', '🕐'], ['ball', '⚽'], ['cookie', '🍪'], ['donut', '🍩'], ['orange', '🍊'], ['button', '🔘']] },
+  square: { he: 'ריבוע', mark: '🟧', things: [['present', '🎁'], ['picture', '🖼️'], ['waffle', '🧇'], ['box', '📦'], ['window', '🪟']] },
+  triangle: { he: 'משולש', mark: '🔺', things: [['pizza', '🍕'], ['tent', '⛺'], ['tree', '🎄'], ['cheese', '🧀'], ['ruler', '📐']] }
+};
