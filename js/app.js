@@ -223,9 +223,10 @@
       : [];
     return [
       ...review,
-      { id: 'vocab', title: t('task.vocab'), sub: t('task.vocab.sub', lessonSize(u)), href: `#/unit/${u.id}`, icon: 'book', color: 'blue' },
-      { id: 'speak', title: t('task.speak'), sub: t('task.speak.sub'), href: '#/speak', icon: 'mic', color: 'purple' },
-      { id: 'grammar', title: t('task.grammar'), sub: t('task.grammar.sub', { title: ruleTitle(g) }), href: `#/grammar/${g.id}`, icon: 'pencil', color: 'gold' }
+      // a task done today says so, instead of already offering the next lesson's words or rule
+      { id: 'vocab', title: t('task.vocab'), sub: Store.tasks.vocab ? t('task.vocab.done') : t('task.vocab.sub', lessonSize(u)), href: `#/unit/${u.id}`, icon: 'book', color: 'blue' },
+      { id: 'speak', title: t('task.speak'), sub: Store.tasks.speak ? t('task.speak.done') : t('task.speak.sub'), href: '#/speak', icon: 'mic', color: 'purple' },
+      { id: 'grammar', title: t('task.grammar'), sub: Store.tasks.grammar ? t('task.grammar.done') : t('task.grammar.sub', { title: ruleTitle(g) }), href: `#/grammar/${g.id}`, icon: 'pencil', color: 'gold' }
     ];
   }
 
