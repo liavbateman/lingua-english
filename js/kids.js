@@ -148,6 +148,7 @@ const Kids = (() => {
       rsBtn: 'להקליט סיפור בקול שלכם', rsTitle: 'סיפור בקול של אמא ואבא', rsSub: 'מקליטים את עצמכם קוראים כל עמוד באנגלית. הילד ישמע את הקול שלכם בסיפור',
       rsRec: 'הקלטה', rsStop: 'עצירה', rsPlay: 'השמעה', rsDel: 'מחיקה', rsCount: '{n} מתוך {m} עמודים', rsNoMic: 'אין גישה למיקרופון בדפדפן הזה',
       rsVoice: 'הקול של אמא ואבא', rsRobot: 'קול הינשוף',
+      cbw: 'צובעים לפי מילה', cbwSub: 'קוראים את שם הצבע על כל חלק בתמונה וצובעים', cbwTip: 'קראו את המילה על החלק, בחרו את הצבע ולחצו על החלק',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -289,6 +290,7 @@ const Kids = (() => {
       rsBtn: 'Record a story in your voice', rsTitle: "Mum's and dad's story voice", rsSub: 'Record yourself reading each page in English. Your child will hear your voice in the story',
       rsRec: 'Record', rsStop: 'Stop', rsPlay: 'Play', rsDel: 'Delete', rsCount: '{n} of {m} pages', rsNoMic: 'No microphone access in this browser',
       rsVoice: "Mum and dad's voice", rsRobot: "Owl's voice",
+      cbw: 'Colour by word', cbwSub: 'Read the colour word on each part of the picture and paint it', cbwTip: 'Read the word on the part, pick that colour and tap the part',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -732,6 +734,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🙈</span>
           <span class="grow"><b>${kt('peekaboo')}</b><small>${kt('peekabooSub')}</small></span>
         </a>
+        ${little() ? '' : `<a class="k-abc-card k-cbw-card" href="#/kids/cbw">
+          <span class="k-story-books" aria-hidden="true">🐠</span>
+          <span class="grow"><b>${kt('cbw')}</b><small>${kt('cbwSub')}</small></span>
+          ${Store.kidsHasSticker('cbw') ? starsHtml(Store.kidsStars('cbw'), 'sm') : ''}
+        </a>`}
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
           <span class="grow"><b>${kt('songs')}</b><small>${kt('songsSub')}</small></span>
@@ -966,8 +973,8 @@ const Kids = (() => {
   // ---------- colour it ----------
   // A picture of shapes to fill: tap a colour (hear its name), then a part of the picture.
   // The owl gives 5 colour instructions ("Colour the sun yellow"); after that, free colouring.
-  const PAINT = { red: '#ef4444', blue: '#3b82f6', green: '#22c55e', yellow: '#facc15', orange: '#fb923c', purple: '#a855f7', black: '#1f2937', white: '#ffffff' };
-  const PAINT_HE = { red: 'אדום', blue: 'כחול', green: 'ירוק', yellow: 'צהוב', orange: 'כתום', purple: 'סגול', black: 'שחור', white: 'לבן' };
+  const PAINT = { red: '#ef4444', blue: '#3b82f6', green: '#22c55e', yellow: '#facc15', orange: '#fb923c', purple: '#a855f7', black: '#1f2937', white: '#ffffff', pink: '#f472b6' };
+  const PAINT_HE = { red: 'אדום', blue: 'כחול', green: 'ירוק', yellow: 'צהוב', orange: 'כתום', purple: 'סגול', black: 'שחור', white: 'לבן', pink: 'ורוד' };
   const PARTS = [
     ['sky', 'שמיים', '<rect x="0" y="0" width="300" height="258"/>'],
     ['sun', 'שמש', '<circle cx="248" cy="52" r="30"/>'],
@@ -3741,6 +3748,89 @@ const Kids = (() => {
     });
   }
 
+  // ---------- colour by word: reading colour words (the listening colouring game's reading twin) ----------
+  // An underwater picture; every part has its colour written on it ("blue", "orange"). The paint pots
+  // show only colours, so the child has to read the word. A pot says its name when tapped (help, not the answer).
+  const CBW = [
+    { id: 'water', col: 'blue', shape: '<rect x="0" y="0" width="300" height="230"/>', tx: 150, ty: 30 },
+    { id: 'sand', col: 'yellow', shape: '<path d="M0 230 Q75 210 150 228 T300 222 V300 H0 Z"/>', tx: 70, ty: 272 },
+    { id: 'fish', col: 'orange', shape: '<ellipse cx="140" cy="120" rx="62" ry="38"/>', tx: 136, ty: 128 },
+    { id: 'tail', col: 'red', shape: '<path d="M198 120 L250 88 L250 152 Z"/>', tx: 232, ty: 125 },
+    { id: 'plant', col: 'green', shape: '<path d="M250 230 C230 190 270 175 250 140 C280 170 262 200 276 230 Z"/>', tx: 262, ty: 205 },
+    { id: 'star', col: 'pink', shape: '<path d="M200 248 L207 262 L222 263 L211 273 L215 288 L200 280 L185 288 L189 273 L178 263 L193 262 Z"/>', tx: 200, ty: 300 }
+  ];
+  function cbwGame() {
+    document.body.classList.add('in-lesson');
+    const pots = K.shuffle([...new Set(CBW.map(p => p.col)), 'purple', 'black']);
+    let brush = null, done = 0, misses = 0;
+    K.lessonBar(0);
+    K.view.innerHTML = `
+      <div class="k-wrap k-play">
+        <p class="k-step"><span aria-hidden="true">🐠</span> ${kt('cbw')}</p>
+        <div class="k-card k-paint-card">
+          <svg class="k-paint k-cbw" viewBox="0 0 300 310" role="img" aria-label="${kt('cbw')}">
+            ${CBW.map(p => `<g class="k-part" data-part="${p.id}" tabindex="0" role="button" aria-label="${p.col}">${p.shape.replace('/>', ' fill="#ffffff"/>')}</g>`).join('')}
+            <circle cx="105" cy="110" r="6" fill="#1f2937" pointer-events="none"/>
+            ${CBW.map(p => `<text class="k-cbw-word" data-for="${p.id}" x="${p.tx}" y="${p.ty}" text-anchor="middle" pointer-events="none">${p.col}</text>`).join('')}
+          </svg>
+        </div>
+        <div class="k-paints">${pots.map(c => `<button class="k-paint-pot k-cbw-pot" data-c="${c}" style="--p:${PAINT[c]}" aria-label="${c}"><i></i></button>`).join('')}</div>
+        ${owl(kt('cbwTip'), 'small')}
+      </div>`;
+    setTimeout(() => sayEn('Read the colour words and paint the picture!', 0.85), 300);
+    K.view.querySelectorAll('.k-cbw-pot').forEach(b => {
+      b.onclick = () => {
+        brush = b.dataset.c;
+        K.view.querySelectorAll('.k-cbw-pot').forEach(x => x.classList.toggle('picked', x === b));
+        sayEn(brush, 0.9);
+      };
+    });
+    const paint = g => {
+      const p = CBW.find(x => x.id === g.dataset.part);
+      if (g.classList.contains('done')) return;
+      if (!brush) { $('.k-bubble').textContent = kt('cbwTip'); return; }
+      if (brush === p.col) {
+        g.classList.add('done');
+        g.querySelector('path, rect, ellipse').setAttribute('fill', PAINT[p.col]);
+        K.view.querySelector(`.k-cbw-word[data-for="${p.id}"]`).classList.add('done');
+        K.Feel.right();
+        done++;
+        K.lessonBar(done / CBW.length);
+        $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${p.col}!</bdi> ✓`;
+        sayEn(`${p.col}!`, 0.9);
+        if (done === CBW.length) setTimeout(end, 1200);
+      } else {
+        misses++;
+        K.Feel.wrong(g);
+        owlMood('think');
+        $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${brush}? ${kt('tryAgain')}</bdi>`;
+        sayEn(`This one says ${p.col}.`, 0.85);
+      }
+    };
+    K.view.querySelectorAll('.k-cbw .k-part').forEach(g => {
+      g.addEventListener('click', () => paint(g));
+      g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); paint(g); } });
+    });
+    function end() {
+      K.endLesson(1);
+      const stars = misses <= 1 ? 3 : misses <= 3 ? 2 : 1;
+      Store.kidsFinish('cbw', stars, 10 + stars * 5);
+      const pic = K.view.querySelector('.k-paint-card').outerHTML;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}${pic}
+            <h1>🐠 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('What a beautiful fish! You can read colours!', 0.9);
+      $('#k-again').onclick = cbwGame;
+    }
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -5813,6 +5903,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'cbw') cbwGame();
       else if (a === 'peekaboo') peekabooGame();
       else if (a === 'morning') morningGame();
       else if (a === 'seesaw') seesawGame();

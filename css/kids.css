@@ -1541,3 +1541,9 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-rs-rec.on { background: #ffd6de; animation: k-boing 1s ease-in-out infinite; }
 .k-rs-voices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
 .k-rs-voices .k-btn { margin: 0; font-size: .95rem; }
+
+/* colour by word */
+.k-cbw .k-part path, .k-cbw .k-part rect, .k-cbw .k-part ellipse { stroke: #1d2a5b; stroke-width: 2.5; transition: fill .3s; }
+.k-cbw-word { font: 700 15px var(--k-font); fill: #1d2a5b; paint-order: stroke; stroke: #fff; stroke-width: 4px; }
+.k-cbw-word.done { opacity: .35; }
+.k-cbw-pot.picked { transform: translateY(-6px) scale(1.08); box-shadow: 0 0 0 4px #ffd84d; }
