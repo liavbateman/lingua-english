@@ -216,6 +216,9 @@ const Store = (() => {
     // My scene: pictures the child placed on the playground ({ p: picture, w: word id or '', x, y } in %)
     get kidsScene() { return (state.kids && state.kids.scene) || []; },
     set kidsScene(v) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.scene = v.slice(-40); save(); },
+    // Today's weather as the child sees it out of the window (sunny, rainy…)
+    get kidsWeather() { const w = state.kids && state.kids.weather; return w && w.day === dayKey() ? w.id : null; },
+    set kidsWeather(id) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.weather = { day: dayKey(), id }; save(); },
     // Daily check-in with the owl: how the child feels each day (word id), kept for 8 weeks
     get kidsMoodToday() { const m = state.kids && state.kids.moods; return (m && m[dayKey()]) || null; },
     kidsMoodOn: key => (state.kids && state.kids.moods && state.kids.moods[key]) || null,

@@ -962,3 +962,22 @@ body.kids-little .k-speaker { width: 120px; height: 120px; font-size: 3.6rem; }
 .k-checkin.done { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; font-size: .95rem; }
 .k-checkin.done b { font-size: 1.1rem; }
 .k-wk-days em { font-style: normal; font-size: 1rem; line-height: 1; }
+
+/* weather of the day: the sky over the kids world follows it */
+.k-wx { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px; border: 0; border-radius: 16px; background: #f3f6ff; cursor: pointer; font-size: 1.9rem; }
+.k-wx small { font-size: .72rem; color: var(--k-ink); }
+.k-checkin.done b + b { margin-inline-start: 4px; }
+body.kids.wx-cloudy:not(.night) { background:
+  radial-gradient(40% 10% at 25% 10%, rgba(255, 255, 255, .9), transparent 70%), radial-gradient(45% 12% at 75% 20%, rgba(255, 255, 255, .85), transparent 70%),
+  linear-gradient(#9fb6cf 0%, #c3d3e3 55%, #e5edf5 100%); }
+body.kids.wx-rainy::after, body.kids.wx-snowy::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .5;
+  animation: k-fall 0.9s linear infinite;
+}
+body.kids.wx-rainy::after { background-image: repeating-linear-gradient(105deg, transparent 0 14px, rgba(255, 255, 255, .55) 14px 16px, transparent 16px 40px); background-size: 40px 60px; }
+body.kids.wx-snowy::after { background-image: radial-gradient(3px 3px at 10px 10px, #fff 50%, transparent 60%), radial-gradient(2px 2px at 30px 40px, #fff 50%, transparent 60%); background-size: 50px 60px; animation-duration: 4s; }
+body.kids.wx-rainy:not(.night) { background: linear-gradient(#7d93ad 0%, #a7b8cb 55%, #d5dee8 100%); }
+body.kids.wx-windy .k-isle-pic, body.kids.wx-windy .k-owl .k-av { animation: mv-sway 1.6s ease-in-out infinite; transform-origin: bottom center; }
+@keyframes k-fall { from { background-position: 0 0; } to { background-position: -10px 60px; } }
+body.kids.wx-rainy .view, body.kids.wx-snowy .view { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: reduce) { body.kids.wx-rainy::after, body.kids.wx-snowy::after, body.kids.wx-windy .k-isle-pic { animation: none !important; } }

@@ -94,6 +94,7 @@ const Kids = (() => {
       scene: 'העולם שלי', sceneTip: 'גררו תמונה לתוך הציור (או לחצו עליה ואז על הציור). כל תמונה אומרת את המילה שלה!',
       sceneClear: 'לנקות', sceneEmpty: 'עוד אין תמונות. שחקו באיים כדי לאסוף מילים!',
       checkin: 'הינשוף שואל: איך אתם מרגישים היום?', checkinDone: 'היום הרגשתם:',
+      weatherQ: 'ומה מזג האוויר היום? הסתכלו מהחלון!', checkinToday: 'היום:',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -181,6 +182,7 @@ const Kids = (() => {
       scene: 'My world', sceneTip: 'Drag a picture into the scene (or tap it, then the scene). Every picture says its word!',
       sceneClear: 'Clear', sceneEmpty: 'No pictures yet. Play the islands to collect words!',
       checkin: 'The owl asks: how do you feel today?', checkinDone: 'Today you feel:',
+      weatherQ: "And what's the weather today? Look out of the window!", checkinToday: 'Today:',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -550,18 +552,8 @@ const Kids = (() => {
       Sfx.tap();
     };
     checkVoice();
-    K.view.querySelectorAll('.k-mood').forEach(b => {
-      b.onclick = () => {
-        const w = KIDS_WORDS.find(x => x.id === b.dataset.id);
-        Store.kidsSetMood(w.id);
-        Store.kidsWordRight(w.id);   // the feeling word goes into the garden too
-        const reply = { 'feelings/happy': 'Me too!', 'feelings/sad': "Oh no. A big hug!", 'feelings/tired': "Let's play something calm.", 'feelings/angry': 'Take a big breath with me.', 'feelings/surprised': 'Wow!', 'feelings/scared': "Don't worry, I'm here." }[w.id] || 'Thank you!';
-        say([['en', `You feel ${w.en}. ${reply}`]]);
-        owlMood(w.id === 'feelings/happy' ? 'cheer' : 'love');
-        const card = $('.k-checkin');
-        if (card) card.outerHTML = checkinCard();
-      };
-    });
+    bindCheckin();
+    applyWeather();
     const wotdBtn = $('#k-wotd');
     if (wotdBtn) wotdBtn.onclick = () => {
       const w = KIDS_WORDS.find(x => x.id === wotdBtn.dataset.id);
@@ -1907,10 +1899,42 @@ const Kids = (() => {
 
   // ---------- the owl's daily check-in ----------
   // One question a day, answered with a picture: practises the feelings words in a real moment
+  const WEATHER = [{ id: 'sunny', pic: '☀️' }, { id: 'cloudy', pic: '☁️' }, { id: 'rainy', pic: '🌧️' }, { id: 'windy', pic: '🌬️' }, { id: 'snowy', pic: '❄️' }];
+  // The map's sky follows the weather the child picked today
+  const applyWeather = () => { WEATHER.forEach(x => document.body.classList.toggle('wx-' + x.id, Store.kidsWeather === x.id)); };
+  function bindCheckin() {
+    K.view.querySelectorAll('.k-mood').forEach(b => {
+      b.onclick = () => {
+        const w = KIDS_WORDS.find(x => x.id === b.dataset.id);
+        Store.kidsSetMood(w.id);
+        Store.kidsWordRight(w.id);   // the feeling word goes into the garden too
+        const reply = { 'feelings/happy': 'Me too!', 'feelings/sad': 'Oh no. A big hug!', 'feelings/tired': "Let's play something calm.", 'feelings/angry': 'Take a big breath with me.', 'feelings/surprised': 'Wow!', 'feelings/scared': "Don't worry, I'm here." }[w.id] || 'Thank you!';
+        say([['en', `You feel ${w.en}. ${reply}`]]);
+        owlMood(w.id === 'feelings/happy' ? 'cheer' : 'love');
+        $('.k-checkin').outerHTML = checkinCard();
+        bindCheckin();
+      };
+    });
+    K.view.querySelectorAll('.k-wx').forEach(b => {
+      b.onclick = () => {
+        Store.kidsWeather = b.dataset.wx;
+        applyWeather();
+        say([['en', `It's ${b.dataset.wx} today!`]]);
+        owlMood('cheer');
+        $('.k-checkin').outerHTML = checkinCard();
+      };
+    });
+  }
   function checkinCard() {
     const feels = ['happy', 'tired', 'sad', 'angry', 'surprised'].map(f => KIDS_WORDS.find(w => w.id === 'feelings/' + f)).filter(Boolean);
     const today = Store.kidsMoodToday && KIDS_WORDS.find(w => w.id === Store.kidsMoodToday);
-    if (today) return `<div class="k-checkin done"><span>${kt('checkinDone')}</span><b class="en">${today.pic} ${today.en}</b></div>`;
+    const wx = Store.kidsWeather && WEATHER.find(x => x.id === Store.kidsWeather);
+    if (today && wx) return `<div class="k-checkin done"><span>${kt('checkinToday')}</span><b class="en">${today.pic} ${today.en}</b><b class="en">${wx.pic} ${wx.id}</b></div>`;
+    if (today) return `
+      <div class="k-checkin" role="group" aria-label="${kt('weatherQ')}">
+        <p>🦉 ${kt('weatherQ')}</p>
+        <div class="k-moods">${WEATHER.map(x => `<button class="k-wx" data-wx="${x.id}" aria-label="${x.id}"><span aria-hidden="true">${x.pic}</span><small class="en">${x.id}</small></button>`).join('')}</div>
+      </div>`;
     return `
       <div class="k-checkin" role="group" aria-label="${kt('checkin')}">
         <p>🦉 ${kt('checkin')}</p>
@@ -2950,6 +2974,6 @@ const Kids = (() => {
       else map();
     },
     gate,
-    leave() { stopRec(); document.body.classList.remove('kids', 'night', 'kids-big', 'kids-little'); document.body.style.removeProperty('--kc'); }
+    leave() { stopRec(); document.body.classList.remove('kids', 'night', 'kids-big', 'kids-little', 'wx-sunny', 'wx-cloudy', 'wx-rainy', 'wx-windy', 'wx-snowy'); document.body.style.removeProperty('--kc'); }
   };
 })();
