@@ -1276,3 +1276,20 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 @keyframes k-td-no { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 @media (prefers-reduced-motion: reduce) { .k-teddy.giggle, .k-td-part.hit, .k-td-part.nope { animation: none; } }
 .k-td-part .k-td-hitbox, .k-td-part.hit .k-td-hitbox { fill: transparent; stroke: none; }
+
+/* picture talk */
+.k-talk-line { min-height: 2.6em; margin: 0 0 8px; padding: 8px 14px; border-radius: 18px; background: #fff; color: var(--k-ink); font: 700 1.25rem var(--k-font); text-align: center; }
+.k-talk-room { height: 280px; }
+.k-talk-table { width: 30%; height: 14px; border-radius: 6px; background: #a8743f; box-shadow: 0 46px 0 -4px transparent; }
+.k-talk-table::before, .k-talk-table::after { content: ''; position: absolute; top: 12px; width: 8px; height: 52px; background: #8a5a2b; border-radius: 3px; }
+.k-talk-table::before { left: 8px; } .k-talk-table::after { right: 8px; }
+.k-talk-spot { border-color: rgba(29, 42, 91, .18); display: grid; place-items: center; }
+.k-talk-on { font-size: 2.6rem; line-height: 1; animation: k-pop .45s var(--ease-pop) both; }
+.k-talk-tray { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0; direction: ltr; }
+.k-talk-friend {
+  display: flex; flex-direction: column; align-items: center; padding: 6px 2px; border: 0; border-radius: 18px; background: #fff;
+  color: var(--k-ink); font-size: 2rem; cursor: pointer; box-shadow: 0 4px 0 var(--k-edge);
+}
+.k-talk-friend small { font: 700 .85rem var(--k-font); }
+.k-talk-friend.picked { background: #fff1c2; box-shadow: 0 4px 0 #f2c94c; transform: translateY(-4px); }
+.k-talk-friend.nudge { animation: k-boing .6s var(--ease-pop); }

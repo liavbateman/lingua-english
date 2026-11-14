@@ -121,6 +121,8 @@ const Kids = (() => {
       zooTipHow: 'לחצו על כל אחד כדי לספור, ואז בחרו את המספר', zooTipGive: 'לחצו על הדברים כדי לשים אותם בסל. לחיצה בסל מחזירה',
       lull: 'שיר ערש של היום', lullSub: 'לילה טוב לכל המילים שלמדנו היום', lullPlay: 'לשיר שוב', lullEnd: 'לילה טוב! חלומות פז',
       teddy: 'גוגעים בדובי', teddySub: 'איפה האף של הדובי? האוזניים? הרגליים?', teddyTip: 'הקשיבו וגעו בחלק הנכון בדובי',
+      talk: 'מציירים ומדברים', talkSub: 'שמים חתול על המיטה, והינשוף אומר את המשפט', talkTip: 'בחרו חבר למטה ואז לחצו על מקום בחדר',
+      talkRead: 'הינשוף מספר על התמונה', talkClear: 'חדר חדש',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -235,6 +237,8 @@ const Kids = (() => {
       zooTipHow: 'Tap each one to count, then pick the number', zooTipGive: 'Tap things to put them in the basket. Tap in the basket to take one out',
       lull: "Today's lullaby", lullSub: 'Good night to every word we learned today', lullPlay: 'Sing again', lullEnd: 'Good night! Sweet dreams',
       teddy: "Touch the teddy", teddySub: "Where is the teddy's nose? ears? feet?", teddyTip: 'Listen and touch the right part of the teddy',
+      talk: 'Picture talk', talkSub: 'Put a cat on the bed and the owl says the sentence', talkTip: 'Pick a friend below, then tap a place in the room',
+      talkRead: 'The owl tells the picture', talkClear: 'New room',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -628,6 +632,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🧸</span>
           <span class="grow"><b>${kt('teddy')}</b><small>${kt('teddySub')}</small></span>
           ${Store.kidsHasSticker('teddy') ? starsHtml(Store.kidsStars('teddy'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-talk-card" href="#/kids/talk">
+          <span class="k-story-books" aria-hidden="true">🖼️</span>
+          <span class="grow"><b>${kt('talk')}</b><small>${kt('talkSub')}</small></span>
+          ${Store.kidsHasSticker('talk') ? starsHtml(Store.kidsStars('talk'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -2517,6 +2526,88 @@ const Kids = (() => {
       $('#k-again').onclick = teddyGame;
     }
     round();
+  }
+
+  // ---------- picture talk: make a picture, hear a sentence ----------
+  // A room with places (on the bed, under the table, in the box...) and a tray of friends. Put a friend
+  // somewhere and the owl says the whole sentence: "The cat is on the bed!". Nothing is wrong; it is play
+  // that turns words into sentences. Four friends placed = stars.
+  const TALK_SPOTS = [
+    { id: 'on the bed', he: 'על המיטה', x: 4, y: 36, w: 40, h: 16 }, { id: 'under the bed', he: 'מתחת למיטה', x: 4, y: 74, w: 40, h: 18 },
+    { id: 'on the table', he: 'על השולחן', x: 54, y: 34, w: 30, h: 16 }, { id: 'under the table', he: 'מתחת לשולחן', x: 54, y: 72, w: 30, h: 20 },
+    { id: 'in the box', he: 'בתוך הקופסה', x: 84, y: 62, w: 15, h: 22 }, { id: 'next to the door', he: 'ליד הדלת', x: 68, y: 4, w: 16, h: 28 }
+  ];
+  const TALK_FRIENDS = [['cat', '🐱', 'החתול'], ['dog', '🐶', 'הכלב'], ['duck', '🦆', 'הברווז'], ['ball', '⚽', 'הכדור'],
+    ['teddy', '🧸', 'הדובי'], ['frog', '🐸', 'הצפרדע'], ['apple', '🍎', 'התפוח'], ['robot', '🤖', 'הרובוט']].map(([en, pic, he]) => ({ en, pic, he }));
+  function talkGame() {
+    K.endLesson();
+    const placed = {};   // spot id -> friend
+    let picked = null, count = 0, rewarded = false;
+    K.view.innerHTML = `
+      <div class="k-wrap">
+        <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
+        <h1 class="k-title">🖼️ ${kt('talk')}</h1>
+        <p class="k-talk-line en" lang="en" dir="ltr" aria-live="polite">&nbsp;</p>
+        <div class="k-room k-talk-room">
+          <span class="k-room-obj" style="left:5%;top:38%;font-size:6.6rem" aria-hidden="true">🛏️</span>
+          <span class="k-room-obj k-talk-table" style="left:55%;top:48%" aria-hidden="true"></span>
+          <span class="k-room-obj" style="left:85%;top:66%;font-size:2.8rem" aria-hidden="true">📦</span>
+          <span class="k-room-obj" style="left:85%;top:6%;font-size:5.2rem" aria-hidden="true">🚪</span>
+          ${TALK_SPOTS.map((p, i) => `<button class="k-spot k-talk-spot" data-i="${i}" data-spot="${p.id}" style="left:${p.x}%;top:${p.y}%;width:${p.w}%;height:${p.h}%" aria-label="${p.id}"></button>`).join('')}
+        </div>
+        <div class="k-talk-tray">${TALK_FRIENDS.map((f, i) => `<button class="k-talk-friend" data-i="${i}" aria-label="${f.en}"><span aria-hidden="true">${f.pic}</span><small class="en">${f.en}</small></button>`).join('')}</div>
+        <button class="k-btn" id="k-talk-read">🦉 ${kt('talkRead')}</button>
+        <button class="k-btn ghost" id="k-talk-clear">🧹 ${kt('talkClear')}</button>
+        ${owl(kt('talkTip'), 'small')}
+      </div>`;
+    const sentence = (f, spot) => `The ${f.en} is ${spot.id}!`;
+    const friends = [...K.view.querySelectorAll('.k-talk-friend')];
+    friends.forEach(b => {
+      b.onclick = () => {
+        friends.forEach(x => x.classList.remove('picked'));
+        picked = TALK_FRIENDS[+b.dataset.i];
+        b.classList.add('picked');
+        sayEn(picked.en, 0.9);
+      };
+    });
+    K.view.querySelectorAll('.k-talk-spot').forEach(s => {
+      s.onclick = () => {
+        const spot = TALK_SPOTS[+s.dataset.i];
+        if (!picked) {
+          // nothing picked: tapping a full place says its sentence again, an empty one nudges to the tray
+          if (placed[spot.id]) { const f = placed[spot.id]; $('.k-talk-line').textContent = sentence(f, spot); sayEn(sentence(f, spot), 0.85); }
+          else { $('.k-bubble').textContent = kt('talkTip'); friends[0].classList.add('nudge'); setTimeout(() => friends[0].classList.remove('nudge'), 700); }
+          return;
+        }
+        // a friend lives in one place at a time
+        Object.keys(placed).forEach(k => { if (placed[k] === picked) { delete placed[k]; const o = K.view.querySelector(`.k-talk-spot[data-spot="${k}"]`); o.innerHTML = ''; o.setAttribute('aria-label', k); } });
+        placed[spot.id] = picked;
+        s.innerHTML = `<span class="k-talk-on" aria-hidden="true">${picked.pic}</span>`;
+        s.setAttribute('aria-label', `${spot.id}: ${picked.en}`);
+        const line = sentence(picked, spot);
+        $('.k-talk-line').textContent = line;
+        $('.k-bubble').textContent = `${picked.he} ${spot.he}!`;
+        popSound();
+        owlMood('giggle');
+        sayEn(line, 0.85);
+        friends.forEach(x => x.classList.remove('picked'));
+        picked = null;
+        if (++count >= 4 && !rewarded) {
+          rewarded = true;
+          Store.kidsFinish('talk', 3, 15);
+          setTimeout(celebrate, 1600);
+        }
+      };
+    });
+    // read the whole picture, place by place
+    $('#k-talk-read').onclick = () => {
+      const lines = TALK_SPOTS.filter(p => placed[p.id]).map(p => sentence(placed[p.id], p));
+      if (!lines.length) { $('.k-bubble').textContent = kt('talkTip'); return; }
+      say(lines.map(l => ['en', l]), 0.85);
+      $('.k-talk-line').textContent = lines.join(' ');
+    };
+    $('#k-talk-clear').onclick = talkGame;
+    setTimeout(() => say([['he', kt('talkTip')]]), 300);
   }
 
   // ---------- songs & chants ----------
@@ -4524,6 +4615,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'talk') talkGame();
       else if (a === 'teddy') teddyGame();
       else if (a === 'lullaby') lullaby();
       else if (a === 'zoo') zooGame();
