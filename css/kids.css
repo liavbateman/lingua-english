@@ -1618,3 +1618,15 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-odd-grid { grid-template-columns: 1fr 1fr; }
 .k-opt.same { opacity: .55; }
 .k-odd-why { min-height: 2.8em; margin: 12px 0 0; text-align: center; font: 700 1.1rem var(--k-font); color: #ffe9a6; }
+
+/* shopping list */
+.k-slist-paper { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; padding: 10px 12px; border-radius: 8px 8px 18px 18px;
+  background: repeating-linear-gradient(#fffdf2 0 26px, #dfe7ff 26px 27px); color: var(--k-ink); box-shadow: 0 4px 0 var(--k-edge); direction: ltr; }
+.k-slist-paper b { width: 100%; text-align: center; }
+.k-slist-paper span { display: inline-flex; align-items: center; gap: 4px; min-width: 52px; justify-content: center; padding: 2px 8px; border-radius: 10px; background: #fff; font-size: 1.4rem; }
+.k-slist-paper small { font: 700 .8rem var(--k-font); }
+.k-shelves { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0; padding: 10px; border-radius: 18px; direction: ltr;
+  background: linear-gradient(#c98a4b 0 6px, transparent 6px) 0 0 / 100% 50%, #f6e3c6; }
+.k-shelf-item { aspect-ratio: 1; border: 0; border-radius: 16px; background: #fff; font-size: 2.2rem; cursor: pointer; box-shadow: 0 4px 0 var(--k-edge); }
+.k-shelf-item.taken { opacity: .3; }
+#k-sl-in i { font-style: normal; font-size: 1.8rem; animation: k-pop .35s var(--ease-pop) both; }

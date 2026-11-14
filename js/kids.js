@@ -158,6 +158,8 @@ const Kids = (() => {
       netOff: 'אין אינטרנט כרגע. הכול עובד גם בלי!', netNoVoice: 'אין קול באנגלית במכשיר הזה. אפשר לשחק עם התמונות והמילים, ומבוגר יכול להקריא',
       bath: 'זמן אמבטיה', bathSub: 'שמים את הברווז במים, מוציאים את הסירה, ומפוצצים בועות!', bathTip: 'הקשיבו ולחצו על הצעצוע הנכון. בסוף מפוצצים בועות',
       odd: 'מי לא שייך?', oddSub: 'שלושה דברים מאותה משפחה ואחד אחר. מי לא שייך?', oddTip: 'מצאו את התמונה שלא שייכת לשאר',
+      slist: 'רשימת קניות', slistSub: 'הינשוף מקריא רשימה: חלב, ביצים, לחם! זוכרים וממלאים את הסל', slistTip: 'הקשיבו לרשימה, ואז מצאו את הדברים על המדפים. אפשר לשמוע שוב',
+      slistAgain: 'לשמוע שוב את הרשימה',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -309,6 +311,8 @@ const Kids = (() => {
       netOff: 'No internet right now. Everything still works!', netNoVoice: 'There is no English voice on this device. You can play with the pictures and words, and a grown-up can read aloud',
       bath: 'Bath time', bathSub: 'Put the duck in the water, take the boat out, and pop the bubbles!', bathTip: 'Listen and tap the right toy. At the end, pop the bubbles',
       odd: 'Odd one out', oddSub: 'Three things from one family and one that is different. Which one?', oddTip: 'Find the picture that does not belong',
+      slist: 'Shopping list', slistSub: 'The owl reads a list: milk, eggs, bread! Remember it and fill the basket', slistTip: 'Listen to the list, then find the things on the shelves. You can listen again',
+      slistAgain: 'Hear the list again',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -800,6 +804,11 @@ const Kids = (() => {
           <span class="k-story-books" aria-hidden="true">🔎</span>
           <span class="grow"><b>${kt('odd')}</b><small>${kt('oddSub')}</small></span>
           ${Store.kidsHasSticker('odd') ? starsHtml(Store.kidsStars('odd'), 'sm') : ''}
+        </a>
+        <a class="k-abc-card k-slist-card" href="#/kids/slist">
+          <span class="k-story-books" aria-hidden="true">📝</span>
+          <span class="grow"><b>${kt('slist')}</b><small>${kt('slistSub')}</small></span>
+          ${Store.kidsHasSticker('slist') ? starsHtml(Store.kidsStars('slist'), 'sm') : ''}
         </a>
         <a class="k-abc-card k-songs-card" href="#/kids/songs">
           <span class="k-story-books" aria-hidden="true">🎵</span>
@@ -4378,6 +4387,80 @@ const Kids = (() => {
     round();
   }
 
+  // ---------- shopping list: listening memory ----------
+  // The owl reads a short list ("Milk, egg and bread!") and then hides it; the child finds the things on the
+  // shop shelves. Lists grow from 2 to 4 items. "Hear the list again" is always there: memory, not pressure.
+  function slistGame() {
+    document.body.classList.add('in-lesson');
+    const shelf = (KIDS_THEMES.find(t => t.id === 'food') || { words: [] }).words;
+    const sizes = little() ? [2, 2, 3] : [2, 3, 4];
+    let at = 0, misses = 0, replays = 0;
+    const list = ws => ws.length === 1 ? ws[0] : `${ws.slice(0, -1).join(', ')} and ${ws[ws.length - 1]}`;
+    function round() {
+      K.lessonBar(at / sizes.length);
+      const want = K.shuffle(shelf).slice(0, sizes[at]), got = new Set();
+      const read = () => say([['en', 'My shopping list:'], ['en', `${list(want.map(w => w.en))}!`]], 0.8);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">📝</span> ${kt('slist')} · ${at + 1}/${sizes.length}</p>
+          <div class="k-slist-paper" id="k-paper"><b>🦉 My list</b>${want.map(() => '<span>❔</span>').join('')}</div>
+          <button class="k-btn ghost" id="k-slist-again">🔊 ${kt('slistAgain')}</button>
+          <div class="k-shelves">${K.shuffle(shelf).map(w => `<button class="k-shelf-item" data-en="${w.en}" aria-label="${w.en}"><span aria-hidden="true">${w.pic}</span></button>`).join('')}</div>
+          <div class="k-fam-basket"><span class="k-fam-bk" aria-hidden="true">🧺</span><span id="k-sl-in"></span></div>
+          ${owl(kt('slistTip'), 'small')}
+        </div>`;
+      setTimeout(read, 300);
+      $('#k-slist-again').onclick = () => { replays++; read(); };
+      K.view.querySelectorAll('.k-shelf-item').forEach(b => {
+        b.onclick = () => {
+          const w = shelf.find(x => x.en === b.dataset.en);
+          if (want.includes(w) && !got.has(w)) {
+            got.add(w);
+            b.disabled = true;
+            b.classList.add('taken');
+            K.Feel.right();
+            Store.kidsWordRight(w.id);
+            sayEn(w.en, 0.9);
+            $('#k-sl-in').insertAdjacentHTML('beforeend', `<i>${w.pic}</i>`);
+            // tick the list as it fills
+            const slots = K.view.querySelectorAll('#k-paper span');
+            slots[got.size - 1].innerHTML = `${w.pic} <small class="en">${w.en}</small>`;
+            if (got.size === want.length) {
+              K.view.querySelectorAll('.k-shelf-item').forEach(x => { x.disabled = true; });
+              owlMood('cheer');
+              say([['en', `Yes! ${list(want.map(x => x.en))}. Thank you!`]], 0.85);
+              setTimeout(() => { at++; at < sizes.length ? round() : end(); }, 2600);
+            }
+          } else if (!want.includes(w)) {
+            misses++;
+            K.Feel.wrong(b);
+            owlMood('think');
+            $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${w.en}?</bdi> 🤔 ${kt('slistAgain')}`;
+            sayEn(`${w.en[0].toUpperCase() + w.en.slice(1)}? Hmm, that's not on the list.`, 0.9);
+          }
+        };
+      });
+    }
+    function end() {
+      K.endLesson(1);
+      const stars = misses === 0 ? 3 : misses <= 2 ? 2 : 1;
+      Store.kidsFinish('slist', stars, 10 + stars * 5);
+      K.view.innerHTML = `
+        <div class="k-wrap k-play k-end">
+          <div class="k-end-card">${endOwl()}
+            <h1>📝 ${kt('done')}</h1>
+            ${starsHtml(stars, 'big pop')}
+          </div>
+          <button class="k-btn" id="k-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
+          <a class="k-btn ghost" href="#/kids">${kt('backToMap')}</a>
+        </div>`;
+      celebrate();
+      sayEn('What a great memory! The shopping is done!', 0.9);
+      $('#k-again').onclick = slistGame;
+    }
+    round();
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -6450,6 +6533,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'slist') slistGame();
       else if (a === 'odd') oddGame();
       else if (a === 'bath') bathGame();
       else if (a === 'lotw') lotwScreen();
