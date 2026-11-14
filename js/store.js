@@ -174,6 +174,38 @@ const Store = (() => {
       state.kids.owl = Object.assign({ color: 'blue', acc: '' }, state.kids.owl, { [part]: id });
       save();
     },
+    // Several children: each has their own kids-world progress (stars, stickers, owl, garden…).
+    // The playing child's data is state.kids; the others wait in state.kidsStore by profile id.
+    get kidsProfiles() {
+      const list = state.kidsProfiles || [{ id: 'p1', face: '🦊', name: '' }];
+      const active = state.kidsActive || list[0].id;
+      return list.map(p => Object.assign({ active: p.id === active }, p));
+    },
+    kidsSwitch(id) {
+      const list = this.kidsProfiles, cur = list.find(p => p.active);
+      if (!list.some(p => p.id === id) || cur.id === id) return;
+      state.kidsProfiles = list.map(({ id, face, name }) => ({ id, face, name }));
+      state.kidsStore = state.kidsStore || {};
+      state.kidsStore[cur.id] = state.kids || { stars: {}, stickers: {}, words: {} };
+      state.kids = state.kidsStore[id] || { stars: {}, stickers: {}, words: {} };
+      delete state.kidsStore[id];
+      state.kidsActive = id;
+      save();
+    },
+    kidsAddProfile(face, name) {
+      const list = this.kidsProfiles.map(({ id, face, name }) => ({ id, face, name }));
+      if (list.length >= 4) return null;
+      const id = 'p' + (Math.max(...list.map(p => +p.id.slice(1) || 0)) + 1);
+      list.push({ id, face, name: (name || '').trim().slice(0, 14) });
+      state.kidsProfiles = list;
+      save();
+      this.kidsSwitch(id);
+      return id;
+    },
+    kidsEditProfile(id, face, name) {
+      state.kidsProfiles = this.kidsProfiles.map(p => p.id === id ? { id, face, name: (name || '').trim().slice(0, 14) } : { id: p.id, face: p.face, name: p.name });
+      save();
+    },
     // Kids mode: the rest of the app (and the language switch) sits behind a grown-up check
     get kidsMode() { return !!state.kidsMode; },
     set kidsMode(v) { state.kidsMode = !!v; save(); },

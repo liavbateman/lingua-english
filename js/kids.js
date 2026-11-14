@@ -49,6 +49,8 @@ const Kids = (() => {
       today: 'משחקים היום!', todaySub: '{n} תחנות: {list}', advNext: 'לתחנה הבאה', advStep: 'תחנה {a} מתוך {b}',
       advDone: 'סיימתם את ההרפתקה של היום!', advDoneSub: 'איזה כיף! הינשוף גאה בכם.', advTreasure: 'יש אוצר שמחכה לכם במפה 🎁',
       stWater: 'גינה', stIsland: 'אי', stStory: 'סיפור', stAbc: 'אותיות',
+      who: 'מי משחק עכשיו?', addKid: 'ילד נוסף', kidName: 'שם (לא חובה)', pickFace: 'בחרו פרצוף', save: 'שמירה',
+      addGate: 'הוספת ילד היא להורים', player: 'שחקן',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -91,6 +93,8 @@ const Kids = (() => {
       today: 'Play today!', todaySub: '{n} stops: {list}', advNext: 'Next stop', advStep: 'Stop {a} of {b}',
       advDone: "You finished today's adventure!", advDoneSub: 'So much fun! The owl is proud of you.', advTreasure: 'A treasure is waiting on the map 🎁',
       stWater: 'garden', stIsland: 'island', stStory: 'story', stAbc: 'letters',
+      who: "Who's playing?", addKid: 'Add a child', kidName: 'Name (optional)', pickFace: 'Pick a face', save: 'Save',
+      addGate: 'Adding a child is for grown-ups', player: 'Player',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -233,6 +237,7 @@ const Kids = (() => {
   // ---------- island map ----------
   function map() {
     K.endLesson();
+    const me = Store.kidsProfiles.find(p => p.active);
     const next = KIDS_THEMES.findIndex((th, i) => isOpen(i) && !Store.kidsHasSticker(th.id));
     K.view.innerHTML = `
       <div class="k-wrap">
@@ -242,6 +247,7 @@ const Kids = (() => {
             <div class="k-bubble" role="status">${Store.kidsStickerCount ? kt('pick') : kt('hi')}</div>
           </div>
           <div class="k-chips">
+            <button class="k-chip k-face" id="k-face" aria-label="${kt('who')}">${me.face}${me.name ? ` <b>${esc(me.name)}</b>` : ''}</button>
             <button class="k-chip k-sfx" id="k-sfx" aria-pressed="${Store.kidsSfx}" aria-label="${kt('sfx')}">${Store.kidsSfx ? '🔊' : '🔇'}</button>
             <span class="k-chip star"><b>★ ${Store.kidsTotalStars}</b> ${kt('stars')}</span>
             <a class="k-chip sticker" href="#/kids/stickers"><b>🎁 ${Store.kidsStickerCount}/${KIDS_THEMES.length}</b> ${kt('stickers')}</a>
@@ -299,6 +305,7 @@ const Kids = (() => {
         <button class="k-parents" id="k-parents"><span aria-hidden="true">👪</span> ${kt('parents')}</button>
       </div>`;
     $('#k-parents').onclick = () => gate(() => { location.hash = '#/kids/parents'; });
+    $('#k-face').onclick = whoSheet;
     $('#k-sfx').onclick = () => {
       Store.kidsSfx = !Store.kidsSfx;
       $('#k-sfx').textContent = Store.kidsSfx ? '🔊' : '🔇';
@@ -680,6 +687,70 @@ const Kids = (() => {
         if (av) av.classList.add('boing');
       };
     });
+  }
+
+  // ---------- several children ----------
+  const FACES = ['🦊', '🐼', '🐯', '🐸', '🐨', '🦁', '🐰', '🐵'];
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  function whoSheet() {
+    const list = Store.kidsProfiles;
+    const back = document.createElement('div');
+    back.className = 'k-reveal';
+    back.setAttribute('role', 'dialog');
+    back.setAttribute('aria-modal', 'true');
+    back.setAttribute('aria-labelledby', 'k-who-title');
+    back.innerHTML = `
+      <div class="k-reveal-card k-who">
+        <b id="k-who-title">${kt('who')}</b>
+        <div class="k-who-list">
+          ${list.map(p => `<button class="k-who-kid ${p.active ? 'on' : ''}" data-id="${p.id}" aria-pressed="${p.active}">
+            <span class="k-who-face" aria-hidden="true">${p.face}</span><span>${p.name ? esc(p.name) : kt('player') + ' ' + p.id.slice(1)}</span></button>`).join('')}
+          ${list.length < 4 ? `<button class="k-who-kid add" id="k-who-add"><span class="k-who-face" aria-hidden="true">➕</span><span>${kt('addKid')}</span></button>` : ''}
+        </div>
+        <button class="k-skip" id="k-who-close">${kt('cancel')}</button>
+      </div>`;
+    const close = () => back.remove();
+    back.onclick = e => { if (e.target === back) close(); };
+    back.querySelector('#k-who-close').onclick = close;
+    back.querySelectorAll('.k-who-kid[data-id]').forEach(b => {
+      b.onclick = () => { Store.kidsSwitch(b.dataset.id); close(); K.Feel.right(); map(); sayEn('Hello!'); };
+    });
+    const add = back.querySelector('#k-who-add');
+    if (add) add.onclick = () => { close(); gate(addSheet); };
+    document.body.appendChild(back);
+    back.querySelector('.k-who-kid').focus({ preventScroll: true });
+  }
+  function addSheet() {
+    const taken = Store.kidsProfiles.map(p => p.face);
+    let face = FACES.find(f => !taken.includes(f)) || FACES[0];
+    const back = document.createElement('div');
+    back.className = 'k-reveal';
+    back.setAttribute('role', 'dialog');
+    back.setAttribute('aria-modal', 'true');
+    back.innerHTML = `
+      <div class="k-reveal-card k-who">
+        <b>${kt('addKid')}</b>
+        <p class="k-who-sub">${kt('pickFace')}</p>
+        <div class="k-faces">${FACES.map(f => `<button class="k-face-opt ${f === face ? 'on' : ''}" data-f="${f}" aria-pressed="${f === face}">${f}</button>`).join('')}</div>
+        <input class="k-name" id="k-name" maxlength="14" placeholder="${kt('kidName')}" autocomplete="off">
+        <button class="k-btn" id="k-add-ok">${kt('save')}</button>
+        <button class="k-skip" id="k-add-no">${kt('cancel')}</button>
+      </div>`;
+    back.querySelectorAll('.k-face-opt').forEach(b => {
+      b.onclick = () => {
+        face = b.dataset.f;
+        back.querySelectorAll('.k-face-opt').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', String(x === b)); });
+      };
+    });
+    back.querySelector('#k-add-no').onclick = () => back.remove();
+    back.querySelector('#k-add-ok').onclick = () => {
+      Store.kidsAddProfile(face, back.querySelector('#k-name').value);
+      back.remove();
+      K.confetti('kids'); Sfx.jingle();
+      map();
+      Kids.hello();
+    };
+    document.body.appendChild(back);
   }
 
   // ---------- grown-up check ----------
