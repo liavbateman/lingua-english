@@ -226,7 +226,7 @@
     return [
       ...review,
       // a task done today says so, instead of already offering the next lesson's words or rule
-      { id: 'vocab', title: t('task.vocab'), sub: Store.tasks.vocab ? t('task.vocab.done') : t('task.vocab.sub', lessonSize(u)), href: `#/unit/${u.id}`, icon: 'book', color: 'blue' },
+      { id: 'vocab', title: t('task.vocab'), sub: Store.tasks.vocab ? t('task.vocab.done') : t(lessonSize(u).again ? 'task.vocab.again' : 'task.vocab.sub', lessonSize(u)), href: `#/unit/${u.id}`, icon: 'book', color: 'blue' },
       { id: 'speak', title: t('task.speak'), sub: Store.tasks.speak ? t('task.speak.done') : t('task.speak.sub'), href: '#/speak', icon: 'mic', color: 'purple' },
       { id: 'grammar', title: t('task.grammar'), sub: Store.tasks.grammar ? t('task.grammar.done') : t('task.grammar.sub', { title: ruleTitle(g) }), href: `#/grammar/${g.id}`, icon: 'pencil', color: 'gold' }
     ];
@@ -259,6 +259,10 @@
       // a review round holds 8 words, so the card promises one round, and says how many wait in all
       title: t(due === 1 ? 'cont.review.one' : 'cont.review', { n: Math.min(due, 8) }),
       sub: due > 8 ? t('cont.review.more', { n: due }) : t('cont.review.sub') };
+    // The whole level is done (every word met, every rule passed): the next step is the next level
+    const nextLv = LEVELS[LEVELS.findIndex(l => l.id === Store.level) + 1];
+    if (nextLv && levelComplete(Store.level)) return { href: `#/levelup/${nextLv.id}`, icon: 'levels', color: 'gold',
+      title: t('cont.levelup', { level: t('lv.' + Store.level) }), sub: t('cont.levelup.sub'), go: t('cont.levelup.go', { next: t('lv.' + nextLv.id) }) };
     const wordUnits = levelUnits().filter(x => x.kind !== 'phrases');
     const u = wordUnits.find(x => Store.unitProgress(x).seen < x.words.length);
     if (u && !done.vocab) {
@@ -319,7 +323,7 @@
           <span class="cont-tile${step.spot ? ' ringed' : ''}" style="--pct:${step.spot ? step.spot.pct : 0}"><span class="tile ${step.color}">${step.emoji ? `<span class="cont-emoji">${step.emoji}</span>` : ICON[step.icon]}</span></span>
           <span class="grow"><b>${step.title}</b><span class="small">${step.sub}</span></span>
         </span>
-        <span class="cont-go">${t(Store.xp > 0 ? 'cont.go' : 'cont.start')} ${fwd()}</span>
+        <span class="cont-go">${step.go || t(Store.xp > 0 ? 'cont.go' : 'cont.start')} ${fwd()}</span>
       </a>
 
       <div class="section">${ICON.calendar} ${t('home.plan')} <span class="end"><b class="en">${doneCount} / ${tasks.length}</b> ${t('home.completed')}</span></div>
@@ -752,12 +756,13 @@
   // Today moves on to the next unit at that point, so the path must not still say "5 more lessons".
   // How well the words are known shows in the node's ring (mastery) and in Progress.
   function unitDone(u) { return u.words.length > 0 && u.words.every(w => Store.isSeen(w.id)); }
+  const levelComplete = lv => UNITS.filter(u => u.level === lv).every(unitDone) && GRAMMAR.filter(g => g.level === lv).every(g => Store.isGrammarDone(g.id));
   let lastLesson = { unit: '', ids: [] };   // the words a lesson's cards just showed, practised first after it
   // How many cards the next lesson of a unit really shows, and about how long it takes
   function lessonSize(u) {
     const fresh = u.words.length - Store.unitProgress(u).seen;
     const n = fresh ? Math.min(LESSON_NEW, fresh) : u.words.length;
-    return { n, m: Math.max(3, Math.round(n * 0.55)) };
+    return { n, m: Math.max(3, Math.round(n * 0.55)), again: !fresh };
   }
 
   function miniMap(items, sections) {
@@ -2943,6 +2948,7 @@
     else if (name !== 'x') lessonExit = location.hash || '#/';
     switch (name || 'home') {
       case 'home': refreshChrome('home'); home(); break;
+      case 'levelup': if (LEVELS.some(l => l.id === a)) Store.level = a; location.replace('#/'); return;
       case 'learn': refreshChrome('learn'); learn(); break;
       case 'phrases': refreshChrome('learn'); phrases(); break;
       case 'unit': refreshChrome('learn'); lesson(a); break;
