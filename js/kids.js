@@ -3082,6 +3082,13 @@ const Kids = (() => {
   // "hear it, tap the picture", "which word is this?" and "is this a cat? yes/no". The fifth stop opens
   // a treasure chest. Progress stays all week; a new map starts on Sunday.
   const TMAP_STOPS = ['🌴', '🌉', '⛰️', '🌋', '🏝️'];
+  // "Is it a cat?" / "Is it an apple?" / "Is it milk?" / "Are they grapes?" (and the matching answer)
+  const NOT_PLURAL = ['bus', 'dress', 'glass', 'grass', 'class', 'octopus'];
+  const PLURAL = ['feet', 'teeth', 'people', 'children', 'mice'];
+  const MASS = ['milk', 'bread', 'water', 'juice', 'rice', 'cheese', 'soup', 'tea', 'rain', 'snow'];
+  const isPlural = en => PLURAL.includes(en) || (/s$/.test(en) && !NOT_PLURAL.includes(en));
+  const isItQ = en => isPlural(en) ? `Are they ${en}?` : MASS.includes(en) ? `Is it ${en}?` : `Is it ${/^[aeiou]/.test(en) ? 'an' : 'a'} ${en}?`;
+  const itIs = en => isPlural(en) ? `They are ${en}!` : MASS.includes(en) ? `It is ${en}!` : `It is ${/^[aeiou]/.test(en) ? 'an' : 'a'} ${en}!`;
   function tmapWords() {
     const DRAW = ['animals', 'food', 'family', 'body', 'toys', 'go', 'clothes', 'sky', 'home', 'shapes', 'school'];
     const ok = w => DRAW.includes(String(w.id).split('/')[0]) && !/\s/.test(w.en);
@@ -3130,7 +3137,7 @@ const Kids = (() => {
         sayEn(`Yes! ${w.en}!`, 0.9);
         setTimeout(() => { at++; at < qs.length ? q() : done(); }, 1300);
       };
-      const bad = b => { K.Feel.wrong(b); owlMood('think'); $('.k-bubble').textContent = kt('tryAgain'); };
+      const bad = b => { b.disabled = true; b.classList.add('nope'); K.Feel.wrong(b); owlMood('think'); $('.k-bubble').textContent = kt('tryAgain'); };
       if (kind === 'hear') {
         const opts = K.shuffle([w, ...others]);
         K.view.innerHTML = `<div class="k-wrap k-play">${head}
@@ -3149,7 +3156,7 @@ const Kids = (() => {
         K.view.querySelectorAll('.k-tmap-words button').forEach(b => { b.onclick = () => { const o = opts[+b.dataset.i]; sayEn(o.en, 0.9); if (o === w) { K.view.querySelectorAll('.k-tmap-words button').forEach(x => { x.disabled = true; }); b.classList.add('right'); good(); } else bad(b); }; });
       } else {
         const truth = Math.random() < .5, shown = truth ? w : others[0];
-        const line = `Is it ${/^[aeiou]/.test(w.en) ? 'an' : 'a'} ${w.en}?`;
+        const line = isItQ(w.en);
         K.view.innerHTML = `<div class="k-wrap k-play">${head}
           <div class="k-card k-meet"><span class="k-pic" aria-hidden="true">${shown.pic}</span><span class="k-word en" lang="en">${line}</span></div>
           <div class="k-tmap-yn"><button class="k-btn" data-a="yes">👍 Yes</button><button class="k-btn ghost" data-a="no">👎 No</button></div>
@@ -3160,7 +3167,7 @@ const Kids = (() => {
             if ((b.dataset.a === 'yes') === truth) {
               K.view.querySelectorAll('.k-tmap-yn button').forEach(x => { x.disabled = true; });
               b.classList.add('right');
-              if (!truth) { $('.k-bubble').textContent = `${shown.en}! · ${shown.he}`; sayEn(`No! It is ${/^[aeiou]/.test(shown.en) ? 'an' : 'a'} ${shown.en}!`, 0.9); setTimeout(() => { at++; at < qs.length ? q() : done(); }, 1700); K.Feel.right(); owlMood('cheer'); }
+              if (!truth) { $('.k-bubble').textContent = `${shown.en}! · ${shown.he}`; sayEn(`No! ${itIs(shown.en)}`, 0.9); setTimeout(() => { at++; at < qs.length ? q() : done(); }, 1700); K.Feel.right(); owlMood('cheer'); }
               else good();
             } else bad(b);
           };
