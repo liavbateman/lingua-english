@@ -905,3 +905,10 @@ body.kids-big .k-sentence { font-size: 1.9rem; line-height: 1.7; }
 body.kids-big .k-chip-word { font-size: 1.55rem; }
 body.kids-big .k-mem-face.word { font-size: 1.25rem; }
 body.kids-big .k-mem-face.word.long { font-size: 1rem; }
+
+/* no voice note */
+.k-mute-note { display: flex; align-items: center; gap: 10px; margin: 10px 0 0; padding: 12px 14px; border-radius: 20px; background: #fff6d6; color: #5a430c; box-shadow: 0 5px 0 #e9b949; }
+.k-mute-note > span:first-child { font-size: 1.8rem; }
+.k-mute-note .grow { display: flex; flex-direction: column; flex: 1; }
+.k-mute-note small { font-size: .88rem; }
+.k-mute-note .k-skip { margin: 0; flex: none; background: #fff; color: #5a430c; }

@@ -84,6 +84,8 @@ const Kids = (() => {
       speed: 'סיבוב מהיר', speedSub: '10 מילים, כמה שיותר מהר!', speedBest: 'השיא שלך: {n}', speedScore: '{n} נקודות', speedNew: 'שיא חדש!',
       speedTip: 'הקשיבו ולחצו מהר! לא נורא אם הזמן נגמר',
       pcBig: 'אותיות גדולות ומרווחות', pcBigText: 'גופן קריא במיוחד (Lexend), גדול יותר ועם רווחים בין האותיות. עוזר לילדים שקשה להם לקרוא, כולל דיסלקציה',
+      mute: 'האפליקציה לא מצליחה לדבר כרגע', muteOffline: 'אין חיבור לאינטרנט, ובמכשיר אין קול אנגלי שמור. התחברו פעם אחת לאינטרנט או התקינו קול אנגלי.',
+      muteNoVoice: 'במכשיר לא נמצא קול באנגלית. בקשו מהורה לבדוק בפינת ההורים ← קולות.', muteOk: 'הבנתי',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -161,6 +163,8 @@ const Kids = (() => {
       speed: 'Speed round', speedSub: '10 words, as fast as you can!', speedBest: 'Your best: {n}', speedScore: '{n} points', speedNew: 'New best!',
       speedTip: "Listen and tap fast! It's fine if time runs out",
       pcBig: 'Big, spaced letters', pcBigText: 'An extra-readable font (Lexend), larger and with more space between letters. Helps children who find reading hard, including dyslexia',
+      mute: "The app can't speak right now", muteOffline: "There's no internet and no English voice saved on this device. Connect once, or install an English voice.",
+      muteNoVoice: 'No English voice was found on this device. Ask a grown-up to check Parent corner → Voices.', muteOk: 'Got it',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -527,6 +531,7 @@ const Kids = (() => {
       $('#k-sfx').setAttribute('aria-pressed', String(Store.kidsSfx));
       Sfx.tap();
     };
+    checkVoice();
     const wotdBtn = $('#k-wotd');
     if (wotdBtn) wotdBtn.onclick = () => {
       const w = KIDS_WORDS.find(x => x.id === wotdBtn.dataset.id);
@@ -1761,6 +1766,28 @@ const Kids = (() => {
     } else listenMotion();
   }
   if ('DeviceMotionEvent' in window && typeof DeviceMotionEvent.requestPermission !== 'function') listenMotion();   // Android: no question needed
+
+  // ---------- can the device speak? ----------
+  // The kids world is built on hearing words. If no English voice shows up (no speech at all, or offline
+  // on a device whose voices come from the internet), a calm note on the map says what to do. Once per session.
+  let voiceNoteShown = false;
+  function checkVoice() {
+    if (voiceNoteShown) return;
+    const show = offline => {
+      if (voiceNoteShown || !document.querySelector('.k-map')) return;
+      voiceNoteShown = true;
+      const note = document.createElement('div');
+      note.className = 'k-mute-note';
+      note.setAttribute('role', 'status');
+      note.innerHTML = `<span aria-hidden="true">🔇</span><span class="grow"><b>${kt('mute')}</b><small>${kt(offline ? 'muteOffline' : 'muteNoVoice')}</small></span><button class="k-skip">${kt('muteOk')}</button>`;
+      note.querySelector('button').onclick = () => note.remove();
+      const head = $('.k-head');
+      if (head) head.after(note);
+    };
+    if (!('speechSynthesis' in window)) return show(false);
+    // voices load late on some devices: look again after a moment before saying anything
+    setTimeout(() => { voices(); if (!enVoice) show(!navigator.onLine); }, 1500);
+  }
 
   // ---------- daily treasure ----------
   function chestCard() {
