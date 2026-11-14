@@ -119,6 +119,7 @@ const Kids = (() => {
       callTip: 'בחרו תשובה, והינשוף ישמע אתכם', callEnd: 'שיחה ראשונה באנגלית!', callHint: 'אפשר גם להגיד בקול', callName: 'אמרו בקול: <bdi dir="ltr" lang="en">My name is…</bdi> ואת השם שלכם',
       zoo: 'סופרים ביחד', zooSub: 'כמה תפוחים? תן לי שלושה! סופרים באנגלית', zooCount: 'סופרים איתי', zooDone: 'מוכן!',
       zooTipHow: 'לחצו על כל אחד כדי לספור, ואז בחרו את המספר', zooTipGive: 'לחצו על הדברים כדי לשים אותם בסל. לחיצה בסל מחזירה',
+      lull: 'שיר ערש של היום', lullSub: 'לילה טוב לכל המילים שלמדנו היום', lullPlay: 'לשיר שוב', lullEnd: 'לילה טוב! חלומות פז',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -231,6 +232,7 @@ const Kids = (() => {
       callTip: 'Pick an answer and the owl will hear you', callEnd: 'Your first call in English!', callHint: 'You can say it out loud too', callName: 'Say it out loud: My name is... and your name',
       zoo: 'Count with me', zooSub: 'How many apples? Give me three! Counting in English', zooCount: 'Count with me', zooDone: 'Done!',
       zooTipHow: 'Tap each one to count, then pick the number', zooTipGive: 'Tap things to put them in the basket. Tap in the basket to take one out',
+      lull: "Today's lullaby", lullSub: 'Good night to every word we learned today', lullPlay: 'Sing again', lullEnd: 'Good night! Sweet dreams',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -511,6 +513,11 @@ const Kids = (() => {
         ${isNight() ? `<a class="k-today k-night-card" href="#/kids/story/goodnight">
             <span class="k-today-go" aria-hidden="true">🌙</span>
             <span class="grow"><b>${kt('night')}</b><small>${kt('nightSub')}</small></span>
+            <span class="k-today-arrow" aria-hidden="true">${isHe() ? '‹' : '›'}</span>
+          </a>
+          <a class="k-today k-night-card k-lull-card" href="#/kids/lullaby">
+            <span class="k-today-go" aria-hidden="true">🎶</span>
+            <span class="grow"><b>${kt('lull')}</b><small>${kt('lullSub')}</small></span>
             <span class="k-today-arrow" aria-hidden="true">${isHe() ? '‹' : '›'}</span>
           </a>` : ''}
         ${(() => {
@@ -2314,6 +2321,66 @@ const Kids = (() => {
     round();
   }
 
+  // ---------- bedtime lullaby: good night to today's new words ----------
+  // A slow music-box tune; each of today's new words drifts in with its picture and is sung softly
+  // ("Good night, cat."). Hearing the day's words once more just before sleep helps them stick.
+  // No words today yet? It uses this week's, then a few known ones.
+  let lullTimers = [];
+  function lullaby() {
+    K.endLesson();
+    lullTimers.forEach(clearTimeout);
+    lullTimers = [];
+    const today = Store.kidsWordsOn(Store.kidsDayKey(new Date()));
+    const week = Store.kidsWeek().words;
+    const known = KIDS_WORDS.filter(w => Store.kidsWordCount(w.id) > 0);
+    // only things you can say good night to (animals, toys, family...), not colours, feelings or actions
+    const THINGS = ['animals', 'food', 'family', 'body', 'toys', 'go', 'clothes', 'sky', 'home', 'shapes', 'school'];
+    const thing = w => THINGS.includes(String(w.id).split('/')[0]) && !/\s/.test(w.en);
+    const pick = list => list.filter(thing);
+    const pool = [pick(today), pick(week), pick(known), pick(KIDS_WORDS).slice(0, 6)].find(l => l.length >= 3) || pick(KIDS_WORDS).slice(0, 6);
+    const words = pool.slice(-8);
+    const me = Store.kidsProfiles.find(p => p.active) || {};
+    const name = /^[A-Za-z][A-Za-z '-]*$/.test(me.name || '') ? me.name : 'my friend';
+    K.view.innerHTML = `
+      <div class="k-wrap k-lull">
+        <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
+        <div class="k-lull-sky" aria-hidden="true"><span class="k-lull-moon">🌙</span>${'<i></i>'.repeat(14)}</div>
+        <h1 class="k-title">🎶 ${kt('lull')}</h1>
+        <div class="k-lull-words">${words.map((w, i) => `<span class="k-lull-w" data-i="${i}"><span aria-hidden="true">${w.pic}</span><b class="en" lang="en">${w.en}</b></span>`).join('')}</div>
+        <p class="k-lull-line en" lang="en" aria-live="polite"></p>
+        <button class="k-btn ghost" id="k-lull-again">🔁 ${kt('lullPlay')}</button>
+      </div>`;
+    // a gentle original music-box phrase (pentatonic, slow)
+    const TUNE = [523, 659, 784, 659, 587, 523, 440, 523];
+    const later = (fn, ms) => lullTimers.push(setTimeout(() => { if ($('.k-lull')) fn(); }, ms));
+    function sing() {
+      lullTimers.forEach(clearTimeout);
+      lullTimers = [];
+      K.view.querySelectorAll('.k-lull-w').forEach(x => x.classList.remove('on', 'sleep'));
+      $('.k-lull').classList.remove('done');
+      const step = 2600;
+      words.forEach((w, i) => {
+        later(() => {
+          note(TUNE[i % TUNE.length], 1.2);
+          later(() => note(TUNE[(i + 2) % TUNE.length] / 2, 1.4), 600);
+          const el = K.view.querySelector(`.k-lull-w[data-i="${i}"]`);
+          el.classList.add('on');
+          $('.k-lull-line').textContent = `Good night, ${w.en}.`;
+          sayEn(`Good night, ${w.en}.`, 0.7);
+          later(() => el.classList.add('sleep'), step - 300);
+        }, 800 + i * step);
+      });
+      later(() => {
+        note(392, 1.6); later(() => note(262, 2), 500);
+        $('.k-lull-line').textContent = `Good night, ${name}. Sleep tight. 😴`;
+        $('.k-lull').classList.add('done');
+        say([['en', `Good night, ${name}. Sleep tight.`], ['he', kt('lullEnd')]], 0.7);
+      }, 800 + words.length * step);
+    }
+    $('#k-lull-again').onclick = sing;
+    sing();
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -2342,6 +2409,11 @@ const Kids = (() => {
         <h1 class="k-title">🎵 ${kt('songs')}</h1>
         <p class="k-sub">${kt('songsSub')}</p>
         <div class="k-books">
+          <a class="k-book" href="#/kids/lullaby" style="--c:#6d5bd0">
+            <span class="k-book-pic" aria-hidden="true">🌙</span>
+            <span class="k-book-title en">${kt('lull')}</span>
+            <span class="k-book-he">${kt('lullSub')}</span>
+          </a>
           ${KIDS_SONGS.map(sg => `
             <a class="k-book" href="#/kids/song/${sg.id}" style="--c:${sg.color}">
               <span class="k-book-pic" aria-hidden="true">${sg.pic}</span>
@@ -4314,6 +4386,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'lullaby') lullaby();
       else if (a === 'zoo') zooGame();
       else if (a === 'call') callGame();
       else if (a === 'wear') wearGame();

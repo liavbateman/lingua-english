@@ -191,6 +191,8 @@ const Store = (() => {
     get kidsRemind() { const r = (state.kids && state.kids.remind) || {}; return { on: !!r.on, time: r.time || '17:00', last: r.last || '' }; },
     set kidsRemind(v) { state.kids = state.kids || { stars: {}, stickers: {}, words: {} }; state.kids.remind = { ...this.kidsRemind, ...v }; save(); },
     // The last 7 days for the weekly note: words first got right, and play time per day (oldest first)
+    // Words first got right on one day (for the bedtime lullaby: "today's new words")
+    kidsWordsOn(key) { const first = (state.kids && state.kids.first) || {}; return KIDS_WORDS.filter(w => first[w.id] === key); },
     kidsWeek() {
       const k = state.kids || {}, first = k.first || {}, ds = k.daysec || {};
       const days = Array.from({ length: 7 }, (_, n) => {
