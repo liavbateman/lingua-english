@@ -4368,9 +4368,13 @@ const Kids = (() => {
     const week = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / (7 * 864e5));
     return KIDS_ABC[week % KIDS_ABC.length];
   }
+  // only words that really START WITH THE LETTER'S SOUND: "three" (th), "sheep" (sh), "write" (silent w),
+  // "eight" / "eye" (not "eh"), "one" (a w sound) begin with the letter but would teach the wrong sound
+  const LOTW_NOT = ['eight', 'eye', 'ear', 'one', 'ice', 'unicorn', 'giraffe', 'circle', 'city'];
+  const lotwSound = w => !/^(ch|sh|th|ph|wr|kn|wh(?=o))/.test(w.en) && !LOTW_NOT.includes(w.en);
   function lotwWords(x) {
     const l = x.L.toLowerCase();
-    const list = KIDS_WORDS.filter(w => w.en.startsWith(l) && !/\s/.test(w.en) && w.pic);
+    const list = KIDS_WORDS.filter(w => w.en.startsWith(l) && !/\s/.test(w.en) && w.pic && lotwSound(w));
     const uniq = [];
     if (x.word.startsWith(l) && !/\s/.test(x.word)) uniq.push({ en: x.word, pic: x.pic, he: x.he });
     list.forEach(w => { if (!uniq.some(u => u.en === w.en)) uniq.push(w); });
