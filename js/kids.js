@@ -2324,6 +2324,8 @@ const Kids = (() => {
             setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 2600);
           } else {
             missed = true;
+            btn.disabled = true;
+            btn.classList.add('nope');   // greyed, like the other games: one less picture to think about
             K.Feel.wrong(btn);
             owlMood('think');
             $('.k-bubble').innerHTML = `<bdi dir="ltr">${a.en} - ${o.en}?</bdi> ${kt('tryAgain')}`;
