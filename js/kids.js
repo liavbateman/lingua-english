@@ -2785,7 +2785,7 @@ const Kids = (() => {
           const el = K.view.querySelector(`.k-lull-w[data-i="${i}"]`);
           el.classList.add('on');
           $('.k-lull-line').textContent = `Good night, ${w.en}.`;
-          sayEn(`Good night, ${w.en}.`, 0.7);
+          speakSeq([`Good night, ${w.en}.`], 0.7, null, null, { pitch: 0.95, volume: 0.8 });   // a softer, lower voice
           later(() => el.classList.add('sleep'), step - 300);
         }, 800 + i * step);
       });
@@ -2793,7 +2793,8 @@ const Kids = (() => {
         note(392, 1.6); later(() => note(262, 2), 500);
         $('.k-lull-line').textContent = `Good night, ${name}. Sleep tight. 😴`;
         $('.k-lull').classList.add('done');
-        say([['en', `Good night, ${name}. Sleep tight.`], ['he', kt('lullEnd')]], 0.7);
+        // the same soft voice to the end, then the Hebrew line for the parent / child
+        speakSeq([`Good night, ${name}. Sleep tight.`], 0.65, null, () => { if ($('.k-lull')) say([['he', kt('lullEnd')]], 0.7); }, { pitch: 0.95, volume: 0.8 });
       }, 800 + words.length * step);
     }
     $('#k-lull-again').onclick = sing;

@@ -1260,7 +1260,12 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 #k-in { display: contents; }
 
 /* bedtime lullaby */
-.k-lull { position: relative; text-align: center; }
+/* the lullaby is always night: its own dark sky panel, whatever the time of day (its white words and
+   moon-yellow lines were unreadable on the light day background) */
+.k-lull { position: relative; text-align: center; padding: 12px 12px 22px; border-radius: 30px; color: #fff;
+  background: radial-gradient(120% 60% at 80% 0%, #3b3f8f 0%, transparent 60%), linear-gradient(#141b4d, #232a6e 70%, #2f3584); box-shadow: 0 8px 0 #0d1238; }
+.k-lull .k-title { color: #fff; }
+.k-lull .k-back { background: rgba(255, 255, 255, .92); }
 .k-lull-sky { position: relative; height: 90px; }
 .k-lull-moon { position: absolute; top: 4px; inset-inline-end: 12px; font-size: 3.4rem; animation: k-lull-glow 4s ease-in-out infinite; }
 @keyframes k-lull-glow { 50% { filter: drop-shadow(0 0 14px #ffe9a6); } }
