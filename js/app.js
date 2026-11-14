@@ -2484,6 +2484,8 @@
   // ---------- Speaking ----------
   // Listen, say it into the microphone and get feedback. Where the browser can't listen,
   // the learner rates themselves ("I said it" / "Still hard").
+  // Once the browser refuses the microphone, the next cards stop offering it (it would only fail again)
+  let micBlocked = false;
   function speaking() {
     // Say words you already know: the ones met so far first, topped up from the next lesson's words,
     // so a new learner says "hello" and "thank you", not a word never seen before
@@ -2497,6 +2499,7 @@
       let heardOk = false;
       // The speaking round wears the colour of the learner's level, like the paths
       const lvl = Store.level;
+      const useMic = Recognition() && !micBlocked;
       document.body.dataset.lv = lvl;
       view.innerHTML = `
         <div class="gq-head lv-${lvl}">
@@ -2506,11 +2509,11 @@
         ${lessonBar(i / queue.length)}
         <div class="card flash speak-card lv-${lvl}">
           <span class="gq-lvl">${t('lv.' + lvl)} · <span class="en">${t('lvl.cefr.' + lvl)}</span></span>
-          <div class="small">${t(Recognition() ? 'speak.do.mic' : 'speak.do')}</div>
+          <div class="small" id="sp-do">${t(useMic ? 'speak.do.mic' : 'speak.do')}</div>
           <div class="word en ${w.phrase ? 'long' : ''}" style="margin-top:8px">${w.en}</div>
           <div class="speak-row">
             <span class="sp-btn"><button class="speak xl" id="speak" aria-label="${t('aria.listen')}">${ICON.speaker}</button><small aria-hidden="true">${t('aria.listen')}</small></span>
-            ${Recognition() ? `<span class="sp-btn sp-mic"><button class="speak xl mic" id="mic" aria-label="${t('speak.mic')}" aria-pressed="false">${ICON.mic}</button><small aria-hidden="true">${t('speak.mic')}</small></span>` : ''}
+            ${useMic ? `<span class="sp-btn sp-mic"><button class="speak xl mic" id="mic" aria-label="${t('speak.mic')}" aria-pressed="false">${ICON.mic}</button><small aria-hidden="true">${t('speak.mic')}</small></span>` : ''}
           </div>
           <div class="heard" id="heard" aria-live="polite"></div>
           <div class="he ${w.phrase ? 'long' : ''}">${w.he}</div>
@@ -2571,7 +2574,10 @@
           answered = true;
           if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
             show(t('speak.blocked'), 'bad');
-            mic.remove();                       // no microphone: self-rating only
+            micBlocked = true;                  // no microphone: self-rating only, from here on
+            mic.closest('.sp-mic').remove();
+            $('#sp-do').textContent = t('speak.do');
+            $('#speak').focus();
           } else if (e.error !== 'aborted') {
             show(t('speak.nothing'), 'bad');
           }
