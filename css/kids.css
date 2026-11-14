@@ -1384,3 +1384,24 @@ body.kids-big .k-slot-l, body.kids-big .k-spell-tile { font-family: "Lexend", va
 .k-leaf-spot.rustle .k-leaf { animation: k-rustle .5s ease-in-out; }
 @keyframes k-rustle { 25% { transform: translateX(-50%) rotate(-8deg); } 75% { transform: translateX(-50%) rotate(8deg); } }
 @media (prefers-reduced-motion: reduce) { .k-leaf, .k-peek-animal { transition: none; } .k-leaf-spot.rustle .k-leaf { animation: none; } }
+
+/* my first English book */
+.k-mb-page { min-height: 340px; padding: 18px 16px; border-radius: 10px 26px 26px 10px; background: #fffdf6; color: var(--k-ink);
+  box-shadow: inset 10px 0 0 var(--c, #3f7bff), 0 6px 0 var(--k-edge); text-align: center; animation: k-mb-turn .35s ease-out; }
+@keyframes k-mb-turn { from { transform: perspective(600px) rotateY(-14deg); opacity: .4; } }
+.k-mb-cover { --c: #3f7bff; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(160deg, #eaf3ff, #fffdf6); }
+.k-mb-face { font-size: 5rem; }
+.k-mb-cover h2 { margin: 8px 0 0; font: 700 1.7rem var(--k-font); }
+.k-mb-by { margin: 4px 0; font-size: 1.2rem; }
+.k-mb-n { font-weight: 700; }
+.k-mb-empty { color: var(--k-muted); }
+.k-mb-title { margin: 0 0 12px; font-size: 1.4rem; }
+.k-mb-words { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; direction: ltr; }
+.k-mb-w { display: flex; flex-direction: column; align-items: center; padding: 6px 2px; border: 0; border-radius: 16px; background: #fff; color: var(--k-ink);
+  font-size: 2rem; cursor: pointer; box-shadow: 0 3px 0 var(--k-edge); transition: transform .2s, background .2s; }
+.k-mb-w b { font: 700 .85rem var(--k-font); }
+.k-mb-w.lit { background: #fff1c2; transform: scale(1.12); }
+.k-mb-line { margin: 14px 0 0; font: 700 1.15rem var(--k-font); direction: ltr; }
+.k-mb-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0; color: #fff; font-weight: 700; }
+.k-mb-nav .k-btn { width: 72px; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .k-mb-page { animation: none; } .k-mb-w { transition: none; } }

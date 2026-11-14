@@ -131,6 +131,8 @@ const Kids = (() => {
       tmapDone: 'מצאתם את האוצר! מפה חדשה מחכה ביום ראשון', tmapStop: 'תחנה {n}', tmapIs: 'זה',
       qotd: 'השאלה של הינשוף', qotdDone: 'עניתם היום! שאלה חדשה מחר', qotdCount: '{n} שאלות נענו',
       safari: 'ספארי של קולות', safariSub: 'מי אומר moo? מוצאים את החיה שמתחבאת מאחורי העלים', safariTip: 'הקשיבו לקול ולחצו על העלה שהחיה מציצה ממנו',
+      mybook: 'הספר הראשון שלי באנגלית', mybookSub: 'כל אי שמסיימים מוסיף עמוד עם המילים שלכם', mybookEmpty: 'סיימו אי ראשון וקבלו את העמוד הראשון בספר!',
+      mybookRead: 'הקראה', mybookPage: 'עמוד {a} מתוך {b}',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -255,6 +257,8 @@ const Kids = (() => {
       tmapDone: 'You found the treasure! A new map is waiting on Sunday', tmapStop: 'Stop {n}', tmapIs: 'Is it',
       qotd: "The owl's question", qotdDone: 'You answered today! A new question tomorrow', qotdCount: '{n} questions answered',
       safari: 'Sound safari', safariSub: 'Who says moo? Find the animal hiding behind the leaves', safariTip: 'Listen to the sound and tap the leaf the animal is peeking from',
+      mybook: 'My first English book', mybookSub: 'Every island you finish adds a page with your words', mybookEmpty: 'Finish your first island to get the first page of your book!',
+      mybookRead: 'Read to me', mybookPage: 'Page {a} of {b}',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -2934,6 +2938,61 @@ const Kids = (() => {
     round();
   }
 
+  // ---------- my first English book: a page for every finished island ----------
+  // A cover with the child's name, then one page per finished island with the words they know there.
+  // "Read to me" reads the page ("I know cat, dog and bird!") and lights each word as it is said.
+  function myBook(page = 0) {
+    K.endLesson();
+    const me = Store.kidsProfiles.find(p => p.active) || {};
+    const pages = KIDS_THEMES.filter(th => Store.kidsHasSticker(th.id)).map(th => ({
+      th, words: th.words.filter(w => Store.kidsWordCount(w.id) > 0 && !/\s/.test(w.en)).slice(0, 8)
+    })).filter(p => p.words.length);
+    const total = pages.length + 1;
+    page = Math.max(0, Math.min(page, total - 1));
+    const list = ws => ws.length === 1 ? ws[0] : `${ws.slice(0, -1).join(', ')} and ${ws[ws.length - 1]}`;
+    let body;
+    if (page === 0) {
+      body = `
+        <div class="k-mb-page k-mb-cover">
+          <span class="k-mb-face" aria-hidden="true">${me.face || '🦉'}</span>
+          <h2 class="en" lang="en">My first English book</h2>
+          <p class="k-mb-by en" lang="en">by ${me.name && /^[A-Za-z]/.test(me.name) ? esc(me.name) : '<span aria-hidden="true">⭐</span> me <span aria-hidden="true">⭐</span>'}</p>
+          ${pages.length ? `<p class="k-mb-n">📄 ${pages.length}</p>` : `<p class="k-mb-empty">${kt('mybookEmpty')}</p>`}
+        </div>`;
+    } else {
+      const p = pages[page - 1];
+      body = `
+        <div class="k-mb-page" style="--c:${p.th.color}">
+          <p class="k-mb-title"><span aria-hidden="true">${p.th.pic}</span> <b class="en" lang="en">${p.th.title}</b></p>
+          <div class="k-mb-words">${p.words.map((w, i) => `<button class="k-mb-w" data-i="${i}" aria-label="${w.en}"><span aria-hidden="true">${w.pic}</span><b class="en" lang="en">${w.en}</b></button>`).join('')}</div>
+          <p class="k-mb-line en" lang="en">I know ${list(p.words.map(w => w.en))}!</p>
+        </div>`;
+    }
+    K.view.innerHTML = `
+      <div class="k-wrap k-mybook">
+        <a class="k-back" href="#/kids/stickers"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('album')}</a>
+        <h1 class="k-title">📘 ${kt('mybook')}</h1>
+        ${body}
+        <div class="k-mb-nav" dir="ltr">
+          <button class="k-btn ghost" id="k-mb-prev" ${page === 0 ? 'disabled' : ''} aria-label="previous">◀</button>
+          <span>${kt('mybookPage', { a: page + 1, b: total })}</span>
+          <button class="k-btn ghost" id="k-mb-next" ${page >= total - 1 ? 'disabled' : ''} aria-label="next">▶</button>
+        </div>
+        ${page > 0 ? `<button class="k-btn" id="k-mb-read">🔊 ${kt('mybookRead')}</button>` : ''}
+        ${owl(page === 0 ? kt('mybookSub') : kt('meetTip'), 'small')}
+      </div>`;
+    const go = n => { Sfx.flip ? Sfx.flip() : Sfx.tap(); myBook(n); };
+    $('#k-mb-prev').onclick = () => go(page - 1);
+    $('#k-mb-next').onclick = () => go(page + 1);
+    if (page === 0) { setTimeout(() => sayEn(`My first English book, by ${me.name && /^[A-Za-z]/.test(me.name) ? me.name : 'me'}!`, 0.9), 250); return; }
+    const p = pages[page - 1], btns = [...K.view.querySelectorAll('.k-mb-w')];
+    btns.forEach((b, i) => { b.onclick = () => { sayEn(p.words[i].en, 0.9); b.classList.remove('lit'); void b.offsetWidth; b.classList.add('lit'); }; });
+    $('#k-mb-read').onclick = () => {
+      sayEn('I know', 0.85);
+      btns.forEach((b, i) => setTimeout(() => { if (!b.isConnected) return; b.classList.add('lit'); sayEn(p.words[i].en, 0.9); setTimeout(() => b.classList.remove('lit'), 700); }, 900 + i * 1000));
+    };
+  }
+
   // ---------- songs & chants ----------
   // Each word gets a marimba note (a simple tune going up and down the scale) and is sung by the
   // voice at the same moment, with its picture lit up and bouncing. "Sing along" plays the same
@@ -4906,6 +4965,7 @@ const Kids = (() => {
         <a class="k-back" href="#/kids"><span aria-hidden="true">${isHe() ? '→' : '←'}</span> ${kt('map')}</a>
         <h1 class="k-title">🎁 ${kt('album')}</h1>
         <a class="k-btn" href="#/kids/scene">🎨 ${kt('scene')}</a>
+        <a class="k-btn ghost" href="#/kids/mybook">📘 ${kt('mybook')}</a>
         ${calendarHtml()}
         ${twinsHtml()}
         ${trophiesHtml()}
@@ -4988,6 +5048,7 @@ const Kids = (() => {
       else if (a === 'stories') stories();
       else if (a === 'path') pathStory();
       else if (a === 'riddles') riddles();
+      else if (a === 'mybook') myBook();
       else if (a === 'safari') safariGame();
       else if (a === 'tmap') tmapScreen();
       else if (a === 'band') bandGame();
