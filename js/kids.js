@@ -4105,7 +4105,7 @@ const Kids = (() => {
         <div class="k-wrap k-play">
           <p class="k-step"><span aria-hidden="true">🤗</span> ${kt('feelst')} · ${at + 1}/${rounds.length}</p>
           <div class="k-card k-page">
-            <div class="k-scene" aria-hidden="true">${r.scene}</div>
+            <div class="k-scene k-feel-scene" aria-hidden="true">${r.scene}</div>
             <p class="k-sentence en" lang="en">${r.en}</p>
             <p class="k-he he" lang="he">${r.he}</p>
           </div>
@@ -4131,6 +4131,8 @@ const Kids = (() => {
             setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 4200);
           } else {
             missed = true;
+            b.disabled = true;
+            b.classList.add('nope');
             K.Feel.wrong(b);
             owlMood('think');
             // the face appears as a hint: feelings are read in faces

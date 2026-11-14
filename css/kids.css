@@ -1748,3 +1748,5 @@ bdi.k-q { white-space: nowrap; }
 .k-copy-how { display: inline-block; margin-top: 6px; padding: 4px 12px; border-radius: 999px; background: #fff1c2; color: var(--k-ink); font-weight: 700; }
 button.k-ss-seat { border: 0; font-family: inherit; font-size: 2.6rem; cursor: pointer; }   /* stays absolutely placed on the plank, same size as the other seat */
 .k-ss-ear { position: absolute; top: -8px; inset-inline-start: -8px; font-size: 1rem; font-style: normal; background: #fff; border-radius: 50%; padding: 3px; box-shadow: 0 2px 0 var(--k-edge); }
+/* feelings stories: the scene on one line, so the faces to choose from stay on the screen */
+.k-feel-scene { font-size: clamp(2.2rem, 12vw, 3.4rem); white-space: nowrap; }
