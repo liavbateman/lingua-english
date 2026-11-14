@@ -4296,15 +4296,20 @@ const Kids = (() => {
           </div>
           <p class="k-tip">${kt('wxrSay')}</p>
           <div class="k-copy-row">
-            <button class="k-copy-btn" id="k-wxr-owl"><span aria-hidden="true">🦉</span><small>Owl</small></button>
+            <button class="k-copy-btn" id="k-wxr-owl"><span aria-hidden="true">🦉</span><small>${kt('copyOwl')}</small></button>
             ${canRecord() ? `<button class="k-mic" id="k-wxr-rec" aria-label="${kt('wxrSay')}"><span aria-hidden="true">🎤</span></button>` : ''}
             <button class="k-copy-btn" id="k-wxr-me" disabled><span aria-hidden="true">🙂</span><small>${kt('wxrMine')}</small></button>
           </div>
           <button class="k-btn" id="k-wxr-done">✅ ${kt('wxrDone')}</button>
+          <button class="k-btn ghost" id="k-wxr-again">${kt('again')} <span aria-hidden="true">🔁</span></button>
           ${owl(canRecord() ? kt('wxrTip') : kt('wxrSay'), 'small')}
         </div>`;
-      const owlSays = () => say([['en', hello], ['en', line]], 0.85);
+      // a silly mix (snow and hot, sun and cold...) makes the owl giggle - a joke the child made in English
+      const silly = (sky.id === 'snowy' && temp.id === 'hot') || (sky.id === 'sunny' && temp.id === 'cold');
+      if (silly) owlMood('giggle');
+      const owlSays = () => say([['en', hello], ['en', line], ...(silly ? [['en', 'Hee hee! What silly weather!']] : [])], 0.85);
       $('#k-wxr-owl').onclick = owlSays;
+      $('#k-wxr-again').onclick = () => { temp = null; pick(); };   // change the weather and report again
       setTimeout(owlSays, 300);
       const rec = $('#k-wxr-rec'), me = $('#k-wxr-me');
       if (rec) rec.onclick = () => recordClip(rec, url => {
