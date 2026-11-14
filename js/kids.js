@@ -479,6 +479,41 @@ const Kids = (() => {
     setTimeout(done, lines.length * 2500 + 2000);
   }
 
+  // Go on to the next round only when the voice has finished its line ("Yes! fox!" must not be cut off
+  // by the next question): wait at least `ms`, then while the voice is still talking (up to 6 s more).
+  function afterTalk(fn, ms) {
+    // (a voice is briefly "not speaking" between two queued lines, so it must be quiet twice in a row)
+    const until = Date.now() + ms + 6000;
+    let quiet = 0;
+    const talking = () => 'speechSynthesis' in window && (speechSynthesis.speaking || speechSynthesis.pending);
+    const check = () => {
+      quiet = talking() ? 0 : quiet + 1;
+      if (quiet < 2 && Date.now() < until) return setTimeout(check, 150);
+      fn();
+    };
+    setTimeout(check, ms);
+  }
+  // A word for a tapped thing (a letter tile, a shop item, a counted apple...). Quick taps queue up instead
+  // of cutting each other off, so every tapped thing is named in order; a tap still interrupts an
+  // instruction or a story line. A frantic flurry stops queueing after 4 waiting words.
+  let tapUntil = 0, tapWaiting = 0;
+  function sayTap(text, rate = 0.9) {
+    if (!('speechSynthesis' in window)) return;
+    if (!enVoice) voices();
+    const chaining = Date.now() < tapUntil;   // a tap right after another tap: queue (a just-queued word may not be "speaking" yet)
+    if (!chaining) { seqToken++; speechSynthesis.cancel(); tapWaiting = 0; }
+    if (tapWaiting >= 4) return;
+    const u = new SpeechSynthesisUtterance(spoken(text));
+    u.lang = 'en-US';
+    if (enVoice) u.voice = enVoice;
+    u.rate = rate * voiceRate() * (isNight() ? .85 : 1);
+    u.pitch = 1.1;
+    tapWaiting++;
+    u.onend = u.onerror = () => { tapWaiting = Math.max(0, tapWaiting - 1); };
+    speechSynthesis.speak(u);
+    tapUntil = Date.now() + 1500;
+  }
+
   // A soft "pop" for a balloon: a short falling tone and a puff of noise (quiet; silence is fine too)
   let actx = null;
   function popSound() {
@@ -1030,7 +1065,7 @@ const Kids = (() => {
             $('.k-bubble').textContent = after > before ? `${PLANT[after]} ${pickOne(kt('great'))}` : pickOne(kt('great'));
             owlMood('cheer');
             sayEn(w.en);
-            setTimeout(() => { at++; at < due.length ? round() : end(); }, 1200);
+            afterTalk(() => { at++; at < due.length ? round() : end(); }, 1200);
           } else {
             if (!missed) Store.kidsWordMiss(w.id);   // (was r.w.id: no r here, every wrong tap threw an error)
             missed = true;
@@ -1111,7 +1146,7 @@ const Kids = (() => {
             owlMood('cheer');
             sayEn(`Yes! ${r.w.en}!`);   // not "I am a…": that breaks for apple, shoes, rain
             $('.k-riddle-q').textContent = r.w.pic;
-            setTimeout(() => { at++; at < set.length ? round() : end(); }, 2200);
+            afterTalk(() => { at++; at < set.length ? round() : end(); }, 2200);
           } else {
             if (!missed) Store.kidsWordMiss(r.w.id);
             missed = true;
@@ -1203,7 +1238,7 @@ const Kids = (() => {
       b.onclick = () => {
         brush = b.dataset.c;
         K.view.querySelectorAll('.k-paint-pot').forEach(x => x.classList.toggle('on', x === b));
-        sayEn(brush, 0.9);
+        sayTap(brush, 0.9);
       };
     });
     const paint = g => {
@@ -1279,7 +1314,7 @@ const Kids = (() => {
             owlMood('cheer');
             $('.k-bubble').textContent = pickOne(kt('great'));
             sayEn(w.en);
-            setTimeout(() => { at++; at < tricky.length ? round() : end(); }, 1200);
+            afterTalk(() => { at++; at < tricky.length ? round() : end(); }, 1200);
           } else {
             if (!missed) Store.kidsWordMiss(w.id);
             missed = true;
@@ -1346,7 +1381,7 @@ const Kids = (() => {
             owlMood('cheer');
             $('.k-bubble').textContent = `${w.pic} ${w.en}!`;
             sayEn(w.en, 0.8);
-            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 1400);
+            afterTalk(() => { at++; at < rounds.length ? round() : end(); }, 1400);
           } else {
             missed = true;
             b.disabled = true;
@@ -1443,7 +1478,7 @@ const Kids = (() => {
             $('.k-bubble').textContent = `${'⭐'.repeat(got)} ${w.en}!`;
             if (w.move) $('.k-peek-pic').classList.add('mv', 'mv-' + w.move);
             sayEn(w.en);
-            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 1700);
+            afterTalk(() => { at++; at < rounds.length ? round() : end(); }, 1700);
           } else {
             b.disabled = true;
             b.classList.add('nope');
@@ -1624,7 +1659,7 @@ const Kids = (() => {
             owlMood('cheer');
             $('.k-bubble').innerHTML = `<bdi class="k-q" dir="ltr" lang="en">${w.en.split('').join(' – ')} → ${w.en}!</bdi>`;
             sayEn(w.en, 0.8);
-            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 1600);
+            afterTalk(() => { at++; at < rounds.length ? round() : end(); }, 1600);
           } else {
             missed = true;
             b.disabled = true;
@@ -1817,7 +1852,7 @@ const Kids = (() => {
           if (basket.length >= 4) return;
           const w = shelf[+b.dataset.i];
           basket.push(w);
-          sayEn(w.en, 1);
+          sayTap(w.en, 1);
           Sfx.tap();
           showBasket();
         };
@@ -1844,7 +1879,7 @@ const Kids = (() => {
             $('.k-customer-says').textContent = 'Thank you! 💰';
             $('.k-customer').classList.add('happy');
             say([['en', 'Thank you! Bye bye!']]);
-            setTimeout(() => { at++; at < customers.length ? round() : end(); }, 1700);
+            afterTalk(() => { at++; at < customers.length ? round() : end(); }, 1700);
           } else {
             missed = true;
             K.Feel.wrong($('.k-basket'));
@@ -1927,7 +1962,7 @@ const Kids = (() => {
             t.used = true;
             slots[free] = t;
             Sfx.tap();
-            sayEn(KIDS_ABC.find(x => x.L === t.c.toUpperCase()).name, 1);
+            sayTap(KIDS_ABC.find(x => x.L === t.c.toUpperCase()).name, 1);
             draw();
             if (!slots.includes(null)) check();
           };
@@ -1944,7 +1979,7 @@ const Kids = (() => {
           $('#k-slots').classList.add('right');
           $('.k-bubble').innerHTML = `<bdi class="k-q" dir="ltr" lang="en">${w.en.toUpperCase().split('').join('-')}: ${w.en}! ${w.pic}</bdi>`;
           say([['en', w.en.split('').map(c => KIDS_ABC.find(x => x.L === c.toUpperCase()).name).join(', ') + '.'], ['en', w.en + '!']], 0.9);
-          setTimeout(() => { at++; at < words.length ? round() : end(); }, 2600);
+          afterTalk(() => { at++; at < words.length ? round() : end(); }, 2600);
           return;
         }
         tries++;
@@ -2034,7 +2069,7 @@ const Kids = (() => {
             owlMood('cheer');
             $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${s.id}!</bdi> · ${s.he}`;
             say([['en', `Yes! ${line}`]]);
-            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 2000);
+            afterTalk(() => { at++; at < rounds.length ? round() : end(); }, 2000);
           } else {
             missed = true;
             b.classList.remove('puff'); void b.offsetWidth; b.classList.add('puff');
@@ -2105,7 +2140,7 @@ const Kids = (() => {
         owlMood('cheer');
         sayEn(pickOne(['Great!', 'Super!', 'Well done!', 'Yes!']), 1);
         at++;
-        setTimeout(() => (at < cmds.length ? round() : end()), 700);
+        afterTalk(() => (at < cmds.length ? round() : end()), 700);
       };
     }
     function end() {
@@ -2173,7 +2208,7 @@ const Kids = (() => {
             b.classList.add('in');
             found++;
             K.Feel.right();
-            sayEn(x.w.en, 0.85);
+            sayTap(x.w.en, 0.85);
             $('#k-fam-in').insertAdjacentHTML('beforeend', `<i aria-label="${x.w.en}">${x.w.pic}</i>`);
             $('#k-fam-left').textContent = kt('famLeft', { n: 3 - found });
             if (found === 3) {
@@ -2181,7 +2216,7 @@ const Kids = (() => {
               owlMood('cheer');
               $('.k-bubble').innerHTML = `<bdi class="k-q" dir="ltr" lang="en">${right.map(w => w.en).join(', ')}: ${f.en}!</bdi>`;
               setTimeout(() => say([['en', `Yes! ${right.map(w => w.en).join(', ')}. All ${f.en}!`]], 0.85), 900);
-              setTimeout(() => { at++; at < fams.length ? round() : end(); }, 3600);
+              afterTalk(() => { at++; at < fams.length ? round() : end(); }, 3600);
             }
           } else {
             if (!x.missed) { x.missed = true; misses++; }   // the same picture twice is one mistake
@@ -2189,7 +2224,7 @@ const Kids = (() => {
             K.Feel.wrong(b);
             owlMood('think');
             $('.k-bubble').innerHTML = `<bdi class="k-q" dir="ltr" lang="en">${x.w.en}?</bdi> ${kt('tryAgain')}`;
-            sayEn(x.w.en, 0.85);
+            sayTap(x.w.en, 0.85);
           }
         };
       });
@@ -2260,7 +2295,7 @@ const Kids = (() => {
           $('.k-mon-say').textContent = `Yum! ${w.en}!`;
           $('.k-bubble').textContent = `${w.en} · ${w.he} 😋`;
           setTimeout(() => say([['en', `Yum yum! ${w.en}! Thank you!`]], 0.9), 450);
-          setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 2300);
+          afterTalk(() => { at++; at < rounds.length ? round() : end(); }, 2300);
         } else {
           if (!missed) Store.kidsWordMiss(w.id);
           missed = true;
@@ -2367,7 +2402,7 @@ const Kids = (() => {
             $('.k-rh-main').classList.add('rhymed');
             $('.k-bubble').innerHTML = `<bdi dir="ltr">${a.en} - ${b.en}!</bdi> 🎶`;
             say([['en', `${a.en}, ${b.en}! They rhyme!`]], 0.8);
-            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 2600);
+            afterTalk(() => { at++; at < rounds.length ? round() : end(); }, 2600);
           } else {
             missed = true;
             btn.disabled = true;
@@ -2445,7 +2480,7 @@ const Kids = (() => {
             owlMood('cheer');
             $('.k-bubble').textContent = `${it.en} · ${it.he} ✓`;
             say([['en', `Yes! ${it.en}! Thank you!`]], 0.9);
-            setTimeout(() => { at++; at < steps.length ? round() : end(); }, 2000);
+            afterTalk(() => { at++; at < steps.length ? round() : end(); }, 2000);
           } else {
             missed = true;
             btn.disabled = true;
@@ -2640,7 +2675,7 @@ const Kids = (() => {
     }
     function next(ok) {
       if (ok) firstTry++;
-      setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 1900);
+      afterTalk(() => { at++; at < rounds.length ? round() : end(); }, 1900);
     }
     // How many apples?
     function howRound({ t, n }) {
@@ -2671,7 +2706,7 @@ const Kids = (() => {
           counted++;
           el.classList.add('done');
           el.querySelector('b').textContent = counted;
-          sayEn(NUMS[counted - 1], 1);
+          sayTap(NUMS[counted - 1], 1);
         };
       });
       K.view.querySelectorAll('.k-opt').forEach(b => {
@@ -2730,7 +2765,7 @@ const Kids = (() => {
           it.onclick = () => { it.remove(); el.classList.remove('gone'); refresh(); Sfx.tap(); };
           $('#k-in').appendChild(it);
           refresh();
-          sayEn(NUMS[inBasket().length - 1] || String(inBasket().length), 1);
+          sayTap(NUMS[inBasket().length - 1] || String(inBasket().length), 1);
         };
       });
       $('#k-done').onclick = () => {
@@ -2888,7 +2923,7 @@ const Kids = (() => {
           owlMood('cheer');
           $('.k-bubble').textContent = `${part.id} · ${part.he} ✓`;
           say([['en', `Hee hee! My ${part.id}!`]], 0.95);
-          setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 1900);
+          afterTalk(() => { at++; at < rounds.length ? round() : end(); }, 1900);
         } else {
           missed = true;
           g.classList.add('nope');
@@ -3285,7 +3320,7 @@ const Kids = (() => {
             owlMood('cheer');
             $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">The ${a.en} says ${a.says}!</bdi>`;
             say([['en', `Yes! The ${a.en} says ${a.says}!`]], 0.9);
-            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 2200);
+            afterTalk(() => { at++; at < rounds.length ? round() : end(); }, 2200);
           } else {
             missed = true;
             b.disabled = true;
@@ -3422,7 +3457,7 @@ const Kids = (() => {
             if (found === need) {
               K.view.querySelectorAll('.k-sh-thing').forEach(y => { y.disabled = true; });
               owlMood('cheer');
-              setTimeout(() => { at++; at < order.length ? round() : end(); }, 2200);
+              afterTalk(() => { at++; at < order.length ? round() : end(); }, 2200);
             }
           } else {
             misses++;
@@ -3716,7 +3751,7 @@ const Kids = (() => {
             owlMood('cheer');
             $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${a.en} - ${b.en}</bdi> · ${a.he} - ${b.he}`;
             say([['en', `${a.en[0].toUpperCase() + a.en.slice(1)} and ${b.en}! Opposites!`]], 0.85);
-            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 2600);
+            afterTalk(() => { at++; at < rounds.length ? round() : end(); }, 2600);
           } else {
             missed = true;
             btn.disabled = true;
@@ -3793,7 +3828,7 @@ const Kids = (() => {
             owlMood('cheer');
             $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${want.en}</bdi> · ${want.he}`;
             sayEn(line(done.length - 1), 0.85);
-            setTimeout(() => (done.length < steps.length ? round() : end()), 2200);
+            afterTalk(() => (done.length < steps.length ? round() : end()), 2200);
           } else {
             missesAll++;
             btn.disabled = true;   // one mistake per picture
@@ -4080,7 +4115,7 @@ const Kids = (() => {
       b.onclick = () => {
         brush = b.dataset.c;
         K.view.querySelectorAll('.k-cbw-pot').forEach(x => x.classList.toggle('picked', x === b));
-        sayEn(brush, 0.9);
+        sayTap(brush, 0.9);
       };
     });
     const paint = g => {
@@ -4176,7 +4211,7 @@ const Kids = (() => {
             $('.k-tip').innerHTML = `<b>The ${who} is ${r.feel}.</b> <span aria-hidden="true">${r.kpic}</span> ${r.kind}`;
             $('.k-bubble').textContent = `${r.kindHe} ${r.kpic}`;
             say([['en', `Yes. The ${who} is ${r.feel}.`], ['en', r.kind]], 0.85);
-            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 4200);
+            afterTalk(() => { at++; at < rounds.length ? round() : end(); }, 4200);
           } else {
             missed = true;
             b.disabled = true;
@@ -4264,7 +4299,7 @@ const Kids = (() => {
             pizza.insertAdjacentHTML('beforeend', `<span class="k-pz-piece" style="left:${50 + Math.cos(a) * r}%;top:${50 + Math.sin(a) * r}%">${t.pic}</span>`);
           }
           popSound();
-          sayEn(t.en, 0.9);
+          sayTap(t.en, 0.9);
           $('.k-bubble').innerHTML = `<bdi dir="ltr" lang="en">${t.en}</bdi> · ${t.he} ✓`;
           if (on.size === order.length) {
             K.view.querySelectorAll('.k-pizza-top').forEach(x => { x.disabled = true; });
@@ -4273,7 +4308,7 @@ const Kids = (() => {
               K.Feel.right();
               owlMood('cheer');
               say([['en', `Into the oven! Yum! A ${list(order)} pizza!`]], 0.9);
-              setTimeout(() => { at++; at < orders.length ? round() : end(); }, 3000);
+              afterTalk(() => { at++; at < orders.length ? round() : end(); }, 3000);
             }, 700);
           }
         };
@@ -4609,7 +4644,7 @@ const Kids = (() => {
             $('.k-odd-why').textContent = why;
             $('.k-bubble').textContent = `${fam.pic} ${fam.he}`;
             say([['en', why]], 0.85);
-            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 4200);
+            afterTalk(() => { at++; at < rounds.length ? round() : end(); }, 4200);
           } else {
             missed = true;
             b.disabled = true;
@@ -4675,7 +4710,7 @@ const Kids = (() => {
             b.classList.add('taken');
             K.Feel.right();
             Store.kidsWordRight(w.id);
-            sayEn(w.en, 0.9);
+            sayTap(w.en, 0.9);
             $('#k-sl-in').insertAdjacentHTML('beforeend', `<i>${w.pic}</i>`);
             // tick the list as it fills
             const slots = K.view.querySelectorAll('#k-paper span');
@@ -4684,7 +4719,7 @@ const Kids = (() => {
               K.view.querySelectorAll('.k-shelf-item').forEach(x => { x.disabled = true; });
               owlMood('cheer');
               say([['en', `Yes! ${list(want.map(x => x.en))}. Thank you!`]], 0.85);
-              setTimeout(() => { at++; at < sizes.length ? round() : end(); }, 2600);
+              afterTalk(() => { at++; at < sizes.length ? round() : end(); }, 2600);
             }
           } else if (!want.includes(w)) {
             misses++;
@@ -5008,8 +5043,15 @@ const Kids = (() => {
       const parts = ws.map(w => w.replace(/[.]$/, ''));
       const text = (punct ? parts.join(' ') : parts.join(', ')).replace(/[,]?$/, '') + (/[!?]$/.test(parts[parts.length - 1]) ? '' : '!');
       // where each word starts inside the text, to match boundary events to notes
+      // search the bare word: the sung text may end a word differently ("hello," is sung as "hello!"),
+      // and a failed search used to light the NEXT note on the first word of the line
       let at = 0;
-      const starts = parts.map(w => { const i = text.indexOf(w, at); at = i + w.length; return i; });
+      const starts = parts.map(w => {
+        const bare = w.replace(/[^A-Za-z0-9']/g, '');
+        const i = text.indexOf(bare, at), pos = i < 0 ? at : i;
+        at = pos + bare.length;
+        return pos;
+      });
       const first = lineOf.indexOf(r);
       return { text, starts, first, count: line.length };
     });
@@ -5051,12 +5093,18 @@ const Kids = (() => {
         };
         u.onstart = () => {
           show(0);
-          // no word events from this voice? light the words on a steady beat instead
+          // no word events from this voice? light the words on a steady beat instead - but only once a whole
+          // second has passed without any (a voice that is slow to send its FIRST word event used to be
+          // overtaken by the beat, and the line stayed one word ahead)
           const step = (sg.id === 'abc' ? 520 : 620) / u.rate * 0.8;
           let i = 1;
-          timer = setInterval(() => { if (gotBoundary || ended) return clearInterval(timer); show(i++); if (i >= L.count) clearInterval(timer); }, step);
+          timer = setTimeout(() => {
+            if (gotBoundary || ended) return;
+            show(i++);
+            timer = setInterval(() => { if (gotBoundary || ended) return clearInterval(timer); show(i++); if (i >= L.count) clearInterval(timer); }, step);
+          }, Math.max(1000, step));
         };
-        const next = () => { if (ended) return; ended = true; clearInterval(timer); show(L.count - 1); r++; setTimeout(sing, 380); };
+        const next = () => { if (ended) return; ended = true; clearInterval(timer); clearTimeout(timer); show(L.count - 1); r++; setTimeout(sing, 380); };
         u.onend = next;
         u.onerror = next;
         // safety net if a voice never answers
@@ -6829,7 +6877,7 @@ const Kids = (() => {
             $('.k-bubble').textContent = kt('isFor', { L: x.L, word: x.word });
             owlMood('cheer');
             sayLetter(x);
-            setTimeout(() => { at++; at < rounds.length ? round() : end(); }, 2200);
+            afterTalk(() => { at++; at < rounds.length ? round() : end(); }, 2200);
           } else {
             missed = true;
             b.disabled = true;
