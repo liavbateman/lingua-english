@@ -39,6 +39,8 @@ const Kids = (() => {
       garden: 'הגינה שלי', gardenSub: 'כל מילה שלמדתם היא צמח. השקו אותו כדי שיגדל!', thirsty: '💧 {n} צמאים',
       gardenEmpty: 'הגינה עוד ריקה. שחקו באי, וכל מילה שתלמדו תהפוך לצמח!', water: 'להשקות את הגינה', allWet: 'כל הצמחים שתו! חזרו מחר',
       watered: 'הגינה שתתה!', grew: '{n} צמחים גדלו',
+      drag: 'גררו את המילה לתמונה', dragTip: 'גררו כל מילה לתמונה שלה (או לחצו על מילה ואז על התמונה)',
+      sayDrag: 'גררו כל מילה לתמונה שלה',
       sayFind: 'איפה', sayMeet: 'בואו נכיר מילים חדשות', sayMatch: 'מצאו את הזוגות'
     },
     en: {
@@ -71,6 +73,8 @@ const Kids = (() => {
       garden: 'My garden', gardenSub: 'Every word you learned is a plant. Water it so it grows!', thirsty: '💧 {n} thirsty',
       gardenEmpty: 'The garden is empty for now. Play an island and every word you learn becomes a plant!', water: 'Water the garden', allWet: 'Every plant had a drink! Come back tomorrow',
       watered: 'The garden had a drink!', grew: '{n} plants grew',
+      drag: 'Drag the word to its picture', dragTip: 'Drag each word onto its picture (or tap a word, then the picture)',
+      sayDrag: 'Drag each word to its picture',
       sayFind: 'Find the', sayMeet: "Let's meet new words", sayMatch: 'Find the pairs'
     }
   };
@@ -669,7 +673,8 @@ const Kids = (() => {
       ...words.map(w => ({ kind: 'meet', w })),
       ...order.slice(0, half).map(w => ({ kind: 'tap', w })),
       ...order.slice(half).map(w => ({ kind: 'pop', w })),
-      ...(Rec() ? K.shuffle(words).slice(0, 3).map(w => ({ kind: 'say', w })) : []),
+      { kind: 'drag' },
+      ...(Rec() ? K.shuffle(words).slice(0, 2).map(w => ({ kind: 'say', w })) : []),
       { kind: 'match' }
     ];
     let at = 0, firstTry = 0, tapped = 0;
@@ -684,6 +689,7 @@ const Kids = (() => {
       else if (s.kind === 'tap') tap(s.w);
       else if (s.kind === 'pop') pop(s.w);
       else if (s.kind === 'say') sayIt(s.w);
+      else if (s.kind === 'drag') drag();
       else match();
     }
 
@@ -876,6 +882,90 @@ const Kids = (() => {
         };
         try { r.start(); } catch (err) { rec = null; mic.classList.remove('on'); }
       };
+    }
+
+    // Drag the word: 3 pictures as targets, 3 word chips to drag onto them. A wrong drop floats back.
+    // Tapping a word and then a picture does the same, for small fingers and for screen readers.
+    function drag() {
+      const set = K.shuffle(words).slice(0, 3), chips = K.shuffle(set);
+      let picked = null, placed = 0;
+      K.view.innerHTML = `
+        <div class="k-wrap k-play">
+          <p class="k-step"><span aria-hidden="true">✋</span> ${kt('drag')}</p>
+          <div class="k-targets">
+            ${set.map((w, i) => `<button class="k-target-pic" data-i="${i}" aria-label="${w.he}"><span aria-hidden="true">${w.pic}</span><b class="en"></b></button>`).join('')}
+          </div>
+          <div class="k-chips-row">
+            ${chips.map((w, i) => `<button class="k-chip-word en" data-w="${set.indexOf(w)}">${w.en}</button>`).join('')}
+          </div>
+          ${owl(kt('dragTip'), 'small')}
+        </div>`;
+      say([['he', kt('sayDrag')]]);
+      const targets = [...K.view.querySelectorAll('.k-target-pic')];
+      const drop = (chip, target) => {
+        const w = set[+chip.dataset.w];
+        if (target && +target.dataset.i === +chip.dataset.w) {
+          chip.classList.add('gone');
+          chip.disabled = true;
+          target.classList.add('right', 'filled');
+          target.querySelector('b').textContent = w.en;
+          target.disabled = true;
+          K.Feel.right();
+          sayEn(w.en);
+          if (!chip.dataset.missed) { firstTry++; Store.kidsWordRight(w.id); }
+          tapped++;
+          if (++placed === set.length) {
+            $('.k-bubble').textContent = pickOne(kt('great'));
+            $('.k-owl').classList.add('happy');
+            setTimeout(nextStep, 1300);
+          }
+        } else if (target) {
+          chip.dataset.missed = '1';
+          K.Feel.wrong(target);
+          $('.k-bubble').textContent = kt('tryAgain');
+        }
+        chip.classList.remove('picked');
+        picked = null;
+      };
+      K.view.querySelectorAll('.k-chip-word').forEach(chip => {
+        // tap: pick the word (and hear it), then tap a picture
+        chip.onclick = () => {
+          if (chip.dataset.dragged) { delete chip.dataset.dragged; return; }
+          K.view.querySelectorAll('.k-chip-word').forEach(c => c.classList.remove('picked'));
+          picked = chip;
+          chip.classList.add('picked');
+          sayEn(set[+chip.dataset.w].en);
+        };
+        // drag with a finger or the mouse
+        chip.onpointerdown = e => {
+          if (chip.disabled) return;
+          const sx = e.clientX, sy = e.clientY;
+          let moving = false;
+          const move = ev => {
+            const dx = ev.clientX - sx, dy = ev.clientY - sy;
+            if (!moving && Math.hypot(dx, dy) < 8) return;
+            if (!moving) { moving = true; chip.classList.add('dragging'); sayEn(set[+chip.dataset.w].en); }
+            chip.style.transform = `translate(${dx}px, ${dy}px) scale(1.08)`;
+            targets.forEach(t => t.classList.toggle('over', !t.disabled && hit(t, ev)));
+          };
+          const up = ev => {
+            document.removeEventListener('pointermove', move);
+            document.removeEventListener('pointerup', up);
+            document.removeEventListener('pointercancel', up);
+            targets.forEach(t => t.classList.remove('over'));
+            chip.classList.remove('dragging');
+            chip.style.transform = '';
+            if (!moving) return;
+            chip.dataset.dragged = '1';   // the click that follows a drag is not a tap
+            drop(chip, targets.find(t => !t.disabled && hit(t, ev)));
+          };
+          document.addEventListener('pointermove', move);
+          document.addEventListener('pointerup', up);
+          document.addEventListener('pointercancel', up);
+        };
+      });
+      const hit = (el, ev) => { const r = el.getBoundingClientRect(); return ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom; };
+      targets.forEach(t => { t.onclick = () => { if (picked) drop(picked, t); else sayEn(set[+t.dataset.i].en); }; });
     }
 
     // Memory game: 4 pairs, each a picture card and a word card, face down

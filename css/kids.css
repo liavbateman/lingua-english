@@ -430,3 +430,26 @@ a.k-btn { text-decoration: none; text-align: center; }
 .k-drop { position: absolute; top: -6px; inset-inline-end: 2px; font-size: 1rem; font-style: normal; animation: k-float 1.8s ease-in-out infinite; }
 .k-plant.grew .k-plant-grow { animation: k-sprout .7s var(--ease-pop) both; }
 @keyframes k-sprout { from { transform: scale(.2); } to { transform: none; } }
+
+/* drag the word onto its picture */
+.k-targets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.k-target-pic {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 130px; padding: 10px 4px;
+  border: 3px dashed rgba(29, 42, 91, .2); border-radius: 26px; background: #fff; cursor: pointer; font-size: 3.4rem; line-height: 1;
+  box-shadow: 0 6px 0 var(--k-edge); transition: transform var(--dur-quick), border-color var(--dur-quick), background var(--dur-quick);
+}
+.k-target-pic b { min-height: 1.3em; font: 700 1.05rem var(--k-font); color: #1d9a6b; }
+.k-target-pic.over { border-color: var(--kc, #3fa7ff); background: #eef7ff; transform: scale(1.05); }
+.k-target-pic.filled { border-style: solid; border-color: #2fd093; background: #d8fbe9; }
+.k-target-pic:disabled { cursor: default; }
+.k-chips-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 26px; }
+.k-chip-word {
+  padding: 14px 20px; border: 0; border-radius: 18px; background: var(--kc, #3fa7ff); color: #fff; font: 700 1.35rem var(--k-font);
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--kc, #3fa7ff) 60%, #13235a); cursor: grab; touch-action: none; position: relative; z-index: 1;
+  transition: opacity var(--dur-ui), box-shadow var(--dur-press);
+}
+.k-chip-word.dragging { z-index: 5; cursor: grabbing; box-shadow: 0 12px 24px rgba(20, 60, 140, .3); transition: none; }
+.k-chip-word.picked { outline: 4px solid #fff; outline-offset: 3px; }
+.k-chip-word.gone { opacity: 0; pointer-events: none; }
+.k-chip-word:not(.dragging) { transition: transform .25s var(--ease-pop), opacity var(--dur-ui); }
+.k-target-pic:disabled { opacity: 1; color: inherit; }
