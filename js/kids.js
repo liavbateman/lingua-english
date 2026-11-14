@@ -2133,16 +2133,16 @@ const Kids = (() => {
             if (found === 3) {
               K.view.querySelectorAll('.k-fam-pic').forEach(y => { y.disabled = true; });
               owlMood('cheer');
-              $('.k-bubble').textContent = `${right.map(w => w.en).join(', ')}: ${f.en}!`;
+              $('.k-bubble').innerHTML = `<bdi class="k-q" dir="ltr" lang="en">${right.map(w => w.en).join(', ')}: ${f.en}!</bdi>`;
               setTimeout(() => say([['en', `Yes! ${right.map(w => w.en).join(', ')}. All ${f.en}!`]], 0.85), 900);
               setTimeout(() => { at++; at < fams.length ? round() : end(); }, 3600);
             }
           } else {
-            misses++;
+            if (!x.missed) { x.missed = true; misses++; }   // the same picture twice is one mistake
             b.classList.remove('puff'); void b.offsetWidth; b.classList.add('puff');
             K.Feel.wrong(b);
             owlMood('think');
-            $('.k-bubble').textContent = `${x.w.en}? ${kt('tryAgain')}`;
+            $('.k-bubble').innerHTML = `<bdi class="k-q" dir="ltr" lang="en">${x.w.en}?</bdi> ${kt('tryAgain')}`;
             sayEn(x.w.en, 0.85);
           }
         };
